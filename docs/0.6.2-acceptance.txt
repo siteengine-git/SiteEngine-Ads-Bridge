@@ -1,0 +1,371 @@
+SiteEngine Ads Bridge 0.6.2 acceptance
+Local PHP: 8.3.6
+PHP lint: PASS (22 files)
+No live WordPress, CRM, Sheet or Ads writes were performed.
+
+=== config-settings-acceptance.php ===
+PASS: settings option is the active authority
+PASS: plugin-owned client slug comes from Ads Bridge settings
+PASS: Business Name is overlaid from Base
+PASS: Timezone is overlaid from Base
+PASS: Currency is overlaid from Base
+PASS: Google Ads CID is overlaid from Base
+PASS: Base provenance is reported
+PASS: plugin-owned settings provenance is reported
+PASS: form ID remains plugin-owned
+PASS: complete settings-mode config validates
+
+SUMMARY: 10 PASS, 0 FAIL
+
+=== inquiry-acceptance.php ===
+PASS: existing current inquiry adopts successfully
+PASS: adoption freezes canonical pre-repeat transaction ID
+PASS: adopted row is active and preserves Won lifecycle
+PASS: adoption preserves prior revenue and close date
+PASS: adoption retry is idempotent
+PASS: adoption fails closed on unresolved existing submission_id
+PASS: later contact submission overwrite cannot rebind adopted inquiry
+PASS: repeat inquiry prepare succeeds against adopted previous inquiry
+PASS: new inquiry is prepared with its own immutable form binding
+PASS: prepare retry is idempotent
+PASS: repeat prepare refuses mutable legacy snapshot when previous inquiry was not adopted
+PASS: activation commits after CRM Ops head activation
+PASS: previous inquiry archives without attribution mutation
+PASS: new inquiry activates as New with new immutable transaction
+PASS: current contact projection resets inquiry-specific Ads fields
+PASS: activation makes New the sole lifecycle tag
+PASS: activation retry is idempotent
+PASS: active inquiry mirrors current lifecycle milestone
+PASS: active sync never rebinds immutable transaction from contact submission_id
+PASS: qualified candidate selection preserves both archived and active reached stages
+PASS: archived prior Won inquiry remains export candidate
+PASS: resolver preserves independent canonical transaction IDs across repeat inquiries
+PASS: test double preserves blanks with deleteOtherValues=false, matching installed FluentCRM
+PASS: test double deletes only supplied blank keys with deleteOtherValues=true
+PASS: activation deletes all old inquiry milestones, revenue, reason and export status
+PASS: reset preserves CRM Ops identity, unrelated fields and consent while projecting the new submission
+PASS: reset preserves non-lifecycle tags
+PASS: real lifecycle hooks do not restamp or erase the previous inquiry during reset
+PASS: lifecycle compliance resumes after activation completes
+PASS: silent field-write failure cannot receive a committed acknowledgment
+PASS: failed field reset does not archive old history or activate the new inquiry
+PASS: request guard releases but pending activation still blocks old-history synchronization
+PASS: same activation can complete after the field persistence failure is repaired
+PASS: silent lifecycle-tag failure cannot receive a committed acknowledgment
+PASS: pending activation prevents later lifecycle callbacks from restoring old Won milestones
+PASS: pending activation keeps prior revenue intact across later callbacks
+PASS: same activation can complete after the tag persistence failure is repaired
+PASS: projection exception returns retry and always releases the request guard
+PASS: same activation resumes after a projection exception
+PASS: missing lifecycle tag is detected before any reset field write
+PASS: activation also clears configured lifecycle/revenue field aliases
+PASS: activation marker must persist before any CRM reset begins
+PASS: invalid reset field mapping cannot overwrite the canonical submission binding
+
+SUMMARY: 43 PASS, 0 FAIL
+
+=== inquiry-transition-acceptance.php ===
+PASS: stale prepare version cannot reserve or reset the contact
+PASS: a second request cannot prepare a competing inquiry for the same head
+PASS: the matching prepare retry retains its own reservation
+PASS: invalid or nonconsecutive activation version is rejected: 0
+PASS: invalid or nonconsecutive activation version is rejected: -1
+PASS: invalid or nonconsecutive activation version is rejected: 1
+PASS: invalid or nonconsecutive activation version is rejected: 3
+PASS: invalid or nonconsecutive activation version is rejected: 2
+PASS: invalid or nonconsecutive activation version is rejected: "2.0"
+PASS: invalid or nonconsecutive activation version is rejected: "2e0"
+PASS: invalid or nonconsecutive activation version is rejected: true
+PASS: invalid or nonconsecutive activation version is rejected: "9223372036854775807999"
+PASS: prepare rejects a noninteger, negative or overflowing version: 1
+PASS: prepare rejects a noninteger, negative or overflowing version: "1.0"
+PASS: prepare rejects a noninteger, negative or overflowing version: true
+PASS: prepare rejects a noninteger, negative or overflowing version: -1
+PASS: prepare rejects a noninteger, negative or overflowing version: "9223372036854775807999"
+PASS: activation must match the site identity used to prepare
+PASS: correlation identifiers cannot change identity through surrounding whitespace
+PASS: oversized event identities are rejected before database truncation can break retries
+PASS: valid head version advances from one to two
+PASS: prepare replay after activation reports committed rather than authorizing a second head activation
+PASS: a later inquiry advances from two to three
+PASS: replaying an archived activation never resets or reopens the current inquiry
+PASS: historical prepare replay exposes the archived completed state
+PASS: activation rechecks the current persisted head version before projection
+PASS: lock contention prevents activation from touching the contact
+PASS: history mirroring also honors the contact lock
+PASS: unavailable database locks fail closed
+PASS: lost session lock is detected before the transition writes
+PASS: a callback cannot reenter the same contact transition
+PASS: completed transitions release their database locks
+PASS: nontransactional storage is rejected before the CRM reset
+PASS: failed START TRANSACTION cannot acknowledge an inquiry switch
+PASS: same activation retries after START TRANSACTION failure without duplicate inquiry rows
+PASS: failed COMMIT cannot acknowledge an inquiry switch
+PASS: same activation retries after COMMIT failure without duplicate inquiry rows
+PASS: zero-row fail_archive write rolls back both inquiry pointers
+PASS: retry succeeds after fail_archive is repaired
+PASS: zero-row fail_activate write rolls back both inquiry pointers
+PASS: retry succeeds after fail_activate is repaired
+PASS: projection exceptions release the contact lock
+PASS: a subsequent call can reacquire the contact lock after an exception
+PASS: an unconfirmed lock release closes the connection and withholds success
+PASS: a fresh-request retry recovers the durable commit without resetting again
+PASS: a contact without inquiry history prepares its initial version-zero head
+PASS: adoption cannot replace an initial inquiry already reserved by prepare
+PASS: the initial activation creates version one
+PASS: unconfirmed rollback closes the failed database session and releases its locks
+PASS: a request with an unconfirmed rollback cannot start another transition
+
+SUMMARY: 50 PASS, 0 FAIL
+
+=== lifecycle-acceptance.php ===
+PASS: new-contact Fluent Forms lifecycle hook is registered
+PASS: lifecycle tag hook is registered
+PASS: post-custom-field reconciliation hook is registered
+PASS: canonical Unqualified Reason values are locked
+PASS: configured master form seeds the New lifecycle tag by ID
+PASS: Qualified automatically stamps qualified_at
+PASS: Qualified removes competing lifecycle tags
+PASS: Unqualified automatically stamps unqualified_at
+PASS: Unqualified clears a stale Qualified milestone before export
+PASS: plugin does not invent an Unqualified Reason
+PASS: direct New-to-Won automatically preserves the Qualified milestone
+PASS: Won automatically stamps closed_date when blank
+PASS: plugin never invents invoice revenue
+PASS: existing milestone dates are never overwritten
+PASS: existing invoice amount is untouched
+PASS: Won remains terminal when a lower-stage tag is accidentally added
+PASS: post-save reconciliation restores Won closed_date after a blank custom-field overwrite
+PASS: post-save reconciliation restores Qualified timestamp after a blank custom-field overwrite
+
+SUMMARY: 18 PASS, 0 FAIL
+
+=== static-acceptance-040.php ===
+PASS: current release metadata is consistent
+PASS: SiteEngine Base is declared as a plugin dependency
+PASS: activation no longer requires a PHP config file
+PASS: settings and Base admin layers load from bootstrap
+PASS: configuration precedence is external override -> WordPress settings -> local fallback
+PASS: settings mode overlays shared client facts from SiteEngine Base
+PASS: settings-mode diagnostics relabel plugin-owned provenance as Ads Bridge settings
+PASS: Ads Bridge registers with the Base module registry
+PASS: Ads Bridge contributes versioned setup guidance to Base Help / Reference
+PASS: Base prerequisites include shared identity, timezone, currency, and Google Ads CID
+PASS: one-click PHP config migration is present
+PASS: Base admin exposes setup, lifecycle, export, and Sheet configuration surfaces
+PASS: fresh settings keep exports disabled
+PASS: fresh lost configuration uses shared Outcome Date field
+PASS: doctor reports missing Base as a failure
+PASS: client example reflects shared Outcome Date default
+PASS: configuration UI does not mutate CRM or form data
+
+SUMMARY: 17 PASS, 0 FAIL
+
+=== static-acceptance-050.php ===
+PASS: current 0.6.2 release metadata is locked
+PASS: front-end lead bridge is loaded by the plugin
+PASS: SE | Lead bridge uses documented Fluent Forms server and client success hooks
+PASS: browser bridge emits the standardized SE | Lead event
+PASS: browser bridge is gated by authoritative receipt-backed ad_user_data consent
+PASS: browser bridge exposes SHA-256 user identifiers to dataLayer
+PASS: settings define the durable Qualified Lead stage
+PASS: settings define the standardized Converted Lead action
+PASS: Qualified and Converted use independent ledger scopes
+PASS: Converted migration honors the historical 0.4.x Won ledger sink without collapsing stage scopes
+PASS: stage suffixes are not introduced into canonical transaction IDs
+PASS: aggregate exporter executes intake, lifecycle ledger, Qualified, then Converted
+PASS: Google_Ads_Import is the first physical worksheet contract
+PASS: 0.4.1 20-column Google import headers have a safe 0.5.0 migration path
+PASS: worksheet-order migration changes index only
+PASS: Golden Account ValueTrack context is retained in operational exports
+PASS: Google Data Manager header contract includes Conversion action
+PASS: doctor monitors scheduled export freshness and PHP runtime
+PASS: Setup generates the canonical 10-minute aggregate cron command
+PASS: Setup makes the durable qualification timestamp requirement explicit
+PASS: fresh example removes Lost conversion actions and uses Golden Account conversion names
+PASS: config validator understands both Google lifecycle stages
+PASS: CLI phone normalization accepts ordinary US 10-digit numbers
+PASS: browser EC4L phone normalization matches the server-side E.164 rule
+
+SUMMARY: 24 PASS, 0 FAIL
+
+=== static-acceptance-051.php ===
+PASS: current 0.6.2 release metadata is locked
+PASS: lifecycle compliance runtime is loaded and initialized
+PASS: canonical lifecycle contains New, Qualified, Unqualified, Won
+PASS: customer_rating and unqualified_at defaults are locked
+PASS: FluentCRM compliance hooks are registered
+PASS: Won preserves qualification and close milestones
+PASS: lifecycle automation never writes invoice revenue
+PASS: Won is protected as a terminal lifecycle state
+PASS: CLI exposes lifecycle ledger exporter
+PASS: lifecycle snapshots use independent All_Leads ledger scopes
+PASS: aggregate export order includes lifecycle ledger before Google stages
+PASS: legacy Lost worksheet command is explicitly retired
+PASS: legacy Lost worksheet configuration is inert
+PASS: All_Leads 94-column lifecycle/inquiry tail is exact
+PASS: Google import retains canonical 21-column contract
+PASS: known compact Google header is guarded by blank-data validation
+PASS: known manually edited All_Leads header is safely recognized
+PASS: manual header normalization fails closed on nonblank data
+PASS: field provisioner includes unqualified_at
+PASS: admin and CLI expose client compliance queue
+PASS: doctor documents silent-Unqualified Google behavior
+PASS: Data Manager guidance requires Conversion action filter rather than value filter
+PASS: README documents two-tab workbook
+
+SUMMARY: 23 PASS, 0 FAIL
+
+=== static-acceptance-060.php ===
+PASS: 0.6.2 release metadata is locked
+PASS: inquiry runtime is loaded and initialized
+PASS: stable CRM Ops adapter functions expose adopt, prepare, and activate phases
+PASS: Ads Bridge owns a dedicated durable inquiry-attribution table
+PASS: schema enforces one active Ads inquiry per contact
+PASS: canonical Google transaction binding is unique per inquiry
+PASS: prepare and activation events have durable idempotency keys
+PASS: persisted saga states include prepared, activating, active, and archived
+PASS: inquiry schema migration is explicit and never automatic on plugin traffic
+PASS: one-time current-inquiry adoption API exists
+PASS: adoption fails closed when an existing submission_id cannot be canonically resolved
+PASS: adoption refuses duplicate immutable transaction binding
+PASS: repeat prepare fails closed when the previous inquiry was not durably adopted
+PASS: normal repeat prepare never snapshots previous attribution from mutable contact state
+PASS: Fluent Forms inquiry source requires explicit form_id and entry_id
+PASS: Ads Bridge computes canonical ff:{form}:{entry} transaction ID itself
+PASS: activation projects the new immutable submission binding into the current contact view
+PASS: activation clears prior current-inquiry milestones and revenue before setting New
+PASS: projection hooks are guarded during activation reset
+PASS: active inquiry mirrors mutable milestones without rebinding immutable submission identity
+PASS: stage selectors retain archived inquiry candidates until exported
+PASS: Qualified, Unqualified, and Won exporters have inquiry-aware candidate selection
+PASS: legacy contact fallback is suppressed after inquiry-aware attribution exists
+PASS: Google builders resolve inquiry rows through immutable inquiry binding
+PASS: inquiry exports disable mutable CRM click-ID fallback
+PASS: inquiry exports prefer identity captured on the immutable form submission
+PASS: All_Leads adds Inquiry ID as append-only column 94
+PASS: existing 93-column All_Leads has a safe header-only 93-to-94 migration
+PASS: runtime All_Leads header contract appends Inquiry ID
+PASS: Google_Ads_Import remains unchanged at 21 columns
+PASS: Inquiry ID is intentionally not added to Google Data Manager schema
+PASS: CLI exposes explicit inquiry migrate/adopt/inspect administration
+PASS: doctor holds repeat-inquiry activation when inquiry persistence is absent
+PASS: missing inquiry table is a compatibility warning rather than breaking legacy exports
+PASS: README retains Google import documentation
+PASS: bootstrap contains no Golden CID or Sheet ID
+
+SUMMARY: 36 PASS, 0 FAIL
+
+=== static-acceptance.php ===
+PASS: isolated schema-v2 acceptance config validates
+PASS: release package does not contain an active client config
+PASS: client example ships with active write families and Google Sheets disabled; legacy Lost feeds are omitted
+PASS: won terminal field remains closed_date
+PASS: lost terminal field uses shared closed_date / Outcome Date
+PASS: All_Leads contract has 94 columns including Golden tracking + lifecycle ledger + inquiry context
+PASS: All_Leads contract keys are unique
+PASS: only the two canonical Sheet contracts are declared
+PASS: enabled Sheet tabs are unique
+PASS: Google_Ads_Import is the first physical Sheet contract
+PASS: shared Google import feed has 21 Data Manager columns including Conversion action
+PASS: lost diagnostic feed has 29 columns including Golden Account tracking context
+PASS: All_Leads reference CSV byte-matches the runtime header contract
+PASS: Data Manager reference CSV byte-matches the runtime header contract
+PASS: Sheet column 1 is A
+PASS: Sheet column 26 is Z
+PASS: Sheet column 27 is AA
+PASS: Sheet column 80 is CB
+PASS: Sheet column 88 is CJ
+PASS: Sheet column 93 is CO
+PASS: Sheet column 94 is CP
+PASS: Sheet create helper accepts a required-width contract
+PASS: All_Leads tab is created with 94 columns rather than the default grid width
+PASS: Sheet resize helper accepts existing-tab metadata
+PASS: existing All_Leads grid expands to 94 columns without rewriting cells
+PASS: Sheet resize request changes column count only
+PASS: worksheet-order helper accepts a safe index move
+PASS: Google import tab move targets worksheet index 0 only
+PASS: worksheet-order migration changes index only and never cell data
+PASS: 94-column header write helper succeeds
+PASS: All_Leads header write targets A1:CP1
+PASS: All_Leads row is exportable for a valid configured-form submission
+PASS: All_Leads transaction ID is deterministic
+PASS: All_Leads row contains 94 values
+PASS: All_Leads intake row records the New lifecycle event
+PASS: All_Leads preserves Golden Account ValueTrack context from the canonical form submission
+PASS: All_Leads built headers exactly match provisioning contract
+PASS: All_Leads row links the matching CRM contact without requiring it
+PASS: All_Leads exports a canonical submission even when no CRM contact matches
+PASS: All_Leads records contact_id 0 when no CRM match exists
+PASS: All_Leads still records a canonical submission with malformed response JSON
+PASS: All_Leads labels malformed response JSON explicitly
+PASS: accepted won-job builder remains exportable for the canonical fixture
+PASS: won-job builder preserves deterministic Fluent Forms transaction ID
+PASS: won-job builder preserves America/Chicago DST-aware datetime
+PASS: won-job builder preserves invoiced conversion value
+PASS: converted-lead builder preserves the 21-column Data Manager contract
+PASS: converted-lead row emits the standardized conversion action
+PASS: converted-lead attribution prefers canonical Fluent Forms click IDs and enforces braid mutual exclusion
+PASS: 10-digit US phone is normalized to E.164 before SHA-256 hashing
+PASS: qualified-lead builder exports a durable qualified_at milestone regardless of later lifecycle state
+PASS: qualified and converted stages reuse the canonical Fluent Forms transaction ID
+PASS: qualified timestamp is emitted in the client timezone with offset
+PASS: configured Qualified Lead proxy value is emitted when present
+PASS: qualified row emits the standardized conversion action
+PASS: qualified attribution prefers canonical Fluent Forms submission over CRM fallback
+PASS: wrong-form stored submission is rejected for advertising export
+PASS: wrong-form rejection names the configured master form
+PASS: configured Won value/date fields produce an exportable row
+PASS: configured Won value_field controls conversion value
+PASS: configured Won date_field controls conversion time
+PASS: ledgered Won transaction cannot starve a newer candidate at the limit
+PASS: preselection records the skipped appended transaction
+PASS: legacy 0.4.x Won ledger row suppresses only the matching 0.5 Converted transaction
+PASS: legacy Won suppression is counted during Converted candidate prefilter
+PASS: legacy 0.4.x Won ledger row does not suppress the new Qualified Lead stage
+PASS: multi-sink dedupe helper recognizes the historical Won sink
+PASS: failed prior Sheet attempt remains retryable
+PASS: same contact is eligible for a later sequential transaction despite an older lost ledger row
+PASS: legacy Lost worksheet exporter is hard-retired in 0.5.2
+PASS: All_Leads lifecycle stages own independent append-only ledger sinks
+PASS: phone normalizer converts 10-digit US numbers to E.164
+PASS: phone normalizer converts 11-digit US numbers to E.164
+PASS: phone normalizer preserves explicit international E.164 intent
+PASS: Gmail normalization strips periods but preserves plus aliases
+PASS: terminal datetime observes winter CST offset
+PASS: new export families refuse to run without --dry-run or --apply
+PASS: removed --force flag is absent from CLI source
+PASS: lost discovery no longer suppresses a CRM contact for life
+PASS: append-row has no direct Sheet write path
+PASS: append-row has no independent ledger implementation
+PASS: only the won exporter and shared family exporter can append Sheet rows
+PASS: CLI exposes 19 public commands including inquiry-admin
+PASS: client-neutral runtime code contains no practice Ads account identifiers
+PASS: release version is 0.6.2 in header and runtime constant
+
+SUMMARY: 85 PASS, 0 FAIL
+
+=== inquiry-database-acceptance.php ===
+MariaDB: 10.11.14; InnoDB; dedicated isolated database; two independent PDO connections; Subscriber simulated.
+PASS: native SQL stores adoption and prepared inquiry with canonical unique bindings
+PASS: an independent connection can hold the contact lock
+PASS: actual cross-connection contention prevents source API activation and CRM reset
+PASS: source API commits the old/new inquiry switch through real InnoDB
+PASS: source API releases its native contact lock after commit
+PASS: native pending reservation rejects a competing prepare
+PASS: real SQL rollback restores the old pointer after injected new-pointer failure
+PASS: native retry completes the previously rolled-back transition
+PASS: one contact lock does not block a different contact
+PASS: loss of the real lock-owning session cannot acknowledge activation
+PASS: terminating the owner session releases its native database lock
+PASS: owner-session loss preserves the prior durable inquiry history
+
+SUMMARY: 12 PASS, 0 FAIL
+
+TOTAL: 318 PASS, 0 FAIL
+Unchanged exporter/config/browser/lifecycle/doctor/admin/header contracts: PASS
+Package safety scan: PASS
+0.6.1 host PHP 8.4 isolated suites: 18+43 PASS; WordPress aggregate dry-run: PASS
+0.6.2 host PHP 8.4 validation: PENDING
+Projection checkpoint/recovery and live CRM Ops integration: PENDING
+Start New Inquiry/customer-facing inquiry sends: HELD

@@ -1,0 +1,21 @@
+# Active configuration and credentials. The synthetic fixture remains tracked.
+/config/client.php
+/config/client.*.php
+!/config/client.example.php
+.env
+.env.*
+.secrets/
+*.pem
+*.key
+*service-account*.json
+*credentials*.json
+*.log
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
+*.zip
+*.tar
+*.tar.gz
+/vendor/
+/node_modules/

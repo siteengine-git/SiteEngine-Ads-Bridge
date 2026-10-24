@@ -1,0 +1,1368 @@
+--- a/siteengine-ads-bridge/CHANGELOG.md
++++ b/siteengine-ads-bridge/CHANGELOG.md
+@@ -1,4 +1,15 @@
+ # Changelog
++
++## 0.6.2
++
++- Serialized Ads Bridge adoption, prepare, activation and active-history synchronization with database/prefix/contact-scoped GET_LOCK locks; added owner verification and fail-closed contention/loss/reentrancy handling.
++- Required prepare expected_head_version to match the stored active inquiry and commit head_version to advance exactly one step; activation rechecks the current head before projection.
++- Reserved one pending reconciliation per contact through the serialized API and blocked competing initial adoption.
++- Bound activation site identity to preparation and rejected invalid/overflowing versions and oversized event IDs.
++- Made completed/archived activation replays safe without another contact reset; completed prepare replays report committed/already_activated with historical state/version.
++- Required InnoDB and checked transaction start, guarded archive/activation writes, commit, rollback and final readback. Unconfirmed rollback/release closes the failed session and blocks further transitions in that request.
++- Added 50 isolated transition/fault assertions and 12 dedicated-database assertions covering real cross-connection locks, rollback, retry, contact independence and connection loss. CRM Subscriber operations remain simulated in the database suite.
++- Retained schema version 1, contract version 1 and both worksheet contracts. Partial-projection recovery and live CRM Ops integration remain held.
+ 
+ ## 0.6.1
+ 
+--- a/siteengine-ads-bridge/README.md
++++ b/siteengine-ads-bridge/README.md
+@@ -1,4 +1,4 @@
+-# SiteEngine Ads Bridge 0.6.1
++# SiteEngine Ads Bridge 0.6.2
+ 
+ SiteEngine Ads Bridge connects a configured Fluent Forms master lead form to FluentCRM and exports append-only lead lifecycle data to Google Sheets for Google Ads Data Manager.
+ 
+@@ -35,13 +35,17 @@
+ - Spam / Junk
+ - Other
+ 
+-## 0.6.1 reset correction and activation hold
+-
+-0.6.1 fixes a confirmed FluentCRM integration error: `syncCustomFieldValues(..., false)` does not delete stored values for blank keys. Repeat activation now uses selective deletion, suppresses Ads Bridge lifecycle restamping during the reset, and reads the persisted contact fields and tags back before acknowledging projection success. The same flag error is fixed when Unqualified clears a stale `qualified_at`.
+-
+-The inquiry schema remains version 1; no new database or worksheet migration is required for 0.6.1. The three same-site PHP adapters and contract version 1 are unchanged. No listeners for the proposed CRM Ops reconciliation events are registered.
+-
+-**Start New Inquiry and customer-facing inquiry automation remain held.** This release fixes the reset path; it does not close the outstanding head-version enforcement, concurrent activation, transaction validation, or crash-recovery acceptance gaps. See `docs/INQUIRY-ACCEPTANCE-STATUS.md` before implementing or enabling CRM Ops.
++## 0.6.2 version and transition hardening
++
++0.6.2 enforces the stored Ads inquiry head version at prepare and activation, permits only one pending reconciliation per contact through the supported API, and requires activation to advance the expected head by exactly one. It serializes adoption, prepare, activation and active-history synchronization with connection-scoped database locks. A failed lock acquisition returns retry before the transition mutates the contact.
++
++The activation site identity must match preparation. Completed activation replays, including archived ones, acknowledge the earlier event without resetting the current inquiry. A prepare replay after completion returns `committed / already_activated` with its stored inquiry state and committed version, never a new `ready` authorization.
++
++Inquiry pointer changes require InnoDB, checked transaction control, guarded one-row updates and post-commit readback. Unconfirmed rollback or lock release closes the failed database session and prevents further transitions in that PHP request. See `docs/CRM-OPS-INQUIRY-CONTRACT.md` for response handling.
++
++The 0.6.1 selective field deletion and lifecycle guards are retained. Schema remains 1, adapter contract remains 1, and the worksheet contracts are unchanged. No event listeners for the proposed CRM Ops reconciliation events are registered.
++
++**Start New Inquiry and customer-facing inquiry automation remain held.** Durable projection checkpoints, partial-reset/crash recovery, CRM Ops head compare-and-swap and live integration acceptance remain outstanding. The contact reset still occurs before the inquiry-table transaction, so this is not an atomic transaction across CRM Ops, FluentCRM and Ads Bridge.
+ 
+ ## Inquiry-aware repeat customers (introduced in 0.6.0)
+ 
+@@ -320,6 +324,7 @@
+ php tests/static-acceptance-060.php
+ php tests/lifecycle-acceptance.php
+ php tests/inquiry-acceptance.php
++php tests/inquiry-transition-acceptance.php
+ ```
+ 
+ All PHP files should also pass `php -l` before packaging.
+--- a/siteengine-ads-bridge/docs/CRM-OPS-INQUIRY-CONTRACT.md
++++ b/siteengine-ads-bridge/docs/CRM-OPS-INQUIRY-CONTRACT.md
+@@ -1,12 +1,12 @@
+ # CRM Ops / Ads Bridge Inquiry Contract — v1
+ 
+-Ads Bridge 0.6.1 and SiteEngine CRM Ops coordinate repeat inquiries through same-site PHP adapter functions. CRM Ops owns operational inquiry identity and automation. Ads Bridge owns immutable advertising attribution history. Neither plugin writes the other's tables directly.
++Ads Bridge 0.6.2 and SiteEngine CRM Ops coordinate repeat inquiries through same-site PHP adapter functions. CRM Ops owns operational inquiry identity and automation. Ads Bridge owns immutable advertising attribution history. Neither plugin writes the other's tables directly.
+ 
+ ## Implemented transport
+ 
+ The three documented same-site PHP adapter functions are implemented. Neither proposed `reconciliation_requested` nor `activated` event has an Ads Bridge listener. The event mentioned below describes the intended CRM Ops protocol; emitting it alone does not invoke Ads Bridge. CRM Ops must call the adapters explicitly from its trusted integration layer. No reconciliation REST endpoint or automatic retry worker is registered.
+ 
+-0.6.1 corrects and verifies the contact reset, but this contract is not yet accepted for live repeat-inquiry activation. Read `INQUIRY-ACCEPTANCE-STATUS.md` for the remaining guarantees and acceptance gaps.
++0.6.2 adds version and transition guards to the corrected contact reset, but this contract is not yet accepted for live repeat-inquiry activation. Read `INQUIRY-ACCEPTANCE-STATUS.md` for the remaining guarantees and acceptance gaps.
+ 
+ ## Activation gate
+ 
+@@ -75,7 +75,7 @@
+ 
+ ## 2. CRM Ops activates its head
+ 
+-After matching `ready`, CRM Ops performs its own atomic archive/new-head operation and emits `siteengine.crm_ops.inquiry.activated.v1`. It must still hold customer automation.
++After matching `ready`, CRM Ops must perform its own atomic archive/new-head operation with a compare-and-swap on `expected_head_version`. It must still hold customer automation. Persisting/emitting a CRM Ops activation event does not invoke Ads Bridge; call `seab_inquiry_commit_activation()` explicitly after the CRM Ops head commits.
+ 
+ ## 3. Ads Bridge activation commit / acknowledgment
+ 
+@@ -120,3 +120,30 @@
+ Additional `status=retry` reasons include `activation_state_not_persisted`, `projection_lifecycle_tags_unresolved`, `projection_lifecycle_tags_not_unique`, `projection_field_mapping_invalid`, `projection_readback_unavailable`, `projection_fields_not_persisted`, and `projection_lifecycle_not_persisted`. A projection exception also returns retry.
+ 
+ A failed projection can leave a partially changed current-contact view. It does not intentionally archive the previous inquiry or activate the new inquiry. Ads Bridge's lifecycle and active-inquiry sync callbacks skip that contact while an `activating` row exists, preserving the prior inquiry snapshot. CRM Ops must retain its automation hold and must not allow the contact to progress while recovery is pending. Retry uses the identical activation body; it can repeat the reset. No automatic rollback of the CRM projection is provided.
++
++## 0.6.2 version, reservation and lock rules
++
++- An existing previous inquiry must be the active Ads inquiry for that contact, and its `committed_head_version` must equal prepare's `expected_head_version`.
++- Initial creation with no previous inquiry requires no existing Ads history, no active pointer and `expected_head_version=0`.
++- Prepare reserves at most one `prepared`/`activating` reconciliation per contact through the supported serialized API. A different pending event returns `retry / pending_reconciliation_exists`; it is not automatically expired or discarded.
++- Activation requires `head_version = expected_head_version + 1`, the same site identity used at prepare, the same previous/proposed identities, and a still-matching active previous head. These checks precede the reset.
++- Versions/contact IDs must be nonnegative/positive integer values or canonical integer strings, below PHP_INT_MAX. Floats, booleans, exponent strings, negative values and overflow are rejected. Correlation strings must be nonempty and unpadded. Event IDs are limited to 80 bytes; reconciliation IDs to 64 bytes.
++- The three public functions retain their names and contract version 1. Ads Bridge does not verify or write the CRM Ops head; CRM Ops must enforce its own atomic head version and durable automation hold.
++
++Call each adapter outside any existing SQL transaction. CRM Ops must commit or roll back its own phase transaction before invoking Ads Bridge; the adapter manages its own inquiry transaction and is not a nested transaction boundary.
++
++Adoption, prepare and activation acquire a nonblocking GET_LOCK name derived from DB_NAME, the WordPress prefix and contact ID. Active-history mirroring uses that same lock and refreshes the contact after acquiring it. Lock contention returns `retry / contact_transition_busy`. Unsupported/unavailable locks return `contact_lock_unavailable`; loss returns retry. A transition cannot reenter itself through a callback (`contact_transition_reentrant`). These locks protect cooperating Ads Bridge API operations; they do not lock arbitrary external CRM writes or create an atomic cross-plugin transaction.
++
++### Completed event replay
++
++A matching prepare replay in the prepared state returns `ready / already_prepared`. Once activation is in progress it returns `retry / activation_in_progress`; resume the matching activation phase. After activation completes, prepare replay returns `committed / already_activated` plus `inquiry_state` (`active` or `archived`) and `committed_head_version`.
++
++That terminal prepare response is a historical receipt, not permission to move the CRM Ops head or enroll workflows. Only the matching activation acknowledgment, correlated to CRM Ops' committed current head and retained hold, can satisfy the activation handshake. Matching activation replays on active or archived inquiries return `committed / already_committed` without projecting/resetting again. Conflicting event bodies remain rejected.
++
++### Persistence failures
++
++The inquiry table must use InnoDB. Activation checks START TRANSACTION, guarded archive/new-head updates, COMMIT, ROLLBACK and the final persisted pointer/version/event state. Zero-row pointer changes do not count as success. Adoption and prepare also read back their new rows before success.
++
++Additional retry reasons include `inquiry_table_requires_innodb`, `inquiry_transaction_start_failed`, `previous_inquiry_archive_failed`, `new_inquiry_activation_failed`, `inquiry_transaction_commit_failed`, `inquiry_transaction_rollback_failed`, `inquiry_commit_readback_failed`, `contact_lock_release_failed`, and `inquiry_connection_unusable`. Unconfirmed rollback or release closes the failed database session and refuses further transitions in that PHP request. Retry only in a new request with identical phase/event/body after the underlying failure is resolved.
++
++The CRM projection is still outside the inquiry-table transaction. A failed/terminated activation can leave it partly or fully reset while the durable state remains activating. Caller automation and current-inquiry edits must remain held. A durable projection checkpoint and explicit partial-reset/crash recovery protocol are still required before live activation is enabled.
+--- a/siteengine-ads-bridge/docs/INQUIRY-ACCEPTANCE-STATUS.md
++++ b/siteengine-ads-bridge/docs/INQUIRY-ACCEPTANCE-STATUS.md
+@@ -1,33 +1,33 @@
+-# Inquiry acceptance status - 0.6.1
++# Inquiry acceptance status - 0.6.2
+ 
+-This is a reset-correction release. It is not acceptance of live repeat-inquiry activation.
++Start New Inquiry and customer-facing inquiry sends remain HELD.
+ 
+-## Confirmed cause and correction
++## Completed in this continuation
+ 
+-The installed FluentCRM 3.2.6 method deletes explicitly supplied blank custom-field keys only when its second argument, deleteOtherValues, is true. Ads Bridge 0.6.0 passed false for both the repeat-inquiry reset and Unqualified's stale qualification clearing. Its merge-only test doubles incorrectly treated those calls as deleting fields.
++- Deployed 0.6.1 passed 18 lifecycle and 43 inquiry isolated assertions on the Golden server's PHP 8.4. The aggregate WordPress export dry-run completed all four groups without writes and preserved the existing historical eligibility failures.
++- 0.6.2 enforces the Ads inquiry head version, single pending API reservation, exact one-step activation, site binding and stable completed-event replay.
++- Adoption, prepare, activation and history sync use contact-scoped database session locks. History sync refreshes the contact after acquiring its lock and only updates the active pointer.
++- Inquiry pointer changes require InnoDB, checked transaction control, guarded updates and final persisted readback. Unconfirmed rollback/release closes the failed session and blocks further transitions in that request.
++- The 0.6.1 selective deletion, lifecycle reset guards and persisted-field/tag verification are retained.
++- Schema version 1, adapter contract version 1, All_Leads 94 columns and Google_Ads_Import 21 columns remain unchanged. The three adapters are same-site PHP functions; proposed CRM Ops events have no Ads Bridge listener.
+ 
+-The corrected test doubles reproduce installed deletion behavior. The inquiry test dispatches the real Ads Bridge lifecycle and inquiry callbacks. On the unpatched source, the corrected lifecycle suite reported 17 PASS / 1 FAIL and the inquiry suite reported 20 PASS / 2 FAIL. The old contact retained previous dates/revenue despite a committed activation response, and the new inquiry could inherit a false Won milestone.
++## Evidence and practical limits
+ 
+-0.6.1 uses selective deletion and suppresses Ads Bridge's timestamp restoration during projection. It verifies the persisted activating marker before resetting, validates reset configuration, re-reads contact fields/tags, and returns retry rather than acknowledging failed projection. Incomplete activations suppress lifecycle stamping and active-history mirroring for that contact. Configured field aliases are also cleared; unrelated fields, CRM Ops identity, consent values and non-lifecycle tags are preserved.
++The isolated inquiry suite uses deletion semantics confirmed from installed FluentCRM 3.2.6, and dispatches the real Ads Bridge lifecycle/inquiry callbacks. It still simulates Subscriber persistence and the database.
+ 
+-## Scope and evidence
++The new isolated transition suite covers stale/noninteger/overflow versions, competing preparation, completed/historical replays, unavailable/lost/reentrant locks, engine rejection, transaction faults, zero-row updates, rollback failure and safe session disposal.
+ 
+-- Three same-site PHP adapters remain adopt / prepare / commit; contract version 1.
+-- Inquiry schema remains 1. No extra migration is needed over migrated 0.6.0.
+-- All_Leads remains 94 columns; Google_Ads_Import remains 21.
+-- Tests are isolated PHP tests with a simulated database and Subscriber. They do not exercise the installed FluentCRM sanitizer, database transactions, database locks, actual mail, or Google/Sheets.
+-- Local test PHP is 8.3.6. The deployed 0.6.0 PHP 8.4.27 runtime has passed its aggregate dry-run and scheduled-export doctor check. The 0.6.1 build still needs server PHP 8.4 validation after installation.
+-- No adoption, prepare, commit or repeat-inquiry recovery has been run live on the Golden site in this continuation.
+-- CRM Ops inquiry runtime remains unimplemented. Its operational fields and email drafts do not implement inquiry identity or reconciliation.
++The dedicated-database suite runs the actual inquiry runtime against MariaDB 10.11.14 / InnoDB through two independent PDO connections. It covers actual lock contention, source API pointer commits, lock release, competing preparation, rollback after a failed pointer update, retry, different-contact independence and loss of the lock-owning session. Subscriber/CRM operations remain simulated. It is not an installed-FluentCRM or Google/Sheets test.
++
++Local PHP is 8.3.6. The 0.6.2 package still needs server PHP 8.4 validation after installation. No live adoption, prepare, activation, fault injection or repeat-inquiry recovery has run on the Golden site in this continuation.
++
++The Golden test fixture remains an internal controlled fixture (site-specific identifiers omitted), with valid authoritative consent and no CRM Ops inquiry ID assigned. No Ads inquiry rows have been adopted live. CRM Ops inquiry runtime remains unimplemented; its fields/drafts do not implement the head, holds, outbox or reconciliation.
+ 
+ ## Remaining work before live repeat activation
+ 
+-1. Enforce head-version comparison at prepare and activation; current version fields are stored but do not provide compare-and-swap protection.
+-2. Serialize concurrent contact transitions across requests and coordinate that protection with CRM Ops. The request-local projection guard is not a database lock.
+-3. Validate transactional storage and check all inquiry archive/activate and transaction-control results. The contact reset precedes that transaction and is not atomically committed with CRM Ops.
+-4. Define durable recovery after partial projection or a process crash. Identical retries can repeat the reset; no recovery worker, projection checkpoint, or compensation adapter exists. Customer activity must remain held during an incomplete activation.
+-5. Define stale/replayed-event behavior after later inquiry transitions and test identity conflicts and contention.
+-6. Implement CRM Ops inquiry creation, adoption-before-replacement and the prepare / head activation / committed-ack hold. The proposed CRM Ops events do not have Ads Bridge listeners.
+-7. Run live tests for old Won -> new inquiry, prior unexported milestones, retry/fault cases, immutable identity/consent binding, DNC suppression, and independent stage ledgers.
++1. Add a durable projection checkpoint and explicit recovery after a partial reset or process crash. Identical retries from activating can still repeat the reset. There is no recovery worker, compensation adapter or abandoned-reservation cancellation operation.
++2. Build CRM Ops inquiry creation, adoption-before-replacement, atomic head compare-and-swap, event/phase persistence and the committed-ack automation hold. Ads Bridge does not independently verify the CRM Ops head and never writes its tables.
++3. Coordinate all permitted current-inquiry edits with the hold. Database named locks serialize Ads Bridge operations, not arbitrary external FluentCRM writes or third-party automation. The CRM projection is still outside the inquiry-table transaction.
++4. Run live acceptance for old Won -> new inquiry, prior unexported milestones, retries/crash cases, immutable identity/consent binding, DNC suppression and independent stage ledgers. Test on the host database/runtime before accepting live reconciliation.
+ 
+-Do not enable Start New Inquiry or customer-facing inquiry sends based on the reset test results alone.
++Do not enable Start New Inquiry or customer-facing inquiry sends from the isolated/native-SQL results alone.
+--- a/siteengine-ads-bridge/docs/OPERATIONS.md
++++ b/siteengine-ads-bridge/docs/OPERATIONS.md
+@@ -1,4 +1,4 @@
+-# Operations — SiteEngine Ads Bridge 0.6.1
++# Operations — SiteEngine Ads Bridge 0.6.2
+ 
+ ## Canonical client lifecycle
+ 
+@@ -139,3 +139,11 @@
+ ## 0.6.1 upgrade scope
+ 
+ 0.6.1 requires no new schema or worksheet migration over the already migrated 0.6.0 installation. It corrects blank-field deletion and verifies the inquiry reset. Start New Inquiry and customer-facing inquiry automation remain held pending the hardening and live integration checks in `INQUIRY-ACCEPTANCE-STATUS.md`.
++
++## 0.6.2 upgrade and acceptance
++
++No schema or worksheet migration is added over migrated 0.6.0/0.6.1. Inquiry activation requires InnoDB and working connection-scoped GET_LOCK functions. The lifecycle, inquiry and new inquiry-transition isolated suites can run directly with PHP; they do not bootstrap WordPress or write real CRM/Sheets.
++
++The opt-in `tests/inquiry-database-acceptance.php` suite makes actual SQL changes only in a dedicated database named `seab_inquiry_acceptance`, with a random table prefix removed afterward. It refuses any other database and requires SEAB_TEST_DSN, SEAB_TEST_DB_USER, optional SEAB_TEST_DB_PASSWORD, and SEAB_TEST_ALLOW_DB_WRITES=1 plus PDO mysql. Do not point it at a WordPress database. Without opt-in it prints SKIP and does not connect. CRM operations remain simulated in this suite.
++
++Start New Inquiry and customer-facing inquiry sends remain held pending projection recovery and live CRM Ops integration acceptance.
+--- a/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-inquiries.php
++++ b/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-inquiries.php
+@@ -19,6 +19,175 @@
+ 
+ 	/** @var bool Prevent current-contact projection hooks from corrupting archived state during activation. */
+ 	private static $reconciling = false;
++
++	/** @var array Contact IDs locked by this request; transitions are not reentrant. */
++	private static $held_locks = array();
++
++	/** @var bool Do not reuse a connection after an unconfirmed rollback/release. */
++	private static $connection_unusable = false;
++
++	/**
++	 * Serialize Ads Bridge transitions by database, table prefix and contact.
++	 * CRM Ops must separately enforce its own atomic head compare-and-swap.
++	 *
++	 * @param string   $phase adoption|prepare|activation.
++	 * @param mixed    $payload Contract payload.
++	 * @param callable $callback Validated transition.
++	 * @return array
++	 */
++	private static function serialized_transition( $phase, $payload, $callback ) {
++		$payload = is_array( $payload ) ? $payload : array();
++		if ( self::$connection_unusable ) {
++			return self::transition_failure( $phase, $payload, 'retry', 'inquiry_connection_unusable' );
++		}
++		$validator = array( 'adoption' => 'validate_adoption_payload', 'prepare' => 'validate_prepare_payload', 'activation' => 'validate_activation_payload' );
++		$valid = call_user_func( array( __CLASS__, $validator[ $phase ] ), $payload );
++		if ( ! $valid['ok'] ) {
++			return self::transition_failure( $phase, $payload, 'rejected', $valid['reason'] );
++		}
++		if ( ! self::table_exists() ) {
++			return self::transition_failure( $phase, $payload, 'retry', 'inquiry_table_missing' );
++		}
++		$contact_id = (int) $payload['contact_id'];
++		$lock = self::acquire_contact_lock( $contact_id );
++		if ( ! $lock['ok'] ) {
++			return self::transition_failure( $phase, $payload, 'retry', $lock['reason'] );
++		}
++		try {
++			self::assert_contact_lock( $contact_id );
++			$result = call_user_func( $callback, $payload );
++			if ( ! self::$connection_unusable ) {
++				self::assert_contact_lock( $contact_id );
++			}
++		} catch ( \Throwable $e ) {
++			$result = self::transition_failure( $phase, $payload, 'retry', self::safe_reason( $e->getMessage() ) );
++		} finally {
++			$released = self::release_contact_lock( $contact_id );
++		}
++		if ( ! $released ) {
++			self::discard_connection();
++			if ( ! in_array( $result['status'], array( 'retry', 'rejected' ), true ) ) {
++				return self::transition_failure( $phase, $payload, 'retry', 'contact_lock_release_failed' );
++			}
++			$result['lock_reason_code'] = 'contact_lock_release_failed';
++		}
++		return $result;
++	}
++
++	/**
++	 * @param string $phase Phase.
++	 * @param array  $payload Payload.
++	 * @param string $status Status.
++	 * @param string $reason Reason.
++	 * @return array
++	 */
++	private static function transition_failure( $phase, $payload, $status, $reason ) {
++		if ( 'adoption' === $phase ) {
++			return self::adoption_response( $payload, $status, $reason, '' );
++		}
++		if ( 'prepare' === $phase ) {
++			return self::prepare_response( $payload, $status, $reason, '' );
++		}
++		return self::activation_response( $payload, $status, $reason );
++	}
++
++	/**
++	 * @param int $contact_id Contact ID.
++	 * @return array
++	 */
++	private static function acquire_contact_lock( $contact_id ) {
++		if ( self::$connection_unusable ) {
++			return array( 'ok' => false, 'reason' => 'inquiry_connection_unusable' );
++		}
++		if ( isset( self::$held_locks[ $contact_id ] ) ) {
++			return array( 'ok' => false, 'reason' => 'contact_transition_reentrant' );
++		}
++		global $wpdb;
++		$database = defined( 'DB_NAME' ) ? DB_NAME : '';
++		$name = 'seab_i_' . substr( hash( 'sha256', $database . '|' . $wpdb->prefix . '|' . (int) $contact_id ), 0, 48 );
++		try {
++			$got = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $name ) );
++		} catch ( \Throwable $e ) {
++			return array( 'ok' => false, 'reason' => 'contact_lock_unavailable' );
++		}
++		if ( '1' !== (string) $got ) {
++			return array( 'ok' => false, 'reason' => '0' === (string) $got ? 'contact_transition_busy' : 'contact_lock_unavailable' );
++		}
++		self::$held_locks[ $contact_id ] = $name;
++		return array( 'ok' => true, 'reason' => '' );
++	}
++
++	/**
++	 * @param int $contact_id Contact ID.
++	 * @return void
++	 */
++	private static function assert_contact_lock( $contact_id ) {
++		global $wpdb;
++		if ( self::$connection_unusable || ! isset( self::$held_locks[ $contact_id ] ) || '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT IS_USED_LOCK(%s) = CONNECTION_ID()', self::$held_locks[ $contact_id ] ) ) ) {
++			throw new \RuntimeException( 'contact_lock_lost' );
++		}
++	}
++
++	/**
++	 * @param int $contact_id Contact ID.
++	 * @return bool
++	 */
++	private static function release_contact_lock( $contact_id ) {
++		global $wpdb;
++		if ( ! isset( self::$held_locks[ $contact_id ] ) ) {
++			return false;
++		}
++		$name = self::$held_locks[ $contact_id ];
++		unset( self::$held_locks[ $contact_id ] );
++		if ( self::$connection_unusable ) {
++			return false;
++		}
++		try {
++			return '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) );
++		} catch ( \Throwable $e ) {
++			return false;
++		}
++	}
++
++	/**
++	 * Close the failed session so uncommitted changes/locks cannot leak.
++	 *
++	 * @return void
++	 */
++	private static function discard_connection() {
++		self::$connection_unusable = true;
++		global $wpdb;
++		if ( method_exists( $wpdb, 'close' ) ) {
++			try {
++				$wpdb->close();
++			} catch ( \Throwable $e ) {
++				// The request remains poisoned even when the driver cannot close.
++			}
++		}
++	}
++
++	/**
++	 * @param mixed $value Version to validate.
++	 * @param int   $minimum Minimum.
++	 * @return bool
++	 */
++	private static function valid_head_version( $value, $minimum = 0 ) {
++		return ( is_int( $value ) || ( is_string( $value ) && ctype_digit( $value ) && (string) (int) $value === $value ) ) && (int) $value >= $minimum && (int) $value < PHP_INT_MAX;
++	}
++
++	/**
++	 * @param int $contact_id Contact ID.
++	 * @return array
++	 */
++	private static function pending_for_contact( $contact_id ) {
++		global $wpdb;
++		$table = self::table_name();
++		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$table}` WHERE contact_id = %d AND state IN ('prepared','activating') ORDER BY id ASC", (int) $contact_id ), ARRAY_A );
++		if ( ! is_array( $rows ) || ! empty( $wpdb->last_error ) ) {
++			throw new \RuntimeException( 'pending_inquiry_read_failed' );
++		}
++		return $rows;
++	}
+ 
+ 	/**
+ 	 * Let lifecycle compliance distinguish an intentional inquiry reset from an
+@@ -174,6 +343,16 @@
+ 	 * @return array
+ 	 */
+ 	public static function adopt_current_inquiry( $payload ) {
++		return self::serialized_transition( 'adoption', $payload, static function ( $normalized ) {
++			return self::adopt_current_inquiry_locked( $normalized );
++		} );
++	}
++
++	/**
++	 * @param array $payload Validated payload.
++	 * @return array
++	 */
++	private static function adopt_current_inquiry_locked( $payload ) {
+ 		try {
+ 			$payload = is_array( $payload ) ? $payload : array();
+ 			$valid   = self::validate_adoption_payload( $payload );
+@@ -209,6 +388,10 @@
+ 			$active = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table}` WHERE active_contact_id = %d LIMIT 1", $contact_id ), ARRAY_A );
+ 			if ( is_array( $active ) ) {
+ 				return self::adoption_response( $payload, 'rejected', 'contact_already_has_active_inquiry', isset( $active['transaction_id'] ) ? (string) $active['transaction_id'] : '' );
++			}
++
++			if ( ! empty( self::pending_for_contact( $contact_id ) ) ) {
++				return self::adoption_response( $payload, 'retry', 'pending_reconciliation_exists', '' );
+ 			}
+ 
+ 			$subscriber = self::find_subscriber( $contact_id );
+@@ -276,9 +459,14 @@
+ 				'created_at_utc'               => $now,
+ 				'updated_at_utc'               => $now,
+ 			);
++			self::assert_contact_lock( $contact_id );
+ 			$inserted = $wpdb->insert( $table, $data );
+-			if ( false === $inserted ) {
++			if ( 1 !== $inserted ) {
+ 				return self::adoption_response( $payload, 'retry', 'adoption_persistence_failed', isset( $binding['transaction_id'] ) ? (string) $binding['transaction_id'] : '' );
++			}
++			$saved = self::get( $inquiry_id );
++			if ( ! is_array( $saved ) || 'active' !== (string) $saved['state'] || (int) $saved['active_contact_id'] !== $contact_id || (string) $saved['request_payload_hash'] !== $payload_hash ) {
++				return self::adoption_response( $payload, 'retry', 'adoption_readback_failed', '' );
+ 			}
+ 			return self::adoption_response( $payload, 'adopted', 'adopted', isset( $binding['transaction_id'] ) ? (string) $binding['transaction_id'] : '' );
+ 		} catch ( \Throwable $e ) {
+@@ -310,6 +498,16 @@
+ 	 * @return array
+ 	 */
+ 	public static function prepare_reconciliation( $payload ) {
++		return self::serialized_transition( 'prepare', $payload, static function ( $normalized ) {
++			return self::prepare_reconciliation_locked( $normalized );
++		} );
++	}
++
++	/**
++	 * @param array $payload Validated payload.
++	 * @return array
++	 */
++	private static function prepare_reconciliation_locked( $payload ) {
+ 		try {
+ 			$payload = is_array( $payload ) ? $payload : array();
+ 			$valid   = self::validate_prepare_payload( $payload );
+@@ -335,7 +533,18 @@
+ 				if ( (string) $existing['request_event_id'] !== $event_id || (string) $existing['inquiry_id'] !== $proposed || (string) $existing['request_payload_hash'] !== $payload_hash ) {
+ 					return self::prepare_response( $payload, 'rejected', 'prepare_idempotency_conflict', isset( $existing['reconciliation_id'] ) ? (string) $existing['reconciliation_id'] : $recon_id );
+ 				}
+-				return self::prepare_response( $payload, 'ready', 'already_prepared', (string) $existing['reconciliation_id'] );
++				if ( in_array( (string) $existing['state'], array( 'active', 'archived' ), true ) && ! empty( $existing['activation_event_id'] ) ) {
++					$response = self::prepare_response( $payload, 'committed', 'already_activated', (string) $existing['reconciliation_id'] );
++					$response['inquiry_state'] = (string) $existing['state'];
++					$response['committed_head_version'] = (int) $existing['committed_head_version'];
++					return $response;
++				}
++				if ( 'activating' === (string) $existing['state'] ) {
++					return self::prepare_response( $payload, 'retry', 'activation_in_progress', (string) $existing['reconciliation_id'] );
++				}
++				if ( 'prepared' !== (string) $existing['state'] ) {
++					return self::prepare_response( $payload, 'rejected', 'prepared_state_invalid', (string) $existing['reconciliation_id'] );
++				}
+ 			}
+ 
+ 			$subscriber = self::find_subscriber( $contact_id );
+@@ -343,26 +552,36 @@
+ 				return self::prepare_response( $payload, 'rejected', 'contact_not_found', $recon_id );
+ 			}
+ 
+-			$active = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table}` WHERE active_contact_id = %d LIMIT 1", $contact_id ), ARRAY_A );
++			$active = self::active_for_contact( $contact_id );
+ 			if ( null === $previous ) {
+ 				if ( is_array( $active ) ) {
+ 					return self::prepare_response( $payload, 'rejected', 'unexpected_active_inquiry', $recon_id );
+ 				}
++				if ( 0 !== $expected ) {
++					return self::prepare_response( $payload, 'rejected', 'head_version_mismatch', $recon_id );
++				}
++				if ( self::contact_has_history( $contact_id ) ) {
++					return self::prepare_response( $payload, 'retry', 'current_inquiry_head_missing', $recon_id );
++				}
+ 			} else {
+-				if ( is_array( $active ) && (string) $active['inquiry_id'] !== $previous ) {
++				if ( ! is_array( $active ) ) {
++					$prior = self::get( $previous );
++					return self::prepare_response( $payload, is_array( $prior ) ? 'rejected' : 'retry', is_array( $prior ) ? 'previous_inquiry_state_mismatch' : 'previous_inquiry_not_adopted', $recon_id );
++				}
++				if ( (string) $active['inquiry_id'] !== $previous || (int) $active['contact_id'] !== $contact_id || 'active' !== (string) $active['state'] ) {
+ 					return self::prepare_response( $payload, 'rejected', 'active_inquiry_mismatch', $recon_id );
+ 				}
+-				if ( ! is_array( $active ) ) {
+-					$prior = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table}` WHERE inquiry_id = %s LIMIT 1", $previous ), ARRAY_A );
+-					if ( is_array( $prior ) ) {
+-						if ( (int) $prior['contact_id'] !== $contact_id || 'active' !== (string) $prior['state'] ) {
+-							return self::prepare_response( $payload, 'rejected', 'previous_inquiry_state_mismatch', $recon_id );
+-						}
+-						$wpdb->update( $table, array( 'active_contact_id' => $contact_id, 'updated_at_utc' => self::utc_now() ), array( 'id' => (int) $prior['id'] ), array( '%d', '%s' ), array( '%d' ) );
+-					} else {
+-						return self::prepare_response( $payload, 'retry', 'previous_inquiry_not_adopted', $recon_id );
+-					}
+-				}
++				if ( null === $active['committed_head_version'] || $expected !== (int) $active['committed_head_version'] ) {
++					return self::prepare_response( $payload, 'rejected', 'head_version_mismatch', $recon_id );
++				}
++			}
++			foreach ( self::pending_for_contact( $contact_id ) as $pending ) {
++				if ( ! is_array( $existing ) || (int) $pending['id'] !== (int) $existing['id'] ) {
++					return self::prepare_response( $payload, 'retry', 'pending_reconciliation_exists', $recon_id );
++				}
++			}
++			if ( is_array( $existing ) ) {
++				return self::prepare_response( $payload, 'ready', 'already_prepared', (string) $existing['reconciliation_id'] );
+ 			}
+ 
+ 			$source  = (array) $payload['source'];
+@@ -404,9 +623,14 @@
+ 				'created_at_utc'             => $now,
+ 				'updated_at_utc'             => $now,
+ 			);
++			self::assert_contact_lock( $contact_id );
+ 			$inserted = $wpdb->insert( $table, $data );
+-			if ( false === $inserted ) {
++			if ( 1 !== $inserted ) {
+ 				return self::prepare_response( $payload, 'retry', 'prepare_persistence_failed', $recon_id );
++			}
++			$saved = self::get( $proposed );
++			if ( ! is_array( $saved ) || 'prepared' !== (string) $saved['state'] || (int) $saved['contact_id'] !== $contact_id || (string) $saved['request_payload_hash'] !== $payload_hash || (string) $saved['reconciliation_id'] !== $recon_id ) {
++				return self::prepare_response( $payload, 'retry', 'prepare_readback_failed', $recon_id );
+ 			}
+ 			return self::prepare_response( $payload, 'ready', 'prepared', $recon_id );
+ 		} catch ( \Throwable $e ) {
+@@ -416,7 +640,7 @@
+ 
+ 	/**
+ 	 * Stable plugin API: commit phase after CRM Ops has atomically activated its
+-	 * inquiry head and emitted siteengine.crm_ops.inquiry.activated.v1.
++	 * inquiry head. The trusted CRM Ops adapter must call this method explicitly.
+ 	 *
+ 	 * Ads Bridge applies the current-contact reset idempotently, archives the old
+ 	 * Ads inquiry snapshot, activates the new one, then acknowledges. CRM Ops must
+@@ -426,6 +650,16 @@
+ 	 * @return array
+ 	 */
+ 	public static function commit_activation( $payload ) {
++		return self::serialized_transition( 'activation', $payload, static function ( $normalized ) {
++			return self::commit_activation_locked( $normalized );
++		} );
++	}
++
++	/**
++	 * @param array $payload Validated payload.
++	 * @return array
++	 */
++	private static function commit_activation_locked( $payload ) {
+ 		try {
+ 			$payload = is_array( $payload ) ? $payload : array();
+ 			$valid   = self::validate_activation_payload( $payload );
+@@ -448,11 +682,15 @@
+ 			if ( (string) $row['inquiry_id'] !== (string) $payload['proposed_inquiry_id'] || (int) $row['contact_id'] !== (int) $payload['contact_id'] ) {
+ 				return self::activation_response( $payload, 'rejected', 'activation_identity_mismatch' );
+ 			}
++			$site_binding = self::reconciliation_id_for( array( 'site_instance_id' => $payload['site_instance_id'], 'event_id' => $row['request_event_id'], 'proposed_inquiry_id' => $row['inquiry_id'] ) );
++			if ( $site_binding !== $recon_id ) {
++				return self::activation_response( $payload, 'rejected', 'activation_site_mismatch' );
++			}
+ 			$previous = self::nullable_string( isset( $payload['previous_inquiry_id'] ) ? $payload['previous_inquiry_id'] : null );
+ 			if ( self::nullable_string( $row['previous_inquiry_id'] ) !== $previous ) {
+ 				return self::activation_response( $payload, 'rejected', 'activation_previous_inquiry_mismatch' );
+ 			}
+-			if ( 'active' === (string) $row['state'] ) {
++			if ( in_array( (string) $row['state'], array( 'active', 'archived' ), true ) ) {
+ 				if ( (string) $row['activation_event_id'] === $event_id && (string) $row['activation_payload_hash'] === $payload_hash ) {
+ 					return self::activation_response( $payload, 'committed', 'already_committed' );
+ 				}
+@@ -464,6 +702,30 @@
+ 			if ( 'activating' === (string) $row['state'] && ( (string) $row['activation_event_id'] !== $event_id || (string) $row['activation_payload_hash'] !== $payload_hash ) ) {
+ 				return self::activation_response( $payload, 'rejected', 'activation_idempotency_conflict' );
+ 			}
++
++
++			$expected = (int) $row['expected_head_version'];
++			if ( (int) $payload['head_version'] !== $expected + 1 ) {
++				return self::activation_response( $payload, 'rejected', 'activation_head_version_mismatch' );
++			}
++			$active = self::active_for_contact( (int) $row['contact_id'] );
++			if ( null === $previous ) {
++				if ( is_array( $active ) || 0 !== $expected ) {
++					return self::activation_response( $payload, 'rejected', 'activation_current_head_mismatch' );
++				}
++			} elseif ( ! is_array( $active ) || (string) $active['inquiry_id'] !== $previous || 'active' !== (string) $active['state'] || null === $active['committed_head_version'] || (int) $active['committed_head_version'] !== $expected ) {
++				return self::activation_response( $payload, 'rejected', 'activation_current_head_mismatch' );
++			}
++			foreach ( self::pending_for_contact( (int) $row['contact_id'] ) as $pending ) {
++				if ( (int) $pending['id'] !== (int) $row['id'] ) {
++					return self::activation_response( $payload, 'retry', 'pending_reconciliation_exists' );
++				}
++			}
++			$storage = $wpdb->get_row( $wpdb->prepare( 'SHOW TABLE STATUS WHERE Name = %s', $table ), ARRAY_A );
++			if ( ! is_array( $storage ) || empty( $storage['Engine'] ) || 'innodb' !== strtolower( (string) $storage['Engine'] ) ) {
++				return self::activation_response( $payload, 'retry', 'inquiry_table_requires_innodb' );
++			}
++			self::assert_contact_lock( (int) $row['contact_id'] );
+ 
+ 			$marked = $wpdb->update(
+ 				$table,
+@@ -474,9 +736,9 @@
+ 					'committed_head_version'  => (int) $payload['head_version'],
+ 					'updated_at_utc'          => self::utc_now(),
+ 				),
+-				array( 'id' => (int) $row['id'] ),
++				array( 'id' => (int) $row['id'], 'state' => (string) $row['state'] ),
+ 				array( '%s','%s','%s','%d','%s' ),
+-				array( '%d' )
++				array( '%d','%s' )
+ 			);
+ 			$marked_row = self::get( (string) $row['inquiry_id'] );
+ 			if ( false === $marked || ! is_array( $marked_row ) || 'activating' !== (string) $marked_row['state'] || $event_id !== (string) $marked_row['activation_event_id'] || $payload_hash !== (string) $marked_row['activation_payload_hash'] ) {
+@@ -488,6 +750,7 @@
+ 				return self::activation_response( $payload, 'retry', 'contact_not_found' );
+ 			}
+ 
++			self::assert_contact_lock( (int) $row['contact_id'] );
+ 			self::$reconciling = true;
+ 			try {
+ 				$projected = self::project_new_inquiry_to_contact( $subscriber, $row );
+@@ -499,17 +762,20 @@
+ 			}
+ 
+ 			$now = self::utc_now();
+-			$wpdb->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
++			self::assert_contact_lock( (int) $row['contact_id'] );
++			if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
++				return self::activation_response( $payload, 'retry', 'inquiry_transaction_start_failed' );
++			}
+ 			try {
+ 				if ( null !== $previous ) {
+ 					$updated_prev = $wpdb->update(
+ 						$table,
+ 						array( 'state' => 'archived', 'active_contact_id' => null, 'archived_at_utc' => $now, 'updated_at_utc' => $now ),
+-						array( 'inquiry_id' => $previous, 'contact_id' => (int) $row['contact_id'] ),
++						array( 'inquiry_id' => $previous, 'contact_id' => (int) $row['contact_id'], 'state' => 'active', 'active_contact_id' => (int) $row['contact_id'], 'committed_head_version' => $expected ),
+ 						array( '%s','%d','%s','%s' ),
+-						array( '%s','%d' )
++						array( '%s','%d','%s','%d','%d' )
+ 					);
+-					if ( false === $updated_prev ) {
++					if ( 1 !== $updated_prev ) {
+ 						throw new \RuntimeException( 'previous_inquiry_archive_failed' );
+ 					}
+ 				}
+@@ -522,17 +788,29 @@
+ 						'activated_at_utc'   => $now,
+ 						'updated_at_utc'     => $now,
+ 					),
+-					array( 'id' => (int) $row['id'] ),
++					array( 'id' => (int) $row['id'], 'state' => 'activating', 'activation_event_id' => $event_id, 'activation_payload_hash' => $payload_hash, 'expected_head_version' => $expected ),
+ 					array( '%s','%d','%s','%s','%s' ),
+-					array( '%d' )
++					array( '%d','%s','%s','%s','%d' )
+ 				);
+-				if ( false === $updated_new ) {
++				if ( 1 !== $updated_new ) {
+ 					throw new \RuntimeException( 'new_inquiry_activation_failed' );
+ 				}
+-				$wpdb->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
++				self::assert_contact_lock( (int) $row['contact_id'] );
++				if ( false === $wpdb->query( 'COMMIT' ) ) {
++					throw new \RuntimeException( 'inquiry_transaction_commit_failed' );
++				}
+ 			} catch ( \Throwable $e ) {
+-				$wpdb->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
++				if ( false === $wpdb->query( 'ROLLBACK' ) ) {
++					self::discard_connection();
++					return self::activation_response( $payload, 'retry', 'inquiry_transaction_rollback_failed' );
++				}
+ 				return self::activation_response( $payload, 'retry', self::safe_reason( $e->getMessage() ) );
++			}
++
++			$committed = self::get( (string) $row['inquiry_id'] );
++			$archived = null === $previous ? null : self::get( $previous );
++			if ( ! is_array( $committed ) || 'active' !== (string) $committed['state'] || (int) $committed['active_contact_id'] !== (int) $row['contact_id'] || (int) $committed['committed_head_version'] !== (int) $payload['head_version'] || (string) $committed['activation_event_id'] !== $event_id || (string) $committed['activation_payload_hash'] !== $payload_hash || ( null !== $previous && ( ! is_array( $archived ) || 'archived' !== (string) $archived['state'] || null !== $archived['active_contact_id'] ) ) ) {
++				return self::activation_response( $payload, 'retry', 'inquiry_commit_readback_failed' );
+ 			}
+ 
+ 			return self::activation_response( $payload, 'committed', 'activated' );
+@@ -563,6 +841,36 @@
+ 	 * @return bool
+ 	 */
+ 	public static function sync_active_from_subscriber( $subscriber ) {
++		if ( self::$connection_unusable || self::$reconciling || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! self::table_exists() ) {
++			return false;
++		}
++		$contact_id = (int) $subscriber->id;
++		$lock = self::acquire_contact_lock( $contact_id );
++		if ( ! $lock['ok'] ) {
++			return false;
++		}
++		try {
++			self::assert_contact_lock( $contact_id );
++			// Do not mirror a stale model captured before another inquiry switch.
++			$fresh = self::find_subscriber( $contact_id );
++			$synced = self::sync_active_locked( $fresh );
++			self::assert_contact_lock( $contact_id );
++		} catch ( \Throwable $e ) {
++			$synced = false;
++		} finally {
++			$released = self::release_contact_lock( $contact_id );
++			if ( ! $released ) {
++				self::discard_connection();
++			}
++		}
++		return $released && $synced;
++	}
++
++	/**
++	 * @param object $subscriber Fresh contact resolved under its lock.
++	 * @return bool
++	 */
++	private static function sync_active_locked( $subscriber ) {
+ 		if ( self::$reconciling || ! self::table_exists() || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! method_exists( $subscriber, 'custom_fields' ) ) {
+ 			return false;
+ 		}
+@@ -593,7 +901,8 @@
+ 			'ads_conversion_value_frozen' => self::positive_decimal_or_null( isset( $custom['ads_conversion_value_frozen'] ) ? $custom['ads_conversion_value_frozen'] : null ),
+ 			'updated_at_utc'              => self::utc_now(),
+ 		);
+-		$updated = $wpdb->update( $table, $data, array( 'id' => (int) $row['id'] ), array( '%s','%s','%s','%s','%f','%s','%f','%s' ), array( '%d' ) );
++		self::assert_contact_lock( (int) $subscriber->id );
++		$updated = $wpdb->update( $table, $data, array( 'id' => (int) $row['id'], 'state' => 'active', 'active_contact_id' => (int) $subscriber->id ), array( '%s','%s','%s','%s','%f','%s','%f','%s' ), array( '%d','%s','%d' ) );
+ 		return false !== $updated;
+ 	}
+ 
+@@ -744,18 +1053,21 @@
+ 
+ 	/** @param array $payload @return array */
+ 	private static function validate_adoption_payload( $payload ) {
+-		if ( ! isset( $payload['contract_version'] ) || self::CONTRACT_VERSION !== (string) $payload['contract_version'] ) {
++		if ( ! isset( $payload['contract_version'] ) || ( self::CONTRACT_VERSION !== $payload['contract_version'] && 1 !== $payload['contract_version'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'unsupported_contract_version' );
+ 		}
+ 		foreach ( array( 'event_id', 'site_instance_id', 'inquiry_id' ) as $key ) {
+-			if ( ! isset( $payload[ $key ] ) || '' === trim( (string) $payload[ $key ] ) ) {
++			if ( ! isset( $payload[ $key ] ) || ! is_string( $payload[ $key ] ) || '' === $payload[ $key ] || trim( $payload[ $key ] ) !== $payload[ $key ] ) {
+ 				return array( 'ok' => false, 'reason' => 'missing_' . $key );
+ 			}
+ 		}
+-		if ( ! isset( $payload['contact_id'] ) || (int) $payload['contact_id'] < 1 ) {
++		if ( strlen( $payload['event_id'] ) > 80 ) {
++			return array( 'ok' => false, 'reason' => 'invalid_event_id' );
++		}
++		if ( ! isset( $payload['contact_id'] ) || ! self::valid_head_version( $payload['contact_id'], 1 ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_contact_id' );
+ 		}
+-		if ( ! isset( $payload['head_version'] ) || ! is_numeric( $payload['head_version'] ) || (int) $payload['head_version'] < 0 ) {
++		if ( ! isset( $payload['head_version'] ) || ! self::valid_head_version( $payload['head_version'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_head_version' );
+ 		}
+ 		if ( ! self::valid_inquiry_id( $payload['inquiry_id'] ) ) {
+@@ -769,24 +1081,27 @@
+ 
+ 	/** @param array $payload @return array */
+ 	private static function validate_prepare_payload( $payload ) {
+-		if ( ! isset( $payload['contract_version'] ) || self::CONTRACT_VERSION !== (string) $payload['contract_version'] ) {
++		if ( ! isset( $payload['contract_version'] ) || ( self::CONTRACT_VERSION !== $payload['contract_version'] && 1 !== $payload['contract_version'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'unsupported_contract_version' );
+ 		}
+ 		foreach ( array( 'event_id', 'site_instance_id', 'proposed_inquiry_id', 'request_id' ) as $key ) {
+-			if ( ! isset( $payload[ $key ] ) || '' === trim( (string) $payload[ $key ] ) ) {
++			if ( ! isset( $payload[ $key ] ) || ! is_string( $payload[ $key ] ) || '' === $payload[ $key ] || trim( $payload[ $key ] ) !== $payload[ $key ] ) {
+ 				return array( 'ok' => false, 'reason' => 'missing_' . $key );
+ 			}
+ 		}
+-		if ( ! isset( $payload['contact_id'] ) || (int) $payload['contact_id'] < 1 ) {
++		if ( strlen( $payload['event_id'] ) > 80 ) {
++			return array( 'ok' => false, 'reason' => 'invalid_event_id' );
++		}
++		if ( ! isset( $payload['contact_id'] ) || ! self::valid_head_version( $payload['contact_id'], 1 ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_contact_id' );
+ 		}
+-		if ( ! isset( $payload['expected_head_version'] ) || ! is_numeric( $payload['expected_head_version'] ) || (int) $payload['expected_head_version'] < 0 ) {
++		if ( ! isset( $payload['expected_head_version'] ) || ! self::valid_head_version( $payload['expected_head_version'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_expected_head_version' );
+ 		}
+ 		if ( ! self::valid_inquiry_id( $payload['proposed_inquiry_id'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_proposed_inquiry_id' );
+ 		}
+-		if ( isset( $payload['previous_inquiry_id'] ) && null !== $payload['previous_inquiry_id'] && '' !== (string) $payload['previous_inquiry_id'] && ! self::valid_inquiry_id( $payload['previous_inquiry_id'] ) ) {
++		if ( isset( $payload['previous_inquiry_id'] ) && ( ! is_string( $payload['previous_inquiry_id'] ) || ( '' !== $payload['previous_inquiry_id'] && ( trim( $payload['previous_inquiry_id'] ) !== $payload['previous_inquiry_id'] || ! self::valid_inquiry_id( $payload['previous_inquiry_id'] ) ) ) ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_previous_inquiry_id' );
+ 		}
+ 		if ( ! isset( $payload['source'] ) || ! is_array( $payload['source'] ) || empty( $payload['source']['type'] ) ) {
+@@ -797,19 +1112,28 @@
+ 
+ 	/** @param array $payload @return array */
+ 	private static function validate_activation_payload( $payload ) {
+-		if ( ! isset( $payload['contract_version'] ) || self::CONTRACT_VERSION !== (string) $payload['contract_version'] ) {
++		if ( ! isset( $payload['contract_version'] ) || ( self::CONTRACT_VERSION !== $payload['contract_version'] && 1 !== $payload['contract_version'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'unsupported_contract_version' );
+ 		}
+ 		foreach ( array( 'event_id', 'site_instance_id', 'reconciliation_id', 'proposed_inquiry_id' ) as $key ) {
+-			if ( ! isset( $payload[ $key ] ) || '' === trim( (string) $payload[ $key ] ) ) {
++			if ( ! isset( $payload[ $key ] ) || ! is_string( $payload[ $key ] ) || '' === $payload[ $key ] || trim( $payload[ $key ] ) !== $payload[ $key ] ) {
+ 				return array( 'ok' => false, 'reason' => 'missing_' . $key );
+ 			}
+ 		}
+-		if ( ! isset( $payload['contact_id'] ) || (int) $payload['contact_id'] < 1 ) {
++		if ( strlen( $payload['event_id'] ) > 80 ) {
++			return array( 'ok' => false, 'reason' => 'invalid_event_id' );
++		}
++		if ( ! isset( $payload['contact_id'] ) || ! self::valid_head_version( $payload['contact_id'], 1 ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_contact_id' );
+ 		}
+-		if ( ! isset( $payload['head_version'] ) || ! is_numeric( $payload['head_version'] ) || (int) $payload['head_version'] < 1 ) {
++		if ( ! isset( $payload['head_version'] ) || ! self::valid_head_version( $payload['head_version'], 1 ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_head_version' );
++		}
++		if ( strlen( $payload['reconciliation_id'] ) > 64 ) {
++			return array( 'ok' => false, 'reason' => 'invalid_reconciliation_id' );
++		}
++		if ( isset( $payload['previous_inquiry_id'] ) && ( ! is_string( $payload['previous_inquiry_id'] ) || ( '' !== $payload['previous_inquiry_id'] && ! self::valid_inquiry_id( $payload['previous_inquiry_id'] ) ) ) ) {
++			return array( 'ok' => false, 'reason' => 'invalid_previous_inquiry_id' );
+ 		}
+ 		if ( ! self::valid_inquiry_id( $payload['proposed_inquiry_id'] ) ) {
+ 			return array( 'ok' => false, 'reason' => 'invalid_proposed_inquiry_id' );
+@@ -819,9 +1143,15 @@
+ 
+ 	/** @param array $source @return array */
+ 	private static function validate_source_binding( $source ) {
++		if ( ! isset( $source['type'] ) || ! is_string( $source['type'] ) || '' === trim( $source['type'] ) ) {
++			return array( 'ok' => false, 'reason' => 'invalid_source' );
++		}
+ 		$type = isset( $source['type'] ) ? trim( (string) $source['type'] ) : '';
+ 		if ( 'fluent_form' !== $type ) {
+ 			return array( 'ok' => true, 'reason' => '', 'form_id' => null, 'entry_id' => null, 'transaction_id' => null );
++		}
++		if ( ! isset( $source['form_id'], $source['entry_id'] ) || ! self::valid_head_version( $source['form_id'], 1 ) || ! self::valid_head_version( $source['entry_id'], 1 ) ) {
++			return array( 'ok' => false, 'reason' => 'fluent_form_source_requires_form_id_and_entry_id' );
+ 		}
+ 		$form_id  = isset( $source['form_id'] ) ? (int) $source['form_id'] : 0;
+ 		$entry_id = isset( $source['entry_id'] ) ? (int) $source['entry_id'] : 0;
+--- a/siteengine-ads-bridge/siteengine-ads-bridge.php
++++ b/siteengine-ads-bridge/siteengine-ads-bridge.php
+@@ -2,7 +2,7 @@
+ /**
+  * Plugin Name: SiteEngine Ads Bridge
+  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
+- * Version: 0.6.1
++ * Version: 0.6.2
+  * Requires PHP: 7.4
+  * Requires Plugins: siteengine-base
+  * Author: SiteEngine
+@@ -13,7 +13,7 @@
+ 	exit;
+ }
+ 
+-define( 'SEAB_VERSION', '0.6.1' );
++define( 'SEAB_VERSION', '0.6.2' );
+ define( 'SEAB_PLUGIN_FILE', __FILE__ );
+ define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+ define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+--- a/siteengine-ads-bridge/tests/inquiry-acceptance.php
++++ b/siteengine-ads-bridge/tests/inquiry-acceptance.php
+@@ -1,6 +1,6 @@
+ <?php
+ /**
+- * Dynamic 0.6.1 inquiry/adoption/reconciliation acceptance.
++ * Dynamic 0.6.2 inquiry/adoption/reconciliation acceptance.
+  * Run: php tests/inquiry-acceptance.php
+  */
+ namespace FluentCrm\App\Models {
+@@ -22,6 +22,7 @@
+         public $ignore_tag_writes = false;
+         public $throw_on_field_write = false;
+         public $field_write_calls = 0;
++        public $on_field_write = null;
+         private $custom = array();
+ 
+         public function __construct( $id, array $custom, $lifecycle = 'won' ) {
+@@ -42,6 +43,7 @@
+         public function syncCustomFieldValues( $values, $delete_other = true, $custom_fields = array() ) {
+             unset( $custom_fields );
+             $this->field_write_calls++;
++            if (is_callable($this->on_field_write)) { $callback=$this->on_field_write; $this->on_field_write=null; $callback(); }
+             if ( $this->throw_on_field_write ) { throw new \RuntimeException( 'injected_field_write_failure' ); }
+             if ( $this->ignore_field_writes ) { return array(); }
+             $changed = array();
+@@ -93,7 +95,7 @@
+ namespace {
+     define( 'ABSPATH', __DIR__ . '/' );
+     define( 'ARRAY_A', 'ARRAY_A' );
+-    define( 'SEAB_VERSION', '0.6.1' );
++    define( 'SEAB_VERSION', '0.6.2' );
+ 
+     $GLOBALS['seab_hooks'] = array();
+     function add_action( $hook, $callback, $priority = 10, $args = 1 ) {
+@@ -139,6 +141,16 @@
+         public $rows = array();
+         public $submissions = array();
+         public $fail_activating_write = false;
++        public $locks = array();
++        public $deny_locks = false;
++        public $lock_unavailable = false;
++        public $lose_lock = false;
++        public $fail_release = false;
++        public $storage_engine = 'InnoDB';
++        public $fail_query = '';
++        public $fail_archive = false;
++        public $fail_activate = false;
++        private $transaction_rows = null;
+         private $next_id = 1;
+         public function get_charset_collate() { return ''; }
+         public function prepare( $query, ...$args ) {
+@@ -150,6 +162,22 @@
+             return $query;
+         }
+         public function get_var( $sql ) {
++            if (preg_match("/SELECT GET_LOCK\\('([^']+)', 0\\)/",$sql,$m)) {
++                if ($this->lock_unavailable) return null;
++                if ($this->deny_locks || (isset($this->locks[$m[1]]) && 1!==$this->locks[$m[1]])) return 0;
++                $this->locks[$m[1]]=1;
++                return 1;
++            }
++            if (preg_match("/SELECT IS_USED_LOCK\\('([^']+)'\\) = CONNECTION_ID\\(\\)/",$sql,$m)) {
++                if ($this->lose_lock) { unset($this->locks[$m[1]]); return null; }
++                return isset($this->locks[$m[1]]) ? (int)(1===$this->locks[$m[1]]) : null;
++            }
++            if (preg_match("/SELECT RELEASE_LOCK\\('([^']+)'\\)/",$sql,$m)) {
++                if ($this->fail_release) return null;
++                if (!isset($this->locks[$m[1]])) return null;
++                if (1!==$this->locks[$m[1]]) return 0;
++                unset($this->locks[$m[1]]); return 1;
++            }
+             if ( false !== strpos( $sql, 'SHOW TABLES LIKE' ) ) {
+                 if ( false !== strpos( $sql, 'wp_se_ads_inquiries' ) ) { return 'wp_se_ads_inquiries'; }
+                 if ( false !== strpos( $sql, 'wp_fluentform_submissions' ) ) { return 'wp_fluentform_submissions'; }
+@@ -170,6 +198,7 @@
+         private function unquote( $s ) { return str_replace( "''", "'", trim( $s, "'" ) ); }
+         public function get_row( $sql, $format = null ) {
+             unset( $format );
++            if (false!==strpos($sql,'SHOW TABLE STATUS WHERE Name')) return array('Engine'=>$this->storage_engine);
+             if ( preg_match( '/SELECT id, form_id FROM `wp_fluentform_submissions` WHERE id = (\d+)/', $sql, $m ) ) {
+                 $id=(int)$m[1]; return isset($this->submissions[$id]) ? array('id'=>$id,'form_id'=>$this->submissions[$id]['form_id']) : null;
+             }
+@@ -178,6 +207,7 @@
+                 foreach ( $this->rows as $row ) {
+                     $match=false;
+                     if ( preg_match( "/request_event_id = '([^']+)' OR inquiry_id = '([^']+)'/", $where, $w ) ) $match = ((string)$row['request_event_id']===$this->unquote($w[1]) || (string)$row['inquiry_id']===$this->unquote($w[2]));
++                    elseif ( preg_match( "/inquiry_id = '([^']+)' OR request_event_id = '([^']+)'/", $where, $w ) ) $match = ((string)$row['inquiry_id']===$this->unquote($w[1]) || (string)$row['request_event_id']===$this->unquote($w[2]));
+                     elseif ( preg_match( '/active_contact_id = (\d+)/', $where, $w ) ) $match = ((int)$row['active_contact_id']===(int)$w[1]);
+                     elseif ( preg_match( "/inquiry_id = '([^']+)'/", $where, $w ) ) $match = ((string)$row['inquiry_id']===$this->unquote($w[1]));
+                     elseif ( preg_match( "/reconciliation_id = '([^']+)'/", $where, $w ) ) $match = ((string)$row['reconciliation_id']===$this->unquote($w[1]));
+@@ -209,6 +239,8 @@
+         public function update( $table, $data, $where, $formats = null, $where_formats = null ) {
+             unset($formats,$where_formats); if('wp_se_ads_inquiries'!==$table) return false;
+             if ($this->fail_activating_write && 'activating' === ($data['state'] ?? '')) return false;
++            if ($this->fail_archive && 'archived' === ($data['state'] ?? '')) return 0;
++            if ($this->fail_activate && 'active' === ($data['state'] ?? '')) return 0;
+             $n=0;
+             foreach($this->rows as &$r) {
+                 $ok=true; foreach($where as $k=>$v) { if((string)$r[$k] !== (string)$v) {$ok=false; break;} }
+@@ -216,12 +248,24 @@
+             }
+             unset($r); return $n;
+         }
+-        public function query( $sql ) { return true; }
++        public function query( $sql ) {
++            if ($sql===$this->fail_query) return false;
++            if ('START TRANSACTION'===$sql) $this->transaction_rows=$this->rows;
++            if ('COMMIT'===$sql) $this->transaction_rows=null;
++            if ('ROLLBACK'===$sql && null!==$this->transaction_rows) { $this->rows=$this->transaction_rows; $this->transaction_rows=null; }
++            return 0;
++        }
++        public function close() {
++            if (null!==$this->transaction_rows) $this->rows=$this->transaction_rows;
++            $this->transaction_rows=null; $this->locks=array(); return true;
++        }
+         public function get_results( $sql, $format = null ) {
+             unset($format);
+             if(false===strpos($sql,'FROM `wp_se_ads_inquiries`')) return array();
+             $rows=$this->rows;
+             if(false!==strpos($sql,"state IN ('active','archived')")) $rows=array_values(array_filter($rows,fn($r)=>in_array($r['state'],array('active','archived'),true)));
++            if(false!==strpos($sql,"state IN ('prepared','activating')")) $rows=array_values(array_filter($rows,fn($r)=>in_array($r['state'],array('prepared','activating'),true)));
++            if(preg_match('/WHERE contact_id = (\d+)/',$sql,$m)) $rows=array_values(array_filter($rows,fn($r)=>(int)$r['contact_id']===(int)$m[1]));
+             if(preg_match('/`(qualified_at|unqualified_at|closed_date)` IS NOT NULL/',$sql,$m)) { $f=$m[1]; $rows=array_values(array_filter($rows,fn($r)=>null!==$r[$f] && ''!==$r[$f])); }
+             if(false!==strpos($sql,"transaction_id IS NOT NULL")) $rows=array_values(array_filter($rows,fn($r)=>!empty($r['transaction_id'])));
+             if(preg_match('/contact_id IN \(([^)]+)\)/',$sql,$m)){ $ids=array_map('intval',explode(',',$m[1])); $rows=array_values(array_filter($rows,fn($r)=>in_array((int)$r['contact_id'],$ids,true))); }
+@@ -430,6 +474,8 @@
+     check_inq('retry'===$result['status'] && 'projection_field_mapping_invalid'===$result['reason_code'] && $calls===$contact->field_write_calls,'invalid reset field mapping cannot overwrite the canonical submission binding');
+     SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
+ 
+-    echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
+-    exit($fails?1:0);
++    if (!defined('SEAB_INQUIRY_TEST_INCLUDE')) {
++        echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
++        exit($fails?1:0);
++    }
+ }
+--- a/siteengine-ads-bridge/tests/inquiry-database-acceptance.php
++++ b/siteengine-ads-bridge/tests/inquiry-database-acceptance.php
+@@ -0,0 +1,155 @@
++<?php
++/**
++ * Opt-in MariaDB/MySQL integration. NEVER point this at a WordPress database.
++ * Requires PDO mysql and a dedicated database named seab_inquiry_acceptance.
++ * Set SEAB_TEST_DSN, SEAB_TEST_DB_USER, SEAB_TEST_DB_PASSWORD and
++ * SEAB_TEST_ALLOW_DB_WRITES=1. Without opt-in this test exits without connecting.
++ * Subscriber/CRM calls remain simulated; inquiry storage and locks use SQL.
++ */
++if ('cli' !== PHP_SAPI || '1' !== getenv('SEAB_TEST_ALLOW_DB_WRITES') || !getenv('SEAB_TEST_DSN')) {
++    echo "SKIP: explicit dedicated-database opt-in is required.\n";
++    exit(0);
++}
++if (!class_exists('PDO') || !in_array('mysql',PDO::getAvailableDrivers(),true)) {
++    fwrite(STDERR,"PDO mysql is required.\n"); exit(1);
++}
++define('DB_NAME','seab_inquiry_acceptance');
++$dsn=getenv('SEAB_TEST_DSN'); $user=getenv('SEAB_TEST_DB_USER') ?: ''; $password=getenv('SEAB_TEST_DB_PASSWORD') ?: '';
++$pdo=new PDO($dsn,$user,$password,array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION));
++$observer=new PDO($dsn,$user,$password,array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION));
++if ('seab_inquiry_acceptance' !== $pdo->query('SELECT DATABASE()')->fetchColumn() || 'seab_inquiry_acceptance' !== $observer->query('SELECT DATABASE()')->fetchColumn()) {
++    fwrite(STDERR,"Refusing a database other than seab_inquiry_acceptance.\n"); exit(1);
++}
++define('SEAB_INQUIRY_TEST_INCLUDE',true);
++ob_start(); require __DIR__.'/inquiry-acceptance.php'; $bootstrap_log=ob_get_clean();
++if ($fails) { echo $bootstrap_log; exit(1); }
++$passes=0; $fails=0;
++
++final class SEAB_SQL_Test_WPDB {
++    public $prefix;
++    public $pdo;
++    public $submissions=array();
++    public $last_error='';
++    public $fail_activation=false;
++    public function __construct($pdo,$prefix) { $this->pdo=$pdo; $this->prefix=$prefix; }
++    public function get_charset_collate() { return 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'; }
++    public function prepare($query,...$args) {
++        if (1===count($args) && is_array($args[0])) $args=$args[0];
++        $i=0;
++        return preg_replace_callback('/%[dsf]/',function($m)use(&$i,$args){
++            $v=$args[$i++];
++            return '%s'===$m[0] ? $this->pdo->quote((string)$v) : ( '%d'===$m[0] ? (string)(int)$v : (string)(float)$v );
++        },$query);
++    }
++    public function get_var($sql) {
++        $this->last_error='';
++        try { $value=$this->pdo->query($sql)->fetchColumn(); return false===$value?null:$value; }
++        catch(Throwable $e) { $this->last_error=$e->getMessage(); return null; }
++    }
++    public function get_row($sql,$format=null) {
++        $this->last_error='';
++        try { $row=$this->pdo->query($sql)->fetch(PDO::FETCH_ASSOC); return false===$row?null:$row; }
++        catch(Throwable $e) { $this->last_error=$e->getMessage(); return null; }
++    }
++    public function get_results($sql,$format=null) {
++        $this->last_error='';
++        try { return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC); }
++        catch(Throwable $e) { $this->last_error=$e->getMessage(); return null; }
++    }
++    public function insert($table,$data,$formats=null) {
++        $this->last_error='';
++        try {
++            $columns=implode(',',array_map(fn($key)=>'`'.$key.'`',array_keys($data)));
++            $statement=$this->pdo->prepare('INSERT INTO `'.$table.'` ('.$columns.') VALUES ('.implode(',',array_fill(0,count($data),'?')).')');
++            $statement->execute(array_values($data)); return $statement->rowCount();
++        } catch(Throwable $e) { $this->last_error=$e->getMessage(); return false; }
++    }
++    public function update($table,$data,$where,$formats=null,$where_formats=null) {
++        if ($this->fail_activation && 'active'===($data['state']??'')) return 0;
++        $this->last_error='';
++        try {
++            $set=implode(',',array_map(fn($key)=>'`'.$key.'`=?',array_keys($data)));
++            $filter=implode(' AND ',array_map(fn($key)=>'`'.$key.'`=?',array_keys($where)));
++            $statement=$this->pdo->prepare('UPDATE `'.$table.'` SET '.$set.' WHERE '.$filter);
++            $statement->execute(array_merge(array_values($data),array_values($where))); return $statement->rowCount();
++        } catch(Throwable $e) { $this->last_error=$e->getMessage(); return false; }
++    }
++    public function query($sql) {
++        $this->last_error='';
++        try { return $this->pdo->exec($sql); }
++        catch(Throwable $e) { $this->last_error=$e->getMessage(); return false; }
++    }
++    public function close() { $this->pdo=null; return true; }
++}
++
++$prefix='seab_acceptance_'.bin2hex(random_bytes(6)).'_';
++$tables=array($prefix.'se_ads_inquiries',$prefix.'fluentform_submissions',$prefix.'fc_tags');
++$GLOBALS['wpdb']=new SEAB_SQL_Test_WPDB($pdo,$prefix);
++function native_case($id) {
++    global $wpdb;
++    $entry=$id*10;
++    $wpdb->query('INSERT INTO `'.$wpdb->prefix.'fluentform_submissions` (id,form_id) VALUES ('.$entry.',3),('.($entry+1).',3)');
++    return reset_case($id);
++}
++function native_lock_name($id) {
++    global $wpdb;
++    return 'seab_i_'.substr(hash('sha256',DB_NAME.'|'.$wpdb->prefix.'|'.$id),0,48);
++}
++try {
++    $pdo->exec('SET SESSION default_storage_engine=InnoDB');
++    $pdo->exec(SiteEngine_Ads_Bridge_Inquiries::schema_sql());
++    $pdo->exec('CREATE TABLE `'.$tables[1].'` (id BIGINT UNSIGNED PRIMARY KEY, form_id BIGINT UNSIGNED NOT NULL) ENGINE=InnoDB');
++    $pdo->exec('CREATE TABLE `'.$tables[2].'` (id BIGINT UNSIGNED PRIMARY KEY, title VARCHAR(191) NOT NULL) ENGINE=InnoDB');
++    $pdo->exec('INSERT INTO `'.$tables[2]."` (id,title) VALUES (101,'New'),(102,'Qualified'),(103,'Unqualified'),(104,'Won')");
++
++    [$contact,$old,$new,$activation]=native_case(1000);
++    check_inq('prepared'===SiteEngine_Ads_Bridge_Inquiries::get($new)['state'],'native SQL stores adoption and prepared inquiry with canonical unique bindings');
++    $lock=native_lock_name(1000);
++    check_inq(1===(int)$observer->query('SELECT GET_LOCK('.$observer->quote($lock).',0)')->fetchColumn(),'an independent connection can hold the contact lock');
++    $calls=$contact->field_write_calls;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && 'contact_transition_busy'===$result['reason_code'] && $calls===$contact->field_write_calls,'actual cross-connection contention prevents source API activation and CRM reset');
++    $observer->query('SELECT RELEASE_LOCK('.$observer->quote($lock).')');
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'] && 'archived'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'] && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($new)['state'],'source API commits the old/new inquiry switch through real InnoDB');
++    check_inq(null===$observer->query('SELECT IS_USED_LOCK('.$observer->quote($lock).')')->fetchColumn(),'source API releases its native contact lock after commit');
++
++    [$contact,$old,$new,$activation]=native_case(1001);
++    $other=prep_for_native(1001,$old,uuid_for(990001));
++    $result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($other);
++    check_inq('retry'===$result['status'] && 'pending_reconciliation_exists'===$result['reason_code'],'native pending reservation rejects a competing prepare');
++    $GLOBALS['wpdb']->fail_activation=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $old_state=$observer->query('SELECT state FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($old))->fetchColumn();
++    $new_state=$observer->query('SELECT state FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($new))->fetchColumn();
++    check_inq('retry'===$result['status'] && 'active'===$old_state && 'activating'===$new_state,'real SQL rollback restores the old pointer after injected new-pointer failure');
++    $GLOBALS['wpdb']->fail_activation=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'native retry completes the previously rolled-back transition');
++
++    [$contact,$old,$new,$activation]=native_case(1002);
++    $lock=native_lock_name(1002);
++    $observer->query('SELECT GET_LOCK('.$observer->quote($lock).',0)');
++    [$independent,$i_old,$i_new,$i_activation]=native_case(1003);
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($i_activation);
++    check_inq('committed'===$result['status'],'one contact lock does not block a different contact');
++    $observer->query('SELECT RELEASE_LOCK('.$observer->quote($lock).')');
++
++    // End the database session during projection. Its connection-scoped lock
++    // must disappear and no committed acknowledgement may be returned.
++    $connection=(int)$pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
++    $contact->on_field_write=function()use($observer,$connection){ $observer->exec('KILL CONNECTION '.$connection); };
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'],'loss of the real lock-owning session cannot acknowledge activation');
++    check_inq(null===$observer->query('SELECT IS_USED_LOCK('.$observer->quote($lock).')')->fetchColumn(),'terminating the owner session releases its native database lock');
++    $old_state=$observer->query('SELECT state FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($old))->fetchColumn();
++    check_inq('active'===$old_state,'owner-session loss preserves the prior durable inquiry history');
++} finally {
++    foreach (array_reverse($tables) as $table) $observer->exec('DROP TABLE IF EXISTS `'.$table.'`');
++}
++echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
++exit($fails?1:0);
++
++function prep_for_native($id,$old,$new) {
++    return array('contract_version'=>'1','event_id'=>'evt_compete_'.$id,'site_instance_id'=>'site-test','contact_id'=>$id,'previous_inquiry_id'=>$old,'proposed_inquiry_id'=>$new,'expected_head_version'=>1,'request_id'=>'req_compete_'.$id,'source'=>array('type'=>'fluent_form','form_id'=>3,'entry_id'=>$id*10+1));
++}
+--- a/siteengine-ads-bridge/tests/inquiry-transition-acceptance.php
++++ b/siteengine-ads-bridge/tests/inquiry-transition-acceptance.php
+@@ -0,0 +1,159 @@
++<?php
++/**
++ * Version, reservation, lock and transaction failure tests using isolated doubles.
++ * Run directly with PHP, never through a WordPress bootstrap.
++ */
++define( 'SEAB_INQUIRY_TEST_INCLUDE', true );
++ob_start();
++require __DIR__ . '/inquiry-acceptance.php';
++$bootstrap_log = ob_get_clean();
++if ( $fails ) { echo $bootstrap_log; exit(1); }
++$passes = 0; $fails = 0;
++
++function prep_for_case($id,$old,$new,$version=1) {
++    return array('contract_version'=>'1','event_id'=>'evt_prepare_'.$id,'site_instance_id'=>'site-test','contact_id'=>$id,'previous_inquiry_id'=>$old,'proposed_inquiry_id'=>$new,'expected_head_version'=>$version,'request_id'=>'req_'.$id,'source'=>array('type'=>'fluent_form','form_id'=>3,'entry_id'=>$id*10+1));
++}
++
++[$contact,$old,$new,$activation]=reset_case(50);
++$prep=prep_for_case(50,$old,uuid_for(5050),0);
++$prep['event_id']='evt_prepare_50_competing'; $prep['request_id']='req_50_competing';
++$calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($prep);
++check_inq('rejected'===$result['status'] && 'head_version_mismatch'===$result['reason_code'] && $calls===$contact->field_write_calls,'stale prepare version cannot reserve or reset the contact');
++$prep['expected_head_version']=1;
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($prep);
++check_inq('retry'===$result['status'] && 'pending_reconciliation_exists'===$result['reason_code'] && null===SiteEngine_Ads_Bridge_Inquiries::get(uuid_for(5050)),'a second request cannot prepare a competing inquiry for the same head');
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation(prep_for_case(50,$old,$new));
++check_inq('ready'===$result['status'] && 'already_prepared'===$result['reason_code'],'the matching prepare retry retains its own reservation');
++
++foreach (array(0,-1,1,3,2.0,'2.0','2e0',true,'9223372036854775807999') as $version) {
++    $bad=$activation; $bad['head_version']=$version;
++    $calls=$contact->field_write_calls;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($bad);
++    check_inq('rejected'===$result['status'] && $calls===$contact->field_write_calls,'invalid or nonconsecutive activation version is rejected: '.json_encode($version));
++}
++foreach (array(1.0,'1.0',true,-1,'9223372036854775807999') as $version) {
++    $bad=prep_for_case(50,$old,uuid_for(5051),$version);
++    $result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($bad);
++    check_inq('rejected'===$result['status'] && 'invalid_expected_head_version'===$result['reason_code'],'prepare rejects a noninteger, negative or overflowing version: '.json_encode($version));
++}
++$bad=$activation; $bad['site_instance_id']='different-site';
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($bad);
++check_inq('rejected'===$result['status'] && 'activation_site_mismatch'===$result['reason_code'],'activation must match the site identity used to prepare');
++$bad=prep_for_case(50,$old,uuid_for(5052)); $bad['event_id']=' evt_whitespace';
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($bad);
++check_inq('rejected'===$result['status'],'correlation identifiers cannot change identity through surrounding whitespace');
++$bad=prep_for_case(50,$old,uuid_for(5052)); $bad['event_id']=str_repeat('x',81);
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($bad);
++check_inq('rejected'===$result['status'] && 'invalid_event_id'===$result['reason_code'],'oversized event identities are rejected before database truncation can break retries');
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'],'valid head version advances from one to two');
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation(prep_for_case(50,$old,$new));
++check_inq('committed'===$result['status'] && 'already_activated'===$result['reason_code'] && 2===$result['committed_head_version'],'prepare replay after activation reports committed rather than authorizing a second head activation');
++
++// Advance again, then replay the earlier completed event without resetting C.
++$GLOBALS['wpdb']->submissions[502]=array('form_id'=>3);
++$next=uuid_for(5053); $prep=prep_for_case(50,$new,$next,2);
++$prep['event_id']='evt_prepare_50_C'; $prep['request_id']='req_50_C'; $prep['source']['entry_id']=502;
++$ready=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($prep);
++$commit=$activation; $commit['event_id']='evt_activate_50_C'; $commit['previous_inquiry_id']=$new; $commit['proposed_inquiry_id']=$next; $commit['head_version']=3; $commit['reconciliation_id']=$ready['reconciliation_id'];
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($commit);
++check_inq('committed'===$result['status'],'a later inquiry advances from two to three');
++$contact->attachTags(array(102)); $calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && 'already_committed'===$result['reason_code'] && $calls===$contact->field_write_calls && $next===SiteEngine_Ads_Bridge_Inquiries::active_for_contact(50)['inquiry_id'],'replaying an archived activation never resets or reopens the current inquiry');
++$result=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation(prep_for_case(50,$old,$new));
++check_inq('committed'===$result['status'] && 'archived'===$result['inquiry_state'],'historical prepare replay exposes the archived completed state');
++
++[$contact,$old,$new,$activation]=reset_case(51);
++$GLOBALS['wpdb']->update('wp_se_ads_inquiries',array('committed_head_version'=>2),array('inquiry_id'=>$old));
++$calls=$contact->field_write_calls; $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('rejected'===$result['status'] && 'activation_current_head_mismatch'===$result['reason_code'] && $calls===$contact->field_write_calls,'activation rechecks the current persisted head version before projection');
++
++[$contact,$old,$new,$activation]=reset_case(52);
++$GLOBALS['wpdb']->deny_locks=true; $calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'contact_transition_busy'===$result['reason_code'] && $calls===$contact->field_write_calls,'lock contention prevents activation from touching the contact');
++check_inq(false===SiteEngine_Ads_Bridge_Inquiries::sync_active_from_subscriber($contact),'history mirroring also honors the contact lock');
++$GLOBALS['wpdb']->deny_locks=false;
++$GLOBALS['wpdb']->lock_unavailable=true; $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'contact_lock_unavailable'===$result['reason_code'],'unavailable database locks fail closed');
++$GLOBALS['wpdb']->lock_unavailable=false;
++$GLOBALS['wpdb']->lose_lock=true; $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'contact_lock_lost'===$result['reason_code'] && $calls===$contact->field_write_calls,'lost session lock is detected before the transition writes');
++$GLOBALS['wpdb']->lose_lock=false;
++// A lost session poisons that PHP request. Model a new request explicitly.
++$poison=new ReflectionProperty(SiteEngine_Ads_Bridge_Inquiries::class,'connection_unusable');
++$poison->setAccessible(true); $poison->setValue(null,false);
++$nested=null;
++$contact->on_field_write=function() use($activation,&$nested) { $nested=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation); };
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && 'retry'===$nested['status'] && 'contact_transition_reentrant'===$nested['reason_code'],'a callback cannot reenter the same contact transition');
++check_inq(array()===$GLOBALS['wpdb']->locks,'completed transitions release their database locks');
++
++[$contact,$old,$new,$activation]=reset_case(53);
++$GLOBALS['wpdb']->storage_engine='MyISAM'; $calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'inquiry_table_requires_innodb'===$result['reason_code'] && $calls===$contact->field_write_calls,'nontransactional storage is rejected before the CRM reset');
++$GLOBALS['wpdb']->storage_engine='InnoDB';
++
++foreach (array('START TRANSACTION'=>'inquiry_transaction_start_failed','COMMIT'=>'inquiry_transaction_commit_failed') as $statement=>$reason) {
++    $id='COMMIT'===$statement?55:54;
++    [$contact,$old,$new,$activation]=reset_case($id);
++    $GLOBALS['wpdb']->fail_query=$statement;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && $reason===$result['reason_code'] && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'] && 'activating'===SiteEngine_Ads_Bridge_Inquiries::get($new)['state'],'failed '.$statement.' cannot acknowledge an inquiry switch');
++    $GLOBALS['wpdb']->fail_query='';
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'same activation retries after '.$statement.' failure without duplicate inquiry rows');
++}
++foreach (array('fail_archive'=>'previous_inquiry_archive_failed','fail_activate'=>'new_inquiry_activation_failed') as $flag=>$reason) {
++    [$contact,$old,$new,$activation]=reset_case('fail_archive'===$flag?56:57);
++    $GLOBALS['wpdb']->$flag=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && $reason===$result['reason_code'] && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'] && 'activating'===SiteEngine_Ads_Bridge_Inquiries::get($new)['state'],'zero-row '.$flag.' write rolls back both inquiry pointers');
++    $GLOBALS['wpdb']->$flag=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'retry succeeds after '.$flag.' is repaired');
++}
++
++[$contact,$old,$new,$activation]=reset_case(58);
++$contact->throw_on_field_write=true; $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && array()===$GLOBALS['wpdb']->locks,'projection exceptions release the contact lock');
++$contact->throw_on_field_write=false;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'],'a subsequent call can reacquire the contact lock after an exception');
++
++[$contact,$old,$new,$activation]=reset_case(59);
++$GLOBALS['wpdb']->fail_release=true;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'contact_lock_release_failed'===$result['reason_code'] && array()===$GLOBALS['wpdb']->locks,'an unconfirmed lock release closes the connection and withholds success');
++$calls=$contact->field_write_calls;
++$GLOBALS['wpdb']->fail_release=false; $poison->setValue(null,false);
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && 'already_committed'===$result['reason_code'] && $calls===$contact->field_write_calls,'a fresh-request retry recovers the durable commit without resetting again');
++
++// Initial head creation must be version zero -> one and cannot race adoption.
++$GLOBALS['wpdb']->submissions[600]=array('form_id'=>3);
++$contact=new \FluentCrm\App\Models\Subscriber(60,array('submission_id'=>'600'),'new');
++\FluentCrm\App\Models\Subscriber::$rows[60]=$contact;
++$initial=array('contract_version'=>'1','event_id'=>'evt_initial_60','site_instance_id'=>'site-test','contact_id'=>60,'previous_inquiry_id'=>null,'proposed_inquiry_id'=>uuid_for(6000),'expected_head_version'=>0,'request_id'=>'req_initial_60','source'=>array('type'=>'fluent_form','form_id'=>3,'entry_id'=>600));
++$ready=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($initial);
++check_inq('ready'===$ready['status'],'a contact without inquiry history prepares its initial version-zero head');
++$adopt=array('contract_version'=>'1','event_id'=>'evt_adopt_60','site_instance_id'=>'site-test','contact_id'=>60,'inquiry_id'=>uuid_for(6001),'head_version'=>0);
++$result=SiteEngine_Ads_Bridge_Inquiries::adopt_current_inquiry($adopt);
++check_inq('retry'===$result['status'] && 'pending_reconciliation_exists'===$result['reason_code'],'adoption cannot replace an initial inquiry already reserved by prepare');
++$activation=array('contract_version'=>'1','event_id'=>'evt_initial_activate_60','site_instance_id'=>'site-test','contact_id'=>60,'previous_inquiry_id'=>null,'proposed_inquiry_id'=>uuid_for(6000),'head_version'=>1,'reconciliation_id'=>$ready['reconciliation_id']);
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && 1===(int)SiteEngine_Ads_Bridge_Inquiries::active_for_contact(60)['committed_head_version'],'the initial activation creates version one');
++
++// Rollback failure is terminal for this request: close the session and refuse reuse.
++[$contact,$old,$new,$activation]=reset_case(61);
++$GLOBALS['wpdb']->fail_archive=true; $GLOBALS['wpdb']->fail_query='ROLLBACK';
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'inquiry_transaction_rollback_failed'===$result['reason_code'] && array()===$GLOBALS['wpdb']->locks,'unconfirmed rollback closes the failed database session and releases its locks');
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'inquiry_connection_unusable'===$result['reason_code'],'a request with an unconfirmed rollback cannot start another transition');
++
++echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
++exit($fails?1:0);
+--- a/siteengine-ads-bridge/tests/static-acceptance-040.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-040.php
+@@ -11,7 +11,7 @@
+     if ( $ok ) { $passes++; echo "PASS: {$msg}\n"; }
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+-$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1" ), 'current release metadata is consistent' );
++$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2" ), 'current release metadata is consistent' );
+ $check( false !== strpos( $main, 'Requires Plugins: siteengine-base' ), 'SiteEngine Base is declared as a plugin dependency' );
+ $check( false === strpos( $main, "if ( ! file_exists( SEAB_CONFIG_FILE ) )" ), 'activation no longer requires a PHP config file' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-settings.php' ) && false !== strpos( $main, 'class-siteengine-ads-bridge-admin.php' ), 'settings and Base admin layers load from bootstrap' );
+--- a/siteengine-ads-bridge/tests/static-acceptance-050.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-050.php
+@@ -19,7 +19,7 @@
+     if ( $ok ) { $passes++; echo "PASS: {$msg}\n"; }
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+-$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1'" ), 'current 0.6.1 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2'" ), 'current 0.6.2 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-runtime.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Runtime::init()' ), 'front-end lead bridge is loaded by the plugin' );
+ $check( false !== strpos( $runtime, "fluentform/submission_confirmation" ) && false !== strpos( $runtime, "fluentform_submission_success" ), 'SE | Lead bridge uses documented Fluent Forms server and client success hooks' );
+ $check( false !== strpos( $runtime, "siteengine_ads_bridge_lead" ) && false !== strpos( $runtime, "'conversion_action' => 'SE | Lead'" ), 'browser bridge emits the standardized SE | Lead event' );
+--- a/siteengine-ads-bridge/tests/static-acceptance-051.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-051.php
+@@ -21,7 +21,7 @@
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+ 
+-$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1'" ), 'current 0.6.1 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2'" ), 'current 0.6.2 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-lifecycle.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Lifecycle::init()' ), 'lifecycle compliance runtime is loaded and initialized' );
+ $check( false !== strpos( $config, "'new'," ) && false !== strpos( $config, "'qualified'," ) && false !== strpos( $config, "'unqualified'," ) && false !== strpos( $config, "'won'," ), 'canonical lifecycle contains New, Qualified, Unqualified, Won' );
+ $check( false !== strpos( $settings, "'unqualified_reason_field' => 'customer_rating'" ) && false !== strpos( $settings, "'unqualified_at_field'     => 'unqualified_at'" ), 'customer_rating and unqualified_at defaults are locked' );
+--- a/siteengine-ads-bridge/tests/static-acceptance-060.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-060.php
+@@ -1,6 +1,6 @@
+ <?php
+ /**
+- * 0.6.1 inquiry-aware attribution contract acceptance.
++ * 0.6.2 inquiry-aware attribution contract acceptance.
+  * Run: php tests/static-acceptance-060.php
+  */
+ $root      = dirname( __DIR__ );
+@@ -18,7 +18,7 @@
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+ 
+-$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1'" ), '0.6.1 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2'" ), '0.6.2 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-inquiries.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Inquiries::init()' ), 'inquiry runtime is loaded and initialized' );
+ $check( false !== strpos( $main, 'function seab_inquiry_adopt_current' ) && false !== strpos( $main, 'function seab_inquiry_prepare_reconciliation' ) && false !== strpos( $main, 'function seab_inquiry_commit_activation' ), 'stable CRM Ops adapter functions expose adopt, prepare, and activate phases' );
+ 
+--- a/siteengine-ads-bridge/tests/static-acceptance.php
++++ b/siteengine-ads-bridge/tests/static-acceptance.php
+@@ -474,7 +474,7 @@
+ 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
+ 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
+ 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
+-	check( false !== strpos( $main_source, 'Version: 0.6.1' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.1'" ), 'release version is 0.6.1 in header and runtime constant' );
++	check( false !== strpos( $main_source, 'Version: 0.6.2' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.2'" ), 'release version is 0.6.2 in header and runtime constant' );
+ 
+ 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
+ 	exit( 0 === $fails ? 0 : 1 );

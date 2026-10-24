@@ -1,0 +1,95 @@
+override_key,default_header
+transaction_id,Transaction ID
+form_id,Form ID
+submission_id,Submission ID
+serial_number,Submission serial number
+submission_status,Submission status
+submitted_at,Submitted at
+submission_updated_at,Submission updated at
+source_url,Source URL
+user_id,WordPress user ID
+browser,Browser
+device,Device
+is_favourite,Favourite
+payment_status,Payment status
+payment_method,Payment method
+payment_type,Payment type
+payment_currency,Payment currency
+payment_total,Payment total
+total_paid,Total paid
+response_decode_status,Response decode status
+raw_response_truncated,Raw response truncated
+crm_contact_id,CRM contact ID
+crm_match_source,CRM match source
+crm_match_detail,CRM match detail
+crm_status,CRM status
+crm_contact_type,CRM contact type
+crm_created_at,CRM created at
+crm_last_activity,CRM last activity
+lifecycle_tags,Lifecycle tags
+source_tags,Source tags
+other_tags,Other tags
+lists,Lists
+dnc,DNC
+first_name,First name
+last_name,Last name
+email,Email
+phone,Phone
+address_1,Address line 1
+address_2,Address line 2
+city,City
+state,State
+postal_code,Postal code
+country,Country
+service_type,Service type
+estimated_value,Estimated value
+invoiced_amount,Invoiced amount
+closed_date,Closed date
+lost_date,Lost date
+gclid,GCLID
+gbraid,GBRAID
+wbraid,WBRAID
+fbclid,FBCLID
+msclkid,MSCLKID
+utm_source,UTM source
+utm_medium,UTM medium
+utm_campaign,UTM campaign
+utm_content,UTM content
+utm_term,UTM term
+referrer_url,Referrer URL
+page_title,Page title
+ip_address,IP address
+user_agent,User agent
+cookie_value,Cookie value
+hidden_transaction_id,Hidden transaction ID
+stored_submission_id,Stored submission ID
+consent_receipt_id,Consent receipt ID
+consent_receipt_source,Consent receipt ID source
+consent_receipt_row_id,Consent receipt row ID
+consent_policy_version,Consent policy version
+consent_banner_version,Consent banner version
+required_policy_version,Required policy version
+runtime_policy_version,Runtime consent policy version
+consent_policy_check,Consent policy check
+ad_user_data,Ad user data
+ad_personalization,Ad personalization
+measurement_feed,Ad measurement consent
+personalization_feed,Ad personalization consent
+consent_decision,Consent decision
+consent_block_reason,Consent block reason
+google_consent_json,Google consent JSON
+raw_submission_json,Raw submission JSON
+se_cid,Google campaign ID
+se_agid,Google ad group ID
+se_adid,Google creative ID
+se_kw,Google matched keyword
+se_mt,Google match type
+se_net,Google network
+se_dev,Google device
+se_loc,Google physical location criterion ID
+customer_rating,Customer Rating
+qualified_at,Qualified at
+unqualified_at,Unqualified at
+lifecycle_event,Lifecycle event
+lifecycle_event_at,Lifecycle event at
+inquiry_id,Inquiry ID

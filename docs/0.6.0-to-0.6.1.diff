@@ -1,0 +1,729 @@
+--- a/siteengine-ads-bridge/CHANGELOG.md
++++ b/siteengine-ads-bridge/CHANGELOG.md
+@@ -1,4 +1,15 @@
+ # Changelog
++
++## 0.6.1
++
++- Corrected repeat-inquiry resets to use FluentCRM selective blank-key deletion. Prior dates, revenue, reason, and export-state fields now actually clear.
++- Suppressed Ads Bridge lifecycle timestamp restoration during an intentional inquiry reset and while that contact has an incomplete activation.
++- Added fresh-model field/tag readback so silent projection failures cannot be acknowledged as committed.
++- Verified the activating marker before performing the CRM reset and preserved prior active history from synchronization while activation remains incomplete.
++- Cleared configured lifecycle/revenue field aliases as well as canonical fields; invalid mappings and unresolved/non-unique lifecycle tags fail before reset writes.
++- Corrected Unqualified milestone clearing to delete a stale qualification value.
++- Replaced merge-only test behavior with installed FluentCRM deletion semantics; inquiry acceptance now dispatches the real lifecycle and inquiry callbacks and includes projection-failure cases.
++- Kept schema version 1, adapter contract version 1, and both worksheet contracts unchanged. Broader reconciliation hardening and live CRM Ops acceptance remain pending.
+ 
+ ## 0.6.0
+ 
+--- a/siteengine-ads-bridge/README.md
++++ b/siteengine-ads-bridge/README.md
+@@ -1,4 +1,4 @@
+-# SiteEngine Ads Bridge 0.6.0
++# SiteEngine Ads Bridge 0.6.1
+ 
+ SiteEngine Ads Bridge connects a configured Fluent Forms master lead form to FluentCRM and exports append-only lead lifecycle data to Google Sheets for Google Ads Data Manager.
+ 
+@@ -35,7 +35,15 @@
+ - Spam / Junk
+ - Other
+ 
+-## Inquiry-aware repeat customers (0.6.0)
++## 0.6.1 reset correction and activation hold
++
++0.6.1 fixes a confirmed FluentCRM integration error: `syncCustomFieldValues(..., false)` does not delete stored values for blank keys. Repeat activation now uses selective deletion, suppresses Ads Bridge lifecycle restamping during the reset, and reads the persisted contact fields and tags back before acknowledging projection success. The same flag error is fixed when Unqualified clears a stale `qualified_at`.
++
++The inquiry schema remains version 1; no new database or worksheet migration is required for 0.6.1. The three same-site PHP adapters and contract version 1 are unchanged. No listeners for the proposed CRM Ops reconciliation events are registered.
++
++**Start New Inquiry and customer-facing inquiry automation remain held.** This release fixes the reset path; it does not close the outstanding head-version enforcement, concurrent activation, transaction validation, or crash-recovery acceptance gaps. See `docs/INQUIRY-ACCEPTANCE-STATUS.md` before implementing or enabling CRM Ops.
++
++## Inquiry-aware repeat customers (introduced in 0.6.0)
+ 
+ 0.6.0 removes the assumption that one FluentCRM contact equals one lifetime advertising inquiry. FluentCRM remains the editable current-contact/current-inquiry projection, while Ads Bridge owns immutable attribution history in `{prefix}se_ads_inquiries`.
+ 
+--- a/siteengine-ads-bridge/docs/CRM-OPS-INQUIRY-CONTRACT.md
++++ b/siteengine-ads-bridge/docs/CRM-OPS-INQUIRY-CONTRACT.md
+@@ -1,6 +1,12 @@
+ # CRM Ops / Ads Bridge Inquiry Contract — v1
+ 
+-Ads Bridge 0.6.0 and SiteEngine CRM Ops coordinate repeat inquiries through same-site PHP adapter functions. CRM Ops owns operational inquiry identity and automation. Ads Bridge owns immutable advertising attribution history. Neither plugin writes the other's tables directly.
++Ads Bridge 0.6.1 and SiteEngine CRM Ops coordinate repeat inquiries through same-site PHP adapter functions. CRM Ops owns operational inquiry identity and automation. Ads Bridge owns immutable advertising attribution history. Neither plugin writes the other's tables directly.
++
++## Implemented transport
++
++The three documented same-site PHP adapter functions are implemented. Neither proposed `reconciliation_requested` nor `activated` event has an Ads Bridge listener. The event mentioned below describes the intended CRM Ops protocol; emitting it alone does not invoke Ads Bridge. CRM Ops must call the adapters explicitly from its trusted integration layer. No reconciliation REST endpoint or automatic retry worker is registered.
++
++0.6.1 corrects and verifies the contact reset, but this contract is not yet accepted for live repeat-inquiry activation. Read `INQUIRY-ACCEPTANCE-STATUS.md` for the remaining guarantees and acceptance gaps.
+ 
+ ## Activation gate
+ 
+@@ -106,3 +112,11 @@
+ ## Non-form/manual inquiries
+ 
+ A manual inquiry may exist operationally without a canonical Fluent Forms binding. It is not eligible for the current form-based Google export contract until/unless a supported deterministic advertising source is introduced (for example a future Call Bridge contract). Do not synthesize an `ff:` transaction ID.
++
++## 0.6.1 projection failure responses
++
++Activation first verifies the persisted `activating` marker, then selectively deletes explicitly supplied blank fields, sets the new canonical submission, and makes New the sole configured lifecycle tag. It re-reads the contact before proceeding to archive/activate the inquiry rows.
++
++Additional `status=retry` reasons include `activation_state_not_persisted`, `projection_lifecycle_tags_unresolved`, `projection_lifecycle_tags_not_unique`, `projection_field_mapping_invalid`, `projection_readback_unavailable`, `projection_fields_not_persisted`, and `projection_lifecycle_not_persisted`. A projection exception also returns retry.
++
++A failed projection can leave a partially changed current-contact view. It does not intentionally archive the previous inquiry or activate the new inquiry. Ads Bridge's lifecycle and active-inquiry sync callbacks skip that contact while an `activating` row exists, preserving the prior inquiry snapshot. CRM Ops must retain its automation hold and must not allow the contact to progress while recovery is pending. Retry uses the identical activation body; it can repeat the reset. No automatic rollback of the CRM projection is provided.
+--- a/siteengine-ads-bridge/docs/INQUIRY-ACCEPTANCE-STATUS.md
++++ b/siteengine-ads-bridge/docs/INQUIRY-ACCEPTANCE-STATUS.md
+@@ -0,0 +1,33 @@
++# Inquiry acceptance status - 0.6.1
++
++This is a reset-correction release. It is not acceptance of live repeat-inquiry activation.
++
++## Confirmed cause and correction
++
++The installed FluentCRM 3.2.6 method deletes explicitly supplied blank custom-field keys only when its second argument, deleteOtherValues, is true. Ads Bridge 0.6.0 passed false for both the repeat-inquiry reset and Unqualified's stale qualification clearing. Its merge-only test doubles incorrectly treated those calls as deleting fields.
++
++The corrected test doubles reproduce installed deletion behavior. The inquiry test dispatches the real Ads Bridge lifecycle and inquiry callbacks. On the unpatched source, the corrected lifecycle suite reported 17 PASS / 1 FAIL and the inquiry suite reported 20 PASS / 2 FAIL. The old contact retained previous dates/revenue despite a committed activation response, and the new inquiry could inherit a false Won milestone.
++
++0.6.1 uses selective deletion and suppresses Ads Bridge's timestamp restoration during projection. It verifies the persisted activating marker before resetting, validates reset configuration, re-reads contact fields/tags, and returns retry rather than acknowledging failed projection. Incomplete activations suppress lifecycle stamping and active-history mirroring for that contact. Configured field aliases are also cleared; unrelated fields, CRM Ops identity, consent values and non-lifecycle tags are preserved.
++
++## Scope and evidence
++
++- Three same-site PHP adapters remain adopt / prepare / commit; contract version 1.
++- Inquiry schema remains 1. No extra migration is needed over migrated 0.6.0.
++- All_Leads remains 94 columns; Google_Ads_Import remains 21.
++- Tests are isolated PHP tests with a simulated database and Subscriber. They do not exercise the installed FluentCRM sanitizer, database transactions, database locks, actual mail, or Google/Sheets.
++- Local test PHP is 8.3.6. The deployed 0.6.0 PHP 8.4.27 runtime has passed its aggregate dry-run and scheduled-export doctor check. The 0.6.1 build still needs server PHP 8.4 validation after installation.
++- No adoption, prepare, commit or repeat-inquiry recovery has been run live on the Golden site in this continuation.
++- CRM Ops inquiry runtime remains unimplemented. Its operational fields and email drafts do not implement inquiry identity or reconciliation.
++
++## Remaining work before live repeat activation
++
++1. Enforce head-version comparison at prepare and activation; current version fields are stored but do not provide compare-and-swap protection.
++2. Serialize concurrent contact transitions across requests and coordinate that protection with CRM Ops. The request-local projection guard is not a database lock.
++3. Validate transactional storage and check all inquiry archive/activate and transaction-control results. The contact reset precedes that transaction and is not atomically committed with CRM Ops.
++4. Define durable recovery after partial projection or a process crash. Identical retries can repeat the reset; no recovery worker, projection checkpoint, or compensation adapter exists. Customer activity must remain held during an incomplete activation.
++5. Define stale/replayed-event behavior after later inquiry transitions and test identity conflicts and contention.
++6. Implement CRM Ops inquiry creation, adoption-before-replacement and the prepare / head activation / committed-ack hold. The proposed CRM Ops events do not have Ads Bridge listeners.
++7. Run live tests for old Won -> new inquiry, prior unexported milestones, retry/fault cases, immutable identity/consent binding, DNC suppression, and independent stage ledgers.
++
++Do not enable Start New Inquiry or customer-facing inquiry sends based on the reset test results alone.
+--- a/siteengine-ads-bridge/docs/OPERATIONS.md
++++ b/siteengine-ads-bridge/docs/OPERATIONS.md
+@@ -1,4 +1,4 @@
+-# Operations — SiteEngine Ads Bridge 0.6.0
++# Operations — SiteEngine Ads Bridge 0.6.1
+ 
+ ## Canonical client lifecycle
+ 
+@@ -135,3 +135,7 @@
+ 
+ Once a contact has Ads inquiry history, its mutable FluentCRM `submission_id` is no longer used as advertising attribution authority.
+ 
++
++## 0.6.1 upgrade scope
++
++0.6.1 requires no new schema or worksheet migration over the already migrated 0.6.0 installation. It corrects blank-field deletion and verifies the inquiry reset. Start New Inquiry and customer-facing inquiry automation remain held pending the hardening and live integration checks in `INQUIRY-ACCEPTANCE-STATUS.md`.
+--- a/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-inquiries.php
++++ b/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-inquiries.php
+@@ -19,6 +19,32 @@
+ 
+ 	/** @var bool Prevent current-contact projection hooks from corrupting archived state during activation. */
+ 	private static $reconciling = false;
++
++	/**
++	 * Let lifecycle compliance distinguish an intentional inquiry reset from an
++	 * ordinary edit to a terminal Won contact. This guard covers this request only.
++	 *
++	 * @return bool
++	 */
++	public static function is_reconciling() {
++		return self::$reconciling;
++	}
++
++	/**
++	 * A failed projection may leave the contact partly reset. Until activation
++	 * completes, do not mirror that projection into the prior active history.
++	 *
++	 * @param int $contact_id Contact ID.
++	 * @return bool
++	 */
++	public static function activation_pending_for_contact( $contact_id ) {
++		if ( (int) $contact_id < 1 || ! self::table_exists() ) {
++			return false;
++		}
++		global $wpdb;
++		$table = self::table_name();
++		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE contact_id = %d AND state = 'activating'", (int) $contact_id ) ) > 0;
++	}
+ 
+ 	/** @return void */
+ 	public static function init() {
+@@ -439,7 +465,7 @@
+ 				return self::activation_response( $payload, 'rejected', 'activation_idempotency_conflict' );
+ 			}
+ 
+-			$wpdb->update(
++			$marked = $wpdb->update(
+ 				$table,
+ 				array(
+ 					'state'                   => 'activating',
+@@ -452,6 +478,10 @@
+ 				array( '%s','%s','%s','%d','%s' ),
+ 				array( '%d' )
+ 			);
++			$marked_row = self::get( (string) $row['inquiry_id'] );
++			if ( false === $marked || ! is_array( $marked_row ) || 'activating' !== (string) $marked_row['state'] || $event_id !== (string) $marked_row['activation_event_id'] || $payload_hash !== (string) $marked_row['activation_payload_hash'] ) {
++				return self::activation_response( $payload, 'retry', 'activation_state_not_persisted' );
++			}
+ 
+ 			$subscriber = self::find_subscriber( (int) $row['contact_id'] );
+ 			if ( ! $subscriber ) {
+@@ -534,6 +564,9 @@
+ 	 */
+ 	public static function sync_active_from_subscriber( $subscriber ) {
+ 		if ( self::$reconciling || ! self::table_exists() || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! method_exists( $subscriber, 'custom_fields' ) ) {
++			return false;
++		}
++		if ( self::activation_pending_for_contact( (int) $subscriber->id ) ) {
+ 			return false;
+ 		}
+ 		global $wpdb;
+@@ -887,6 +920,17 @@
+ 		if ( ! method_exists( $subscriber, 'syncCustomFieldValues' ) || ! method_exists( $subscriber, 'attachTags' ) || ! method_exists( $subscriber, 'detachTags' ) ) {
+ 			return array( 'ok' => false, 'reason' => 'subscriber_projection_methods_unavailable' );
+ 		}
++		$map = SiteEngine_Ads_Bridge_Lifecycle::configured_tag_map();
++		$lifecycle_ids = array();
++		foreach ( array( 'new', 'qualified', 'unqualified', 'won' ) as $role ) {
++			if ( empty( $map[ $role ]['id'] ) ) {
++				return array( 'ok' => false, 'reason' => 'projection_lifecycle_tags_unresolved' );
++			}
++			$lifecycle_ids[] = (int) $map[ $role ]['id'];
++		}
++		if ( 4 !== count( array_unique( $lifecycle_ids ) ) ) {
++			return array( 'ok' => false, 'reason' => 'projection_lifecycle_tags_not_unique' );
++		}
+ 		$entry_id = isset( $inquiry['submission_id'] ) && (int) $inquiry['submission_id'] > 0 ? (string) (int) $inquiry['submission_id'] : '';
+ 		$reset = array(
+ 			'submission_id'               => $entry_id,
+@@ -901,11 +945,24 @@
+ 			'ads_conversion_value_frozen' => '',
+ 			'ads_export_error'            => '',
+ 		);
+-		$subscriber->syncCustomFieldValues( $reset, false );
+-		$map = SiteEngine_Ads_Bridge_Lifecycle::configured_tag_map();
+-		if ( empty( $map['new']['id'] ) ) {
+-			return array( 'ok' => false, 'reason' => 'new_lifecycle_tag_unresolved' );
+-		}
++		$config = SiteEngine_Ads_Bridge_Config::instance();
++		$fields = array(
++			'exports.qualified_leads.date_field' => 'qualified_at',
++			'fluentcrm.lifecycle_automation.unqualified_at_field' => 'unqualified_at',
++			'exports.won_jobs.date_field' => 'closed_date',
++			'exports.won_jobs.value_field' => 'invoiced_amount',
++			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',
++		);
++		foreach ( $fields as $key => $default ) {
++			$slug = trim( (string) $config->get( $key, $default ) );
++			if ( '' === $slug || 'submission_id' === $slug ) {
++				return array( 'ok' => false, 'reason' => 'projection_field_mapping_invalid' );
++			}
++			$reset[ $slug ] = '';
++		}
++		// FluentCRM only deletes the explicitly supplied blank keys when this
++		// flag is true. false silently preserves old dates, revenue and status.
++		$subscriber->syncCustomFieldValues( $reset, true );
+ 		$detach = array();
+ 		foreach ( $map as $role => $row ) {
+ 			if ( 'new' !== $role && ! empty( $row['id'] ) ) {
+@@ -916,6 +973,29 @@
+ 			$subscriber->detachTags( array_values( array_unique( $detach ) ) );
+ 		}
+ 		$subscriber->attachTags( array( (int) $map['new']['id'] ) );
++
++		// Model write results are not boolean success guarantees. Read persisted
++		// values from a newly resolved contact before acknowledging activation.
++		$persisted = self::find_subscriber( (int) $subscriber->id );
++		if ( ! $persisted || ! method_exists( $persisted, 'custom_fields' ) ) {
++			return array( 'ok' => false, 'reason' => 'projection_readback_unavailable' );
++		}
++		$custom = (array) $persisted->custom_fields();
++		foreach ( $reset as $slug => $expected ) {
++			$actual = isset( $custom[ $slug ] ) ? $custom[ $slug ] : '';
++			if ( ! is_scalar( $actual ) || (string) $actual !== (string) $expected ) {
++				return array( 'ok' => false, 'reason' => 'projection_fields_not_persisted' );
++			}
++		}
++		$attached = array();
++		foreach ( isset( $persisted->tags ) ? $persisted->tags : array() as $tag ) {
++			if ( isset( $tag->id ) && in_array( (int) $tag->id, $lifecycle_ids, true ) ) {
++				$attached[] = (int) $tag->id;
++			}
++		}
++		if ( array( (int) $map['new']['id'] ) !== array_values( array_unique( $attached ) ) ) {
++			return array( 'ok' => false, 'reason' => 'projection_lifecycle_not_persisted' );
++		}
+ 		return array( 'ok' => true, 'reason' => '' );
+ 	}
+ 
+--- a/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-lifecycle.php
++++ b/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-lifecycle.php
+@@ -44,8 +44,19 @@
+ 		add_action( 'fluent_crm/contact_custom_data_updated', array( __CLASS__, 'on_contact_custom_data_updated' ), 50, 3 );
+ 	}
+ 
+-	/** @return bool */
+-	private static function enabled() {
++	/**
++	 * @param object|null $subscriber Contact being reconciled.
++	 * @return bool
++	 */
++	private static function enabled( $subscriber = null ) {
++		// During an intentional repeat-inquiry reset the old Won tag may still
++		// be attached while its fields are being cleared. Do not restamp those
++		// milestones or restore terminal state from the previous inquiry.
++		if ( class_exists( 'SiteEngine_Ads_Bridge_Inquiries' ) ) {
++			if ( SiteEngine_Ads_Bridge_Inquiries::is_reconciling() || ( is_object( $subscriber ) && isset( $subscriber->id ) && SiteEngine_Ads_Bridge_Inquiries::activation_pending_for_contact( (int) $subscriber->id ) ) ) {
++				return false;
++			}
++		}
+ 		$config = SiteEngine_Ads_Bridge_Config::instance();
+ 		return (bool) $config->get( 'fluentcrm.lifecycle_automation.enabled', false );
+ 	}
+@@ -65,7 +76,7 @@
+ 	 */
+ 	public static function on_contact_added_by_fluentform( $subscriber, $entry, $form, $feed ) {
+ 		unset( $entry, $feed );
+-		if ( ! self::enabled() || ! is_object( $subscriber ) || ! method_exists( $subscriber, 'attachTags' ) ) {
++		if ( ! self::enabled( $subscriber ) || ! is_object( $subscriber ) || ! method_exists( $subscriber, 'attachTags' ) ) {
+ 			return;
+ 		}
+ 
+@@ -94,7 +105,7 @@
+ 	 * @return void
+ 	 */
+ 	public static function on_contact_added_to_tags( $subscriber, $tag_ids ) {
+-		if ( self::$mutating || ! self::enabled() || ! is_object( $subscriber ) ) {
++		if ( self::$mutating || ! self::enabled( $subscriber ) || ! is_object( $subscriber ) ) {
+ 			return;
+ 		}
+ 		if ( ! method_exists( $subscriber, 'detachTags' ) || ! method_exists( $subscriber, 'syncCustomFieldValues' ) || ! method_exists( $subscriber, 'custom_fields' ) ) {
+@@ -195,7 +206,7 @@
+ 	 */
+ 	public static function on_contact_custom_data_updated( $new_values, $subscriber, $update_values ) {
+ 		unset( $new_values, $update_values );
+-		if ( self::$mutating || ! self::enabled() || ! is_object( $subscriber ) ) {
++		if ( self::$mutating || ! self::enabled( $subscriber ) || ! is_object( $subscriber ) ) {
+ 			return;
+ 		}
+ 		if ( ! method_exists( $subscriber, 'syncCustomFieldValues' ) || ! method_exists( $subscriber, 'custom_fields' ) ) {
+@@ -335,7 +346,7 @@
+ 		if ( '' === $current ) {
+ 			return;
+ 		}
+-		$subscriber->syncCustomFieldValues( array( $slug => '' ), false );
++		$subscriber->syncCustomFieldValues( array( $slug => '' ), true );
+ 	}
+ 
+ 	/**
+--- a/siteengine-ads-bridge/siteengine-ads-bridge.php
++++ b/siteengine-ads-bridge/siteengine-ads-bridge.php
+@@ -2,7 +2,7 @@
+ /**
+  * Plugin Name: SiteEngine Ads Bridge
+  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
+- * Version: 0.6.0
++ * Version: 0.6.1
+  * Requires PHP: 7.4
+  * Requires Plugins: siteengine-base
+  * Author: SiteEngine
+@@ -13,7 +13,7 @@
+ 	exit;
+ }
+ 
+-define( 'SEAB_VERSION', '0.6.0' );
++define( 'SEAB_VERSION', '0.6.1' );
+ define( 'SEAB_PLUGIN_FILE', __FILE__ );
+ define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+ define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+--- a/siteengine-ads-bridge/tests/inquiry-acceptance.php
++++ b/siteengine-ads-bridge/tests/inquiry-acceptance.php
+@@ -1,6 +1,6 @@
+ <?php
+ /**
+- * Dynamic 0.6.0 inquiry/adoption/reconciliation acceptance.
++ * Dynamic 0.6.1 inquiry/adoption/reconciliation acceptance.
+  * Run: php tests/inquiry-acceptance.php
+  */
+ namespace FluentCrm\App\Models {
+@@ -18,6 +18,10 @@
+         public $country = '';
+         public $tags = array();
+         public $lists = array();
++        public $ignore_field_writes = false;
++        public $ignore_tag_writes = false;
++        public $throw_on_field_write = false;
++        public $field_write_calls = 0;
+         private $custom = array();
+ 
+         public function __construct( $id, array $custom, $lifecycle = 'won' ) {
+@@ -35,21 +39,42 @@
+         }
+         public static function find( $id ) { return isset( self::$rows[ (int) $id ] ) ? self::$rows[ (int) $id ] : null; }
+         public function custom_fields() { return $this->custom; }
+-        public function syncCustomFieldValues( $values, $unused = false ) {
+-            unset( $unused );
+-            foreach ( (array) $values as $k => $v ) { $this->custom[ $k ] = $v; }
+-            return true;
++        public function syncCustomFieldValues( $values, $delete_other = true, $custom_fields = array() ) {
++            unset( $custom_fields );
++            $this->field_write_calls++;
++            if ( $this->throw_on_field_write ) { throw new \RuntimeException( 'injected_field_write_failure' ); }
++            if ( $this->ignore_field_writes ) { return array(); }
++            $changed = array();
++            foreach ( (array) $values as $k => $v ) {
++                if ( '' === $v ) {
++                    if ( $delete_other && array_key_exists( $k, $this->custom ) ) {
++                        unset( $this->custom[ $k ] );
++                        $changed[ $k ] = '';
++                    }
++                } elseif ( ! array_key_exists( $k, $this->custom ) || (string) $v !== (string) $this->custom[ $k ] ) {
++                    $this->custom[ $k ] = $v;
++                    $changed[ $k ] = $v;
++                }
++            }
++            if ( $changed ) {
++                \do_action( 'fluent_crm/contact_custom_data_updated', array_filter( $values, fn($v)=>''!==$v ), $this, $changed );
++            }
++            return $changed;
+         }
+         public function attachTags( $ids ) {
++            if ( $this->ignore_tag_writes ) { return $this; }
++            $added = array();
+             foreach ( (array) $ids as $id ) {
+                 $id = (int) $id;
+                 $found = false;
+                 foreach ( $this->tags as $tag ) { if ( (int) $tag->id === $id ) { $found = true; } }
+-                if ( ! $found ) { $this->tags[] = (object) array( 'id' => $id, 'title' => self::tagTitle( $id ) ); }
+-            }
+-            return true;
++                if ( ! $found ) { $this->tags[] = (object) array( 'id' => $id, 'title' => self::tagTitle( $id ) ); $added[] = $id; }
++            }
++            if ( $added ) { \do_action( 'fluent_crm/contact_added_to_tags', $this, $added ); }
++            return $this;
+         }
+         public function detachTags( $ids ) {
++            if ( $this->ignore_tag_writes ) { return $this; }
+             $ids = array_map( 'intval', (array) $ids );
+             $this->tags = array_values( array_filter( $this->tags, function ( $tag ) use ( $ids ) { return ! in_array( (int) $tag->id, $ids, true ); } ) );
+             return true;
+@@ -68,9 +93,18 @@
+ namespace {
+     define( 'ABSPATH', __DIR__ . '/' );
+     define( 'ARRAY_A', 'ARRAY_A' );
+-    define( 'SEAB_VERSION', '0.6.0' );
+-
+-    function add_action( $hook, $callback, $priority = 10, $args = 1 ) { return true; }
++    define( 'SEAB_VERSION', '0.6.1' );
++
++    $GLOBALS['seab_hooks'] = array();
++    function add_action( $hook, $callback, $priority = 10, $args = 1 ) {
++        $GLOBALS['seab_hooks'][$hook][$priority][] = array($callback, $args);
++    }
++    function do_action( $hook, ...$args ) {
++        $callbacks = $GLOBALS['seab_hooks'][$hook] ?? array();
++        ksort($callbacks);
++        foreach ($callbacks as $group) foreach ($group as [$callback, $count]) call_user_func_array($callback, array_slice($args,0,$count));
++    }
++    function current_time( $format ) { return 'Y-m-d' === $format ? '2026-10-23' : '2026-10-23 12:34:56'; }
+     function absint( $value ) { return abs( (int) $value ); }
+     function wp_json_encode( $value, $flags = 0 ) { return json_encode( $value, $flags ); }
+     function get_option( $key, $default = false ) { return isset( $GLOBALS['seab_options'][ $key ] ) ? $GLOBALS['seab_options'][ $key ] : $default; }
+@@ -78,9 +112,16 @@
+ 
+     final class SiteEngine_Ads_Bridge_Config {
+         private static $instance;
++        public $overrides = array();
+         public static function instance() { return self::$instance ?: ( self::$instance = new self() ); }
++        public static function lifecycle_roles() { return array('new', 'qualified', 'unqualified', 'won'); }
+         public function get( $key, $default = null ) {
+             $map = array(
++                'fluentcrm.lifecycle_automation.enabled' => true,
++                'fluentcrm.tags.lifecycle.new' => 'New',
++                'fluentcrm.tags.lifecycle.qualified' => 'Qualified',
++                'fluentcrm.tags.lifecycle.unqualified' => 'Unqualified',
++                'fluentcrm.tags.lifecycle.won' => 'Won',
+                 'fluent_forms.form_id' => 3,
+                 'exports.qualified_leads.date_field' => 'qualified_at',
+                 'fluentcrm.lifecycle_automation.unqualified_at_field' => 'unqualified_at',
+@@ -88,17 +129,8 @@
+                 'exports.won_jobs.value_field' => 'invoiced_amount',
+                 'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',
+             );
++            if ( array_key_exists( $key, $this->overrides ) ) { return $this->overrides[$key]; }
+             return array_key_exists( $key, $map ) ? $map[ $key ] : $default;
+-        }
+-    }
+-    final class SiteEngine_Ads_Bridge_Lifecycle {
+-        public static function configured_tag_map() {
+-            return array(
+-                'new'=>array('id'=>101,'title'=>'New'),
+-                'qualified'=>array('id'=>102,'title'=>'Qualified'),
+-                'unqualified'=>array('id'=>103,'title'=>'Unqualified'),
+-                'won'=>array('id'=>104,'title'=>'Won'),
+-            );
+         }
+     }
+ 
+@@ -106,6 +138,7 @@
+         public $prefix = 'wp_';
+         public $rows = array();
+         public $submissions = array();
++        public $fail_activating_write = false;
+         private $next_id = 1;
+         public function get_charset_collate() { return ''; }
+         public function prepare( $query, ...$args ) {
+@@ -120,9 +153,13 @@
+             if ( false !== strpos( $sql, 'SHOW TABLES LIKE' ) ) {
+                 if ( false !== strpos( $sql, 'wp_se_ads_inquiries' ) ) { return 'wp_se_ads_inquiries'; }
+                 if ( false !== strpos( $sql, 'wp_fluentform_submissions' ) ) { return 'wp_fluentform_submissions'; }
+-            }
++                if ( false !== strpos( $sql, 'wp_fc_tags' ) ) { return 'wp_fc_tags'; }
++            }
++            if (preg_match("/WHERE title = '([^']+)'/",$sql,$m)) return array('New'=>101,'Qualified'=>102,'Unqualified'=>103,'Won'=>104)[$m[1]] ?? null;
+             if ( preg_match( '/SELECT COUNT\(\*\) FROM `wp_se_ads_inquiries` WHERE contact_id = (\d+)/', $sql, $m ) ) {
+-                return count( array_filter( $this->rows, fn($r)=>(int)$r['contact_id']===(int)$m[1] ) );
++                $rows = array_filter( $this->rows, fn($r)=>(int)$r['contact_id']===(int)$m[1] );
++                if ( false !== strpos($sql, "state = 'activating'") ) $rows = array_filter($rows,fn($r)=>'activating'===$r['state']);
++                return count($rows);
+             }
+             if ( preg_match( "/SELECT COUNT\(\*\) FROM `wp_se_ads_inquiries` WHERE state='([^']+)'/", $sql, $m ) ) {
+                 return count( array_filter( $this->rows, fn($r)=>(string)$r['state']===$m[1] ) );
+@@ -171,6 +208,7 @@
+         }
+         public function update( $table, $data, $where, $formats = null, $where_formats = null ) {
+             unset($formats,$where_formats); if('wp_se_ads_inquiries'!==$table) return false;
++            if ($this->fail_activating_write && 'activating' === ($data['state'] ?? '')) return false;
+             $n=0;
+             foreach($this->rows as &$r) {
+                 $ok=true; foreach($where as $k=>$v) { if((string)$r[$k] !== (string)$v) {$ok=false; break;} }
+@@ -206,7 +244,10 @@
+     $c25 = new \FluentCrm\App\Models\Subscriber( 25, array('submission_id'=>'39','qualified_at'=>'','unqualified_at'=>'','closed_date'=>'','invoiced_amount'=>'','customer_rating'=>''), 'new' );
+     \FluentCrm\App\Models\Subscriber::$rows[25]=$c25;
+ 
++    require dirname(__DIR__) . '/includes/class-siteengine-ads-bridge-lifecycle.php';
+     require dirname(__DIR__) . '/includes/class-siteengine-ads-bridge-inquiries.php';
++    SiteEngine_Ads_Bridge_Lifecycle::init();
++    SiteEngine_Ads_Bridge_Inquiries::init();
+ 
+     $passes=0; $fails=0;
+     function check_inq($ok,$msg){ global $passes,$fails; if($ok){$passes++;echo "PASS: $msg\n";}else{$fails++;echo "FAIL: $msg\n";} }
+@@ -261,7 +302,7 @@
+     check_inq('archived'===$old['state'] && 'ff:3:37'===$old['transaction_id'],'previous inquiry archives without attribution mutation');
+     check_inq('active'===$new['state'] && 'new'===$new['lifecycle'] && 'ff:3:38'===$new['transaction_id'],'new inquiry activates as New with new immutable transaction');
+     $custom=$c23->custom_fields();
+-    check_inq('38'===(string)$custom['submission_id'] && ''===(string)$custom['qualified_at'] && ''===(string)$custom['closed_date'] && ''===(string)$custom['invoiced_amount'],'current contact projection resets inquiry-specific Ads fields');
++    check_inq('38'===(string)$custom['submission_id'] && ''===(string)($custom['qualified_at']??'') && ''===(string)($custom['closed_date']??'') && ''===(string)($custom['invoiced_amount']??''),'current contact projection resets inquiry-specific Ads fields');
+     $tagids=array_map(fn($t)=>(int)$t->id,$c23->tags);
+     check_inq(array(101)===$tagids,'activation makes New the sole lifecycle tag');
+     $ar2=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
+@@ -285,6 +326,110 @@
+     $resB=SiteEngine_Ads_Bridge_Inquiries::resolver_for_inquiry($new);
+     check_inq('ff:3:37'===$resA['order_id'] && 'ff:3:38'===$resB['order_id'],'resolver preserves independent canonical transaction IDs across repeat inquiries');
+ 
++    // Reset regression cases use real lifecycle callbacks and FluentCRM's
++    // selective blank-key deletion semantics, rather than merge-only doubles.
++    function reset_case($id) {
++        $entry = $id * 10;
++        $GLOBALS['wpdb']->submissions[$entry] = array('form_id'=>3);
++        $GLOBALS['wpdb']->submissions[$entry+1] = array('form_id'=>3);
++        $contact = new \FluentCrm\App\Models\Subscriber($id, array(
++            'submission_id'=>(string)$entry,
++            'qualified_at'=>'2026-10-20 10:00:00', 'unqualified_at'=>'2026-10-19 10:00:00',
++            'closed_date'=>'2026-10-21', 'invoiced_amount'=>'4500', 'customer_rating'=>'Other',
++            'lost_date'=>'2026-10-19', 'ads_export_status'=>'exported', 'ads_exported_at'=>'2026-10-22',
++            'ads_conversion_value_frozen'=>'4500', 'ads_export_error'=>'old error',
++            'se_crm_current_inquiry_id'=>uuid_for(900+$id), 'service_type'=>'Repair',
++            'se_google_ad_user_data'=>'granted',
++        ), 'won');
++        \FluentCrm\App\Models\Subscriber::$rows[$id] = $contact;
++        $contact->attachTags(array(201));
++        $old=uuid_for($id*2); $new=uuid_for($id*2+1);
++        $adopt=array('contract_version'=>'1','event_id'=>'evt_adopt_'.$id,'site_instance_id'=>'site-test','contact_id'=>$id,'inquiry_id'=>$old,'head_version'=>1);
++        $adopted=SiteEngine_Ads_Bridge_Inquiries::adopt_current_inquiry($adopt);
++        if ('adopted'!==$adopted['status']) throw new \RuntimeException('reset fixture adoption failed');
++        $contact->syncCustomFieldValues(array('submission_id'=>(string)($entry+1)),false);
++        $prep=array('contract_version'=>'1','event_id'=>'evt_prepare_'.$id,'site_instance_id'=>'site-test','contact_id'=>$id,'previous_inquiry_id'=>$old,'proposed_inquiry_id'=>$new,'expected_head_version'=>1,'request_id'=>'req_'.$id,'source'=>array('type'=>'fluent_form','form_id'=>3,'entry_id'=>$entry+1));
++        $ready=SiteEngine_Ads_Bridge_Inquiries::prepare_reconciliation($prep);
++        if ('ready'!==$ready['status']) throw new \RuntimeException('reset fixture prepare failed');
++        $activation=array('contract_version'=>'1','event_id'=>'evt_activate_'.$id,'site_instance_id'=>'site-test','reconciliation_id'=>$ready['reconciliation_id'],'contact_id'=>$id,'previous_inquiry_id'=>$old,'proposed_inquiry_id'=>$new,'head_version'=>2);
++        return array($contact,$old,$new,$activation);
++    }
++
++    $semantics=new \FluentCrm\App\Models\Subscriber(99,array('closed_date'=>'2026-10-21'),'new');
++    $semantics->syncCustomFieldValues(array('closed_date'=>''),false);
++    check_inq('2026-10-21'===($semantics->custom_fields()['closed_date']??''),'test double preserves blanks with deleteOtherValues=false, matching installed FluentCRM');
++    $semantics->syncCustomFieldValues(array('closed_date'=>''),true);
++    check_inq(!array_key_exists('closed_date',$semantics->custom_fields()),'test double deletes only supplied blank keys with deleteOtherValues=true');
++
++    [$contact,$old,$new,$activation]=reset_case(40);
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $values=$contact->custom_fields();
++    $clear_keys=array('qualified_at','unqualified_at','closed_date','invoiced_amount','customer_rating','lost_date','ads_export_status','ads_exported_at','ads_conversion_value_frozen','ads_export_error');
++    check_inq('committed'===$result['status'] && !array_intersect($clear_keys,array_keys($values)),'activation deletes all old inquiry milestones, revenue, reason and export status');
++    check_inq('401'===($values['submission_id']??'') && uuid_for(940)===($values['se_crm_current_inquiry_id']??'') && 'Repair'===($values['service_type']??'') && 'granted'===($values['se_google_ad_user_data']??''),'reset preserves CRM Ops identity, unrelated fields and consent while projecting the new submission');
++    check_inq(in_array(201,array_map(fn($t)=>(int)$t->id,$contact->tags),true),'reset preserves non-lifecycle tags');
++    $prior=SiteEngine_Ads_Bridge_Inquiries::get($old);
++    check_inq('4500'==(string)$prior['invoiced_amount'] && '2026-10-21'===$prior['closed_date'] && '2026-10-20 10:00:00'===$prior['qualified_at'],'real lifecycle hooks do not restamp or erase the previous inquiry during reset');
++    $contact->attachTags(array(102));
++    check_inq('2026-10-23 12:34:56'===($contact->custom_fields()['qualified_at']??''),'lifecycle compliance resumes after activation completes');
++
++    [$contact,$old,$new,$activation]=reset_case(41);
++    $contact->ignore_field_writes=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && 'projection_fields_not_persisted'===$result['reason_code'],'silent field-write failure cannot receive a committed acknowledgment');
++    check_inq('active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'] && 'activating'===SiteEngine_Ads_Bridge_Inquiries::get($new)['state'],'failed field reset does not archive old history or activate the new inquiry');
++    check_inq(!SiteEngine_Ads_Bridge_Inquiries::is_reconciling() && false===SiteEngine_Ads_Bridge_Inquiries::sync_active_from_subscriber($contact),'request guard releases but pending activation still blocks old-history synchronization');
++    $contact->ignore_field_writes=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'same activation can complete after the field persistence failure is repaired');
++
++    [$contact,$old,$new,$activation]=reset_case(42);
++    $contact->ignore_tag_writes=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && 'projection_lifecycle_not_persisted'===$result['reason_code'],'silent lifecycle-tag failure cannot receive a committed acknowledgment');
++    $contact->syncCustomFieldValues(array('service_type'=>'Maintenance'),false);
++    check_inq(!isset($contact->custom_fields()['closed_date']) && !isset($contact->custom_fields()['qualified_at']),'pending activation prevents later lifecycle callbacks from restoring old Won milestones');
++    check_inq('4500'==(string)SiteEngine_Ads_Bridge_Inquiries::get($old)['invoiced_amount'],'pending activation keeps prior revenue intact across later callbacks');
++    $contact->ignore_tag_writes=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'same activation can complete after the tag persistence failure is repaired');
++
++    [$contact,$old,$new,$activation]=reset_case(43);
++    $contact->throw_on_field_write=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && !SiteEngine_Ads_Bridge_Inquiries::is_reconciling(),'projection exception returns retry and always releases the request guard');
++    $contact->throw_on_field_write=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'same activation resumes after a projection exception');
++
++    [$contact,$old,$new,$activation]=reset_case(44);
++    SiteEngine_Ads_Bridge_Config::instance()->overrides['fluentcrm.tags.lifecycle.new']='Missing New';
++    $calls=$contact->field_write_calls;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && 'projection_lifecycle_tags_unresolved'===$result['reason_code'] && $calls===$contact->field_write_calls,'missing lifecycle tag is detected before any reset field write');
++    SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
++
++    [$contact,$old,$new,$activation]=reset_case(45);
++    $contact->syncCustomFieldValues(array('sale_total'=>'987','qualified_date'=>'2026-10-20 10:00:00'),false);
++    SiteEngine_Ads_Bridge_Config::instance()->overrides=array('exports.won_jobs.value_field'=>'sale_total','exports.qualified_leads.date_field'=>'qualified_date');
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'] && !isset($contact->custom_fields()['sale_total']) && !isset($contact->custom_fields()['qualified_date']),'activation also clears configured lifecycle/revenue field aliases');
++    SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
++
++    [$contact,$old,$new,$activation]=reset_case(46);
++    $GLOBALS['wpdb']->fail_activating_write=true;
++    $calls=$contact->field_write_calls;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && 'activation_state_not_persisted'===$result['reason_code'] && $calls===$contact->field_write_calls,'activation marker must persist before any CRM reset begins');
++    $GLOBALS['wpdb']->fail_activating_write=false;
++
++    [$contact,$old,$new,$activation]=reset_case(47);
++    SiteEngine_Ads_Bridge_Config::instance()->overrides['exports.won_jobs.value_field']='submission_id';
++    $calls=$contact->field_write_calls;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('retry'===$result['status'] && 'projection_field_mapping_invalid'===$result['reason_code'] && $calls===$contact->field_write_calls,'invalid reset field mapping cannot overwrite the canonical submission binding');
++    SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
++
+     echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
+     exit($fails?1:0);
+ }
+--- a/siteengine-ads-bridge/tests/lifecycle-acceptance.php
++++ b/siteengine-ads-bridge/tests/lifecycle-acceptance.php
+@@ -73,7 +73,15 @@
+     public function attachTags( $ids ) { $this->attached = array_merge( $this->attached, (array) $ids ); }
+     public function detachTags( $ids ) { $this->detached = array_merge( $this->detached, (array) $ids ); }
+     public function custom_fields() { return $this->custom; }
+-    public function syncCustomFieldValues( $values, $delete_other = true ) { $this->custom = array_merge( $this->custom, $values ); }
++    public function syncCustomFieldValues( $values, $delete_other = true ) {
++        foreach ( $values as $key => $value ) {
++            if ( '' === $value ) {
++                if ( $delete_other ) { unset( $this->custom[ $key ] ); }
++            } else {
++                $this->custom[ $key ] = $value;
++            }
++        }
++    }
+ }
+ 
+ require dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-lifecycle.php';
+@@ -104,7 +112,7 @@
+ $unqualified->custom = array( 'qualified_at' => '2026-10-22 14:00:00' );
+ SiteEngine_Ads_Bridge_Lifecycle::on_contact_added_to_tags( $unqualified, array( 3 ) );
+ $check( '2026-10-23 09:30:00' === $unqualified->custom['unqualified_at'], 'Unqualified automatically stamps unqualified_at' );
+-$check( '' === $unqualified->custom['qualified_at'], 'Unqualified clears a stale Qualified milestone before export' );
++$check( '' === ( $unqualified->custom['qualified_at'] ?? '' ), 'Unqualified clears a stale Qualified milestone before export' );
+ $check( ! isset( $unqualified->custom['customer_rating'] ), 'plugin does not invent an Unqualified Reason' );
+ 
+ $won = new SEAB_Test_Subscriber();
+--- a/siteengine-ads-bridge/tests/static-acceptance-040.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-040.php
+@@ -11,7 +11,7 @@
+     if ( $ok ) { $passes++; echo "PASS: {$msg}\n"; }
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+-$check( false !== strpos( $main, 'Version: 0.6.0' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.0" ), 'current release metadata is consistent' );
++$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1" ), 'current release metadata is consistent' );
+ $check( false !== strpos( $main, 'Requires Plugins: siteengine-base' ), 'SiteEngine Base is declared as a plugin dependency' );
+ $check( false === strpos( $main, "if ( ! file_exists( SEAB_CONFIG_FILE ) )" ), 'activation no longer requires a PHP config file' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-settings.php' ) && false !== strpos( $main, 'class-siteengine-ads-bridge-admin.php' ), 'settings and Base admin layers load from bootstrap' );
+--- a/siteengine-ads-bridge/tests/static-acceptance-050.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-050.php
+@@ -19,7 +19,7 @@
+     if ( $ok ) { $passes++; echo "PASS: {$msg}\n"; }
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+-$check( false !== strpos( $main, 'Version: 0.6.0' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.0'" ), 'current 0.6.0 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1'" ), 'current 0.6.1 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-runtime.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Runtime::init()' ), 'front-end lead bridge is loaded by the plugin' );
+ $check( false !== strpos( $runtime, "fluentform/submission_confirmation" ) && false !== strpos( $runtime, "fluentform_submission_success" ), 'SE | Lead bridge uses documented Fluent Forms server and client success hooks' );
+ $check( false !== strpos( $runtime, "siteengine_ads_bridge_lead" ) && false !== strpos( $runtime, "'conversion_action' => 'SE | Lead'" ), 'browser bridge emits the standardized SE | Lead event' );
+--- a/siteengine-ads-bridge/tests/static-acceptance-051.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-051.php
+@@ -21,7 +21,7 @@
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+ 
+-$check( false !== strpos( $main, 'Version: 0.6.0' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.0'" ), 'current 0.6.0 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1'" ), 'current 0.6.1 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-lifecycle.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Lifecycle::init()' ), 'lifecycle compliance runtime is loaded and initialized' );
+ $check( false !== strpos( $config, "'new'," ) && false !== strpos( $config, "'qualified'," ) && false !== strpos( $config, "'unqualified'," ) && false !== strpos( $config, "'won'," ), 'canonical lifecycle contains New, Qualified, Unqualified, Won' );
+ $check( false !== strpos( $settings, "'unqualified_reason_field' => 'customer_rating'" ) && false !== strpos( $settings, "'unqualified_at_field'     => 'unqualified_at'" ), 'customer_rating and unqualified_at defaults are locked' );
+--- a/siteengine-ads-bridge/tests/static-acceptance-060.php
++++ b/siteengine-ads-bridge/tests/static-acceptance-060.php
+@@ -1,6 +1,6 @@
+ <?php
+ /**
+- * 0.6.0 inquiry-aware attribution contract acceptance.
++ * 0.6.1 inquiry-aware attribution contract acceptance.
+  * Run: php tests/static-acceptance-060.php
+  */
+ $root      = dirname( __DIR__ );
+@@ -18,7 +18,7 @@
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+ 
+-$check( false !== strpos( $main, 'Version: 0.6.0' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.0'" ), '0.6.0 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.1'" ), '0.6.1 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-inquiries.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Inquiries::init()' ), 'inquiry runtime is loaded and initialized' );
+ $check( false !== strpos( $main, 'function seab_inquiry_adopt_current' ) && false !== strpos( $main, 'function seab_inquiry_prepare_reconciliation' ) && false !== strpos( $main, 'function seab_inquiry_commit_activation' ), 'stable CRM Ops adapter functions expose adopt, prepare, and activate phases' );
+ 
+--- a/siteengine-ads-bridge/tests/static-acceptance.php
++++ b/siteengine-ads-bridge/tests/static-acceptance.php
+@@ -474,7 +474,7 @@
+ 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
+ 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
+ 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
+-	check( false !== strpos( $main_source, 'Version: 0.6.0' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.0'" ), 'release version is 0.6.0 in header and runtime constant' );
++	check( false !== strpos( $main_source, 'Version: 0.6.1' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.1'" ), 'release version is 0.6.1 in header and runtime constant' );
+ 
+ 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
+ 	exit( 0 === $fails ? 0 : 1 );

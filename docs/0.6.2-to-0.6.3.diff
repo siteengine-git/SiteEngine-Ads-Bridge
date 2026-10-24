@@ -1,0 +1,1141 @@
+--- 0.6.2/siteengine-ads-bridge/CHANGELOG.md
++++ 0.6.3/siteengine-ads-bridge/CHANGELOG.md
+@@ -1,4 +1,14 @@
+ # Changelog
++
++## 0.6.3 - 2026-10-23
++
++- Persist an activation-bound reset plan and original field/lifecycle values before touching FluentCRM.
++- Resume only unfinished original-to-intended changes; do not resubmit completed field deletions or tag changes.
++- Persist a verified projection checkpoint before the inquiry pointer transaction. Pointer retries verify the checkpoint without repeating the reset.
++- Fail closed on unexpected contact edits, configuration drift, corrupt plans and legacy activating rows without a recovery snapshot.
++- Add inquiry schema 2 with three nullable recovery columns through explicit migration. Check physical column types/nullability and the stored version before adapter mutations; report incomplete migration in doctor/inspect and as a CLI migration failure.
++- Add isolated interruption/recovery coverage and native SQL checkpoint/session-loss coverage. CRM Ops runtime and installed live inquiry acceptance remain outstanding.
++
+ 
+ ## 0.6.2
+ 
+--- 0.6.2/siteengine-ads-bridge/README.md
++++ 0.6.3/siteengine-ads-bridge/README.md
+@@ -1,4 +1,4 @@
+-# SiteEngine Ads Bridge 0.6.2
++# SiteEngine Ads Bridge 0.6.3
+ 
+ SiteEngine Ads Bridge connects a configured Fluent Forms master lead form to FluentCRM and exports append-only lead lifecycle data to Google Sheets for Google Ads Data Manager.
+ 
+@@ -43,9 +43,17 @@
+ 
+ Inquiry pointer changes require InnoDB, checked transaction control, guarded one-row updates and post-commit readback. Unconfirmed rollback or lock release closes the failed database session and prevents further transitions in that PHP request. See `docs/CRM-OPS-INQUIRY-CONTRACT.md` for response handling.
+ 
+-The 0.6.1 selective field deletion and lifecycle guards are retained. Schema remains 1, adapter contract remains 1, and the worksheet contracts are unchanged. No event listeners for the proposed CRM Ops reconciliation events are registered.
+-
+-**Start New Inquiry and customer-facing inquiry automation remain held.** Durable projection checkpoints, partial-reset/crash recovery, CRM Ops head compare-and-swap and live integration acceptance remain outstanding. The contact reset still occurs before the inquiry-table transaction, so this is not an atomic transaction across CRM Ops, FluentCRM and Ads Bridge.
++The 0.6.1 selective field deletion and lifecycle guards are retained. The adapter contract remains 1 and the worksheet contracts are unchanged. Version 0.6.3 requires explicit migration to inquiry schema 2. No event listeners for the proposed CRM Ops reconciliation events are registered.
++
++## 0.6.3 durable reset recovery
++
++Before resetting a contact, activation stores the original relevant fields/tags, the intended reset, its configuration and activation identity, and a SHA-256 integrity hash in the inquiry row. It then applies only unfinished changes. After fresh persisted-field/tag verification, it stores a completion checkpoint before committing the inquiry pointers.
++
++Retry uses the identical activation body through the existing PHP adapter. A fully completed reset is verified without clearing fields or changing tags again. A partial reset resumes only values that still match the saved original or intended result. Unexpected field/lifecycle values, changed mappings or damaged plans stop activation for review. Legacy `activating` rows without a saved plan cannot be reconstructed safely and are held for review.
++
++Inquiry schema **2** adds three nullable recovery columns. Install alone does not migrate the database. Preview and apply the existing `inquiry-admin migrate` command explicitly; the adapter refuses new transitions until both the physical columns and recorded version pass verification. Legacy exports continue during this migration gate. No Sheet provisioning is needed.
++
++CRM Ops runtime is not implemented. Start New Inquiry and inquiry email sequences are planned features, not settings in this plugin. Before those features are built and accepted, CRM Ops must provide its atomic head compare-and-swap, durable holds and coordination of current-inquiry edits. The contact reset still occurs before the inquiry-table transaction; this is not an atomic transaction across CRM Ops, FluentCRM and Ads Bridge. No background recovery worker, cancellation or automatic compensation is provided. See `docs/CRM-OPS-INQUIRY-CONTRACT.md` for the recovery procedure and limits.
+ 
+ ## Inquiry-aware repeat customers (introduced in 0.6.0)
+ 
+--- 0.6.2/siteengine-ads-bridge/docs/CRM-OPS-INQUIRY-CONTRACT.md
++++ 0.6.3/siteengine-ads-bridge/docs/CRM-OPS-INQUIRY-CONTRACT.md
+@@ -1,18 +1,18 @@
+ # CRM Ops / Ads Bridge Inquiry Contract — v1
+ 
+-Ads Bridge 0.6.2 and SiteEngine CRM Ops coordinate repeat inquiries through same-site PHP adapter functions. CRM Ops owns operational inquiry identity and automation. Ads Bridge owns immutable advertising attribution history. Neither plugin writes the other's tables directly.
++Ads Bridge 0.6.3 and SiteEngine CRM Ops coordinate repeat inquiries through same-site PHP adapter functions. CRM Ops owns operational inquiry identity and automation. Ads Bridge owns immutable advertising attribution history. Neither plugin writes the other's tables directly.
+ 
+ ## Implemented transport
+ 
+ The three documented same-site PHP adapter functions are implemented. Neither proposed `reconciliation_requested` nor `activated` event has an Ads Bridge listener. The event mentioned below describes the intended CRM Ops protocol; emitting it alone does not invoke Ads Bridge. CRM Ops must call the adapters explicitly from its trusted integration layer. No reconciliation REST endpoint or automatic retry worker is registered.
+ 
+-0.6.2 adds version and transition guards to the corrected contact reset, but this contract is not yet accepted for live repeat-inquiry activation. Read `INQUIRY-ACCEPTANCE-STATUS.md` for the remaining guarantees and acceptance gaps.
++0.6.3 adds durable reset plans and completion checkpoints to the version/transition guards; this contract is not yet accepted for live repeat-inquiry activation. Read `INQUIRY-ACCEPTANCE-STATUS.md` for the remaining guarantees and acceptance gaps.
+ 
+ ## Activation gate
+ 
+-CRM Ops must keep Start New Inquiry and customer-facing inquiry automation disabled until:
++CRM Ops runtime has not been implemented. Start New Inquiry and inquiry email sequences are planned capabilities, not existing Ads Bridge settings. Their implementation must require the following before activation or enrollment:
+ 
+-- Ads Bridge inquiry schema exists;
++- Ads Bridge inquiry schema 2 is explicitly migrated and verified;
+ - every pre-0.6 current inquiry that may be replaced has been adopted;
+ - the reconciliation integration has passed prepare/activate/retry tests;
+ - CRM Ops holds automation until final Ads Bridge `committed` acknowledgment.
+@@ -119,7 +119,7 @@
+ 
+ Additional `status=retry` reasons include `activation_state_not_persisted`, `projection_lifecycle_tags_unresolved`, `projection_lifecycle_tags_not_unique`, `projection_field_mapping_invalid`, `projection_readback_unavailable`, `projection_fields_not_persisted`, and `projection_lifecycle_not_persisted`. A projection exception also returns retry.
+ 
+-A failed projection can leave a partially changed current-contact view. It does not intentionally archive the previous inquiry or activate the new inquiry. Ads Bridge's lifecycle and active-inquiry sync callbacks skip that contact while an `activating` row exists, preserving the prior inquiry snapshot. CRM Ops must retain its automation hold and must not allow the contact to progress while recovery is pending. Retry uses the identical activation body; it can repeat the reset. No automatic rollback of the CRM projection is provided.
++A failed projection can leave a partially changed current-contact view. It does not intentionally archive the previous inquiry or activate the new inquiry. Ads Bridge's lifecycle and active-inquiry sync callbacks skip that contact while an `activating` row exists, preserving the prior inquiry snapshot. CRM Ops must retain its automation hold and must not allow the contact to progress while recovery is pending. Retry uses the identical activation body. In 0.6.3, the frozen reset plan governs safe resumption as described below. No automatic rollback of the CRM projection is provided.
+ 
+ ## 0.6.2 version, reservation and lock rules
+ 
+@@ -146,4 +146,42 @@
+ 
+ Additional retry reasons include `inquiry_table_requires_innodb`, `inquiry_transaction_start_failed`, `previous_inquiry_archive_failed`, `new_inquiry_activation_failed`, `inquiry_transaction_commit_failed`, `inquiry_transaction_rollback_failed`, `inquiry_commit_readback_failed`, `contact_lock_release_failed`, and `inquiry_connection_unusable`. Unconfirmed rollback or release closes the failed database session and refuses further transitions in that PHP request. Retry only in a new request with identical phase/event/body after the underlying failure is resolved.
+ 
+-The CRM projection is still outside the inquiry-table transaction. A failed/terminated activation can leave it partly or fully reset while the durable state remains activating. Caller automation and current-inquiry edits must remain held. A durable projection checkpoint and explicit partial-reset/crash recovery protocol are still required before live activation is enabled.
++The CRM projection remains outside the inquiry-table transaction. A failed/terminated activation can leave it partly or fully reset while the durable state remains activating. Caller automation and current-inquiry edits must remain held through recovery. Version 0.6.3 adds the plan/checkpoint protocol below; live CRM Ops integration acceptance is still required.
++
++
++## 0.6.3 durable projection plan and recovery
++
++The three PHP adapter names, payloads and contract version 1 are unchanged. This adds no event listener, REST endpoint, recovery worker, cancellation operation or compensation adapter.
++
++### Explicit schema migration
++
++Inquiry schema version 2 adds nullable `projection_plan` (longtext), `projection_plan_hash` (char(64)) and `projection_verified_at_utc` (datetime). Migration uses the existing explicit `inquiry-admin migrate` operation; it does not run on installation or traffic. Existing inquiry rows and attribution bindings are retained. Adapters require both the recorded version and the physical recovery columns with matching types/nullability; otherwise they return `retry / inquiry_schema_migration_required` before changing the contact. Doctor reports the migration requirement without blocking legacy exports.
++
++The plan contains original inquiry-specific field values, so treat database backups with the same access controls as the inquiry table. Inspection does not print the raw plan.
++
++### First activation
++
++1. Validate the identity, stored head, reservation, InnoDB storage, lifecycle tags, reset mapping and required Subscriber methods under the existing contact lock.
++2. Store `state=activating`, the activation identity/hash, and the reset plan/hash in one guarded update. Read back the exact saved plan before any contact write. The plan binds the intended field reset and lifecycle IDs to this inquiry/reconciliation and activation body; it also records the original relevant field values and lifecycle membership.
++3. Re-read all relevant fields/tags. Apply only values that differ from the intended result and still equal their saved original. Preserve unrelated fields and non-lifecycle tags. Freshly verify the field reset before tag changes, and verify the complete projection afterwards.
++4. Store/read back `projection_verified_at_utc`. Failure returns retry with the previous Ads inquiry still active.
++5. Verify the contact once more, then perform the checked archive/new-head inquiry transaction. A rollback of that transaction leaves the already-saved reset checkpoint available for the next retry.
++
++### Explicit resumption
++
++The trusted integration layer resumes by calling `seab_inquiry_commit_activation()` again with the **identical activation event and complete body**, outside any caller SQL transaction and while the same CRM Ops head/automation hold remains in force. There is no separate recovery payload and no timer-based retry.
++
++- With a saved completion checkpoint, the adapter checks the intended fields/lifecycle and performs **no CRM writes**. It retries only the inquiry pointer commit. Drift returns `retry / projection_checkpoint_drift`.
++- With a plan but no completion checkpoint, it first validates every relevant current field/tag against the original or intended result. It sends only unfinished original-to-intended field changes and missing tag operations. Completed work is not resubmitted. If the reset was fully completed immediately before process loss, retry persists the missing checkpoint without any CRM write.
++- A field with a third value or an unexpected configured lifecycle tag returns `retry / projection_recovery_conflict` before further reset writes. Configuration/tag-ID changes return `projection_plan_configuration_changed`. Plan corruption returns `projection_plan_corrupt`. Keep the hold, investigate and restore the expected source/configuration only after review; do not rotate IDs or invent a new activation event to bypass the pending inquiry.
++- An exception or database-session loss still withholds acknowledgment and releases/discards locks as in 0.6.2. Resume in a new request when the connection was discarded.
++- An older `activating` row without a saved plan returns `legacy_activation_projection_unknown`. Do not infer its pre-reset state from the mutable contact or clear it automatically. It requires an operator-specific recovery review; this release provides no override/cancellation operation.
++- A checkpoint write/readback failure returns `projection_checkpoint_not_persisted`. No inquiry pointer switch is acknowledged; the next matching retry checks the real persisted state.
++
++The only success acknowledgment remains the matching `status=committed`. A retry reason or a projection checkpoint alone never authorizes enrollment.
++
++### Limits
++
++These checks detect values outside the saved original/intended states. They cannot identify external writes that happen to reproduce either state, or make arbitrary third-party FluentCRM writes atomic with Ads Bridge. The per-contact named lock protects cooperating Ads Bridge calls; CRM Ops must coordinate all permitted lifecycle/field edits and incoming form projection while its hold is retained. An unrelated field/tag may change without blocking resumption.
++
++Recovery currently completes the accepted activation; it does not restore the former CRM contact projection or abandon a prepared reservation. CRM Ops still needs durable phase/outbox persistence, head compare-and-swap, explicit hold/edit coordination, and installed FluentCRM/live inquiry acceptance.
+--- 0.6.2/siteengine-ads-bridge/docs/INQUIRY-ACCEPTANCE-STATUS.md
++++ 0.6.3/siteengine-ads-bridge/docs/INQUIRY-ACCEPTANCE-STATUS.md
+@@ -1,33 +1,35 @@
+-# Inquiry acceptance status - 0.6.2
++# Inquiry acceptance status - 0.6.3
+ 
+-Start New Inquiry and customer-facing inquiry sends remain HELD.
++CRM Ops runtime remains unimplemented. Start New Inquiry and inquiry customer-email sequences are planned features, not current Ads Bridge settings.
+ 
+-## Completed in this continuation
++## Server evidence supplied by Aubrey
+ 
+-- Deployed 0.6.1 passed 18 lifecycle and 43 inquiry isolated assertions on the Golden server's PHP 8.4. The aggregate WordPress export dry-run completed all four groups without writes and preserved the existing historical eligibility failures.
+-- 0.6.2 enforces the Ads inquiry head version, single pending API reservation, exact one-step activation, site binding and stable completed-event replay.
+-- Adoption, prepare, activation and history sync use contact-scoped database session locks. History sync refreshes the contact after acquiring its lock and only updates the active pointer.
+-- Inquiry pointer changes require InnoDB, checked transaction control, guarded updates and final persisted readback. Unconfirmed rollback/release closes the failed session and blocks further transitions in that request.
+-- The 0.6.1 selective deletion, lifecycle reset guards and persisted-field/tag verification are retained.
+-- Schema version 1, adapter contract version 1, All_Leads 94 columns and Google_Ads_Import 21 columns remain unchanged. The three adapters are same-site PHP functions; proposed CRM Ops events have no Ads Bridge listener.
++- Installed 0.6.1 passed 18 lifecycle and 43 inquiry isolated assertions on the Golden server's PHP 8.4.
++- Installed 0.6.2 passed 50 isolated transition assertions on the server. Its WordPress aggregate export dry-run completed all four groups without writes. The known legacy records remained blocked for their existing missing dates/revenue or authoritative consent defects.
++- No live adoption, prepare or activation has been run in this continuation. The last observed Ads inquiry table had zero rows. An internal controlled fixture (site-specific identifiers omitted) remains the known valid-consent fixture with no CRM Ops inquiry ID assigned.
++
++## Implemented in 0.6.3
++
++- Freeze the original reset field/lifecycle snapshot, intended projection, configuration and activation identity in a durable hashed plan before any CRM reset.
++- Resume partial resets by sending only unfinished original-to-intended changes. Verify fully completed work without another field/tag write.
++- Store a verified completion checkpoint before the inquiry pointer transaction. Retry pointer failures without repeating the CRM reset.
++- Withhold success on unexpected current values, configuration drift, corrupt plans, missing checkpoints or legacy activating rows whose original reset cannot be reconstructed safely.
++- Explicit inquiry schema 2 adds three nullable recovery columns. Check physical column types/nullability and the recorded version before new adapter transitions. Migration must verify those columns/version before CLI success.
++- The contract remains version 1 with the same three PHP functions. All_Leads remains 94 columns and Google_Ads_Import remains 21. No automatic schema/Sheet migration or new event listener is registered.
+ 
+ ## Evidence and practical limits
+ 
+-The isolated inquiry suite uses deletion semantics confirmed from installed FluentCRM 3.2.6, and dispatches the real Ads Bridge lifecycle/inquiry callbacks. It still simulates Subscriber persistence and the database.
++See 0.6.3-acceptance.txt for exact local results. The isolated Subscriber doubles follow the selective deletion semantics supplied from installed FluentCRM 3.2.6 and invoke the real Ads Bridge lifecycle callbacks. Subscriber persistence remains simulated.
+ 
+-The new isolated transition suite covers stale/noninteger/overflow versions, competing preparation, completed/historical replays, unavailable/lost/reentrant locks, engine rejection, transaction faults, zero-row updates, rollback failure and safe session disposal.
++The dedicated SQL suite uses MariaDB 10.11.14 / InnoDB and two independent PDO connections. It covers additive recovery-column SQL, real row preservation, contention, checked pointer commit/rollback, durable plan/checkpoint visibility, partial-reset resumption and loss/replacement of the lock-owning session. It does not bootstrap WordPress dbDelta or installed FluentCRM. All database tests use a dedicated acceptance database, never the Golden database.
+ 
+-The dedicated-database suite runs the actual inquiry runtime against MariaDB 10.11.14 / InnoDB through two independent PDO connections. It covers actual lock contention, source API pointer commits, lock release, competing preparation, rollback after a failed pointer update, retry, different-contact independence and loss of the lock-owning session. Subscriber/CRM operations remain simulated. It is not an installed-FluentCRM or Google/Sheets test.
+-
+-Local PHP is 8.3.6. The 0.6.2 package still needs server PHP 8.4 validation after installation. No live adoption, prepare, activation, fault injection or repeat-inquiry recovery has run on the Golden site in this continuation.
+-
+-The Golden test fixture remains an internal controlled fixture (site-specific identifiers omitted), with valid authoritative consent and no CRM Ops inquiry ID assigned. No Ads inquiry rows have been adopted live. CRM Ops inquiry runtime remains unimplemented; its fields/drafts do not implement the head, holds, outbox or reconciliation.
++Local PHP is 8.3.6. Version 0.6.3 still needs installation, isolated PHP 8.4 validation, explicit Golden schema migration and WordPress regression verification. Live repeat-inquiry acceptance remains outstanding.
+ 
+ ## Remaining work before live repeat activation
+ 
+-1. Add a durable projection checkpoint and explicit recovery after a partial reset or process crash. Identical retries from activating can still repeat the reset. There is no recovery worker, compensation adapter or abandoned-reservation cancellation operation.
+-2. Build CRM Ops inquiry creation, adoption-before-replacement, atomic head compare-and-swap, event/phase persistence and the committed-ack automation hold. Ads Bridge does not independently verify the CRM Ops head and never writes its tables.
+-3. Coordinate all permitted current-inquiry edits with the hold. Database named locks serialize Ads Bridge operations, not arbitrary external FluentCRM writes or third-party automation. The CRM projection is still outside the inquiry-table transaction.
+-4. Run live acceptance for old Won -> new inquiry, prior unexported milestones, retries/crash cases, immutable identity/consent binding, DNC suppression and independent stage ledgers. Test on the host database/runtime before accepting live reconciliation.
++1. Build CRM Ops inquiry identity/head creation, adoption-before-replacement, atomic head compare-and-swap, durable event/phase/outbox persistence and the matching committed-ack automation hold.
++2. Coordinate all permitted current-inquiry edits and form projections with the hold. Named locks serialize Ads Bridge calls, not arbitrary external FluentCRM writes. The CRM reset and inquiry pointer commit are not one shared transaction.
++3. Decide and implement any required abandoned-reservation cancellation, operator conflict recovery or compensation workflow. This release safely resumes the same activation; it does not supply these operations or a recovery worker.
++4. Run installed FluentCRM/live acceptance for old Won -> new inquiry, unexported old stages, retries/crash cases, immutable identity/consent, DNC suppression and independent stage ledgers on the host runtime/database.
+ 
+-Do not enable Start New Inquiry or customer-facing inquiry sends from the isolated/native-SQL results alone.
++Passing isolated/native SQL suites does not establish end-to-end CRM Ops readiness. The Golden CRM starter-data importer identity is still unknown.
+--- 0.6.2/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-cli.php
++++ 0.6.3/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-cli.php
+@@ -7851,8 +7851,8 @@
+                                 WP_CLI::success( 'Dry-run complete. No database write.' );
+                                 return;
+                         }
+-                        if ( empty( $result['exists_after'] ) ) {
+-                                WP_CLI::error( 'Inquiry table migration did not produce the canonical table.' );
++                        if ( empty( $result['applied'] ) ) {
++                                WP_CLI::error( 'Inquiry table migration did not verify the recovery columns and schema version.' );
+                         }
+                         WP_CLI::success( 'Inquiry table migration complete.' );
+                         return;
+@@ -7925,6 +7925,7 @@
+                 WP_CLI::line( '------------------------------------------------------------' );
+                 WP_CLI::line( 'Table exists: ' . ( $summary['table_exists'] ? 'yes' : 'no' ) );
+                 WP_CLI::line( 'Schema version option: ' . ( '' !== (string) $summary['schema_version'] ? (string) $summary['schema_version'] : '(not set)' ) );
++                WP_CLI::line( 'Recovery schema ready: ' . ( $summary['schema_ready'] ? 'yes' : 'no; explicit migration required' ) );
+                 if ( ! $summary['table_exists'] ) {
+                         WP_CLI::warning( 'Inquiry table is not installed. Run inquiry-admin migrate first.' );
+                         return;
+--- 0.6.2/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-doctor.php
++++ 0.6.3/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-doctor.php
+@@ -165,7 +165,7 @@
+ 	/**
+ 	 * Inquiry-aware attribution persistence. Missing table is a warning rather
+ 	 * than a failure so 0.6.0 remains backward-compatible in single-inquiry mode.
+-	 * CRM Ops must not enable Start New Inquiry until this check passes.
++	 * CRM Ops inquiry integration requires persistence plus its own acceptance.
+ 	 *
+ 	 * @return void
+ 	 */
+@@ -179,8 +179,12 @@
+ 			$this->add_result(
+ 				self::STATUS_WARN,
+ 				'Inquiry attribution layer',
+-				'0.6.0 inquiry table is not installed. Single-inquiry exports remain supported, but CRM Ops Start New Inquiry must stay disabled. Preview with: wp se-ads inquiry-admin migrate'
+-			);
++				'Ads inquiry table is not installed. Legacy exports remain supported; CRM Ops repeat-inquiry integration requires migration and acceptance. Preview with: wp se-ads inquiry-admin migrate'
++			);
++			return;
++		}
++		if ( empty( $status['schema_ready'] ) ) {
++			$this->add_result( self::STATUS_WARN, 'Inquiry attribution layer', 'Inquiry recovery schema migration is required. Legacy exports remain supported. Preview with: wp se-ads inquiry-admin migrate' );
+ 			return;
+ 		}
+ 		$this->add_result(
+--- 0.6.2/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-inquiries.php
++++ 0.6.3/siteengine-ads-bridge/includes/class-siteengine-ads-bridge-inquiries.php
+@@ -15,7 +15,7 @@
+ final class SiteEngine_Ads_Bridge_Inquiries {
+ 
+ 	const CONTRACT_VERSION = '1';
+-	const SCHEMA_VERSION   = '1';
++	const SCHEMA_VERSION   = '2';
+ 
+ 	/** @var bool Prevent current-contact projection hooks from corrupting archived state during activation. */
+ 	private static $reconciling = false;
+@@ -47,6 +47,9 @@
+ 		}
+ 		if ( ! self::table_exists() ) {
+ 			return self::transition_failure( $phase, $payload, 'retry', 'inquiry_table_missing' );
++		}
++		if ( ! self::schema_ready() ) {
++			return self::transition_failure( $phase, $payload, 'retry', 'inquiry_schema_migration_required' );
+ 		}
+ 		$contact_id = (int) $payload['contact_id'];
+ 		$lock = self::acquire_contact_lock( $contact_id );
+@@ -232,6 +235,32 @@
+ 		global $wpdb;
+ 		$table = self::table_name();
+ 		return (string) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
++	}
++
++	/**
++	 * Check physical recovery columns as well as the recorded migration version.
++	 *
++	 * @param bool $require_version Whether to check the persisted version option.
++	 * @return bool
++	 */
++	public static function schema_ready( $require_version = true ) {
++		if ( $require_version && self::SCHEMA_VERSION !== (string) get_option( 'seab_inquiry_schema_version', '' ) ) {
++			return false;
++		}
++		global $wpdb;
++		$table = self::table_name();
++		$columns = $wpdb->get_results( "SHOW COLUMNS FROM `{$table}`", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
++		if ( ! is_array( $columns ) || ! empty( $wpdb->last_error ) ) {
++			return false;
++		}
++		$required = array( 'projection_plan' => 'longtext', 'projection_plan_hash' => 'char(64)', 'projection_verified_at_utc' => 'datetime' );
++		foreach ( $columns as $column ) {
++			$name = $column['Field'];
++			if ( isset( $required[ $name ] ) && $required[ $name ] === strtolower( (string) $column['Type'] ) && 'YES' === $column['Null'] ) {
++				unset( $required[ $name ] );
++			}
++		}
++		return empty( $required );
+ 	}
+ 
+ 	/**
+@@ -265,6 +294,9 @@
+ 			request_payload_hash char(64) NULL,
+ 			activation_event_id varchar(80) NULL,
+ 			activation_payload_hash char(64) NULL,
++			projection_plan longtext NULL,
++			projection_plan_hash char(64) NULL,
++			projection_verified_at_utc datetime NULL,
+ 			expected_head_version bigint(20) unsigned NOT NULL DEFAULT 0,
+ 			committed_head_version bigint(20) unsigned NULL,
+ 			contract_version varchar(24) NOT NULL DEFAULT '1',
+@@ -313,9 +345,10 @@
+ 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+ 		dbDelta( self::schema_sql() );
+ 		$out['exists_after'] = self::table_exists();
+-		$out['applied']      = $out['exists_after'];
+-		if ( $out['exists_after'] ) {
++		$out['applied']      = $out['exists_after'] && self::schema_ready( false );
++		if ( $out['applied'] ) {
+ 			update_option( 'seab_inquiry_schema_version', self::SCHEMA_VERSION, false );
++			$out['applied'] = self::schema_ready();
+ 		}
+ 		return $out;
+ 	}
+@@ -446,6 +479,9 @@
+ 				'activation_payload_hash'      => null,
+ 				'expected_head_version'        => $head_version,
+ 				'committed_head_version'       => $head_version,
++				'projection_plan'             => null,
++				'projection_plan_hash'        => null,
++				'projection_verified_at_utc'  => null,
+ 				'contract_version'             => self::CONTRACT_VERSION,
+ 				'qualified_at'                 => self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
+ 				'unqualified_at'               => self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
+@@ -610,6 +646,9 @@
+ 				'activation_payload_hash'    => null,
+ 				'expected_head_version'      => $expected,
+ 				'committed_head_version'     => null,
++				'projection_plan'             => null,
++				'projection_plan_hash'        => null,
++				'projection_verified_at_utc'  => null,
+ 				'contract_version'           => self::CONTRACT_VERSION,
+ 				'qualified_at'               => null,
+ 				'unqualified_at'             => null,
+@@ -727,38 +766,65 @@
+ 			}
+ 			self::assert_contact_lock( (int) $row['contact_id'] );
+ 
+-			$marked = $wpdb->update(
+-				$table,
+-				array(
+-					'state'                   => 'activating',
+-					'activation_event_id'     => $event_id,
+-					'activation_payload_hash' => $payload_hash,
+-					'committed_head_version'  => (int) $payload['head_version'],
+-					'updated_at_utc'          => self::utc_now(),
+-				),
+-				array( 'id' => (int) $row['id'], 'state' => (string) $row['state'] ),
+-				array( '%s','%s','%s','%d','%s' ),
+-				array( '%d','%s' )
+-			);
+-			$marked_row = self::get( (string) $row['inquiry_id'] );
+-			if ( false === $marked || ! is_array( $marked_row ) || 'activating' !== (string) $marked_row['state'] || $event_id !== (string) $marked_row['activation_event_id'] || $payload_hash !== (string) $marked_row['activation_payload_hash'] ) {
+-				return self::activation_response( $payload, 'retry', 'activation_state_not_persisted' );
+-			}
+-
+ 			$subscriber = self::find_subscriber( (int) $row['contact_id'] );
+ 			if ( ! $subscriber ) {
+ 				return self::activation_response( $payload, 'retry', 'contact_not_found' );
+ 			}
++			$planned = self::activation_projection_plan( $subscriber, $row, $payload_hash );
++			if ( ! $planned['ok'] ) {
++				return self::activation_response( $payload, 'retry', $planned['reason'] );
++			}
++			if ( 'prepared' === (string) $row['state'] ) {
++				// Persist both the intent and original values before any CRM write.
++				$marked = $wpdb->update(
++					$table,
++					array(
++						'state'                   => 'activating',
++						'activation_event_id'     => $event_id,
++						'activation_payload_hash' => $payload_hash,
++						'committed_head_version'  => (int) $payload['head_version'],
++						'projection_plan'         => $planned['encoded'],
++						'projection_plan_hash'    => $planned['hash'],
++						'updated_at_utc'          => self::utc_now(),
++					),
++					array( 'id' => (int) $row['id'], 'state' => 'prepared' )
++				);
++				$marked_row = self::get( (string) $row['inquiry_id'] );
++				if ( 1 !== $marked || ! is_array( $marked_row ) || 'activating' !== (string) $marked_row['state'] || $event_id !== (string) $marked_row['activation_event_id'] || $payload_hash !== (string) $marked_row['activation_payload_hash'] || $planned['encoded'] !== (string) $marked_row['projection_plan'] || $planned['hash'] !== (string) $marked_row['projection_plan_hash'] ) {
++					return self::activation_response( $payload, 'retry', 'activation_state_not_persisted' );
++				}
++				$row = $marked_row;
++			}
+ 
+ 			self::assert_contact_lock( (int) $row['contact_id'] );
+ 			self::$reconciling = true;
+ 			try {
+-				$projected = self::project_new_inquiry_to_contact( $subscriber, $row );
++				$projected = self::project_new_inquiry_to_contact( $subscriber, $planned['plan'], ! empty( $row['projection_verified_at_utc'] ) );
+ 			} finally {
+ 				self::$reconciling = false;
+ 			}
+ 			if ( ! $projected['ok'] ) {
+ 				return self::activation_response( $payload, 'retry', $projected['reason'] );
++			}
++			if ( empty( $row['projection_verified_at_utc'] ) ) {
++				self::assert_contact_lock( (int) $row['contact_id'] );
++				$verified_at = self::utc_now();
++				$checkpoint = $wpdb->update(
++					$table,
++					array( 'projection_verified_at_utc' => $verified_at, 'updated_at_utc' => $verified_at ),
++					array( 'id' => (int) $row['id'], 'state' => 'activating', 'activation_event_id' => $event_id, 'activation_payload_hash' => $payload_hash, 'projection_plan_hash' => $planned['hash'], 'projection_verified_at_utc' => null )
++				);
++				$saved = self::get( (string) $row['inquiry_id'] );
++				if ( 1 !== $checkpoint || ! is_array( $saved ) || $verified_at !== (string) $saved['projection_verified_at_utc'] || $planned['hash'] !== (string) $saved['projection_plan_hash'] ) {
++					return self::activation_response( $payload, 'retry', 'projection_checkpoint_not_persisted' );
++				}
++				$row = $saved;
++			}
++			// A persisted checkpoint is evidence of the reset, not permission to
++			// erase edits made afterwards. Recheck before committing the pointers.
++			$verified = self::projection_matches_plan( (int) $row['contact_id'], $planned['plan'] );
++			if ( ! $verified['ok'] ) {
++				return self::activation_response( $payload, 'retry', 'projection_checkpoint_drift' );
+ 			}
+ 
+ 			$now = self::utc_now();
+@@ -788,9 +854,9 @@
+ 						'activated_at_utc'   => $now,
+ 						'updated_at_utc'     => $now,
+ 					),
+-					array( 'id' => (int) $row['id'], 'state' => 'activating', 'activation_event_id' => $event_id, 'activation_payload_hash' => $payload_hash, 'expected_head_version' => $expected ),
++					array( 'id' => (int) $row['id'], 'state' => 'activating', 'activation_event_id' => $event_id, 'activation_payload_hash' => $payload_hash, 'expected_head_version' => $expected, 'projection_plan_hash' => $planned['hash'], 'projection_verified_at_utc' => $row['projection_verified_at_utc'] ),
+ 					array( '%s','%d','%s','%s','%s' ),
+-					array( '%d','%s','%s','%s','%d' )
++					array( '%d','%s','%s','%s','%d','%s','%s' )
+ 				);
+ 				if ( 1 !== $updated_new ) {
+ 					throw new \RuntimeException( 'new_inquiry_activation_failed' );
+@@ -1038,10 +1104,11 @@
+ 
+ 	/** @return array */
+ 	public static function status_summary() {
+-		$out = array( 'table_exists' => self::table_exists(), 'schema_version' => get_option( 'seab_inquiry_schema_version', '' ), 'rows' => 0, 'active' => 0, 'prepared' => 0, 'archived' => 0 );
++		$out = array( 'table_exists' => self::table_exists(), 'schema_version' => get_option( 'seab_inquiry_schema_version', '' ), 'schema_ready' => false, 'rows' => 0, 'active' => 0, 'prepared' => 0, 'archived' => 0 );
+ 		if ( ! $out['table_exists'] ) {
+ 			return $out;
+ 		}
++		$out['schema_ready'] = self::schema_ready();
+ 		global $wpdb;
+ 		$table = self::table_name();
+ 		$out['rows']     = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+@@ -1209,6 +1276,9 @@
+ 			'activation_payload_hash'     => null,
+ 			'expected_head_version'       => 0,
+ 			'committed_head_version'      => null,
++			'projection_plan'             => null,
++			'projection_plan_hash'        => null,
++			'projection_verified_at_utc'  => null,
+ 			'contract_version'            => self::CONTRACT_VERSION,
+ 			'qualified_at'                => self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
+ 			'unqualified_at'              => self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
+@@ -1245,11 +1315,8 @@
+ 		return array( 'form_id' => (int) $row['form_id'], 'entry_id' => (int) $row['id'], 'transaction_id' => 'ff:' . (int) $row['form_id'] . ':' . (int) $row['id'] );
+ 	}
+ 
+-	/** @param object $subscriber @param array $inquiry @return array */
+-	private static function project_new_inquiry_to_contact( $subscriber, $inquiry ) {
+-		if ( ! method_exists( $subscriber, 'syncCustomFieldValues' ) || ! method_exists( $subscriber, 'attachTags' ) || ! method_exists( $subscriber, 'detachTags' ) ) {
+-			return array( 'ok' => false, 'reason' => 'subscriber_projection_methods_unavailable' );
+-		}
++	/** @param array $inquiry @return array */
++	private static function projection_definition( $inquiry ) {
+ 		$map = SiteEngine_Ads_Bridge_Lifecycle::configured_tag_map();
+ 		$lifecycle_ids = array();
+ 		foreach ( array( 'new', 'qualified', 'unqualified', 'won' ) as $role ) {
+@@ -1290,43 +1357,169 @@
+ 			}
+ 			$reset[ $slug ] = '';
+ 		}
+-		// FluentCRM only deletes the explicitly supplied blank keys when this
+-		// flag is true. false silently preserves old dates, revenue and status.
+-		$subscriber->syncCustomFieldValues( $reset, true );
++		return array( 'ok' => true, 'reason' => '', 'fields' => $reset, 'lifecycle_ids' => $lifecycle_ids, 'new_tag_id' => (int) $map['new']['id'] );
++	}
++
++	/**
++	 * Freeze the reset before first use; retries must use that exact plan.
++	 * Legacy activating rows have no trustworthy pre-reset snapshot.
++	 *
++	 * @param object $subscriber Contact.
++	 * @param array  $row Inquiry row.
++	 * @param string $activation_hash Matching activation body hash.
++	 * @return array
++	 */
++	private static function activation_projection_plan( $subscriber, $row, $activation_hash ) {
++		$definition = self::projection_definition( $row );
++		if ( ! $definition['ok'] ) {
++			return $definition;
++		}
++		$context = array( 'version' => 1, 'inquiry_id' => (string) $row['inquiry_id'], 'reconciliation_id' => (string) $row['reconciliation_id'], 'activation_payload_hash' => $activation_hash, 'definition' => $definition );
++		if ( 'prepared' === (string) $row['state'] ) {
++			if ( ! method_exists( $subscriber, 'syncCustomFieldValues' ) || ! method_exists( $subscriber, 'attachTags' ) || ! method_exists( $subscriber, 'detachTags' ) ) {
++				return array( 'ok' => false, 'reason' => 'subscriber_projection_methods_unavailable' );
++			}
++			$before = self::projection_snapshot( (int) $row['contact_id'], $definition );
++			if ( ! $before['ok'] ) {
++				return $before;
++			}
++			$plan = array( 'context' => $context, 'before' => $before );
++			$encoded = wp_json_encode( $plan );
++			if ( ! is_string( $encoded ) || '' === $encoded ) {
++				return array( 'ok' => false, 'reason' => 'projection_plan_encoding_failed' );
++			}
++		} else {
++			$encoded = isset( $row['projection_plan'] ) ? $row['projection_plan'] : null;
++			if ( ! is_string( $encoded ) || '' === $encoded ) {
++				return array( 'ok' => false, 'reason' => 'legacy_activation_projection_unknown' );
++			}
++			if ( ! isset( $row['projection_plan_hash'] ) || ! hash_equals( (string) $row['projection_plan_hash'], hash( 'sha256', $encoded ) ) ) {
++				return array( 'ok' => false, 'reason' => 'projection_plan_corrupt' );
++			}
++			$plan = json_decode( $encoded, true );
++			if ( ! is_array( $plan ) || ! isset( $plan['context'], $plan['before']['fields'], $plan['before']['tags'] ) || ! is_array( $plan['before']['fields'] ) || ! is_array( $plan['before']['tags'] ) ) {
++				return array( 'ok' => false, 'reason' => 'projection_plan_corrupt' );
++			}
++			if ( $context !== $plan['context'] ) {
++				return array( 'ok' => false, 'reason' => 'projection_plan_configuration_changed' );
++			}
++			if ( array_keys( $definition['fields'] ) !== array_keys( $plan['before']['fields'] ) ) {
++				return array( 'ok' => false, 'reason' => 'projection_plan_corrupt' );
++			}
++		}
++		return array( 'ok' => true, 'reason' => '', 'plan' => $plan, 'encoded' => $encoded, 'hash' => hash( 'sha256', $encoded ) );
++	}
++
++	/** @param int $contact_id @param array $definition @return array */
++	private static function projection_snapshot( $contact_id, $definition ) {
++		$contact = self::find_subscriber( $contact_id );
++		if ( ! $contact || ! method_exists( $contact, 'custom_fields' ) ) {
++			return array( 'ok' => false, 'reason' => 'projection_readback_unavailable' );
++		}
++		$custom = (array) $contact->custom_fields();
++		$fields = array();
++		foreach ( $definition['fields'] as $slug => $desired ) {
++			$value = isset( $custom[ $slug ] ) ? $custom[ $slug ] : '';
++			if ( ! is_scalar( $value ) ) {
++				return array( 'ok' => false, 'reason' => 'projection_field_value_invalid' );
++			}
++			$fields[ $slug ] = (string) $value;
++		}
++		$tags = array();
++		foreach ( isset( $contact->tags ) ? $contact->tags : array() as $tag ) {
++			if ( isset( $tag->id ) && in_array( (int) $tag->id, $definition['lifecycle_ids'], true ) ) {
++				$tags[] = (int) $tag->id;
++			}
++		}
++		$tags = array_values( array_unique( $tags ) );
++		sort( $tags, SORT_NUMERIC );
++		return array( 'ok' => true, 'reason' => '', 'fields' => $fields, 'tags' => $tags );
++	}
++
++	/** @param int $contact_id @param array $plan @return array */
++	private static function projection_matches_plan( $contact_id, $plan ) {
++		$definition = $plan['context']['definition'];
++		$current = self::projection_snapshot( $contact_id, $definition );
++		if ( ! $current['ok'] ) {
++			return $current;
++		}
++		if ( $definition['fields'] !== $current['fields'] ) {
++			return array( 'ok' => false, 'reason' => 'projection_fields_not_persisted' );
++		}
++		if ( array( $definition['new_tag_id'] ) !== $current['tags'] ) {
++			return array( 'ok' => false, 'reason' => 'projection_lifecycle_not_persisted' );
++		}
++		return array( 'ok' => true, 'reason' => '' );
++	}
++
++	/**
++	 * Resume only original -> desired changes. Never resubmit completed fields
++	 * or clear a value not present in the frozen pre-reset snapshot.
++	 *
++	 * @param object $subscriber Contact.
++	 * @param array  $plan Persisted projection plan.
++	 * @param bool   $verified Whether a completion checkpoint already exists.
++	 * @return array
++	 */
++	private static function project_new_inquiry_to_contact( $subscriber, $plan, $verified ) {
++		$definition = $plan['context']['definition'];
++		$contact_id = (int) $subscriber->id;
++		if ( $verified ) {
++			$result = self::projection_matches_plan( $contact_id, $plan );
++			return $result['ok'] ? $result : array( 'ok' => false, 'reason' => 'projection_checkpoint_drift' );
++		}
++		$current = self::projection_snapshot( $contact_id, $definition );
++		if ( ! $current['ok'] ) {
++			return $current;
++		}
++		$remaining = array();
++		foreach ( $definition['fields'] as $slug => $desired ) {
++			$actual = $current['fields'][ $slug ];
++			if ( $actual === $desired ) {
++				continue;
++			}
++			if ( $actual !== $plan['before']['fields'][ $slug ] ) {
++				return array( 'ok' => false, 'reason' => 'projection_recovery_conflict' );
++			}
++			$remaining[ $slug ] = $desired;
++		}
++		foreach ( $current['tags'] as $tag_id ) {
++			if ( $definition['new_tag_id'] !== $tag_id && ! in_array( $tag_id, $plan['before']['tags'], true ) ) {
++				return array( 'ok' => false, 'reason' => 'projection_recovery_conflict' );
++			}
++		}
++		if ( ! empty( $remaining ) ) {
++			self::assert_contact_lock( $contact_id );
++			// true deletes only the supplied blanks in installed FluentCRM.
++			$subscriber->syncCustomFieldValues( $remaining, true );
++		}
++		self::assert_contact_lock( $contact_id );
++		$current = self::projection_snapshot( $contact_id, $definition );
++		if ( ! $current['ok'] ) {
++			return $current;
++		}
++		if ( $definition['fields'] !== $current['fields'] ) {
++			return array( 'ok' => false, 'reason' => 'projection_fields_not_persisted' );
++		}
+ 		$detach = array();
+-		foreach ( $map as $role => $row ) {
+-			if ( 'new' !== $role && ! empty( $row['id'] ) ) {
+-				$detach[] = (int) $row['id'];
++		foreach ( $current['tags'] as $tag_id ) {
++			if ( $definition['new_tag_id'] !== $tag_id ) {
++				if ( ! in_array( $tag_id, $plan['before']['tags'], true ) ) {
++					return array( 'ok' => false, 'reason' => 'projection_recovery_conflict' );
++				}
++				$detach[] = $tag_id;
+ 			}
+ 		}
+ 		if ( ! empty( $detach ) ) {
+-			$subscriber->detachTags( array_values( array_unique( $detach ) ) );
+-		}
+-		$subscriber->attachTags( array( (int) $map['new']['id'] ) );
+-
+-		// Model write results are not boolean success guarantees. Read persisted
+-		// values from a newly resolved contact before acknowledging activation.
+-		$persisted = self::find_subscriber( (int) $subscriber->id );
+-		if ( ! $persisted || ! method_exists( $persisted, 'custom_fields' ) ) {
+-			return array( 'ok' => false, 'reason' => 'projection_readback_unavailable' );
+-		}
+-		$custom = (array) $persisted->custom_fields();
+-		foreach ( $reset as $slug => $expected ) {
+-			$actual = isset( $custom[ $slug ] ) ? $custom[ $slug ] : '';
+-			if ( ! is_scalar( $actual ) || (string) $actual !== (string) $expected ) {
+-				return array( 'ok' => false, 'reason' => 'projection_fields_not_persisted' );
+-			}
+-		}
+-		$attached = array();
+-		foreach ( isset( $persisted->tags ) ? $persisted->tags : array() as $tag ) {
+-			if ( isset( $tag->id ) && in_array( (int) $tag->id, $lifecycle_ids, true ) ) {
+-				$attached[] = (int) $tag->id;
+-			}
+-		}
+-		if ( array( (int) $map['new']['id'] ) !== array_values( array_unique( $attached ) ) ) {
+-			return array( 'ok' => false, 'reason' => 'projection_lifecycle_not_persisted' );
+-		}
+-		return array( 'ok' => true, 'reason' => '' );
++			self::assert_contact_lock( $contact_id );
++			$subscriber->detachTags( $detach );
++		}
++		if ( ! in_array( $definition['new_tag_id'], $current['tags'], true ) ) {
++			self::assert_contact_lock( $contact_id );
++			$subscriber->attachTags( array( $definition['new_tag_id'] ) );
++		}
++		self::assert_contact_lock( $contact_id );
++		return self::projection_matches_plan( $contact_id, $plan );
+ 	}
+ 
+ 	/** @param int $contact_id @return object|null */
+--- 0.6.2/siteengine-ads-bridge/siteengine-ads-bridge.php
++++ 0.6.3/siteengine-ads-bridge/siteengine-ads-bridge.php
+@@ -2,7 +2,7 @@
+ /**
+  * Plugin Name: SiteEngine Ads Bridge
+  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
+- * Version: 0.6.2
++ * Version: 0.6.3
+  * Requires PHP: 7.4
+  * Requires Plugins: siteengine-base
+  * Author: SiteEngine
+@@ -13,7 +13,7 @@
+ 	exit;
+ }
+ 
+-define( 'SEAB_VERSION', '0.6.2' );
++define( 'SEAB_VERSION', '0.6.3' );
+ define( 'SEAB_PLUGIN_FILE', __FILE__ );
+ define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+ define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+--- 0.6.2/siteengine-ads-bridge/tests/inquiry-acceptance.php
++++ 0.6.3/siteengine-ads-bridge/tests/inquiry-acceptance.php
+@@ -1,6 +1,6 @@
+ <?php
+ /**
+- * Dynamic 0.6.2 inquiry/adoption/reconciliation acceptance.
++ * Dynamic 0.6.3 inquiry/adoption/reconciliation acceptance.
+  * Run: php tests/inquiry-acceptance.php
+  */
+ namespace FluentCrm\App\Models {
+@@ -22,6 +22,11 @@
+         public $ignore_tag_writes = false;
+         public $throw_on_field_write = false;
+         public $field_write_calls = 0;
++        public $tag_write_calls = 0;
++        public $field_batches = array();
++        public $throw_after_field_keys = 0;
++        public $throw_after_detach = false;
++        public $throw_after_attach = false;
+         public $on_field_write = null;
+         private $custom = array();
+ 
+@@ -43,10 +48,12 @@
+         public function syncCustomFieldValues( $values, $delete_other = true, $custom_fields = array() ) {
+             unset( $custom_fields );
+             $this->field_write_calls++;
++            $this->field_batches[]=$values;
+             if (is_callable($this->on_field_write)) { $callback=$this->on_field_write; $this->on_field_write=null; $callback(); }
+             if ( $this->throw_on_field_write ) { throw new \RuntimeException( 'injected_field_write_failure' ); }
+             if ( $this->ignore_field_writes ) { return array(); }
+             $changed = array();
++            $processed=0;
+             foreach ( (array) $values as $k => $v ) {
+                 if ( '' === $v ) {
+                     if ( $delete_other && array_key_exists( $k, $this->custom ) ) {
+@@ -57,6 +64,7 @@
+                     $this->custom[ $k ] = $v;
+                     $changed[ $k ] = $v;
+                 }
++                if ($this->throw_after_field_keys && ++$processed >= $this->throw_after_field_keys) { throw new \RuntimeException('injected_partial_field_crash'); }
+             }
+             if ( $changed ) {
+                 \do_action( 'fluent_crm/contact_custom_data_updated', array_filter( $values, fn($v)=>''!==$v ), $this, $changed );
+@@ -64,6 +72,7 @@
+             return $changed;
+         }
+         public function attachTags( $ids ) {
++            $this->tag_write_calls++;
+             if ( $this->ignore_tag_writes ) { return $this; }
+             $added = array();
+             foreach ( (array) $ids as $id ) {
+@@ -72,13 +81,16 @@
+                 foreach ( $this->tags as $tag ) { if ( (int) $tag->id === $id ) { $found = true; } }
+                 if ( ! $found ) { $this->tags[] = (object) array( 'id' => $id, 'title' => self::tagTitle( $id ) ); $added[] = $id; }
+             }
++            if ($this->throw_after_attach) throw new \RuntimeException('injected_after_attach_crash');
+             if ( $added ) { \do_action( 'fluent_crm/contact_added_to_tags', $this, $added ); }
+             return $this;
+         }
+         public function detachTags( $ids ) {
++            $this->tag_write_calls++;
+             if ( $this->ignore_tag_writes ) { return $this; }
+             $ids = array_map( 'intval', (array) $ids );
+             $this->tags = array_values( array_filter( $this->tags, function ( $tag ) use ( $ids ) { return ! in_array( (int) $tag->id, $ids, true ); } ) );
++            if ($this->throw_after_detach) throw new \RuntimeException('injected_after_detach_crash');
+             return true;
+         }
+         public function setLifecycle( $role ) {
+@@ -95,8 +107,9 @@
+ namespace {
+     define( 'ABSPATH', __DIR__ . '/' );
+     define( 'ARRAY_A', 'ARRAY_A' );
+-    define( 'SEAB_VERSION', '0.6.2' );
+-
++    define( 'SEAB_VERSION', '0.6.3' );
++
++    $GLOBALS['seab_options'] = array('seab_inquiry_schema_version'=>'2');
+     $GLOBALS['seab_hooks'] = array();
+     function add_action( $hook, $callback, $priority = 10, $args = 1 ) {
+         $GLOBALS['seab_hooks'][$hook][$priority][] = array($callback, $args);
+@@ -141,6 +154,9 @@
+         public $rows = array();
+         public $submissions = array();
+         public $fail_activating_write = false;
++        public $missing_recovery_columns = false;
++        public $fail_checkpoint = false;
++        public $after_checkpoint = null;
+         public $locks = array();
+         public $deny_locks = false;
+         public $lock_unavailable = false;
+@@ -238,6 +254,7 @@
+         }
+         public function update( $table, $data, $where, $formats = null, $where_formats = null ) {
+             unset($formats,$where_formats); if('wp_se_ads_inquiries'!==$table) return false;
++            if ($this->fail_checkpoint && isset($data['projection_verified_at_utc']) && null!==$data['projection_verified_at_utc']) return 0;
+             if ($this->fail_activating_write && 'activating' === ($data['state'] ?? '')) return false;
+             if ($this->fail_archive && 'archived' === ($data['state'] ?? '')) return 0;
+             if ($this->fail_activate && 'active' === ($data['state'] ?? '')) return 0;
+@@ -246,7 +263,9 @@
+                 $ok=true; foreach($where as $k=>$v) { if((string)$r[$k] !== (string)$v) {$ok=false; break;} }
+                 if($ok){ foreach($data as $k=>$v)$r[$k]=$v; $n++; }
+             }
+-            unset($r); return $n;
++            unset($r);
++            if (isset($data['projection_verified_at_utc']) && is_callable($this->after_checkpoint)) { $callback=$this->after_checkpoint; $this->after_checkpoint=null; $callback(); }
++            return $n;
+         }
+         public function query( $sql ) {
+             if ($sql===$this->fail_query) return false;
+@@ -261,6 +280,11 @@
+         }
+         public function get_results( $sql, $format = null ) {
+             unset($format);
++            if(false!==strpos($sql,'SHOW COLUMNS FROM')) return $this->missing_recovery_columns ? array() : array(
++                array('Field'=>'projection_plan','Type'=>'longtext','Null'=>'YES'),
++                array('Field'=>'projection_plan_hash','Type'=>'char(64)','Null'=>'YES'),
++                array('Field'=>'projection_verified_at_utc','Type'=>'datetime','Null'=>'YES')
++            );
+             if(false===strpos($sql,'FROM `wp_se_ads_inquiries`')) return array();
+             $rows=$this->rows;
+             if(false!==strpos($sql,"state IN ('active','archived')")) $rows=array_values(array_filter($rows,fn($r)=>in_array($r['state'],array('active','archived'),true)));
+--- 0.6.2/siteengine-ads-bridge/tests/inquiry-database-acceptance.php
++++ 0.6.3/siteengine-ads-bridge/tests/inquiry-database-acceptance.php
+@@ -31,6 +31,7 @@
+     public $submissions=array();
+     public $last_error='';
+     public $fail_activation=false;
++    public $fail_checkpoint=false;
+     public function __construct($pdo,$prefix) { $this->pdo=$pdo; $this->prefix=$prefix; }
+     public function get_charset_collate() { return 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'; }
+     public function prepare($query,...$args) {
+@@ -66,12 +67,14 @@
+     }
+     public function update($table,$data,$where,$formats=null,$where_formats=null) {
+         if ($this->fail_activation && 'active'===($data['state']??'')) return 0;
++        if ($this->fail_checkpoint && !empty($data['projection_verified_at_utc'])) return 0;
+         $this->last_error='';
+         try {
+             $set=implode(',',array_map(fn($key)=>'`'.$key.'`=?',array_keys($data)));
+-            $filter=implode(' AND ',array_map(fn($key)=>'`'.$key.'`=?',array_keys($where)));
++            $filter=implode(' AND ',array_map(fn($key)=>'`'.$key.'`'.(null===$where[$key]?' IS NULL':'=?'),array_keys($where)));
++            $where_values=array_values(array_filter($where,fn($v)=>null!==$v));
+             $statement=$this->pdo->prepare('UPDATE `'.$table.'` SET '.$set.' WHERE '.$filter);
+-            $statement->execute(array_merge(array_values($data),array_values($where))); return $statement->rowCount();
++            $statement->execute(array_merge(array_values($data),$where_values)); return $statement->rowCount();
+         } catch(Throwable $e) { $this->last_error=$e->getMessage(); return false; }
+     }
+     public function query($sql) {
+@@ -97,7 +100,16 @@
+ }
+ try {
+     $pdo->exec('SET SESSION default_storage_engine=InnoDB');
+-    $pdo->exec(SiteEngine_Ads_Bridge_Inquiries::schema_sql());
++    // Exercise the additive SQL column upgrade independently of WordPress dbDelta.
++    $legacy_ddl=preg_replace('/^\s*projection_(?:plan longtext|plan_hash char\(64\)|verified_at_utc datetime) NULL,\n/m','',SiteEngine_Ads_Bridge_Inquiries::schema_sql());
++    $pdo->exec($legacy_ddl);
++    $legacy_id=uuid_for(999999);
++    $pdo->exec('INSERT INTO `'.$tables[0].'` (inquiry_id,contact_id,state,transaction_id,invoiced_amount,created_at_utc,updated_at_utc) VALUES ('.$pdo->quote($legacy_id).",9999,'archived','ff:3:99999',4500,'2026-10-20 12:00:00','2026-10-20 12:00:00')");
++    check_inq(!SiteEngine_Ads_Bridge_Inquiries::schema_ready(),'native schema-one table is rejected despite a newer recorded option');
++    $pdo->exec('ALTER TABLE `'.$tables[0].'` ADD projection_plan LONGTEXT NULL, ADD projection_plan_hash CHAR(64) NULL, ADD projection_verified_at_utc DATETIME NULL');
++    $legacy=$pdo->query('SELECT * FROM `'.$tables[0].'` WHERE inquiry_id='.$pdo->quote($legacy_id))->fetch(PDO::FETCH_ASSOC);
++    check_inq(SiteEngine_Ads_Bridge_Inquiries::schema_ready() && 'archived'===$legacy['state'] && 'ff:3:99999'===$legacy['transaction_id'] && 4500===(int)$legacy['invoiced_amount'] && null===$legacy['projection_plan'] && null===$legacy['projection_verified_at_utc'],'native additive column upgrade preserves prior attribution rows and initializes empty checkpoints');
++    $pdo->exec('DELETE FROM `'.$tables[0].'` WHERE inquiry_id='.$pdo->quote($legacy_id));
+     $pdo->exec('CREATE TABLE `'.$tables[1].'` (id BIGINT UNSIGNED PRIMARY KEY, form_id BIGINT UNSIGNED NOT NULL) ENGINE=InnoDB');
+     $pdo->exec('CREATE TABLE `'.$tables[2].'` (id BIGINT UNSIGNED PRIMARY KEY, title VARCHAR(191) NOT NULL) ENGINE=InnoDB');
+     $pdo->exec('INSERT INTO `'.$tables[2]."` (id,title) VALUES (101,'New'),(102,'Qualified'),(103,'Unqualified'),(104,'Won')");
+@@ -123,9 +135,31 @@
+     $old_state=$observer->query('SELECT state FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($old))->fetchColumn();
+     $new_state=$observer->query('SELECT state FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($new))->fetchColumn();
+     check_inq('retry'===$result['status'] && 'active'===$old_state && 'activating'===$new_state,'real SQL rollback restores the old pointer after injected new-pointer failure');
++    $saved_plan=$observer->query('SELECT projection_plan,projection_plan_hash,projection_verified_at_utc FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($new))->fetch(PDO::FETCH_ASSOC);
++    check_inq(!empty($saved_plan['projection_verified_at_utc']) && hash('sha256',$saved_plan['projection_plan'])===$saved_plan['projection_plan_hash'],'an independent SQL connection observes the committed reset plan and completion checkpoint after pointer rollback');
++    $fields=$contact->field_write_calls; $tags=$contact->tag_write_calls;
+     $GLOBALS['wpdb']->fail_activation=false;
+     $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
+-    check_inq('committed'===$result['status'],'native retry completes the previously rolled-back transition');
++    check_inq('committed'===$result['status'] && $fields===$contact->field_write_calls && $tags===$contact->tag_write_calls,'native retry completes the rolled-back pointer transition without repeating the CRM reset');
++
++    [$contact,$old,$new,$activation]=native_case(1004);
++    $GLOBALS['wpdb']->fail_checkpoint=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $fields=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++    $pending=$observer->query('SELECT state,projection_plan,projection_verified_at_utc FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($new))->fetch(PDO::FETCH_ASSOC);
++    check_inq('retry'===$result['status'] && 'activating'===$pending['state'] && !empty($pending['projection_plan']) && null===$pending['projection_verified_at_utc'],'native failed checkpoint leaves the durable original plan and an uncommitted inquiry head');
++    $GLOBALS['wpdb']->fail_checkpoint=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'] && $fields===$contact->field_write_calls && $tags===$contact->tag_write_calls,'native retry reconstructs reset completion without repeating CRM writes');
++
++    [$contact,$old,$new,$activation]=native_case(1005);
++    $contact->throw_after_field_keys=3;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $contact->throw_after_field_keys=0;
++    $checkpoint=$observer->query('SELECT projection_verified_at_utc FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($new))->fetchColumn();
++    check_inq('retry'===$result['status'] && null===$checkpoint,'native storage preserves the unverified plan after a partial CRM interruption');
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'],'native recovery completes the remaining partial reset and commits its checkpoint');
+ 
+     [$contact,$old,$new,$activation]=native_case(1002);
+     $lock=native_lock_name(1002);
+@@ -144,6 +178,15 @@
+     check_inq(null===$observer->query('SELECT IS_USED_LOCK('.$observer->quote($lock).')')->fetchColumn(),'terminating the owner session releases its native database lock');
+     $old_state=$observer->query('SELECT state FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($old))->fetchColumn();
+     check_inq('active'===$old_state,'owner-session loss preserves the prior durable inquiry history');
++    $pending=$observer->query('SELECT projection_plan,projection_verified_at_utc FROM `'.$tables[0].'` WHERE inquiry_id='.$observer->quote($new))->fetch(PDO::FETCH_ASSOC);
++    check_inq(!empty($pending['projection_plan']) && null===$pending['projection_verified_at_utc'],'the original reset plan survives loss of its owning SQL session');
++    $replacement=new PDO($dsn,$user,$password,array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION));
++    $GLOBALS['wpdb']=new SEAB_SQL_Test_WPDB($replacement,$prefix);
++    $poison=new ReflectionProperty(SiteEngine_Ads_Bridge_Inquiries::class,'connection_unusable');
++    $poison->setAccessible(true); $poison->setValue(null,false);
++    $fields=$contact->field_write_calls;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'] && $fields===$contact->field_write_calls,'a replacement database session resumes the same activation without repeating completed field changes');
+ } finally {
+     foreach (array_reverse($tables) as $table) $observer->exec('DROP TABLE IF EXISTS `'.$table.'`');
+ }
+--- /dev/null
++++ 0.6.3/siteengine-ads-bridge/tests/inquiry-recovery-acceptance.php
+@@ -0,0 +1,167 @@
++<?php
++/**
++ * Durable projection recovery acceptance. Isolated doubles; no WordPress load.
++ * Run directly: php tests/inquiry-recovery-acceptance.php
++ */
++define('SEAB_INQUIRY_TEST_INCLUDE',true);
++ob_start(); require __DIR__.'/inquiry-acceptance.php'; $bootstrap_log=ob_get_clean();
++if ($fails) { echo $bootstrap_log; exit(1); }
++$passes=0; $fails=0;
++
++// Stop after each possible field deletion. Replay must only send unfinished keys.
++for ($boundary=1; $boundary<=10; $boundary++) {
++    [$contact,$old,$new,$activation]=reset_case(100+$boundary);
++    $contact->throw_after_field_keys=$boundary;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $pending=SiteEngine_Ads_Bridge_Inquiries::get($new);
++    check_inq('retry'===$result['status'] && 'activating'===$pending['state'] && !empty($pending['projection_plan']) && empty($pending['projection_verified_at_utc']) && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'],'interruption after field '.$boundary.' retains the original plan and prior history');
++    $completed=array_slice(array_keys(end($contact->field_batches)),0,$boundary);
++    $batches=count($contact->field_batches);
++    $contact->throw_after_field_keys=0;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $new_batches=array_slice($contact->field_batches,$batches);
++    $resent=false;
++    foreach($new_batches as $batch) if(array_intersect($completed,array_keys($batch))) $resent=true;
++    check_inq('committed'===$result['status'] && !$resent && '4500'==(string)SiteEngine_Ads_Bridge_Inquiries::get($old)['invoiced_amount'],'recovery after field '.$boundary.' completes without resubmitting completed keys');
++}
++
++foreach(array('throw_after_detach','throw_after_attach') as $i=>$fault) {
++    [$contact,$old,$new,$activation]=reset_case(120+$i);
++    $contact->$fault=true;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    $fields=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++    check_inq('retry'===$result['status'] && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'],'interrupted '.$fault.' cannot acknowledge or archive the previous inquiry');
++    $contact->$fault=false;
++    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++    check_inq('committed'===$result['status'] && $fields===$contact->field_write_calls && $contact->tag_write_calls===$tags+('throw_after_detach'===$fault?1:0),'retry after '.$fault.' performs only the missing tag operation');
++}
++
++[$contact,$old,$new,$activation]=reset_case(122);
++$GLOBALS['wpdb']->fail_checkpoint=true;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++check_inq('retry'===$result['status'] && 'projection_checkpoint_not_persisted'===$result['reason_code'] && empty(SiteEngine_Ads_Bridge_Inquiries::get($new)['projection_verified_at_utc']) && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'],'a failed checkpoint write withholds the pointer commit');
++$GLOBALS['wpdb']->fail_checkpoint=false;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls,'fully reset contact resumes after a missing checkpoint without any CRM write');
++
++[$contact,$old,$new,$activation]=reset_case(123);
++$GLOBALS['wpdb']->fail_activate=true;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++check_inq('retry'===$result['status'] && !empty(SiteEngine_Ads_Bridge_Inquiries::get($new)['projection_verified_at_utc']),'the completed reset checkpoint survives rollback of the inquiry pointers');
++$GLOBALS['wpdb']->fail_activate=false;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls,'pointer retry uses the checkpoint without clearing or retagging the contact');
++
++[$contact,$old,$new,$activation]=reset_case(124);
++$GLOBALS['wpdb']->fail_activate=true;
++SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$GLOBALS['wpdb']->fail_activate=false;
++$contact->syncCustomFieldValues(array('invoiced_amount'=>'99'),false);
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'projection_checkpoint_drift'===$result['reason_code'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls && '99'===($contact->custom_fields()['invoiced_amount']??''),'edits after the verified reset stop recovery and preserve the changed value');
++check_inq('active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'] && '4500'==(string)SiteEngine_Ads_Bridge_Inquiries::get($old)['invoiced_amount'],'checkpoint drift leaves prior history and active pointer intact');
++
++[$contact,$old,$new,$activation]=reset_case(125);
++$contact->throw_after_field_keys=1;
++SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$contact->throw_after_field_keys=0;
++$contact->syncCustomFieldValues(array('invoiced_amount'=>'88'),false);
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'projection_recovery_conflict'===$result['reason_code'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls && '88'===($contact->custom_fields()['invoiced_amount']??''),'a third value after a partial reset fails preflight before any further CRM writes');
++
++[$contact,$old,$new,$activation]=reset_case(126);
++$contact->ignore_tag_writes=true;
++SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$contact->ignore_tag_writes=false;
++$contact->attachTags(array(102));
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'projection_recovery_conflict'===$result['reason_code'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls,'an unexpected lifecycle edit during recovery is preserved for review');
++
++[$contact,$old,$new,$activation]=reset_case(127);
++$contact->throw_after_field_keys=1;
++SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$contact->throw_after_field_keys=0;
++SiteEngine_Ads_Bridge_Config::instance()->overrides['exports.won_jobs.value_field']='sale_total';
++$calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'projection_plan_configuration_changed'===$result['reason_code'] && $calls===$contact->field_write_calls,'configuration changes cannot silently rewrite a pending reset plan');
++SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'],'restoring the frozen mapping allows the same activation to resume');
++
++[$contact,$old,$new,$activation]=reset_case(128);
++$contact->ignore_tag_writes=true;
++SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$contact->ignore_tag_writes=false;
++$pending=SiteEngine_Ads_Bridge_Inquiries::get($new);
++$GLOBALS['wpdb']->update('wp_se_ads_inquiries',array('projection_plan'=>$pending['projection_plan'].' '),array('inquiry_id'=>$new));
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'projection_plan_corrupt'===$result['reason_code'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls,'corrupt stored plan cannot initiate another CRM write');
++
++[$contact,$old,$new,$activation]=reset_case(129);
++$GLOBALS['wpdb']->after_checkpoint=function()use($contact){ $contact->syncCustomFieldValues(array('invoiced_amount'=>'77'),false); };
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'projection_checkpoint_drift'===$result['reason_code'] && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'],'final readback detects an edit between checkpoint persistence and pointer commit');
++
++[$contact,$old,$new,$activation]=reset_case(130);
++$GLOBALS['wpdb']->update('wp_se_ads_inquiries',array('state'=>'activating','activation_event_id'=>$activation['event_id'],'activation_payload_hash'=>hash_for_recovery($activation),'committed_head_version'=>2),array('inquiry_id'=>$new));
++$calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'legacy_activation_projection_unknown'===$result['reason_code'] && $calls===$contact->field_write_calls,'an older activating row without a saved original plan requires review rather than a guessed reset');
++
++[$contact,$old,$new,$activation]=reset_case(131);
++$GLOBALS['wpdb']->missing_recovery_columns=true;
++$calls=$contact->field_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'inquiry_schema_migration_required'===$result['reason_code'] && $calls===$contact->field_write_calls,'physical recovery columns are required before activation writes');
++$GLOBALS['wpdb']->missing_recovery_columns=false;
++$GLOBALS['seab_options']['seab_inquiry_schema_version']='1';
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('retry'===$result['status'] && 'inquiry_schema_migration_required'===$result['reason_code'] && $calls===$contact->field_write_calls,'schema-version option must also confirm explicit migration');
++$GLOBALS['seab_options']['seab_inquiry_schema_version']='2';
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'],'activation proceeds once both physical and recorded schema checks pass');
++
++[$contact,$old,$new,$activation]=reset_case(132);
++$GLOBALS['wpdb']->fail_activate=true;
++SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$GLOBALS['wpdb']->fail_activate=false;
++$contact->syncCustomFieldValues(array('service_type'=>'Maintenance','new_unrelated_field'=>'keep'),false);
++$contact->attachTags(array(202)); $calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls && 'Maintenance'===($contact->custom_fields()['service_type']??'') && in_array(202,array_map(fn($t)=>(int)$t->id,$contact->tags),true),'recovery leaves unrelated fields and non-lifecycle tags intact');
++
++[$contact,$old,$new,$activation]=reset_case(133);
++$contact->syncCustomFieldValues(array('submission_id'=>'1330'),false);
++$contact->throw_after_field_keys=1;
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$contact->throw_after_field_keys=0;
++$batches=count($contact->field_batches);
++check_inq('retry'===$result['status'] && '1331'===($contact->custom_fields()['submission_id']??''),'an interruption after projecting a changed canonical submission retains its new immutable binding');
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$resent=false;
++foreach(array_slice($contact->field_batches,$batches) as $batch) if(array_key_exists('submission_id',$batch)) $resent=true;
++check_inq('committed'===$result['status'] && !$resent && 'ff:3:1330'===SiteEngine_Ads_Bridge_Inquiries::get($old)['transaction_id'] && 'ff:3:1331'===SiteEngine_Ads_Bridge_Inquiries::get($new)['transaction_id'],'binding recovery skips the completed submission write and preserves both canonical transactions');
++
++[$contact,$old,$new,$activation]=reset_case(134);
++$GLOBALS['wpdb']->after_checkpoint=function(){ throw new \RuntimeException('injected_after_checkpoint_crash'); };
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++$calls=$contact->field_write_calls; $tags=$contact->tag_write_calls;
++check_inq('retry'===$result['status'] && !empty(SiteEngine_Ads_Bridge_Inquiries::get($new)['projection_verified_at_utc']) && 'active'===SiteEngine_Ads_Bridge_Inquiries::get($old)['state'],'an exception immediately after persisting the checkpoint retains both the checkpoint and prior active history');
++$result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
++check_inq('committed'===$result['status'] && $calls===$contact->field_write_calls && $tags===$contact->tag_write_calls,'retry after checkpoint-persistence exception commits without CRM writes');
++
++check_inq(array()===$GLOBALS['wpdb']->locks && !SiteEngine_Ads_Bridge_Inquiries::is_reconciling(),'all recovery paths release the request guard and contact locks');
++echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
++exit($fails?1:0);
++
++function hash_for_recovery($payload) {
++    $method=new ReflectionMethod(SiteEngine_Ads_Bridge_Inquiries::class,'payload_hash');
++    $method->setAccessible(true); return $method->invoke(null,$payload);
++}
+--- 0.6.2/siteengine-ads-bridge/tests/static-acceptance-040.php
++++ 0.6.3/siteengine-ads-bridge/tests/static-acceptance-040.php
+@@ -11,7 +11,7 @@
+     if ( $ok ) { $passes++; echo "PASS: {$msg}\n"; }
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+-$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2" ), 'current release metadata is consistent' );
++$check( false !== strpos( $main, 'Version: 0.6.3' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3" ), 'current release metadata is consistent' );
+ $check( false !== strpos( $main, 'Requires Plugins: siteengine-base' ), 'SiteEngine Base is declared as a plugin dependency' );
+ $check( false === strpos( $main, "if ( ! file_exists( SEAB_CONFIG_FILE ) )" ), 'activation no longer requires a PHP config file' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-settings.php' ) && false !== strpos( $main, 'class-siteengine-ads-bridge-admin.php' ), 'settings and Base admin layers load from bootstrap' );
+--- 0.6.2/siteengine-ads-bridge/tests/static-acceptance-050.php
++++ 0.6.3/siteengine-ads-bridge/tests/static-acceptance-050.php
+@@ -19,7 +19,7 @@
+     if ( $ok ) { $passes++; echo "PASS: {$msg}\n"; }
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+-$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2'" ), 'current 0.6.2 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.3' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3'" ), 'current 0.6.3 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-runtime.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Runtime::init()' ), 'front-end lead bridge is loaded by the plugin' );
+ $check( false !== strpos( $runtime, "fluentform/submission_confirmation" ) && false !== strpos( $runtime, "fluentform_submission_success" ), 'SE | Lead bridge uses documented Fluent Forms server and client success hooks' );
+ $check( false !== strpos( $runtime, "siteengine_ads_bridge_lead" ) && false !== strpos( $runtime, "'conversion_action' => 'SE | Lead'" ), 'browser bridge emits the standardized SE | Lead event' );
+--- 0.6.2/siteengine-ads-bridge/tests/static-acceptance-051.php
++++ 0.6.3/siteengine-ads-bridge/tests/static-acceptance-051.php
+@@ -21,7 +21,7 @@
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+ 
+-$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2'" ), 'current 0.6.2 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.3' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3'" ), 'current 0.6.3 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-lifecycle.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Lifecycle::init()' ), 'lifecycle compliance runtime is loaded and initialized' );
+ $check( false !== strpos( $config, "'new'," ) && false !== strpos( $config, "'qualified'," ) && false !== strpos( $config, "'unqualified'," ) && false !== strpos( $config, "'won'," ), 'canonical lifecycle contains New, Qualified, Unqualified, Won' );
+ $check( false !== strpos( $settings, "'unqualified_reason_field' => 'customer_rating'" ) && false !== strpos( $settings, "'unqualified_at_field'     => 'unqualified_at'" ), 'customer_rating and unqualified_at defaults are locked' );
+--- 0.6.2/siteengine-ads-bridge/tests/static-acceptance-060.php
++++ 0.6.3/siteengine-ads-bridge/tests/static-acceptance-060.php
+@@ -1,6 +1,6 @@
+ <?php
+ /**
+- * 0.6.2 inquiry-aware attribution contract acceptance.
++ * 0.6.3 inquiry-aware attribution contract acceptance.
+  * Run: php tests/static-acceptance-060.php
+  */
+ $root      = dirname( __DIR__ );
+@@ -18,7 +18,7 @@
+     else { $fails++; echo "FAIL: {$msg}\n"; }
+ };
+ 
+-$check( false !== strpos( $main, 'Version: 0.6.2' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.2'" ), '0.6.2 release metadata is locked' );
++$check( false !== strpos( $main, 'Version: 0.6.3' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3'" ), '0.6.3 release metadata is locked' );
+ $check( false !== strpos( $main, 'class-siteengine-ads-bridge-inquiries.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Inquiries::init()' ), 'inquiry runtime is loaded and initialized' );
+ $check( false !== strpos( $main, 'function seab_inquiry_adopt_current' ) && false !== strpos( $main, 'function seab_inquiry_prepare_reconciliation' ) && false !== strpos( $main, 'function seab_inquiry_commit_activation' ), 'stable CRM Ops adapter functions expose adopt, prepare, and activate phases' );
+ 
+@@ -56,7 +56,7 @@
+ $check( false === strpos( implode( ',', $gdm_csv ), 'Inquiry ID' ), 'Inquiry ID is intentionally not added to Google Data Manager schema' );
+ 
+ $check( false !== strpos( $cli, 'inquiry-admin <migrate|adopt|inspect>' ), 'CLI exposes explicit inquiry migrate/adopt/inspect administration' );
+-$check( false !== strpos( $doctor, 'Start New Inquiry must stay disabled' ), 'doctor holds repeat-inquiry activation when inquiry persistence is absent' );
++$check( false !== strpos( $doctor, 'CRM Ops repeat-inquiry integration requires migration and acceptance' ), 'doctor distinguishes pending CRM Ops integration from existing settings' );
+ $check( false !== strpos( $doctor, 'STATUS_WARN' ) && false !== strpos( $doctor, 'inquiry table is not installed' ), 'missing inquiry table is a compatibility warning rather than breaking legacy exports' );
+ 
+ $check( false !== strpos( $readme, 'Google_Ads_Import' ), 'README retains Google import documentation' );
+--- 0.6.2/siteengine-ads-bridge/tests/static-acceptance.php
++++ 0.6.3/siteengine-ads-bridge/tests/static-acceptance.php
+@@ -474,7 +474,7 @@
+ 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
+ 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
+ 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
+-	check( false !== strpos( $main_source, 'Version: 0.6.2' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.2'" ), 'release version is 0.6.2 in header and runtime constant' );
++	check( false !== strpos( $main_source, 'Version: 0.6.3' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.3'" ), 'release version is 0.6.3 in header and runtime constant' );
+ 
+ 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
+ 	exit( 0 === $fails ? 0 : 1 );

@@ -1,0 +1,22 @@
+override_key,default_header
+conversion_time,Conversion date/time
+transaction_id,Transaction ID
+gclid,GCLID
+gbraid,GBRAID
+wbraid,WBRAID
+email,Email address
+phone,Phone number
+ip,IP address
+first_name,First name
+last_name,Last name
+city,City
+postal_code,Postal code
+region_code,State or region code
+country_code,Country code
+conversion_value,Conversion value
+currency_code,Currency code
+ad_measurement_consent,Ad measurement consent
+ad_personalization_consent,Ad personalization consent
+user_agent,User agent
+session_attributes,Session attributes
+conversion_action,Conversion action
