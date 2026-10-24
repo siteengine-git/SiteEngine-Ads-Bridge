@@ -7,7 +7,11 @@ Updated 2026-10-24 (America/Chicago).
 Canonical source: `D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\source`.
 Origin: https://github.com/siteengine-git/SiteEngine-Ads-Bridge.git
 Branch: main. Original parent: b7b3cdc3037a38206ef4b8b167a244de93e0f5da.
-Baseline commit/push: pending this authorized import checkpoint.
+Baseline source commit: bd54e89a44d87bc6b739efad2d1cd23d152a1200.
+Pushed to origin/main and independently verified through GitHub: all 45 blobs
+match the local index, including runtime, tests, examples and documentation.
+This follow-up status commit records that verified baseline; use git rev-parse
+HEAD for the current documentation tip.
 
 Accepted runtime 0.6.3; inquiry schema 2; CRM Ops adapter contract 1;
 configuration tree schema 2. No behavior change or version bump.
@@ -55,7 +59,7 @@ No Ads-side defect requiring a new plugin release has been established.
 
 ## Next step
 
-Complete the authorized baseline commit/push and remote-file verification.
+Baseline commit/push and remote-file verification are complete.
 Then obtain a concrete CRM Ops WordPress hold/adopt-before-replace assignment
 and a separately authorized isolated Alma setup/acceptance scope. No live
 transitions, migrations, settings writes, exports or customer sends are implied.
