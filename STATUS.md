@@ -107,3 +107,17 @@ queue verification), with no fixtures/transitions/exports yet, and separately
 assign CRM Ops its WordPress integration work. After both gates pass, approve
 finite paired-inquiry fixtures/failure injection. Test-sink appends/native SQL
 and customer delivery/AWS promotion are separate scopes. None is granted here.
+
+## Authorized setup-track task state
+
+The user authorized supported environment setup after its isolation and runtime
+prerequisites pass, keeping automation/export toggles disabled and excluding
+fixtures, transitions and customer delivery. Those prerequisites have not passed;
+setup remains incomplete. Supported no-write previews completed; no apply was
+performed. The already-authorized setup can resume once the precondition passes.
+
+Exact environment diagnostics and a scoped isolation proposal are retained only
+in the local parent evidence/status files, outside public Git. New site-level
+isolation deployment or infrastructure changes require their own concrete scope;
+they are not silently included as plugin settings or a new Ads release. CRM Ops
+integration remains with its owning writer. Accepted runtime files are unchanged.
