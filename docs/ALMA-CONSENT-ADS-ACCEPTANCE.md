@@ -1,20 +1,3 @@
-> Final prepared Ads code/test pin2846305d19d550997295f85e58c7312b736925bd;
-> candidate0.6.3.1-rc.1. ZIP SHA-256
-> 34d75e77285aa1e6b8441e0a9f1f766e614150b533423549ce03a91cbd71b72f;
-> manifest SHA-25633bde105e09bda298b15e52564888ec3fe82563901f18ce5c07561a086cb8ac7.
-> All J0-J7 remain NOT RUN. The notes below distinguish prepared code from
-> installed engine/browser/CRM acceptance; no site action is authorized here.
-
-> Updated dependency/code preparation: Consent implementation
-> 1c0a42000927db720cfc60934ea5e2b31db28533 and docs
-> b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f now supply the real rc.2 authority;
-> Ads enforcement is complete in this maintenance successor. The former API block
-> below is historical. Bind the final source/package manifests from
-> MAINTENANCE-RELEASE.md before authorizing J0-J7. J4 must assert old withdrawn
-> submissions remain blocked after re-grant while newly captured eligible ones
-> pass. Consent owns its new InnoDB chains/events schema installation; Ads adds no
-> schema. All installed cases remain NOT RUN and require the coordinator.
-
 # Finite joint Consent/Ads installed acceptance — PREPARATION ONLY
 
 Owning projects: Consent (authority, capture/persistence) and Ads Bridge (consumer,
@@ -25,21 +8,65 @@ No execution, bootstrap or server configuration is authorized by this document.
 
 ## Entry gate and exact pins
 
-Ads reviewed code: ba5aff0a94fd490819aaec91f3125b344bef4687, maintenance preparation
-on its scoped descendant. Consent inspected pin:
-37cb66d56b1039255ff2348ef5e5a94edc353db2, 0.6.1-rc.1; authority SHA-256
-7c3b419fcc2b33563dc0fde9f917ac44ad620b905bb7cd3a9ec4cfb35586fc54.
-Neither is a completed withdrawal-capable joint candidate. **Entry blocked** until
-the Consent owner supplies the actual authority and Ads integrates/tests it.
+Ads **0.6.3.1-rc.1**, code/test source
+`2846305d19d550997295f85e58c7312b736925bd`.
+ZIP `siteengine-ads-bridge-0.6.3.1-rc.1-UNACCEPTED-20261029.zip` SHA-256:
+`34d75e77285aa1e6b8441e0a9f1f766e614150b533423549ce03a91cbd71b72f`.
+Member manifest SHA-256:
+`33bde105e09bda298b15e52564888ec3fe82563901f18ce5c07561a086cb8ac7`.
 
-Before execution, replace these planning pins with final Ads/Consent commits,
-versions, ZIP/member-manifest hashes and fixture harness hash. Coordinator records
+Consent **0.6.1-rc.2**, implementation
+`1c0a42000927db720cfc60934ea5e2b31db28533`; reviewed contract/documentation
+`b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f`. Authority and continuity code are
+byte-identical at those two pins. Consent ZIP SHA-256 recorded in that handoff:
+`8471e4761eef927bb10d44967ab88205ef0890a3b6bf90888b8d1ef2c182b619`.
+Authority SHA-256:
+`6d49bfe9006fc108d198dea7309b6dae88e123466d2e0767a2aa74391e4488c9`;
+continuity SHA-256:
+`660c83315e50ae6f159ddcb3f97f28b1f960c726bb5c9be62a0cdccd2507fe3d`.
+
+The dependency/code-preparation block is resolved. **All J0-J7 installed cases
+remain NOT RUN**; coordinator authorization/isolation and a pinned owned-ID
+installed harness are still required. The earlier b49e2db preparation is preserved
+in Git history, not a second implementation task. No replacement package is
+needed for this handoff clarification; packaged code and hashes remain unchanged.
+
+Coordinator records
 the actual profile, effective owner/web+CLI PHP, plugin/dependency versions, form
 ID/field mapping, actual prefix/table names and fixture IDs; never borrow Golden
 identities. Verify candidate bytes and preserve restricted installed-file backups.
 Do not allocate another database or resume the Windows initializer to satisfy this
 matrix. Read-only installed inspection and any application bootstrap also require
 the coordinator's recorded task scope.
+
+## Consent storage, engine and rollback entry conditions
+
+Consent owns the additive `{prefix}se_consent_chains` and
+`{prefix}se_consent_events` tables. Its existing `{prefix}se_consent_receipts`
+columns/history remain unchanged. **All three tables must be InnoDB**; verify the
+actual site's prefix, physical schema and required indexes, rather than inferring
+success from an option/version. Chains have a chain primary key; events have an
+exact receipt-row primary key and unique receipt-ID and chain/revision indexes.
+Ads adds no table or migration. Consent refuses an incompatible receipts engine;
+no implicit engine conversion, schema repair or privilege expansion is allowed.
+
+Any Consent installation/normal version-upgrade schema writes must be separately
+recorded and assigned by Alma's coordinator to the owner/executor before bootstrap.
+Verify/install that pinned dependency before the Ads candidate. Do not reactivate,
+uninstall, force upgrade/cron or delete a table as an installation shortcut.
+Use the existing qualified primary WPDB/autocommit path; verify routing and
+LOCK IN SHARE MODE current-read behavior on the actual engine. Ads blocks an
+unqualified db.php routing/cache drop-in or read-only database. A writable replica
+can report read_only=0, so that guard alone is not proof of primary topology.
+Ambient transactions can retain the shared head lock until commit; no caller may
+hold it across a long batch/network operation without a separately reviewed path.
+
+A file rollback is not a database rollback. Preserve receipts, event links, chain
+heads and permanent withdrawal barriers. Never drop the additive tables, restore
+an older head/barrier, run destructive uninstall or restore a whole database to
+reverse an installation/fixture. Keep advertising delivery disabled if either
+plugin is restored to an older incompatible/unsafe consumer. Any structural
+recovery requires a separate owner-reviewed assignment and exact retained evidence.
 
 ## Minimum isolation proof
 
@@ -67,8 +94,8 @@ Control implementation and verification are separate coordinator-authorized work
 ## Finite resource and mutation ceiling
 
 One configured test form within the assigned site's supported master-form context,
-one controlled browser subject and at most two synthetic contacts; at most ten new
-Consent event rows, ten submissions with owned details, and four Ads inquiry rows.
+one controlled same-browser bearer chain (not a claim of person identity) and at most two synthetic contacts; at most ten new
+Consent receipt rows and ten immutable event-link rows, one chain head with at most ten acknowledged revisions, ten submissions with owned details, and four Ads inquiry rows.
 One grant/withdraw/re-grant sequence only; no load loop. Mark and collision-check
 all test identities before use. No broad scans, exports, Sheet provisioning/writes,
 real numbers/calls, messages, invoice changes on real contacts or production API
@@ -92,7 +119,7 @@ once the real withdrawal API exists; this document is not an executable harness.
 | J1 Grant A and actual persistence | Explicit acknowledged event G1, real form submission A, form-bound signed stored stamp and one exact digest row. Actual response-array/submission_form_data transforms, stored response, serialized details and confirmation order recorded. Browser payload for canonical A only when current authority permits. | Persisted/request disagreement or early payload: preserve owned rows/evidence, stop; do not upgrade submission later. |
 | J2 Rejection/conflicting evidence | Rejection B plus attempted conflicting flat/detail/browser grant cannot override the stored negative decision. Pending/failed ACK, null/malformed/unknown stamp and absent unsigned legacy fixture each block both advertising builders and browser payload; internal All_Leads remains usable. Local tests cover corruption; installed injection only through the reviewed fixture harness. | Any advertising eligibility/payload is a failure, even if delivery fence caught it. No receipt repair or fallback. |
 | J3 Subsequent withdrawal | Same authority-defined subject/scope withdraws after G1. Current callable returns withdrawn; old A and new rejected B produce no browser advertising payload and are ineligible for Qualified/Converted. A's stored receipt/signature/digest/attribution remain byte-identical. | Unknown identity/read/result blocks, not permission. Preserve controls and unresolved recovery record. |
-| J4 Subsequent re-grant | New acknowledged event G2 and submission C. Compare old A and new C against the final Consent contract: explicitly assert its old-inquiry revival or sticky-withdrawal rule. Never replace A's evidence with G2. | No documented rule or conflicting result: fail, do not infer latest receipt. |
+| J4 Subsequent re-grant | New acknowledged event G2 and submission C. Old withdrawn A stays ineligible because its event revision does not clear the permanent category barrier; eligible new C may pass. Frozen negative B never upgrades. Keep A/B evidence and attribution unchanged; test effective personalization independently. | Any revival of A/B or implicit latest-receipt replacement fails; retain controls and evidence. |
 | J5 Authority failures | Fixture-scoped missing callable and failed/unavailable current-permission reads deny browser payload and both builders, while intact historical proof remains stored. Actual real authority handles success; no always-successful stub. | Restore only reviewed fixture override; verify restoration. Any uncertainty retains isolation. |
 | J6 Policy, DNC, personalization, inquiry binding | Reversible test-contact DNC toggled once on/off and required-policy mismatch tested in the reviewed fixture harness; both builders deny appropriately. Independent personalization denied/granted remains independent of ad_user_data. One active and one archived reached-stage inquiry keep canonical A/B binding despite mutable CRM submission changes. 21/94 column contracts unchanged. | No real contact edits, head release or new CRM transitions implied. Existing holds/adopt-before-replace remain CRM-owned and must already be proven if that path is used. |
 | J7 Closure | Zero external deliveries; original file/configuration/schema/cron/GC state compared; original rows unchanged outside normal attributed maintenance. All fixture resource IDs accounted for, bounded cleanup verified or explicit retained-evidence ownership recorded. | Failed evidence preserved; no retry outside procedure. Do not lift controls while a fixture worker/delivery can remain in flight. |

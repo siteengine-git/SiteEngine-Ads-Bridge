@@ -1,3 +1,14 @@
+## Helper reconciliation — 2026-10-29
+
+The repeated rc.2 implementation request matches the already completed candidate.
+Verified retained ZIP/member hashes and identical authority/continuity code at
+implementation1c0a420 and docs b8ceb8c. No implementation/test repetition or new
+package. J0-J7 now names the two additive Consent tables, all-three InnoDB/index
+requirements, normal-upgrade ownership, primary/autocommit/current-read checks,
+permanent old-event withdrawal, bounded chain/link fixtures and rollback limits.
+Code remains2846305; candidate ZIP/manifest unchanged. Prior preparationb49e2db,
+all unrelated work and untracked native material remain preserved and excluded.
+
 ## Exact candidate delivery
 
 Code/test source2846305d19d550997295f85e58c7312b736925bd.
@@ -34,7 +45,7 @@ re-grant permits new eligible evidence, not historical revival. Independent
 personalization enforced. Primary routing/autocommit remain installed gates.
 
 Actual PHP8.3.36 -n:488 PASS/0 FAIL across12 suites (32 new dispatch,104 consumer,
-352 existing);18 PHP lint PASS. Actual pinned Consent capture/current algorithms,
+352 existing);19 PHP lint PASS. Actual pinned Consent capture/current algorithms,
 synthetic SQL and HTTP sink; nine separately injected authority fault cases retain
 real historical verification. No native SQL/installed WP/browser/real export or
 server check. Detailed local evidence ../consent-rc2-review-20261029/RESULTS.json.
