@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
+require_once __DIR__ . '/class-siteengine-ads-bridge-consent.php';
+
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
         return;
 }
@@ -7594,23 +7596,11 @@ class SiteEngine_Ads_Bridge_CLI {
          * already resolved for the Order ID. Read-only: never mutates FluentCRM,
          * Fluent Forms, the consent receipts table, the Sheet, or the ledger.
          *
-         * Authority chain:
-         *   1. Require a deterministic canonical submission (entry id) to attach to.
-         *      Arbitrary recent receipts are NEVER guessed.
-         *   2. Resolve the stamped receipt id from that submission, in precedence order:
-         *        a. response JSON `_se_consent_server.receipt_id` (server-captured)
-         *        b. response JSON flat `se_consent_receipt_id`
-         *        c. {prefix}fluentform_entry_details.field_name = 'se_consent_receipt_id'
-         *   3. Load the matching row from {prefix}se_consent_receipts (the PLURAL,
-         *      authoritative table).
-         *   4. Decode google_consent_json and read ad_user_data / ad_personalization.
-         *   5. Policy-version staleness: compare the receipt policy_version against the
-         *      configured consent.required_policy_version authority. Runtime consent
-         *      plugin policy values are diagnostic only.
-         *
-         * Emitted Sheet/Data Manager columns and the export gate derive ONLY from the
-         * receipt row's google_consent_json. Loose CRM/form copied fields are not used
-         * as authority anywhere in this method.
+         * Signed contract-v1 stamp and exact unambiguous digest-bound row required.
+         * Present invalid/negative evidence blocks every fallback. Unsigned legacy
+         * claims stay blocked; no historical grant backfill. Historical verification
+         * does not resolve current revocation. Policy/ad_user_data/caller DNC gates
+         * remain independent; personalization never grants measurement permission.
          *
          * @param array       $resolved Result of resolve_won_order_id() or direct submission context.
          * @param object|null $config   Config instance; loaded when omitted.
@@ -7657,93 +7647,26 @@ class SiteEngine_Ads_Bridge_CLI {
                 $out['attached_entry_id'] = $entry_id;
                 $out['attached_form_id']  = isset( $resolved['form_id'] ) ? (string) $resolved['form_id'] : '';
 
-                // 2. Resolve the stamped receipt id from the canonical submission.
-                $receipt_id = '';
-                $src        = 'none';
-
-                $table = isset( $resolved['submissions_table'] ) ? (string) $resolved['submissions_table'] : '';
-                if ( '' !== $table && preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {
-                        $cols = $this->table_columns( $table );
-                        if ( in_array( 'response', $cols, true ) ) {
-                                $resp_raw = $wpdb->get_var(
-                                        $wpdb->prepare( "SELECT response FROM `{$table}` WHERE id = %d", (int) $entry_id )
-                                );
-                                if ( is_string( $resp_raw ) && '' !== $resp_raw ) {
-                                        $resp = json_decode( $resp_raw, true );
-                                        if ( is_array( $resp ) ) {
-                                                // 2a: server-captured stamp (primary).
-                                                if ( isset( $resp['_se_consent_server'] ) && is_array( $resp['_se_consent_server'] )
-                                                        && isset( $resp['_se_consent_server']['receipt_id'] )
-                                                        && '' !== trim( (string) $resp['_se_consent_server']['receipt_id'] ) ) {
-                                                        $receipt_id = trim( (string) $resp['_se_consent_server']['receipt_id'] );
-                                                        $src        = 'response._se_consent_server.receipt_id';
-                                                }
-                                                // 2b: flat field (fallback).
-                                                if ( '' === $receipt_id && isset( $resp['se_consent_receipt_id'] )
-                                                        && '' !== trim( (string) $resp['se_consent_receipt_id'] ) ) {
-                                                        $receipt_id = trim( (string) $resp['se_consent_receipt_id'] );
-                                                        $src        = 'response.se_consent_receipt_id';
-                                                }
-                                        }
-                                }
-                        }
-                }
-
-                // 2c: normalized entry-details fallback (proven storage location on live).
-                if ( '' === $receipt_id ) {
-                        $details_table = $wpdb->prefix . 'fluentform_entry_details';
-                        $det_cols      = $this->table_columns( $details_table );
-                        if ( in_array( 'submission_id', $det_cols, true )
-                                && in_array( 'field_name', $det_cols, true )
-                                && in_array( 'field_value', $det_cols, true ) ) {
-                                $val = $wpdb->get_var(
-                                        $wpdb->prepare(
-                                                "SELECT field_value FROM `{$details_table}` WHERE submission_id = %d AND field_name = %s ORDER BY id DESC LIMIT 1",
-                                                (int) $entry_id,
-                                                'se_consent_receipt_id'
-                                        )
-                                );
-                                if ( is_string( $val ) && '' !== trim( $val ) ) {
-                                        $receipt_id = trim( $val );
-                                        $src        = 'fluentform_entry_details.se_consent_receipt_id';
-                                }
-                        }
-                }
-
-                $out['receipt_id']        = $receipt_id;
-                $out['receipt_id_source'] = $src;
-
-                if ( '' === $receipt_id ) {
-                        $out['block_reason'] = 'consent unresolved: canonical submission ' . $entry_id . ' has no stamped consent receipt id.';
-                        return $out;
-                }
-
-                // 3. Load the authoritative receipt row (PLURAL table).
-                $rtable = $wpdb->prefix . 'se_consent_receipts';
-                $rcols  = $this->table_columns( $rtable );
-                if ( ! in_array( 'receipt_id', $rcols, true ) || ! in_array( 'google_consent_json', $rcols, true ) ) {
-                        $out['block_reason'] = 'consent unresolved: authoritative receipts table ' . $rtable . ' is missing or lacks required columns.';
-                        $out['detail'][]     = 'receipts table columns seen: ' . ( ! empty( $rcols ) ? implode( ',', $rcols ) : '(none)' );
-                        return $out;
-                }
-
-                $row = $wpdb->get_row(
-                        $wpdb->prepare(
-                                "SELECT id, policy_version, banner_version, google_consent_json FROM `{$rtable}` WHERE receipt_id = %s ORDER BY id DESC LIMIT 1",
-                                $receipt_id
-                        ),
-                        ARRAY_A
+                // No flat/details fallback can establish historical signed authority.
+                $proof = SiteEngine_Ads_Bridge_Consent::resolve(
+                        (int) $entry_id, (int) $out['attached_form_id'],
+                        isset( $resolved['submissions_table'] ) ? $resolved['submissions_table'] : '', $wpdb
                 );
-                if ( ! $row ) {
-                        $out['block_reason'] = 'consent unresolved: receipt id ' . $receipt_id . ' does not resolve to an authoritative receipt row.';
+                $out['receipt_id'] = $proof['receipt_id'];
+                $out['receipt_row_id'] = $proof['receipt_row_id'];
+                $out['receipt_id_source'] = $proof['receipt_id_source'];
+                $out['stamp_present'] = $proof['stamp_present'];
+                $out['revocation_check'] = $proof['revocation_check'];
+                if ( ! $proof['verified'] ) {
+                        $out['block_reason'] = $proof['block_reason'];
                         return $out;
                 }
-
-                $out['receipt_found']  = true;
-                $out['receipt_row_id'] = (string) $row['id'];
-                $out['policy_version'] = (string) $row['policy_version'];
-                $out['banner_version'] = (string) $row['banner_version'];
-                $out['google_consent_json'] = (string) $row['google_consent_json'];
+                $receipt_id = $proof['receipt_id'];
+                $row = $proof['row'];
+                $out['receipt_found'] = true;
+                $out['policy_version'] = $row['policy_version'];
+                $out['banner_version'] = $row['banner_version'];
+                $out['google_consent_json'] = $row['google_consent_json'];
 
                 // 4. Decode google_consent_json.
                 $gc = json_decode( (string) $row['google_consent_json'], true );

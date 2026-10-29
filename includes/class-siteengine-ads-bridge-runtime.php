@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once __DIR__ . '/class-siteengine-ads-bridge-consent.php';
+
 final class SiteEngine_Ads_Bridge_Runtime {
 
 	/** @return void */
@@ -45,7 +47,7 @@ final class SiteEngine_Ads_Bridge_Runtime {
 			return $return_data;
 		}
 
-		if ( ! self::receipt_allows_ad_user_data( $form_data, $config ) ) {
+		if ( ! self::receipt_allows_ad_user_data( (int) $insert_id, $actual, $config ) ) {
 			return $return_data;
 		}
 
@@ -111,44 +113,21 @@ final class SiteEngine_Ads_Bridge_Runtime {
 	/**
 	 * Validate the authoritative consent receipt referenced by the form submission.
 	 *
-	 * @param array  $form_data Submitted form data.
+	 * @param int    $entry_id  Canonical persisted submission ID.
+	 * @param int    $form_id   Canonical form ID.
 	 * @param object $config    Config instance.
 	 * @return bool
 	 */
-	private static function receipt_allows_ad_user_data( $form_data, $config ) {
-		$receipt_id = isset( $form_data['se_consent_receipt_id'] ) ? trim( (string) $form_data['se_consent_receipt_id'] ) : '';
-		if ( '' === $receipt_id ) {
-			return false;
-		}
-
+	private static function receipt_allows_ad_user_data( $entry_id, $form_id, $config ) {
 		global $wpdb;
-		if ( ! isset( $wpdb->prefix ) ) {
-			return false;
-		}
-		$table = $wpdb->prefix . 'se_consent_receipts';
-		$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
-		if ( (string) $found !== $table ) {
-			return false;
-		}
-
-		$row = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT policy_version, google_consent_json FROM `{$table}` WHERE receipt_id = %s ORDER BY id DESC LIMIT 1",
-				$receipt_id
-			),
-			ARRAY_A
-		);
-		if ( ! is_array( $row ) ) {
-			return false;
-		}
-
+		if ( ! isset( $wpdb->prefix ) ) { return false; }
+		$proof = SiteEngine_Ads_Bridge_Consent::resolve( $entry_id, $form_id, $wpdb->prefix . 'fluentform_submissions', $wpdb );
+		if ( ! $proof['verified'] ) { return false; }
+		$row = $proof['row'];
 		$required = trim( (string) $config->get( 'consent.required_policy_version', '' ) );
-		if ( '' !== $required && (string) $row['policy_version'] !== $required ) {
-			return false;
-		}
-
-		$google = json_decode( (string) $row['google_consent_json'], true );
-		return is_array( $google ) && isset( $google['ad_user_data'] ) && 'granted' === strtolower( trim( (string) $google['ad_user_data'] ) );
+		if ( '' === $required || $row['policy_version'] !== $required ) { return false; }
+		$google = json_decode( $row['google_consent_json'], true );
+		return is_array( $google ) && ( $google['ad_user_data'] ?? null ) === 'granted';
 	}
 
 	/** @return string */

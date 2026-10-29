@@ -1,6 +1,6 @@
 <?php
 /**
- * Dependency-free release acceptance for SiteEngine Ads Bridge.
+ * Isolated acceptance; requires hash-pinned external Consent authority (see docs).
  * Run: php tests/static-acceptance.php
  */
 
@@ -108,6 +108,8 @@ namespace {
 		return array( 'code' => 200, 'body' => '{}' );
 	}
 
+	require_once __DIR__ . '/consent-authority-fixture.php';
+
 	class SEAB_Test_WPDB {
 		public $prefix = 'wp_';
 		public $last_error = '';
@@ -136,7 +138,7 @@ namespace {
 				$columns = array(
 					'wp_fluentform_submissions' => array( 'id', 'form_id', 'response', 'serial_number', 'status', 'created_at', 'updated_at', 'source_url', 'user_id', 'browser', 'device', 'ip' ),
 					'wp_fluentform_entry_details' => array( 'id', 'submission_id', 'field_name', 'field_value' ),
-					'wp_se_consent_receipts' => array( 'id', 'receipt_id', 'policy_version', 'banner_version', 'google_consent_json' ),
+					'wp_se_consent_receipts' => array_keys( seab_fixture_receipt() ),
 					'wp_fc_subscriber_meta' => array( 'id', 'subscriber_id', 'object_type', 'key', 'value' ),
 				);
 				return isset( $columns[ $m[1] ] ) ? $columns[ $m[1] ] : array();
@@ -171,6 +173,7 @@ namespace {
 		}
 
 		public function get_row( $sql, $format = null ) {
+			if ( false !== strpos( $sql, 'SELECT id, form_id, response FROM `wp_fluentform_submissions`' ) ) { return $this->submission_row(); }
 			if ( false !== strpos( $sql, 'SELECT id, form_id FROM `wp_fluentform_submissions`' ) ) {
 				$id = 24;
 				if ( preg_match( '/WHERE id = (\d+)/', $sql, $m ) ) { $id = (int) $m[1]; }
@@ -190,7 +193,9 @@ namespace {
 			}
 			return null;
 		}
-		public function get_results( $sql, $format = null ) { return array(); }
+		public function get_results( $sql, $format = null ) {
+			return false !== strpos( $sql, 'FROM `wp_se_consent_receipts`' ) ? array( seab_fixture_receipt( $this->consent_ad_user_data, $this->consent_ad_personalization ) ) : array();
+		}
 		public function query( $sql ) { return true; }
 		public function insert( $table, $data, $formats = null ) { return 1; }
 		public function submission_row() {
@@ -213,7 +218,7 @@ namespace {
 					'utm_source' => 'google', 'utm_medium' => 'cpc', 'submission_id' => '24',
 					'se_cid' => '123456', 'se_agid' => '654321', 'se_adid' => '777', 'se_kw' => 'ac repair',
 					'se_mt' => 'e', 'se_net' => 'g', 'se_dev' => 'm', 'se_loc' => '1015116',
-					'_se_consent_server' => array( 'receipt_id' => 'receipt-24' ),
+					'_se_consent_server' => seab_fixture_stamp( seab_fixture_receipt( $this->consent_ad_user_data, $this->consent_ad_personalization ) ),
 				) ),
 			);
 		}
@@ -246,6 +251,8 @@ namespace {
 		$ref->setAccessible( true );
 		$ref->setValue( $subscriber, $custom );
 	}
+
+	if ( defined( 'SEAB_TEST_LIBRARY_ONLY' ) ) { return; }
 
 	$config = SiteEngine_Ads_Bridge_Config::instance();
 	check( array() === $config->validate(), 'isolated schema-v2 acceptance config validates' );
