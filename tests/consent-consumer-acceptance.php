@@ -98,13 +98,12 @@ $authority = new SiteEngine_Consent_Authority( array( 'cookie_days' => 180, 'pol
 function capture_choice( $advertising, $personalization = false ) {
     global $authority;
     static $event = 0;
-    $ack = $authority->save( array( 'event_id' => sprintf( '12345678-1234-4123-8123-%012d', ++$event ),
-        'policy_version' => '2026-05-08-v1', 'banner_version' => 'fixture-banner', 'method' => 'explicit_choice',
-        'page_url' => 'https://example.test/form', 'referrer_url' => '',
-        'consent' => array( 'analytics' => false, 'advertising' => $advertising, 'personalization' => $personalization ) ), '192.0.2.1', 'Synthetic UA' );
-    $stamp = $authority->resolve( $ack );
-    if ( $stamp['state'] !== 'verified' ) { throw new RuntimeException( 'real authority fixture generation failed' ); }
-    return SiteEngine_Consent_Authority::seal_stamp( $stamp, 3 );
+    global $wpdb;
+    $row = seab_fixture_receipt( $advertising ? 'granted' : 'denied', $personalization ? 'granted' : 'denied' );
+    $row['id'] = ++$event;
+    $row['receipt_id'] = 'sc1_' . substr( hash( 'sha256', 'historical-independent-chain-' . $event ), 0, 60 );
+    $wpdb->rows[] = $row;
+    return seab_fixture_stamp( $row );
 }
 $grant = capture_choice( true );
 $reject = capture_choice( false );
@@ -112,7 +111,7 @@ $personal = capture_choice( true, true );
 $saved_rows = $wpdb->rows;
 $writes = $wpdb->writes;
 put_stamp( $grant );
-check( consumer_result()['exportable'], 'actual save/resolve/seal grant accepted; later rejection does not rebind history' );
+check( consumer_result()['exportable'], 'signed grant on independent chain accepted; another chain does not rebind history' );
 check( consumer_result()['ad_personalization'] === 'denied', 'personalization denial independent of ad_user_data grant' );
 put_stamp( $reject );
 check( ! consumer_result()['exportable'], 'actual rejection blocks even with later grant and flat/detail grant claims' );
@@ -175,7 +174,7 @@ check( $authority->resolve( $expired_ack )['state'] === 'expired', 'real authori
 check( consumer_result()['exportable'], 'historical signed receipt never uses browser ACK expiry/today' );
 $proof = SiteEngine_Ads_Bridge_Consent::resolve( 24, 3, 'wp_fluentform_submissions', $wpdb );
 check( $proof['revocation_check'] === 'unavailable', 'current revocation explicitly unresolved; no inferred latest choice' );
-$wpdb->rows = $saved_rows; put_stamp( $grant );
+$wpdb->rows = $saved_rows; seab_fixture_continuity( $saved_rows[0] ); put_stamp( $grant );
 $property = new ReflectionProperty( $config, 'config' ); $property->setAccessible( true ); $original = $property->getValue( $config );
 foreach ( array( '', 'different-policy' ) as $policy ) {
     $changed = $original; $changed['consent']['required_policy_version'] = $policy; $property->setValue( $config, $changed );

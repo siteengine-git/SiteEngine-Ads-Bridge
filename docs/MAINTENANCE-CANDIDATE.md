@@ -1,3 +1,5 @@
+> Historical checkpoint; superseded by [rc.2 enforcement and current maintenance notes](MAINTENANCE-RELEASE.md).
+
 # Ads maintenance preparation — 2026-10-29 — BLOCKED / UNACCEPTED
 
 Purpose: ship the reviewed Consent consumer repair and the smallest necessary

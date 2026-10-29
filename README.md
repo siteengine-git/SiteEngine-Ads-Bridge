@@ -1,3 +1,9 @@
+> Current source: **0.6.3.1-rc.1, unaccepted maintenance candidate**. Requires
+> Consent0.6.1-rc.2 at1c0a420 (current eligibility result contract2). Historical
+> grant verification alone no longer permits advertising. Read
+> [maintenance release notes](docs/MAINTENANCE-RELEASE.md) before upgrade.
+> Accepted installable0.6.3 remains preserved; no deployment is implied.
+
 # SiteEngine Ads Bridge 0.6.3
 
 SiteEngine Ads Bridge connects a configured Fluent Forms master lead form to FluentCRM and exports append-only lead lifecycle data to Google Sheets for Google Ads Data Manager.

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.3.1-rc.1 — UNACCEPTED maintenance candidate, 2026-10-29
+
+- Preserve signed canonical v1 evidence and require real Consent rc.2 contract2
+  current eligibility, with strict fail-closed result validation.
+- Re-read at browser payload creation and at every actual advertising Sheet append,
+  including both batch families and retries; current DNC/policy remain required.
+- Withdrawal barriers keep older submissions blocked after re-grant. New captured
+  eligible submissions can proceed; effective personalization remains independent.
+- Block stale prepared consent flags without rewriting retry bodies or history.
+- Preserve All_Leads reporting and accepted inquiry schema2/adapter1/tree2. Exclude
+  unfinished configuration coordination and native diagnostic work.
+- No installed/engine/browser acceptance, deployment or transport enablement.
+
 ## 0.6.3 - 2026-10-23
 
 - Persist an activation-bound reset plan and original field/lifecycle values before touching FluentCRM.

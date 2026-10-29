@@ -121,10 +121,10 @@ final class SiteEngine_Ads_Bridge_Runtime {
 	private static function receipt_allows_ad_user_data( $entry_id, $form_id, $config ) {
 		global $wpdb;
 		if ( ! isset( $wpdb->prefix ) ) { return false; }
-		$proof = SiteEngine_Ads_Bridge_Consent::resolve( $entry_id, $form_id, $wpdb->prefix . 'fluentform_submissions', $wpdb );
-		if ( ! $proof['verified'] ) { return false; }
-		$row = $proof['row'];
 		$required = trim( (string) $config->get( 'consent.required_policy_version', '' ) );
+		$proof = SiteEngine_Ads_Bridge_Consent::current( $entry_id, $form_id, $wpdb->prefix . 'fluentform_submissions', $wpdb, $required );
+		if ( ! $proof['allowed'] ) { return false; }
+		$row = $proof['row'];
 		if ( '' === $required || $row['policy_version'] !== $required ) { return false; }
 		$google = json_decode( $row['google_consent_json'], true );
 		return is_array( $google ) && ( $google['ad_user_data'] ?? null ) === 'granted';

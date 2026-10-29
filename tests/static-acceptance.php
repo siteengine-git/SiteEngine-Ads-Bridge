@@ -30,6 +30,7 @@ namespace FluentCrm\App\Models {
 	}
 
 	class Subscriber {
+		public static $current_dnc = false;
 		public $id = 13;
 		public $email = 'Test.User@gmail.com';
 		public $phone = '+1 (850) 555-0123';
@@ -70,7 +71,7 @@ namespace FluentCrm\App\Models {
 
 		public function custom_fields() { return $this->custom; }
 		public function getTable() { return 'wp_fc_subscribers'; }
-		public static function find( $id ) { return 13 === (int) $id ? new self() : null; }
+		public static function find( $id ) { return 13 === (int) $id ? new self( self::$current_dnc ) : null; }
 		public static function query() { return new SubscriberQuery( new self() ); }
 	}
 }
@@ -149,6 +150,7 @@ namespace {
 			return array();
 		}
 		public function get_var( $sql ) {
+            if ( $sql === 'SELECT @@read_only' ) { return '0'; }
 			if ( false !== strpos( $sql, 'SHOW TABLES LIKE' ) && false !== strpos( $sql, 'wp_se_ads_export_ledger' ) ) {
 				return $this->ledger_enabled ? 'wp_se_ads_export_ledger' : null;
 			}
@@ -173,6 +175,7 @@ namespace {
 		}
 
 		public function get_row( $sql, $format = null ) {
+            if ( strpos( $sql, 'se_consent_events' ) !== false || strpos( $sql, 'se_consent_chains' ) !== false ) { return seab_fixture_current_row( $sql ); }
 			if ( false !== strpos( $sql, 'SELECT id, form_id, response FROM `wp_fluentform_submissions`' ) ) { return $this->submission_row(); }
 			if ( false !== strpos( $sql, 'SELECT id, form_id FROM `wp_fluentform_submissions`' ) ) {
 				$id = 24;
@@ -194,7 +197,7 @@ namespace {
 			return null;
 		}
 		public function get_results( $sql, $format = null ) {
-			return false !== strpos( $sql, 'FROM `wp_se_consent_receipts`' ) ? array( seab_fixture_receipt( $this->consent_ad_user_data, $this->consent_ad_personalization ) ) : array();
+			return false !== strpos( $sql, 'wp_se_consent_receipts' ) ? array( seab_fixture_receipt( $this->consent_ad_user_data, $this->consent_ad_personalization ) ) : array();
 		}
 		public function query( $sql ) { return true; }
 		public function insert( $table, $data, $formats = null ) { return 1; }
@@ -481,7 +484,7 @@ namespace {
 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
-	check( false !== strpos( $main_source, 'Version: 0.6.3' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.3'" ), 'release version is 0.6.3 in header and runtime constant' );
+	check( false !== strpos( $main_source, 'Version: 0.6.3.1-rc.1' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.3.1-rc.1'" ), 'candidate version is 0.6.3.1-rc.1 in header and runtime constant' );
 
 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
 	exit( 0 === $fails ? 0 : 1 );

@@ -1,3 +1,44 @@
+# Consent rc.2 enforcement complete — UNACCEPTED0.6.3.1-rc.1, 2026-10-29
+
+Scoped branch codex/ads-maintenance-preparation-20261029, preserving historical
+repairba5aff0 and preparationb49e2db. No unfinished coordination/native history.
+Canonical checkout unchanged. Accepted0.6.3 archive preserved; inquiry schema2,
+adapter1, config tree2 unchanged. No new Ads DDL or transport enablement.
+
+Consent implementation1c0a42000927db720cfc60934ea5e2b31db28533, docs
+b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f. Shared current() calls real
+current_eligibility with original canonical persisted stamp/form/required policy.
+Strict contract2/available/allowed and result shape/effective flags; exceptions,
+missing API, stale/unknown/unavailable evidence, read-only DB or unsupported
+routing/cache drop-in block. Historical signature/exact-row/negative veto stays.
+
+Before browser payload creation and immediately before each physical advertising
+Sheet append, re-read current authority with no positive cache. Both Converted
+and family/Qualified batch callers pass canonical per-item context, including
+retries. Fresh contact/DNC and policy checked; changed effective consent flags
+block rather than rewriting retry bodies. All_Leads explicit94-column internal
+sinks unchanged. Withdrawal permanently blocks older submissions in that chain;
+re-grant permits new eligible evidence, not historical revival. Independent
+personalization enforced. Primary routing/autocommit remain installed gates.
+
+Actual PHP8.3.36 -n:488 PASS/0 FAIL across12 suites (32 new dispatch,104 consumer,
+352 existing);18 PHP lint PASS. Actual pinned Consent capture/current algorithms,
+synthetic SQL and HTTP sink; nine separately injected authority fault cases retain
+real historical verification. No native SQL/installed WP/browser/real export or
+server check. Detailed local evidence ../consent-rc2-review-20261029/RESULTS.json.
+See docs/MAINTENANCE-RELEASE.md for exact boundaries, pins and acceptance limits.
+
+Candidate packaging is authorized and unaccepted; final source/member/ZIP hashes
+are recorded with the delivered artifact, not original baseline manifests. Keep
+existing PHP7.4 metadata floor distinct from executed PHP8.3 evidence. No deployed
+release/tag/main merge. Next: Consent/CRM review of the successor, then Alma
+coordinator records/delegates finite J0-J7 installation/isolation/fixture scope.
+Existing CRM4c448ec binding is historical and not automatically rebound. Native
+allocations, consumed receipts, prior isolation artifacts and other-plugin source
+preserved. No deployment/bootstrap/schema/settings/queue/export/Sheet/live send.
+
+---
+
 # Maintenance preparation — withdrawal dependency BLOCKED, 2026-10-29
 
 Current branch: codex/ads-maintenance-preparation-20261029, rooted at reviewed

@@ -1,3 +1,13 @@
+> Updated dependency/code preparation: Consent implementation
+> 1c0a42000927db720cfc60934ea5e2b31db28533 and docs
+> b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f now supply the real rc.2 authority;
+> Ads enforcement is complete in this maintenance successor. The former API block
+> below is historical. Bind the final source/package manifests from
+> MAINTENANCE-RELEASE.md before authorizing J0-J7. J4 must assert old withdrawn
+> submissions remain blocked after re-grant while newly captured eligible ones
+> pass. Consent owns its new InnoDB chains/events schema installation; Ads adds no
+> schema. All installed cases remain NOT RUN and require the coordinator.
+
 # Finite joint Consent/Ads installed acceptance — PREPARATION ONLY
 
 Owning projects: Consent (authority, capture/persistence) and Ads Bridge (consumer,

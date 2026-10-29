@@ -2202,7 +2202,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                 continue;
                         }
 
-                        $append     = $this->google_sheets_append_row( $spreadsheet_id, $tab, $item['values'], $token['token'], $vio );
+                        $append     = $this->google_sheets_append_row( $spreadsheet_id, $tab, $item['values'], $token['token'], $vio, array_merge( $item, array( 'sink' => $sink ) ) );
                         $attempt_no = $this->ledger_attempt_count( $sink, $item['txn'] ) + 1;
 
                         if ( $append['ok'] ) {
@@ -6736,7 +6736,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                 continue;
                         }
 
-                        $append     = $this->google_sheets_append_row( $sheet['spreadsheet_id'], $tab, $item['values'], $sheet['token'], $sheet['vio'] );
+                        $append     = $this->google_sheets_append_row( $sheet['spreadsheet_id'], $tab, $item['values'], $sheet['token'], $sheet['vio'], array_merge( $item, array( 'sink' => $sink ) ) );
                         $attempt_no = $this->ledger_attempt_count( $sink, $item['txn'] ) + 1;
 
                         if ( $append['ok'] ) {
@@ -6929,6 +6929,39 @@ class SiteEngine_Ads_Bridge_CLI {
                 return $out;
         }
 
+        /** Last dispatch boundary, including prepared batches and exact-body retries. */
+        private function advertising_dispatch_error( $values, $context ) {
+                try {
+                        if ( count( $values ) !== 21 || ! is_array( $context )
+                            || ! preg_match( '/^ff:([1-9][0-9]*):([1-9][0-9]*)$/D', $context['txn'] ?? '', $m )
+                            || ( $values[1] ?? null ) !== $context['txn'] || (int) ( $context['cid'] ?? 0 ) < 1 ) {
+                                return 'advertising dispatch lacks canonical context';
+                        }
+                        $config = SiteEngine_Ads_Bridge_Config::instance();
+                        if ( (int) $m[1] !== (int) $config->get( 'fluent_forms.form_id', 0 ) ) {
+                                return 'advertising dispatch form mismatch';
+                        }
+                        $subscriber = \FluentCrm\App\Models\Subscriber::find( (int) $context['cid'] );
+                        if ( ! $subscriber || ! is_iterable( $subscriber->lists ) ) { return 'current contact/DNC unavailable'; }
+                        $dnc = (string) $config->get( 'crm_map.lists.do_not_contact', 'DNC' );
+                        if ( '' === $dnc ) { return 'DNC authority unavailable'; }
+                        foreach ( $subscriber->lists as $list ) {
+                                if ( ! is_object( $list ) || ! isset( $list->title ) ) { return 'DNC membership malformed'; }
+                                if ( $list->title === $dnc ) { return 'current DNC blocks advertising dispatch'; }
+                        }
+                        $resolved = array( 'deterministic' => true, 'entry_id' => $m[2], 'form_id' => $m[1],
+                                'submissions_table' => $GLOBALS['wpdb']->prefix . 'fluentform_submissions' );
+                        $consent = $this->resolve_consent_provenance( $resolved, $config );
+                        if ( $consent['decision'] !== 'exportable' ) { return $consent['block_reason']; }
+                        // Never upgrade/alter a prepared retry body. A changed effective flag blocks it.
+                        if ( ( $values[16] ?? null ) !== $consent['measurement_feed']
+                            || ( $values[17] ?? null ) !== $consent['personalization_feed'] ) {
+                                return 'effective consent changed since preparation';
+                        }
+                        return '';
+                } catch ( \Throwable $error ) { return 'advertising dispatch authority unavailable'; }
+        }
+
         /**
          * Append a single row of values to a Google Sheet tab via the Sheets v4
          * values:append endpoint over the WordPress HTTP API. Append-only
@@ -6941,7 +6974,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @param string $vio            valueInputOption (RAW or USER_ENTERED).
          * @return array{ok:bool,updated_range:string,updated_rows:int,error:string}
          */
-        private function google_sheets_append_row( $spreadsheet_id, $tab, $values, $access_token, $vio = 'RAW' ) {
+        private function google_sheets_append_row( $spreadsheet_id, $tab, $values, $access_token, $vio = 'RAW', $context = null ) {
                 $out = array( 'ok' => false, 'updated_range' => '', 'updated_rows' => 0, 'error' => '' );
 
                 $vio = in_array( $vio, array( 'RAW', 'USER_ENTERED' ), true ) ? $vio : 'RAW';
@@ -6955,6 +6988,14 @@ class SiteEngine_Ads_Bridge_CLI {
                 );
 
                 $payload = wp_json_encode( array( 'values' => array( array_values( $values ) ) ) );
+
+                // Every invocation/retry re-reads canonical evidence and current permission.
+                // Operational All_Leads is a different 94-column contract.
+                if ( ! ( count( $values ) === 94 && is_array( $context ) && in_array( $context['sink'] ?? '',
+                    array( 'all_leads_sheet', 'all_leads_lifecycle_qualified', 'all_leads_lifecycle_unqualified', 'all_leads_lifecycle_won' ), true ) ) ) {
+                        $error = $this->advertising_dispatch_error( $values, $context );
+                        if ( '' !== $error ) { $out['error'] = $error; return $out; }
+                }
 
                 $response = wp_remote_post(
                         $url,
@@ -7648,16 +7689,17 @@ class SiteEngine_Ads_Bridge_CLI {
                 $out['attached_form_id']  = isset( $resolved['form_id'] ) ? (string) $resolved['form_id'] : '';
 
                 // No flat/details fallback can establish historical signed authority.
-                $proof = SiteEngine_Ads_Bridge_Consent::resolve(
+                $proof = SiteEngine_Ads_Bridge_Consent::current(
                         (int) $entry_id, (int) $out['attached_form_id'],
-                        isset( $resolved['submissions_table'] ) ? $resolved['submissions_table'] : '', $wpdb
+                        isset( $resolved['submissions_table'] ) ? $resolved['submissions_table'] : '', $wpdb,
+                        trim( (string) $config->get( 'consent.required_policy_version', '' ) )
                 );
                 $out['receipt_id'] = $proof['receipt_id'];
                 $out['receipt_row_id'] = $proof['receipt_row_id'];
                 $out['receipt_id_source'] = $proof['receipt_id_source'];
                 $out['stamp_present'] = $proof['stamp_present'];
                 $out['revocation_check'] = $proof['revocation_check'];
-                if ( ! $proof['verified'] ) {
+                if ( ! $proof['allowed'] ) {
                         $out['block_reason'] = $proof['block_reason'];
                         return $out;
                 }
@@ -7669,7 +7711,7 @@ class SiteEngine_Ads_Bridge_CLI {
                 $out['google_consent_json'] = $row['google_consent_json'];
 
                 // 4. Decode google_consent_json.
-                $gc = json_decode( (string) $row['google_consent_json'], true );
+                $gc = $proof['current_google'];
                 if ( ! is_array( $gc ) ) {
                         $out['block_reason'] = 'consent invalid: receipt ' . $receipt_id . ' google_consent_json is missing or malformed.';
                         return $out;

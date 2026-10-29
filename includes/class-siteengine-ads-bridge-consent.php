@@ -3,6 +3,56 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class SiteEngine_Ads_Bridge_Consent {
+    /** Fresh current-primary decision; never retain a positive permission between calls. */
+    public static function current( $entry_id, $form_id, $table, $db, $required_policy ) {
+        $out = self::resolve( $entry_id, $form_id, $table, $db );
+        $out['allowed'] = false;
+        $out['current_google'] = array();
+        $out['revocation_check'] = 'blocked';
+        if ( ! $out['verified'] ) { return $out; }
+        try {
+            // Unsupported routing/cache drop-ins cannot establish primary evidence here.
+            if ( defined( 'WP_CONTENT_DIR' ) && is_file( WP_CONTENT_DIR . '/db.php' ) ) {
+                throw new RuntimeException( 'database routing drop-in is not qualified' );
+            }
+            if ( (string) $db->get_var( 'SELECT @@read_only' ) !== '0' || ! empty( $db->last_error ) ) {
+                throw new RuntimeException( 'writable primary database unavailable' );
+            }
+            if ( ! is_callable( array( 'SiteEngine_Consent_Authority', 'current_eligibility' ) ) ) {
+                throw new RuntimeException( 'current eligibility API missing' );
+            }
+            global $wpdb;
+            if ( $db !== $wpdb ) { throw new RuntimeException( 'authority database context mismatch' ); }
+            $r = SiteEngine_Consent_Authority::current_eligibility( $out['stamp'], (int) $form_id, (string) $required_policy );
+            if ( ! is_array( $r ) || ( $r['contract_version'] ?? null ) !== 2
+                || ( $r['available'] ?? null ) !== true || ( $r['allowed'] ?? null ) !== true
+                || ( $r['historical_verified'] ?? null ) !== true || ( $r['reason'] ?? null ) !== 'eligible'
+                || ! is_string( $r['checked_at'] ?? null )
+                || ! preg_match( '/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:Z|\+00:00)$/D', $r['checked_at'] )
+                || ! is_int( $r['event_revision'] ?? null ) || $r['event_revision'] < 1
+                || ! is_int( $r['current_revision'] ?? null ) || $r['current_revision'] < $r['event_revision']
+                || $r['event_revision'] !== ( $out['stamp']['event_revision'] ?? null )
+                || ( $r['consent']['advertising'] ?? null ) !== true
+                || ( $r['google_consent']['ad_user_data'] ?? null ) !== 'granted'
+                || ! in_array( $r['google_consent']['ad_personalization'] ?? null, array( 'granted', 'denied' ), true ) ) {
+                throw new RuntimeException( 'current eligibility denied, unavailable or malformed' );
+            }
+            foreach ( array( 'necessary', 'analytics', 'advertising', 'personalization' ) as $key ) {
+                if ( ! is_bool( $r['consent'][$key] ?? null ) ) { throw new RuntimeException( 'current category malformed' ); }
+            }
+            if ( $r['consent']['necessary'] !== true
+                || ! is_callable( array( 'SiteEngine_Consent_Authority', 'google' ) )
+                || $r['google_consent'] !== SiteEngine_Consent_Authority::google( $r['consent'] ) ) {
+                throw new RuntimeException( 'current effective flags inconsistent' );
+            }
+            $out['allowed'] = true;
+            $out['revocation_check'] = 'eligible';
+            $out['current_google'] = $r['google_consent'];
+        } catch ( Throwable $error ) {
+            $out['block_reason'] = 'consent blocked: ' . $error->getMessage();
+        }
+        return $out;
+    }
     const RECEIPT_COLUMNS = array(
         'id', 'receipt_id', 'method', 'policy_version', 'banner_version',
         'consent_json', 'google_consent_json', 'page_url', 'referrer_url',
@@ -127,6 +177,7 @@ final class SiteEngine_Ads_Bridge_Consent {
             // Historical signature/row validation is NOT browser-ACK resolution.
             // No today-based ACK expiry, visitor inference, latest-choice lookup or writes.
             $out['row'] = $row;
+            $out['stamp'] = $stamp;
             $out['verified'] = true;
         } catch ( Throwable $error ) {
             $out['block_reason'] = 'consent blocked: ' . $error->getMessage();

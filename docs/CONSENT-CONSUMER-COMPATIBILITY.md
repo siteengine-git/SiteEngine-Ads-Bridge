@@ -1,3 +1,5 @@
+> Historical checkpoint; superseded by [rc.2 enforcement and current maintenance notes](MAINTENANCE-RELEASE.md).
+
 # Consent consumer compatibility checkpoint — 2026-10-29
 
 Unreleased Ads-owned repair; accepted installable Ads Bridge remains 0.6.3,
