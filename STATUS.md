@@ -1,3 +1,15 @@
+## Exact candidate delivery
+
+Code/test source2846305d19d550997295f85e58c7312b736925bd.
+ZIP siteengine-ads-bridge-0.6.3.1-rc.1-UNACCEPTED-20261029.zip SHA-256:
+34d75e77285aa1e6b8441e0a9f1f766e614150b533423549ce03a91cbd71b72f.
+Member manifest SHA-256:
+33bde105e09bda298b15e52564888ec3fe82563901f18ce5c07561a086cb8ac7.
+21 payload files + embedded manifest, all exact source bytes/CRC verified.
+488/0 assertions;19 PHP lint passes including all12 packaged PHP files.
+See maintenance/CANDIDATE-MANIFEST.json and CANDIDATE-RESULTS.json. These
+closeout/manifest records do not change the packaged runtime source pin.
+
 # Consent rc.2 enforcement complete — UNACCEPTED0.6.3.1-rc.1, 2026-10-29
 
 Scoped branch codex/ads-maintenance-preparation-20261029, preserving historical

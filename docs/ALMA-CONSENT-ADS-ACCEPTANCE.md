@@ -1,3 +1,10 @@
+> Final prepared Ads code/test pin2846305d19d550997295f85e58c7312b736925bd;
+> candidate0.6.3.1-rc.1. ZIP SHA-256
+> 34d75e77285aa1e6b8441e0a9f1f766e614150b533423549ce03a91cbd71b72f;
+> manifest SHA-25633bde105e09bda298b15e52564888ec3fe82563901f18ce5c07561a086cb8ac7.
+> All J0-J7 remain NOT RUN. The notes below distinguish prepared code from
+> installed engine/browser/CRM acceptance; no site action is authorized here.
+
 > Updated dependency/code preparation: Consent implementation
 > 1c0a42000927db720cfc60934ea5e2b31db28533 and docs
 > b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f now supply the real rc.2 authority;
