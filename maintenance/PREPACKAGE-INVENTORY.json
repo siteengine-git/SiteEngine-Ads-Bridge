@@ -1,0 +1,116 @@
+{
+  "status": "BLOCKED_PREPACKAGE_INVENTORY_NOT_A_RELEASE_MANIFEST",
+  "ads_runtime_source_commit": "ba5aff0a94fd490819aaec91f3125b344bef4687",
+  "source_version": "0.6.3",
+  "proposed_candidate_identity": "0.6.3.1-rc.1",
+  "version_metadata_applied": false,
+  "coordination_reserved_version": "0.6.4",
+  "consent_inspected_commit": "37cb66d56b1039255ff2348ef5e5a94edc353db2",
+  "consent_authority_sha256": "7c3b419fcc2b33563dc0fde9f917ac44ad620b905bb7cd3a9ec4cfb35586fc54",
+  "withdrawal_authority": null,
+  "release_zip_created": false,
+  "blocker": "Pinned Consent current-withdrawal authority and Ads consumer enforcement missing; metadata/dependency freeze pending.",
+  "future_zip_root": "siteengine-ads-bridge/",
+  "entries": [
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 15358,
+      "sha256": "7094c1cc0642e81b83d62b182914433bf9a4e4e8714e0dac23b50c5ebcc3922a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 15551,
+      "sha256": "cbd7ef0ee0476908f21f034ec53aeb270b35b29cb9eda6488dbc4d8e78940ea5"
+    },
+    {
+      "path": "config/client.example.php",
+      "bytes": 4241,
+      "sha256": "454920ae8a0fc11594847166255c130b1f6b769d729839691631d1e8940aeb6d"
+    },
+    {
+      "path": "docs/CRM-OPS-INQUIRY-CONTRACT.md",
+      "bytes": 16126,
+      "sha256": "f903176c8a563899e3a09f22ea5fcb609c46ddd58758fbd531469f5bf0bd010f"
+    },
+    {
+      "path": "docs/OPERATIONS.md",
+      "bytes": 5290,
+      "sha256": "deeb250b788c5b4544338d531f4d96a20c463787278c1689b08c2632109bc7ad"
+    },
+    {
+      "path": "docs/headers/all-leads-key-map.csv",
+      "bytes": 2702,
+      "sha256": "71334173dd3105b5cc926595d34aaf21c058f5994db8e64703eea9175a2dbdfd"
+    },
+    {
+      "path": "docs/headers/all-leads.csv",
+      "bytes": 1575,
+      "sha256": "148c0462162c597a2869b73f7d8144aee9a602cb50e65e4cbcaf557fe5527d99"
+    },
+    {
+      "path": "docs/headers/google-data-manager-key-map.csv",
+      "bytes": 581,
+      "sha256": "c3cd7cb8f050492e0c03c77b9fcda50ec4a57376a1e380ca3a9e2b6e6f912a8f"
+    },
+    {
+      "path": "docs/headers/google-data-manager.csv",
+      "bytes": 295,
+      "sha256": "84e146d30f6d8266df556ce975d4a8cfe31d55f63e54d4dde6078c84c478dd16"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-admin.php",
+      "bytes": 38737,
+      "sha256": "e995acaa462ba314e8d7faad5584c47c6f2efa3295bd15d41e90860ee076c02d"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-cli.php",
+      "bytes": 461838,
+      "sha256": "40d4566de3efda85e2b93b574fe7b2fe05a48c6188cfabb89f529c2691d7ad3d"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-config.php",
+      "bytes": 38625,
+      "sha256": "d860a0fd93010f5e37ab77cb052bb81ee6b9fef0a7ba4b3c19aa52001e5148c2"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-consent.php",
+      "bytes": 8656,
+      "sha256": "057c59f58bb55905b2b142339626abf1485dbdb9e5702e0f59712d7fca056798"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-doctor.php",
+      "bytes": 50353,
+      "sha256": "ab977846dc1b3e8b60a27834fb7e0fcc09c0a4fe12af2635b5d8db3ab4675b5d"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-inquiries.php",
+      "bytes": 79069,
+      "sha256": "fe570f2a3b76d7756f2d6822c7088856c1496894fa9c1d2c41b02a5ea9c5a406"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-lifecycle.php",
+      "bytes": 19606,
+      "sha256": "a5ca5e96e8bec01b4736c5dfb71775fd0aec38491d9034b4cf5782cac5b752c7"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-runtime.php",
+      "bytes": 6610,
+      "sha256": "a27e7bb354b9e0ad7c927057f3c0e493ae0848101eff34e49c31bf96ecbd7c0c"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-settings.php",
+      "bytes": 12429,
+      "sha256": "89e4b96c7f25d1a8219afae17b4f3fc8e689bf92cfdc2b8ca834fab85d826a7f"
+    },
+    {
+      "path": "siteengine-ads-bridge.php",
+      "bytes": 4292,
+      "sha256": "d562bfb262920ed7cf6eef108b2bd9643c694c7364904deaedca0965f6401fc3"
+    },
+    {
+      "path": "uninstall.php",
+      "bytes": 610,
+      "sha256": "809d117536df4c1b3fc8e3fb0c440df7b18d94c2efedf5dea9d4a1338b32f097"
+    }
+  ]
+}
