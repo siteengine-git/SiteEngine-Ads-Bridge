@@ -1,13 +1,25 @@
 {
   "assignment": "ALMA-JOINT-CONSENT-ADS-20261031",
-  "source_commit": "a27912b4fb7229c78010a7b8ee5dc77e68a9dce3",
-  "acceptance": "LOCAL_HARNESS_ONLY_INSTALLED_NOT_RUN",
+  "source_commit": "524cc1f38a3da4ab0a383fca122de98eac99ab57",
+  "acceptance": "LOCAL_INTEGRATION_ONLY_INSTALLED_NOT_RUN",
+  "consent_tooling_commit": "ae2fe50dcaaa18d581ea41c06b14db3ac68f1e47",
+  "consent_original_manifest_sha256": "0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51",
   "files": {
     "joint-owned-observer.php": "bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48",
-    "joint-ops.php": "d5d8751dc4dcbc7e9dacef707531214255fd612bdb2158e64c914bf0ed0925b5",
-    "joint-run.py": "7c219d27b7949a89aa9a89b264fe9381cc221b98cb121d56ffb4617b89e39cbd",
-    "joint-browser.cjs": "ad16a89bb4d887c0e6d184b0f24a897af23d6d5aec958d658e1731544799f9af",
-    "allocation.template.json": "b747c1282e59207ce9f687786b19be8d2b87df84c981fdd1b81576e25f51e172",
-    "RUNBOOK-JOINT.md": "4c12f78bd8c56517e78249792af5be287a44a41e88077e482146638f7869975e"
+    "joint-ops.php": "a0bfdf56b11c22604826786934499a7ed75323b2305a90134908514b64667021",
+    "joint-run.py": "3650e251059ccb2fcacf5e41444e2aee032a4f44680feea6c71d8ca8f7dedf10",
+    "joint-browser.cjs": "175df9d3868f9fa8b0a508352b226a5f65d33db7960b53d63a82e737a31fc211",
+    "allocation.template.json": "62d379034893d026b57b3c807654aa6bb53e6a2bebb6bddc547c6c0828f87eb9",
+    "RUNBOOK-JOINT.md": "795537b2f18334626194f4020e80d9af7b81a77b2453836632e05beb0b8cb0bf",
+    "consent-pinned/CONSENT-OPERATIONS.md": "cc2a7da431dd9a4bc6808f9ced7f6953f970529e464d9a71e3dfd13c12d67f3b",
+    "consent-pinned/CONSENT-TOOLING-MANIFEST.json": "0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51",
+    "consent-pinned/consent-joint.php": "7bf5653787a7569d015d0db5e2fc2d3b4fc3638f135c39c309c616e662f6e0e7",
+    "consent-pinned/consent-browser.js": "b5969d67e38a3ddd93c3a2eba00cbf95be55a0042c02bf053c0af40c47791c26"
+  },
+  "focused_tests": {
+    "tests/joint-operations-acceptance.php": "b21488aaf8e9724ef41981f95d80c02e6d04bcaaf2b4779001b3bad2f40b651c",
+    "tests/joint-consent-integration.php": "bbc35bc3de53909fc4f67fc18c3a7680d99ce7c786f5b448080337285b9f7ba3",
+    "tests/joint-run-acceptance.py": "feed35b71ecdfc1fe3c5f3529ad76cec87593d5420c94f1ae043b0464dcd9590",
+    "tests/joint-browser-acceptance.cjs": "6320c832837e28a4baaf8d47b80bb003b85dae46173c2c8828208a95961d3f69"
   }
 }

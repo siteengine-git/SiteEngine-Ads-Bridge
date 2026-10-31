@@ -19,6 +19,14 @@ Head faults are unavailable-head/failed-current-read after intact history proof.
 A/B barriers, personalisation independence, All_Leads and J7 audit retention remain.
 Advertising permission neither authorizes email nor derives from subscription status.
 
+Tooling checkpoint524cc1f38a3da4ab0a383fca122de98eac99ab57; final joint-consent-ads-operations-20261031-r3.zip.
+ZIP SHA2560fe48e70207b92fc676d5b3d2088238bab0a5cf0db16941783a7524f4941f71d.
+Package-manifestb34ad76f2568a5104300c888784b61c6fab6037925a3a52663b10fc2f24c4a01;
+operations-manifest3126ed3a233335aa36d6b0070f11fc82b7f319628aaf471c21d887426f5ff985;16 ZIP members CRC/bytes verified.
+Actual local PASS:24 ownership/pin/stage +25 callback assertions,7 Python tests,
+8 actual-driver admission fixtures +10 exact-ID checks,4 PHP lint,2 JS syntax.
+These are synthetic boundary/integration evidence, not installed/native results.
+
 Executable runbook retains64 commands and all resource ceilings. Focused new local
 results/package pins are in tools/acceptance/OPERATIONS-RESULTS.json; full manifest
 in OPERATIONS-MANIFEST.json. Prior r2 and both runtime packages preserved unchanged.
