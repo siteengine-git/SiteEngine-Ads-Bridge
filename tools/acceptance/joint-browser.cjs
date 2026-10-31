@@ -4,10 +4,16 @@ const crypto = require('crypto');
 const readline = require('readline');
 const {chromium} = require('playwright');
 async function main() {
-  const [file, pin] = process.argv.slice(2);
+  const [file, pin, releaseFile, releasePin] = process.argv.slice(2);
   const raw = fs.readFileSync(file);
   if (crypto.createHash('sha256').update(raw).digest('hex') !== pin) throw Error('browser allocation pin');
   const a = JSON.parse(raw);
+  const releaseRaw=fs.readFileSync(releaseFile);
+  if(crypto.createHash('sha256').update(releaseRaw).digest('hex')!==releasePin)throw Error('independent fixture release pin');
+  const release=JSON.parse(releaseRaw);
+  const opsManifest=fs.readFileSync(require('path').join(__dirname,'OPERATIONS-MANIFEST.json'));
+  if(release.status!=='RELEASED_J1_J6_J7'||release.allocation_sha256!==pin||
+     release.operations_manifest_sha256!==crypto.createHash('sha256').update(opsManifest).digest('hex'))throw Error('browser fixture/package not released');
   if (a.site !== 'https://alma.siteengine.space/' || !/^jct_[a-f0-9]{32}$/.test(a.marker)) throw Error('site/marker');
   for (const k of ['page_url','submit_url','form_selector','submit_selector','submission_request_token','email_selector'])
     if (typeof a.browser[k] !== 'string' || !a.browser[k]) throw Error('allocated browser input missing: '+k);

@@ -104,11 +104,12 @@ No Base-only filter, transport/export command or real token/Sheet ID is used.
 ## One real browser chain
 
 Copy reviewed allocation bytes privately to Dell-8940 through the existing route.
-Set actual $LocalOps, $PrivateAllocation and $Pin; run existing Node/Playwright:
+Copy the independently pinned fixture-release.json privately as well.
+Set actual $LocalOps, $PrivateAllocation, $Pin, $PrivateRelease and $ReleasePin; run existing Node/Playwright:
 
 ```powershell
 $env:NODE_PATH='C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules'
-& 'C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' "$LocalOps\joint-browser.cjs" $PrivateAllocation $Pin
+& 'C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' "$LocalOps\joint-browser.cjs" $PrivateAllocation $Pin $PrivateRelease $ReleasePin
 ```
 
 Driver creates one fresh in-memory Chrome context, aborts cross-origin requests
@@ -220,7 +221,9 @@ From the canonical Ads source checkout, existing PHP8.3.36 with -n executes
 `tools/acceptance/joint-ops.php` with -n -l. Existing Python executes
 `tests/joint-run-acceptance.py` (pure argv/runbook/AST tests, no subprocess);
 existing Node --check tools/acceptance/joint-browser.cjs checks syntax only.
-39 PHP assertions +6 Python tests,2 PHP lint and1 JS syntax check PASS. These do
+Existing Node also executes tests/joint-browser-acceptance.cjs: five actual-driver
+admission fixtures in a VM, with a throwing launch stub (no browser/network).
+39 PHP assertions +6 Python tests +5 JS admission fixtures,2 PHP lint and1 JS syntax check PASS. These do
 not prove Linux process groups, actual SQL/vendor persistence, browser capture,
 installed fault behavior, primary current-read or J0–J7 acceptance. Candidate
 regressions were not repeated. No server command or browser was executed locally.
