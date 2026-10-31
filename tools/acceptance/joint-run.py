@@ -2,26 +2,49 @@
 import hashlib, json, os, pathlib, selectors, signal, subprocess, sys, time
 
 OPS = {'admit', 'form', 'contact', 'attest', 'milestone', 'adopt', 'prepare', 'probe',
-       'dispatch', 'prepare-effective', 'dispatch-effective', 'rejection', 'fault', 'missing', 'policy', 'dnc-on', 'dnc-off', 'archive', 'unarchive', 'rebind', 'browser-evidence', 'begin', 'stage', 'close'}
+       'dispatch', 'consent', 'restore', 'rejection', 'fault', 'missing', 'policy', 'dnc-on', 'dnc-off', 'archive', 'unarchive', 'rebind', 'browser-evidence', 'begin', 'stage', 'close'}
 RUN = '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01'
 
-def command(op, label, argument, allocation, digest, here):
+def command(op, label, argument, allocation, digest, journal_pin, release_pin, here):
     if op not in OPS or label not in {'-', 'A', 'B', 'C', 'J0', 'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7'} or len(argument) > 32:
         raise ValueError('unallowlisted operation/label')
-    if len(digest) != 64 or any(x not in '0123456789abcdef' for x in digest):
-        raise ValueError('allocation pin missing')
+    validate_pins(op, digest, journal_pin, release_pin)
     argv = ['/usr/local/lsws/lsphp83/bin/php', '/usr/bin/wp',
             '--path=/home/alma.siteengine.space/public_html']
     if op == 'missing': argv += ['--skip-plugins=siteengine-consent']
-    return argv + ['eval-file', str(here / 'joint-ops.php'), op, label, argument, str(allocation), digest]
+    return argv + ['eval-file', str(here / 'joint-ops.php'), op, label, argument, str(allocation), digest, journal_pin, release_pin]
+
+def validate_pins(op, allocation, journal, release):
+    def pin(x): return isinstance(x,str) and len(x)==64 and all(c in '0123456789abcdef' for c in x)
+    if not pin(allocation) or (op=='admit' and (journal!='-' or release!='-')) or (op!='admit' and (not pin(journal) or not pin(release))):
+        raise ValueError('independent allocation/current journal/release pins required')
+
+def verify_current_pins(op, run, allocation, journal, release):
+    validate_pins(op, allocation, journal, release)
+    if op=='admit':
+        if (run/'journal.json').exists(): raise ValueError('admission journal already exists')
+    else:
+        for name,pin in [('journal.json',journal),('fixture-release.json',release)]:
+            f=run/name
+            if f.is_symlink() or hashlib.sha256(f.read_bytes()).hexdigest()!=pin: raise ValueError('current journal/release pin mismatch')
+
+def verify_members(here):
+    manifest=json.loads((here/'OPERATIONS-MANIFEST.json').read_text())
+    for name,expected in manifest['files'].items():
+        path=pathlib.PurePosixPath(name)
+        if path.is_absolute() or '..' in path.parts or '\\' in name or (here/name).is_symlink() or hashlib.sha256((here/name).read_bytes()).hexdigest()!=expected:
+            raise ValueError('operations package member provenance')
+    cm=here/'consent-pinned/CONSENT-TOOLING-MANIFEST.json'
+    if hashlib.sha256(cm.read_bytes()).hexdigest()!='0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51':
+        raise ValueError('published Consent tooling pin mismatch')
 
 def private_json(path, value):
     with open(path, 'x', encoding='utf-8') as f:
         os.chmod(path, 0o600); json.dump(value, f); f.flush(); os.fsync(f.fileno())
 
 def main():
-    if len(sys.argv) != 6: raise ValueError('usage: joint-run.py OP LABEL ARG allocation.json SHA256')
-    op, label, argument, filename, digest = sys.argv[1:]
+    if len(sys.argv) != 8: raise ValueError('usage: joint-run.py OP LABEL ARG allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA')
+    op, label, argument, filename, digest, journal_pin, release_pin = sys.argv[1:]
     here = pathlib.Path(__file__).resolve().parent
     allocation = pathlib.Path(filename).resolve()
     if str(allocation.parent) != RUN or allocation.stat().st_mode & 0o777 != 0o600:
@@ -29,11 +52,9 @@ def main():
     a = json.loads(allocation.read_text())
     if os.name != 'posix' or os.geteuid() != a['owner_uid']: raise ValueError('existing Alma owner route required')
     if hashlib.sha256(allocation.read_bytes()).hexdigest() != digest: raise ValueError('allocation provenance')
-    manifest = json.loads((here / 'OPERATIONS-MANIFEST.json').read_text())
-    for p, expected in manifest['files'].items():
-        if pathlib.PurePosixPath(p).name != p or hashlib.sha256((here / p).read_bytes()).hexdigest() != expected:
-            raise ValueError('operations package member provenance')
+    verify_members(here)
     run = allocation.parent
+    verify_current_pins(op, run, digest, journal_pin, release_pin)
     if (run / 'runner-stop.json').exists(): raise ValueError('previous failure retained; no automatic retry/cleanup')
     attempts = list(run.glob('attempt-*.json'))
     for prior in attempts:
@@ -42,8 +63,8 @@ def main():
     sequence = len(attempts) + 1
     if sequence > 64: raise ValueError('finite command ceiling64')
     receipt = run / ('attempt-%02d.json' % sequence)
-    private_json(receipt, {'operation': op, 'label': label, 'status': 'PENDING', 'started': time.time()})
-    process = subprocess.Popen(command(op, label, argument, allocation, digest, here),
+    private_json(receipt, {'operation': op, 'label': label, 'status': 'PENDING', 'started': time.time(), 'allocation_sha256':digest, 'journal_before_sha256':journal_pin, 'release_sha256':release_pin})
+    process = subprocess.Popen(command(op, label, argument, allocation, digest, journal_pin, release_pin, here),
                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                start_new_session=True, cwd=RUN)
     selector = selectors.DefaultSelector()
@@ -85,6 +106,8 @@ def main():
         stream.close()
     try: result = json.loads(chunks[process.stdout].decode())
     except (ValueError, UnicodeError): result = {'status': 'FAIL', 'reason': 'non-JSON/truncated WP output retained privately'}
+    after=hashlib.sha256((run/'journal.json').read_bytes()).hexdigest() if (run/'journal.json').is_file() else None
+    if result.get('status')=='PASS' and result.get('journal_sha256')!=after: failure=failure or 'post-operation journal pin mismatch'
     if failure or code != 0 or result.get('status') != 'PASS':
         private_json(run / 'runner-stop.json', {'status': 'FAIL', 'operation': op, 'exit': code,
                      'reason': failure or 'operation failed', 'recovery_owner': 'Alma Codex'})

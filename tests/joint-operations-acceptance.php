@@ -19,21 +19,15 @@ class X_DB {
     public function update( ...$a ) { $this->writes++; return 1; }
     public function delete( ...$a ) { $this->writes++; return 1; }
 }
-$original = array( '_se_consent_server' => array( 'signature' => 'genuine-unchanged-in-storage', 'contract_version' => 1 ), 'business' => 'preserved' );
-foreach ( array( 'pending', 'failed', 'null', 'malformed', 'unknown', 'unsigned', 'negative' ) as $mode ) {
-    $copy = jx_fault_response( $original, $mode, 'conflicting-grant', array( 'state' => 'verified', 'consent' => array( 'advertising' => false ) ) );
-    check_x( $original['_se_consent_server']['contract_version'] === 1 && $copy['business'] === 'preserved', 'fault copy preserves genuine input/business fields' );
-    check_x( $copy['se_consent_receipt_id'] === 'conflicting-grant', 'conflicting flat grant present in fault' );
-    check_x( $mode === 'unsigned' ? ! array_key_exists( '_se_consent_server', $copy ) : array_key_exists( '_se_consent_server', $copy ), 'presence versus unsigned distinguished' );
-}
-refuses_x( function() use ( $original ) { jx_fault_response( $original, 'invented', 'x' ); }, 'unknown fault' );
-$db = new X_DB(); $view = new JX_Read_View( $db ); $view->entry = 1; $view->response = '{"overlay":true}';
-check_x( $view->get_row( 'SELECT * FROM fixture_fluentform_submissions WHERE id=1' )['response'] === $view->response, 'only request view changed' );
-check_x( $db->row['response'] !== $view->response && $db->writes === 0, 'backing row and writes unchanged' );
-$view->unavailable = true;
-check_x( $view->get_results( 'SELECT * FROM fixture_se_consent_receipts' ) === null && $view->last_error !== '', 'unavailable read is unresolved not empty success' );
-refuses_x( function() use ( $view ) { $view->query( 'DELETE FROM fixture' ); }, 'view query refuses mutation' );
-refuses_x( function() use ( $view ) { $view->get_row( 'UPDATE fixture SET x=1' ); }, 'read facade refuses disguised writes' );
+define( 'ARRAY_A', 'ARRAY_A' );
+class SiteEngine_Consent_Authority { public static function verify_stamp( $s, $f ) { return ( $s['fixture'] ?? false ) === true; } }
+$db = new X_DB(); $GLOBALS['wpdb'] = $db;
+$a0 = array( 'tables' => array( 'submissions' => 'fixture_fluentform_submissions' ), 'form_id' => 3, 'marker' => 'fixture-marker' );
+$db->row['response'] = json_encode( array( 'se_joint_marker' => 'fixture-marker', 'se_joint_case' => 'A', '_se_consent_server' => array( 'fixture' => true ) ) );
+check_x( jx_admission_row( $a0, array( 'entries' => array() ), 'A', '1' )['id'] === 1, 'exact returned ID positive admission' );
+foreach ( array( '', '0', '01', '-1', '1.0', 'latest', '2' ) as $id ) { refuses_x( function() use ( $a0, $id ) { jx_admission_row( $a0, array( 'entries' => array() ), 'A', $id ); }, 'missing/malformed/foreign exact ID' ); }
+refuses_x( function() use ( $a0 ) { jx_admission_row( $a0, array( 'entries' => array( 'A' => array( 'id' => 1 ) ) ), 'A', '1' ); }, 'duplicate admitted ID' );
+refuses_x( function() use ( $a0 ) { jx_admission_row( $a0, array( 'entries' => array() ), 'B', '1' ); }, 'exact ID foreign case' );
 class X_Config { private $config = array( 'original' => true ); public function value() { return $this->config; } }
 $config = new X_Config(); $GLOBALS['wpdb'] = $db; $db->last_error = 'original';
 refuses_x( function() use ( $config ) { jx_scope( $config, function() use ( $config ) {
@@ -44,6 +38,7 @@ $temp = sys_get_temp_dir() . '/joint-harness-' . bin2hex( random_bytes( 8 ) ); m
 $GLOBALS['jx_path'] = $temp . '/journal.json';
 jx_save( $GLOBALS['jx_path'], array( 'pending' => array( 'operation' => 'adopt', 'event_id' => 'fixed-before-write' ) ) );
 check_x( jx_json( $GLOBALS['jx_path'] )['pending']['event_id'] === 'fixed-before-write', 'durable pending identity retained before mutation' );
+refuses_x( function() { jx_pin( $GLOBALS['jx_path'], str_repeat( '0', 64 ) ); }, 'journal pin mismatch before operation' );
 file_put_contents( $GLOBALS['jx_path'] . '.next', 'interrupted' );
 set_error_handler( function() { throw new RuntimeException( 'file collision' ); } );
 refuses_x( function() { jx_save( $GLOBALS['jx_path'], array() ); }, 'interrupted .next refuses overwrite' ); restore_error_handler();
@@ -58,11 +53,13 @@ check_x( $db->writes === 0, 'foreign reference blocked before any destructive re
 $db->fk = array( array( 'TABLE_SCHEMA' => 'foreign_db', 'TABLE_NAME' => 'fixture_foreign_jobs', 'COLUMN_NAME' => 'subscriber_id' ) );
 refuses_x( function() use ( $a, &$j ) { jx_close( $a, $j ); }, 'foreign database reference stops cleanup' );
 check_x( $db->writes === 0, 'cross database failure leaves form/resources intact' );
-$stages = array( 'results' => array(), 'stages' => array( 'J2' => 'NOT RUN' ) );
+$stages = array( 'results' => array(), 'stages' => array( 'J2' => 'NOT RUN' ), 'browser' => array( 'B' => array( 'pending_failed_ack_verified' => true ) ), 'audit' => array( 1 => array(), 2 => array() ), 'head' => array( 'revision' => 2 ) );
 refuses_x( function() use ( &$stages ) { jx_stage( 'J2', array(), $stages ); }, 'missing stage evidence refuses acceptance' );
-foreach ( array( array( 'rejection', 'B', '-' ), array( 'fault', 'C', 'negative' ) ) as $r ) { $stages['results'][] = array( 'operation' => $r[0], 'label' => $r[1], 'argument' => $r[2], 'status' => 'PASS' ); }
-foreach ( array( 'pending', 'failed', 'null', 'malformed', 'unknown', 'unsigned' ) as $mode ) { $stages['results'][] = array( 'operation' => 'fault', 'label' => 'A', 'argument' => $mode, 'status' => 'PASS' ); }
+foreach ( array( array( 'rejection', 'B', '-' ), array( 'fault', 'B', 'conflicting-flat' ) ) as $r ) { $stages['results'][] = array( 'operation' => $r[0], 'label' => $r[1], 'argument' => $r[2], 'status' => 'PASS' ); }
+foreach ( array( 'pending', 'failed', 'null', 'malformed', 'unknown', 'unsigned', 'tampered' ) as $mode ) { $stages['results'][] = array( 'operation' => 'fault', 'label' => 'A', 'argument' => $mode, 'status' => 'PASS' ); }
 check_x( jx_stage( 'J2', array(), $stages )['status'] === 'PASS', 'complete simulated stage verdict positive control' );
+$stages['head']['revision'] = 4;
+refuses_x( function() use ( &$stages ) { jx_stage( 'J2', array(), $stages ); }, 'extra fourth capture cannot satisfy finite three-capture stage evidence' );
 check_x( hash_file( 'sha256', dirname( __DIR__ ) . '/tools/acceptance/joint-owned-observer.php' ) === 'bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48', 'frozen observer unchanged' );
 unlink( $GLOBALS['jx_path'] ); rmdir( $temp );
 echo "PASS {$count} harness-only assertions; installed operations NOT RUN\n";

@@ -69,6 +69,7 @@
     "submit_selector": "<ACTUAL_SUBMIT_SELECTOR>",
     "submission_request_token": "<OBSERVED_FORM_ID_POST_TOKEN>",
     "email_selector": "<ACTUAL_EMAIL_FIELD_SELECTOR>",
-    "required_fields": []
+    "required_fields": [],
+    "response_id_path": []
   }
 }

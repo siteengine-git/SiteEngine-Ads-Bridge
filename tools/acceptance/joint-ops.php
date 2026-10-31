@@ -2,6 +2,8 @@
 /** Review-only installed operations. Run ONLY by Alma Codex after the corresponding release. */
 define( 'SEAB_JOINT_LIBRARY_ONLY', true );
 require __DIR__ . '/joint-owned-observer.php';
+define( 'SCJ_LIBRARY_ONLY', true );
+require __DIR__ . '/consent-pinned/consent-joint.php';
 
 class JX_Stop extends RuntimeException {}
 function jx_assert( $condition, $reason ) { if ( ! $condition ) { throw new JX_Stop( $reason ); } }
@@ -23,45 +25,6 @@ function jx_scope( $config, callable $body ) {
     $p = new ReflectionProperty( $config, 'config' ); $p->setAccessible( true ); $before = $p->getValue( $config );
     try { return $body(); }
     finally { $wpdb = $db; $db->last_error = $last; $p->setValue( $config, $before ); }
-}
-function jx_fault_response( array $response, $mode, $grant_id, $negative = null ) {
-    switch ( $mode ) {
-        case 'negative': jx_assert( is_array( $negative ), 'real negative stamp required' ); $response['_se_consent_server'] = $negative; break;
-        case 'pending': case 'failed': $response['_se_consent_server']['state'] = $mode; break;
-        case 'null': $response['_se_consent_server'] = null; break;
-        case 'malformed': $response['_se_consent_server'] = 'injected-malformed'; break;
-        case 'unknown': $response['_se_consent_server']['contract_version'] = 999; break;
-        case 'unsigned': unset( $response['_se_consent_server'] ); break;
-        default: throw new RuntimeException( 'unknown response fault' );
-    }
-    $response['se_consent_receipt_id'] = $grant_id; return $response;
-}
-/** Request-local read view. No candidate/vendor code or database row is edited. */
-class JX_Read_View {
-    public $prefix, $last_error = '', $entry, $response, $unavailable = false, $reads = 0;
-    private $db;
-    public function __construct( $db ) { $this->db = $db; $this->prefix = $db->prefix; }
-    public function prepare( ...$args ) { return $this->db->prepare( ...$args ); }
-    public function esc_like( $s ) { return $this->db->esc_like( $s ); }
-    private function read( $method, $sql, $format = null ) {
-        jx_assert( is_string( $sql ) && preg_match( '/^\s*(SELECT|SHOW)\b/i', $sql ), 'view refuses non-read SQL' );
-        $this->reads++;
-        if ( $this->unavailable && strpos( $sql, 'se_consent_receipts' ) !== false && stripos( $sql, 'SELECT' ) !== false ) {
-            $this->last_error = 'joint test: unavailable receipt read'; return null;
-        }
-        $v = $format === null ? $this->db->$method( $sql ) : $this->db->$method( $sql, $format );
-        $this->last_error = $this->db->last_error;
-        if ( $method === 'get_row' && is_array( $v ) && isset( $v['response'], $v['id'] )
-            && (int) $v['id'] === $this->entry && $this->response !== null && strpos( $sql, 'fluentform_submissions' ) !== false ) {
-            $v['response'] = $this->response;
-        }
-        return $v;
-    }
-    public function get_row( $sql, $format = null ) { return $this->read( 'get_row', $sql, $format ); }
-    public function get_results( $sql, $format = null ) { return $this->read( 'get_results', $sql, $format ); }
-    public function get_col( $sql ) { return $this->read( 'get_col', $sql ); }
-    public function get_var( $sql ) { return $this->read( 'get_var', $sql ); }
-    public function query( $sql ) { throw new RuntimeException( 'fault view cannot mutate' ); }
 }
 function jx_tables( array $a ) {
     $names = array( 'forms' => 'fluentform_forms', 'submissions' => 'fluentform_submissions', 'details' => 'fluentform_entry_details',
@@ -97,6 +60,19 @@ function jx_allocation( array $a ) {
         jx_assert( $found, 'required logical reference edge missing' );
     }
     return $a;
+}
+function jx_pin( $path, $sha ) {
+    jx_assert( is_string( $sha ) && preg_match( '/^[a-f0-9]{64}$/D', $sha ) && is_file( $path ) && hash_file( 'sha256', $path ) === $sha, 'independent file pin mismatch' );
+}
+function jx_admission_row( array $a, array $j, $label, $exact ) {
+    global $wpdb;
+    jx_assert( in_array( $label, array( 'A', 'B', 'C' ), true ) && is_string( $exact ) && preg_match( '/^[1-9][0-9]{0,9}$/D', $exact ), 'exact individual vendor response ID required; no discovery fallback' );
+    foreach ( $j['entries'] as $e ) { jx_assert( $e['id'] !== (int) $exact, 'already admitted ID' ); }
+    $row = jx_db_row( $a['tables']['submissions'], (int) $exact ); $v = json_decode( $row['response'] ?? '', true );
+    jx_assert( ! $wpdb->last_error && is_array( $row ) && (int) $row['id'] === (int) $exact && (int) $row['form_id'] === $a['form_id']
+        && ( $v['se_joint_marker'] ?? '' ) === $a['marker'] && ( $v['se_joint_case'] ?? '' ) === $label
+        && is_array( $v['_se_consent_server'] ?? null ) && SiteEngine_Consent_Authority::verify_stamp( $v['_se_consent_server'], $a['form_id'] ), 'exact returned submission identity/original signature mismatch' );
+    return $row;
 }
 function jx_db_row( $table, $id ) { global $wpdb; return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table}` WHERE id=%d", $id ), ARRAY_A ); }
 function jx_owned_entry( array $a, array $j, $label ) {
@@ -147,8 +123,8 @@ function jx_probe( array $a, array $j, $label ) {
     $row = jx_owned_entry( $a, $j, $label ); $e = $j['entries'][$label];
     $s = jx_contact( $a, $j, $e['contact'] ); $cli = new SiteEngine_Ads_Bridge_CLI(); $c = SiteEngine_Ads_Bridge_Config::instance();
     $inquiry = isset( $j['inquiries'][$label] ) ? SiteEngine_Ads_Bridge_Inquiries::get( $j['inquiries'][$label] ) : null;
-    jx_assert( is_array( $inquiry ) && (int) $inquiry['submission_id'] === $e['id'], 'probe requires owned persisted inquiry, never a rebound legacy CRM pointer' );
-    jx_assert( (int) $inquiry['contact_id'] === (int) $s->id && $inquiry['transaction_id'] === 'ff:' . $a['form_id'] . ':' . $e['id'], 'canonical inquiry identity mismatch' );
+    if ( $label === 'B' ) { jx_assert( $inquiry === null && ! empty( $j['pointer_rebound'] ) && (string) $s->custom_fields()['submission_id'] === (string) $e['id'], 'negative B requires explicit owned legacy pointer, never A inquiry reuse' ); }
+    else { jx_assert( is_array( $inquiry ) && (int) $inquiry['submission_id'] === $e['id'] && (int) $inquiry['contact_id'] === (int) $s->id && $inquiry['transaction_id'] === 'ff:' . $a['form_id'] . ':' . $e['id'], 'canonical persisted inquiry identity mismatch' ); }
     $q = seab_joint_method( $cli, 'build_qualified_lead_import', array( $s, $c, '12:00:00', $inquiry ) );
     $w = seab_joint_method( $cli, 'build_google_ads_import', array( $s, $c, '12:00:00', $inquiry ) );
     $browser = SiteEngine_Ads_Bridge_Runtime::inject_confirmation_payload( array(), (object) array( 'id' => $a['form_id'] ), array(), $e['id'], json_decode( $row['response'], true ) );
@@ -174,6 +150,15 @@ function jx_append( array $prepared ) {
         $r = seab_joint_method( new SiteEngine_Ads_Bridge_CLI(), 'google_sheets_append_row', array( 'SYNTHETIC-NOT-A-SHEET', 'Google_Ads_Import', $prepared['values'], 'SYNTHETIC-NOT-A-TOKEN', 'RAW', $prepared['context'] ) );
         return array( 'allowed' => $r['ok'], 'synthetic_calls' => $calls );
     } finally { remove_filter( 'pre_http_request', $sink, PHP_INT_MAX ); }
+}
+function jx_consent_fault( array $a, array &$j, $label, $mode, callable $callback ) {
+    jx_assert( ! empty( $j['pending'] ) && is_resource( $GLOBALS['jx_operation_lock'] ?? null ), 'shared operation lock and durable pending intent required before Consent callback' );
+    try { return scj_with_fault( $a, $j, $label, $mode, $callback ); }
+    catch ( Throwable $e ) {
+        $j['fault_failure'] = array( 'primary' => strpos( $e->getMessage(), 'CALLBACK_FAILED;' ) === 0 ? 'CALLBACK_FAILED' : 'FAULT_OR_RESTORATION_FAILED',
+            'restoration' => strpos( $e->getMessage(), 'CALLBACK_FAILED; RESTORATION_VERIFIED:' ) === 0 ? 'VERIFIED' : 'UNKNOWN_OR_FAILED' );
+        jx_intent( $j ); throw new JX_Stop( 'Consent callback failed; retain pending intent and recorded restoration disposition' );
+    }
 }
 function jx_execute( $op, $label, array $a, array &$j ) {
     global $wpdb;
@@ -212,7 +197,7 @@ function jx_execute( $op, $label, array $a, array &$j ) {
         $cp = new ReflectionProperty( $cfg, 'config' ); $cp->setAccessible( true );
         $j = array( 'assignment' => $a['assignment'], 'marker' => $a['marker'], 'allocation_sha256' => $a['_sha256'],
             'baseline' => array( 'config_sha256' => hash( 'sha256', serialize( $cp->getValue( $cfg ) ) ), 'form_fields' => $form['form_fields'], 'active_plugins_sha256' => hash( 'sha256', serialize( get_option( 'active_plugins' ) ) ),
-                'max_submission' => (int) $wpdb->get_var( "SELECT MAX(id) FROM `{$t['submissions']}`" ) ),
+                'admission' => 'EXACT_VENDOR_RESPONSE_ID_ONLY' ),
             'contacts' => array(), 'entries' => array(), 'inquiries' => array(), 'audit' => array(), 'results' => array(), 'pending' => null,
             'active_stage' => 'J0', 'stages' => array( 'J0' => 'PASS', 'J1' => 'NOT RUN', 'J2' => 'NOT RUN', 'J3' => 'NOT RUN', 'J4' => 'NOT RUN', 'J5' => 'NOT RUN', 'J6' => 'NOT RUN', 'J7' => 'NOT RUN' ) );
         return array( 'admission' => 'PASS', 'fixtures_created' => 0 );
@@ -223,9 +208,9 @@ function jx_execute( $op, $label, array $a, array &$j ) {
         $b = jx_json( $file ); $pin = trim( file_get_contents( $file . '.sha256' ) );
         $stamp = json_decode( jx_owned_entry( $a, $j, $label )['response'], true )['_se_consent_server'];
         jx_assert( hash_file( 'sha256', $file ) === $pin && $b['status'] === 'PASS' && $b['operation'] === 'submit ' . $label
-            && $b['receipt_id'] === $stamp['receipt_id'] && $b['advertising_payload'] === ( $label !== 'B' ), 'browser receipt not matched to genuine persisted event' );
+            && $b['entry_id'] === $j['entries'][$label]['id'] && $b['receipt_id'] === $stamp['receipt_id'] && $b['advertising_payload'] === ( $label !== 'B' ), 'browser receipt not matched to genuine persisted event' );
         if ( $label === 'B' ) { jx_assert( ( $b['pending_failed_ack_verified'] ?? false ) === true, 'real pending/failed ACK evidence required' ); }
-        $j['browser'][$label] = array( 'sha256' => $pin, 'advertising_payload' => $b['advertising_payload'] ); return array( 'browser_receipt' => 'PASS' );
+        $j['browser'][$label] = array( 'sha256' => $pin, 'advertising_payload' => $b['advertising_payload'], 'pending_failed_ack_verified' => $b['pending_failed_ack_verified'] ?? false ); return array( 'browser_receipt' => 'PASS' );
     }
     if ( $op === 'stage' ) { return jx_stage( $label, $a, $j ); }
     if ( $op === 'form' ) {
@@ -254,10 +239,10 @@ function jx_execute( $op, $label, array $a, array &$j ) {
     }
     if ( $op === 'attest' ) {
         jx_assert( in_array( $label, array( 'A', 'B', 'C' ), true ) && ! isset( $j['entries'][$label] ) && count( $j['entries'] ) < 10, 'entry ceiling/label' );
-        $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$t['submissions']}` WHERE form_id=%d AND id>%d AND response LIKE %s ORDER BY id LIMIT 11", $a['form_id'], $j['baseline']['max_submission'], '%' . $a['marker'] . '%' ), ARRAY_A );
-        jx_assert( is_array( $rows ) && count( $rows ) <= 10, 'submission ceiling/read' ); $matches = array();
-        foreach ( $rows as $row ) { $v = json_decode( $row['response'], true ); if ( ( $v['se_joint_case'] ?? '' ) === $label && ( $v['se_joint_marker'] ?? '' ) === $a['marker'] ) { $matches[] = $row; } }
-        jx_assert( count( $matches ) === 1, 'exactly one real browser submission required' ); $row = $matches[0];
+        $row = jx_admission_row( $a, $j, $label, $a['_argument'] );
+        $bfile = $a['run_dir'] . '/browser-' . $label . '.json'; $b = jx_json( $bfile ); jx_pin( $bfile, trim( file_get_contents( $bfile . '.sha256' ) ) );
+        $stamp = json_decode( $row['response'], true )['_se_consent_server'];
+        jx_assert( $b['status'] === 'PASS' && $b['operation'] === 'submit ' . $label && $b['entry_id'] === (int) $row['id'] && $b['receipt_id'] === $stamp['receipt_id'] && $b['allocation_sha256'] === $a['_sha256'] && $b['release_sha256'] === $a['_release_sha256'], 'exact vendor response/capture evidence not correlated' );
         $j['entries'][$label] = array( 'id' => (int) $row['id'], 'contact' => $label === 'C' ? 'C' : 'A', 'response_sha256' => hash( 'sha256', $row['response'] ) );
         $details = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$t['details']}` WHERE submission_id=%d ORDER BY id LIMIT 129", $row['id'] ), ARRAY_A );
         jx_assert( is_array( $details ) && count( $details ) > 0 && count( $details ) <= 128 && ! $wpdb->last_error, 'owned serialized details absent/over bound' );
@@ -295,13 +280,13 @@ function jx_execute( $op, $label, array $a, array &$j ) {
         $j['inquiries'][$label] = $id; return array( 'owned_inquiry_id' => $id );
     }
     if ( $op === 'rejection' ) {
-        $row = jx_owned_entry( $a, $j, 'B' );
-        $p = SiteEngine_Ads_Bridge_Consent::current( (int) $row['id'], $a['form_id'], $t['submissions'], $wpdb, (string) SiteEngine_Ads_Bridge_Config::instance()->get( 'consent.required_policy_version', '' ) );
-        $b = SiteEngine_Ads_Bridge_Runtime::inject_confirmation_payload( array(), (object) array( 'id' => $a['form_id'] ), array(), (int) $row['id'], json_decode( $row['response'], true ) );
-        jx_assert( ! $p['allowed'] && ! isset( $b['siteengine_ads_bridge'] ), 'real B rejection not suppressed' );
-        return array( 'canonical_B_rejection' => 'PASS', 'builder_negative_veto' => 'tested with real B negative over C in fault negative, not rebound to A' );
+        $r = jx_probe( $a, $j, 'B' ); jx_expect( $r, false );
+        jx_assert( count( $r['values'] ) === 21, 'negative builder must expose exact canonical candidate body for denied-boundary probe' );
+        $j['blocked_candidate']['B'] = array( 'values' => $r['values'], 'context' => $r['context'] );
+        $sent = jx_append( $j['blocked_candidate']['B'] ); jx_assert( ! $sent['allowed'] && $sent['synthetic_calls'] === 0, 'negative B dispatch allowed' );
+        return array( 'negative_B_browser_builders_dispatch' => 'PASS', 'body' => 'DENIED builder candidate; never authorized preparation' );
     }
-    if ( $op === 'prepare' || $op === 'prepare-effective' ) {
+    if ( $op === 'prepare' ) {
         $key = $op === 'prepare' ? 'prepared' : 'effective'; jx_assert( ! isset( $j[$key][$label] ), 'prepared retry body is immutable' );
         $r = jx_probe( $a, $j, $label ); jx_expect( $r, true ); $j[$key][$label] = array( 'values' => $r['values'], 'context' => $r['context'] ); return array( 'prepared' => 'PASS', 'slot' => $key );
     }
@@ -315,34 +300,41 @@ function jx_execute( $op, $label, array $a, array &$j ) {
             jx_assert( $negative['allowed'] === false, 'frozen negative B revived' ); }
         return array( 'assertions' => 4, 'verdict' => $a['_argument'] );
     }
-    if ( $op === 'dispatch' || $op === 'dispatch-effective' ) {
+    if ( $op === 'dispatch' ) {
         $key = $op === 'dispatch' ? 'prepared' : 'effective';
         jx_assert( isset( $j[$key][$label] ), 'prepared body missing' ); jx_owned_entry( $a, $j, $label );
         $r = jx_append( $j[$key][$label] ); $want = $a['_argument'] === 'allow'; jx_assert( in_array( $a['_argument'], array( 'allow', 'deny' ), true ), 'expected verdict required' );
         jx_assert( $r['allowed'] === $want && $r['synthetic_calls'] === ( $want ? 1 : 0 ), 'actual append boundary verdict/transport mismatch' ); return $r;
     }
-    if ( $op === 'fault' || $op === 'missing' || $op === 'policy' ) {
-        $row = jx_owned_entry( $a, $j, $label ); $db = $wpdb; $last = $db->last_error; $view = new JX_Read_View( $db );
-        if ( $op !== 'missing' ) { jx_expect( jx_probe( $a, $j, $label ), true ); }
-        $config = SiteEngine_Ads_Bridge_Config::instance(); $prop = new ReflectionProperty( $config, 'config' ); $prop->setAccessible( true ); $cfg = $prop->getValue( $config );
-        $a2 = $a; $j2 = $j;
-        jx_scope( $config, function() use ( $op, $a, $j, $label, $row, $view, $prop, $cfg, $config, $a2, $j2 ) {
+    if ( $op === 'consent' || $op === 'restore' ) {
+        scj_context( $a ); $r = scj_inspect( $a, $j, $label ); $reason = $op === 'restore' ? 'eligible' : $a['_argument'];
+        jx_assert( $r['current']['available'] === true && $r['current']['allowed'] === ( $reason === 'eligible' ) && $r['current']['reason'] === $reason, 'normal real Consent readback mismatch' );
+        if ( $op === 'restore' ) { jx_expect( jx_probe( $a, $j, $label ), true ); unset( $j['missing_restore_required'] ); }
+        return array( 'normal_current_readback' => $reason, 'original_evidence' => 'VERIFIED', 'head_revision' => $r['current']['current_revision'] );
+    }
+    if ( $op === 'fault' ) {
+        scj_context( $a );
+        return jx_consent_fault( $a, $j, $label, $a['_argument'], static function( array $projected ) use ( $a, $j, $label ) {
             global $wpdb;
-            if ( $op === 'missing' ) { jx_assert( ! is_callable( array( 'SiteEngine_Consent_Authority', 'current_eligibility' ) ), 'Consent was not request-skipped' ); }
-            elseif ( $op === 'policy' ) { $bad = $cfg; $bad['consent']['required_policy_version'] = 'joint-test-mismatch'; $prop->setValue( $config, $bad ); }
-            elseif ( $a['_argument'] === 'unavailable' ) { $view->unavailable = true; $wpdb = $view; }
-            else {
-                $negative = $a['_argument'] === 'negative' ? json_decode( jx_owned_entry( $a, $j, 'B' )['response'], true )['_se_consent_server'] : null;
-                $source = json_decode( $row['response'], true ); $view->entry = (int) $row['id'];
-                $view->response = wp_json_encode( jx_fault_response( $source, $a['_argument'], $source['_se_consent_server']['receipt_id'], $negative ) );
-                $wpdb = $view; $j2['entries'][$label]['response_sha256'] = hash( 'sha256', $view->response );
-            }
-            $r = jx_probe( $a2, $j2, $label ); jx_expect( $r, false );
-            jx_assert( isset( $j['prepared'][$label] ), 'fault dispatch needs genuine prepared body' );
-            $sent = jx_append( $j['prepared'][$label] ); jx_assert( ! $sent['allowed'] && $sent['synthetic_calls'] === 0, 'fault reached append transport' );
+            $current = SiteEngine_Ads_Bridge_Consent::current( $j['entries'][$label]['id'], $a['form_id'], $a['tables']['submissions'], $wpdb, (string) SiteEngine_Ads_Bridge_Config::instance()->get( 'consent.required_policy_version', '' ) );
+            if ( in_array( $a['_argument'], array( 'unavailable-head', 'failed-current-read' ), true ) ) { jx_assert( $current['verified'] === true && $current['allowed'] === false, 'current-head fault must preserve intact historical proof' ); }
+            jx_expect( jx_probe( $a, $projected, $label ), false );
+            $body = $label === 'B' ? $j['blocked_candidate']['B'] : $j['prepared'][$label];
+            $sent = jx_append( $body ); jx_assert( ! $sent['allowed'] && $sent['synthetic_calls'] === 0, 'Consent fault reached append transport' );
+            return array( 'actual_consumer_browser_builders_dispatch_blocked' => true );
         } );
-        jx_owned_entry( $a, $j, $label ); jx_assert( $prop->getValue( $config ) === $cfg && $wpdb === $db, 'request restoration failed' );
-        return array( 'fault' => $op === 'fault' ? $a['_argument'] : $op, 'assertions' => 5, 'stored_evidence_restored' => true, 'persistent_fault_writes' => 0 );
+    }
+    if ( $op === 'missing' || $op === 'policy' ) {
+        $config = SiteEngine_Ads_Bridge_Config::instance(); $prop = new ReflectionProperty( $config, 'config' ); $prop->setAccessible( true ); $before = $prop->getValue( $config );
+        jx_scope( $config, static function() use ( $op, $a, $j, $label, $config, $prop, $before ) {
+            if ( $op === 'missing' ) { jx_assert( ! is_callable( array( 'SiteEngine_Consent_Authority', 'current_eligibility' ) ), 'Consent was not request-skipped' ); }
+            else { jx_expect( jx_probe( $a, $j, $label ), true ); $bad = $before; $bad['consent']['required_policy_version'] = 'joint-test-mismatch'; $prop->setValue( $config, $bad ); }
+            jx_expect( jx_probe( $a, $j, $label ), false ); $sent = jx_append( $j['prepared'][$label] ); jx_assert( ! $sent['allowed'] && $sent['synthetic_calls'] === 0, 'missing/policy fault reached transport' );
+        } );
+        jx_owned_entry( $a, $j, $label );
+        if ( $op === 'missing' ) { $j['missing_restore_required'] = true; }
+        else { jx_expect( jx_probe( $a, $j, $label ), true ); }
+        return array( 'fault' => $op, 'request_scope_restored' => true, 'normal_request_restore_required' => $op === 'missing' );
     }
     if ( $op === 'dnc-on' || $op === 'dnc-off' ) {
         $s = jx_contact( $a, $j, $label ); $id = (int) $a['dnc_list_id'];
@@ -439,20 +431,20 @@ function jx_close( array $a, array &$j ) {
     return array( 'fixture_cleanup' => 'PASS', 'audit_retained' => array( 'chain_id' => $j['chain_id'] ?? null, 'receipt_ids' => array_keys( $j['audit'] ) ), 'cleanup_owner' => 'Alma Codex', 'retention' => 'Consent review; never delete heads/barriers/events' );
 }
 function jx_stage( $stage, array $a, array &$j ) {
-    $has = static function( $op, $label, $arg = null, $minimum = 1 ) use ( &$j ) {
-        $n = 0; foreach ( $j['results'] as $r ) { if ( $r['operation'] === $op && $r['label'] === $label && ( $arg === null || ( $r['argument'] ?? null ) === $arg ) && $r['status'] === 'PASS' ) { $n++; } }
+    $has = static function( $op, $label, $arg = null, $minimum = 1, $revision = null ) use ( &$j ) {
+        $n = 0; foreach ( $j['results'] as $r ) { if ( $r['operation'] === $op && $r['label'] === $label && ( $arg === null || ( $r['argument'] ?? null ) === $arg ) && $r['status'] === 'PASS' && ( $revision === null || ( $r['result']['head_revision'] ?? null ) === $revision ) ) { $n++; } }
         jx_assert( $n >= $minimum, 'stage missing executable evidence ' . $op . '/' . $label );
     };
     switch ( $stage ) {
         case 'J1': jx_assert( isset( $j['browser']['A'] ), 'browser A evidence' ); $has( 'adopt', 'A' ); $has( 'prepare', 'A' ); $has( 'dispatch', 'A', 'allow' ); break;
-        case 'J2': $has( 'rejection', 'B' ); foreach ( array( 'pending', 'failed', 'null', 'malformed', 'unknown', 'unsigned' ) as $mode ) { $has( 'fault', 'A', $mode ); } $has( 'fault', 'C', 'negative' ); break;
-        case 'J3': jx_assert( isset( $j['browser']['B'] ), 'browser B evidence' ); $has( 'dispatch', 'A', 'deny', 2 ); $has( 'probe', 'A', 'deny' ); break;
-        case 'J4': jx_assert( isset( $j['browser']['C'] ), 'browser C evidence' ); $has( 'adopt', 'C' ); $has( 'dispatch', 'C', 'allow' ); $has( 'probe', 'A', 'deny' ); break;
-        case 'J5': $has( 'missing', 'C' ); $has( 'fault', 'C', 'unavailable' ); break;
+        case 'J2': jx_assert( ( $j['browser']['B']['pending_failed_ack_verified'] ?? false ) === true, 'real owner-controller pending/failed ACK evidence required' ); $has( 'rejection', 'B' ); foreach ( array( 'pending', 'failed', 'null', 'malformed', 'unknown', 'unsigned', 'tampered' ) as $mode ) { $has( 'fault', 'A', $mode ); } $has( 'fault', 'B', 'conflicting-flat' ); break;
+        case 'J3': jx_assert( isset( $j['browser']['B'] ), 'browser B evidence' ); $has( 'dispatch', 'A', 'deny', 2 ); $has( 'probe', 'A', 'deny' ); $has( 'consent', 'A', 'withdrawn', 1, 2 ); $has( 'consent', 'B', 'denied', 1, 2 ); break;
+        case 'J4': jx_assert( isset( $j['browser']['C'] ), 'browser C evidence' ); $has( 'adopt', 'C' ); $has( 'dispatch', 'C', 'allow' ); $has( 'probe', 'A', 'deny' ); $has( 'consent', 'A', 'withdrawn', 1, 3 ); $has( 'consent', 'B', 'denied', 1, 3 ); $has( 'consent', 'C', 'eligible', 1, 3 ); break;
+        case 'J5': $has( 'missing', 'C' ); $has( 'restore', 'C' ); $has( 'fault', 'C', 'unavailable-head' ); $has( 'fault', 'C', 'failed-current-read' ); break;
         case 'J6':
             $has( 'policy', 'C' ); $has( 'dnc-on', 'C' ); $has( 'probe', 'C', 'dnc' ); $has( 'dnc-off', 'C' );
-            $has( 'rebind', 'A', 'B' ); $has( 'rebind', 'A', 'restore' ); $has( 'archive', 'A' ); $has( 'unarchive', 'A' ); $has( 'dispatch', 'C', 'deny' ); $has( 'dispatch-effective', 'C', 'allow' );
-            jx_assert( $j['prepared']['C']['values'][17] === 'Granted' && $j['effective']['C']['values'][17] === 'Denied', 'effective personalization boundary evidence missing' ); break;
+            $has( 'rebind', 'A', 'B' ); $has( 'rebind', 'A', 'restore' ); $has( 'archive', 'A' ); $has( 'unarchive', 'A' ); $has( 'dispatch', 'C', 'deny' );
+            jx_assert( $j['prepared']['A']['values'][16] === 'Granted' && $j['prepared']['C']['values'][16] === 'Granted' && $j['prepared']['C']['values'][17] === 'Granted' && $j['prepared']['A']['values'][17] === 'Denied', 'effective personalization boundary evidence missing' ); break;
         case 'J7':
             jx_assert( ! empty( $j['closed'] ), 'owned cleanup not complete' );
             foreach ( array( 'J1', 'J2', 'J3', 'J4', 'J5', 'J6' ) as $prior ) { jx_assert( $j['stages'][$prior] === 'PASS', 'earlier stage incomplete' ); }
@@ -462,23 +454,29 @@ function jx_stage( $stage, array $a, array &$j ) {
                 && $v['scoped_controls_restored'] === true && $v['cleanup_owner'] === 'Alma Codex' && $v['audit_retention_owner'] === 'Consent', 'owner closure/evidence required' ); break;
         default: throw new JX_Stop( 'unknown stage' );
     }
+    if ( in_array( $stage, array( 'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7' ), true ) ) { $expected = $stage === 'J1' ? 1 : ( in_array( $stage, array( 'J2', 'J3' ), true ) ? 2 : 3 ); jx_assert( count( $j['audit'] ) === $expected && $j['head']['revision'] === $expected, 'single real three-capture sequence mismatch' ); }
     $j['stages'][$stage] = 'PASS'; return array( 'stage' => $stage, 'status' => 'PASS', 'all_stages' => $j['stages'] );
 }
 if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
-    $path = null; $j = array(); $lock = null;
+    $path = null; $j = array(); $lock = null; $journal_authorized = false;
     try {
-        jx_assert( defined( 'WP_CLI' ) && WP_CLI && isset( $args ) && count( $args ) === 5, 'WP eval-file: op label argument allocation.json SHA256' );
-        list( $op, $label, $argument, $file, $sha ) = $args;
+        jx_assert( defined( 'WP_CLI' ) && WP_CLI && isset( $args ) && count( $args ) === 7, 'WP eval-file: op label argument allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA' );
+        list( $op, $label, $argument, $file, $sha, $journal_sha, $release_sha ) = $args;
         jx_assert( preg_match( '/^[a-f0-9]{64}$/D', $sha ) && hash_file( 'sha256', $file ) === $sha, 'allocation hash mismatch' );
-        $a = jx_allocation( jx_json( $file ) ); $a['_sha256'] = $sha; $a['_argument'] = $argument;
+        $a = jx_allocation( jx_json( $file ) ); $a['_sha256'] = $sha; $a['_argument'] = $argument; $a['_release_sha256'] = $release_sha;
         jx_assert( ! is_link( $file ) && realpath( $file ) === $a['run_dir'] . '/allocation.json' && realpath( dirname( $file ) ) === $a['run_dir'] && posix_geteuid() === $a['owner_uid'] && ( fileperms( dirname( $file ) ) & 0777 ) === 0700, 'owner/private path mismatch' );
         jx_assert( ( fileperms( $file ) & 0777 ) === 0600, 'allocation must be0600' );
         global $wpdb; jx_assert( home_url( '/' ) === $a['site'] && $wpdb->prefix === $a['prefix'], 'target mismatch' );
-        $lock = fopen( $a['run_dir'] . '/operations.lock', 'c' ); chmod( $a['run_dir'] . '/operations.lock', 0600 ); jx_assert( flock( $lock, LOCK_EX | LOCK_NB ), 'another owned operation running' );
+        $lockpath = $a['run_dir'] . '/operations.lock';
+        if ( ! file_exists( $lockpath ) ) { jx_assert( $op === 'admit', 'initial admission must create owned lock' ); $lock = fopen( $lockpath, 'x+' ); chmod( $lockpath, 0600 ); }
+        else { jx_assert( ! is_link( $lockpath ) && fileowner( $lockpath ) === $a['owner_uid'] && ( fileperms( $lockpath ) & 0777 ) === 0600, 'shared lock owner/mode mismatch' ); $lock = fopen( $lockpath, 'r+' ); }
+        jx_assert( is_resource( $lock ) && flock( $lock, LOCK_EX | LOCK_NB ), 'another owned operation running' ); $GLOBALS['jx_operation_lock'] = $lock;
         $path = $a['run_dir'] . '/journal.json'; $GLOBALS['jx_path'] = $path; $j = is_file( $path ) ? jx_json( $path ) : array();
+        if ( $op === 'admit' ) { jx_assert( ! $j && $journal_sha === '-' && $release_sha === '-', 'initial admission only, no existing journal' ); }
+        else { jx_pin( $path, $journal_sha ); }
         if ( $op !== 'admit' ) {
             $review = jx_json( $a['run_dir'] . '/fixture-release.json' );
-            $review_pin = trim( file_get_contents( $a['run_dir'] . '/fixture-release.sha256' ) );
+            $review_pin = $release_sha;
             jx_assert( $review['status'] === 'RELEASED_J1_J6_J7' && $review['allocation_sha256'] === $sha
                 && preg_match( '/^[a-f0-9]{64}$/D', $review_pin )
                 && hash_file( 'sha256', $a['run_dir'] . '/fixture-release.json' ) === $review_pin
@@ -486,7 +484,14 @@ if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
             jx_assert( ! empty( $j ) && $j['allocation_sha256'] === $sha && ( empty( $j['closed'] ) || ( $op === 'stage' && $label === 'J7' ) ), 'journal identity/closure' );
             jx_assert( count( $j['results'] ) < 64, 'finite operation ceiling' );
             jx_assert( empty( $j['pending'] ) && empty( $j['stopped'] ), 'pending/failure requires explicit reviewed recovery; no replay' );
-            $j['pending'] = array( 'operation' => $op, 'label' => $label, 'argument' => $argument, 'at' => gmdate( 'c' ) );
+            jx_assert( empty( $j['missing_restore_required'] ) || ( $op === 'restore' && $label === 'C' ), 'missing-plugin probe requires next normal-request restoration' );
+            $journal_authorized = true;
+            if ( $op === 'fault' ) { $j['active_stage'] = in_array( $argument, array( 'unavailable-head', 'failed-current-read' ), true ) ? 'J5' : 'J2'; }
+            if ( $op === 'missing' || $op === 'restore' ) { $j['active_stage'] = 'J5'; }
+            if ( $op === 'policy' ) { $j['active_stage'] = 'J6'; }
+            if ( $op === 'dispatch' && $label === 'A' && ( $j['head']['revision'] ?? 0 ) === 2 ) { $j['active_stage'] = 'J3'; }
+            if ( $op === 'stage' ) { $j['active_stage'] = $label; }
+            $j['pending'] = array( 'operation' => $op, 'label' => $label, 'argument' => $argument, 'at' => gmdate( 'c' ), 'allocation_sha256' => $sha, 'release_sha256' => $release_sha, 'journal_before_sha256' => $journal_sha );
             if ( $op === 'adopt' ) { $j['pending']['inquiry_id'] = 'inq_' . wp_generate_uuid4(); $j['pending']['event_id'] = 'evt_' . wp_generate_uuid4(); }
             jx_save( $path, $j );
         }
@@ -497,10 +502,10 @@ if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
         try { $r = jx_execute( $op, $label, $a, $j ); }
         finally { remove_filter( 'pre_http_request', $no_http, PHP_INT_MAX ); remove_filter( 'pre_wp_mail', $no_mail, PHP_INT_MAX ); }
         $j['pending'] = null; $j['results'][] = array( 'operation' => $op, 'label' => $label, 'argument' => $argument, 'status' => 'PASS', 'at' => gmdate( 'c' ), 'result' => $r ); jx_save( $path, $j );
-        echo json_encode( array( 'operation' => $op, 'label' => $label, 'status' => 'PASS', 'result' => $r ) ) . "\n";
+        echo json_encode( array( 'operation' => $op, 'label' => $label, 'status' => 'PASS', 'journal_sha256' => hash_file( 'sha256', $path ), 'result' => $r ) ) . "\n";
     } catch ( Throwable $e ) {
         $reason = $e instanceof JX_Stop ? $e->getMessage() : 'unexpected exception; stop and retain private pending evidence';
-        if ( $path && $j ) { $j['stopped'] = true; $j['stages'][$j['active_stage'] ?? 'J0'] = 'FAIL'; $j['failure'] = array( 'status' => 'FAIL', 'reason' => $reason, 'at' => gmdate( 'c' ) ); try { jx_save( $path, $j ); } catch ( Throwable $secondary ) { /* retain earlier durable pending journal */ } }
+        if ( $journal_authorized && $path && $j ) { $j['stopped'] = true; $j['stages'][$j['active_stage'] ?? 'J0'] = 'FAIL'; $j['failure'] = array( 'status' => 'FAIL', 'reason' => $reason, 'at' => gmdate( 'c' ) ); try { jx_save( $path, $j ); } catch ( Throwable $secondary ) { /* retain earlier durable pending journal */ } }
         fwrite( STDERR, json_encode( array( 'status' => 'FAIL', 'reason' => $reason, 'remaining' => 'journal/controls retained; Alma Codex recovery owner' ) ) . "\n" ); exit( 1 );
     } finally { if ( is_resource( $lock ) ) { flock( $lock, LOCK_UN ); fclose( $lock ); } }
 }

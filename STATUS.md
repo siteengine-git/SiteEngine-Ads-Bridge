@@ -1,3 +1,37 @@
+## Joint Consent-owned tooling integration — 2026-10-31, local only
+
+Integrated published Consent operations ae2fe50dcaaa18d581ea41c06b14db3ac68f1e47;
+original manifest0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51
+and four reviewed files retained byte-identically under tools/acceptance/consent-pinned/.
+scj_with_fault now executes inside the existing supervised/locked Ads child with
+durable pending intent. All operations carry independent allocation/release/current
+journal pins; refreshed journal hashes are independently compared after each step.
+Callback success/failure receives owner finally restoration/positive readback;
+unknown restoration preserves pending and fails. Missing-plugin probe requires
+immediate fresh normal-request restoration before further cases.
+
+Submission admission is exact vendor-response ID only, with signature/marker/form/
+case/browser-receipt correlation; no latest/MAX/marker discovery. Actual response
+ID path is an explicit J0 input; unavailable correlation is a concrete stop gate.
+Driver delegates capture/withdraw/failure/retry/form/admission to Consent's pinned
+browser controller, with exactly3 receipts/links,one chain/revisions1–3,A/B/C.
+Head faults are unavailable-head/failed-current-read after intact history proof.
+A/B barriers, personalisation independence, All_Leads and J7 audit retention remain.
+Advertising permission neither authorizes email nor derives from subscription status.
+
+Executable runbook retains64 commands and all resource ceilings. Focused new local
+results/package pins are in tools/acceptance/OPERATIONS-RESULTS.json; full manifest
+in OPERATIONS-MANIFEST.json. Prior r2 and both runtime packages preserved unchanged.
+Ads runtime source2846305, Consent runtime1c0a420, observerbff8339e unchanged.
+No unchanged runtime suites, database provision, server command, website/bootstrap,
+fixture, export or email-policy change. Unrelated native work remains untracked.
+
+Through Aubrey: Alma reviews/pins this integrated package and supplies actual J0
+allocation/vendor response ID path/reference map and independent pins before fixture
+release. J0 proceeds independently; J1–J7 NOT RUN here. Alma Codex sole executor/
+cleanup owner; Consent retains all3 receipts/links/head/barriers. No server resources
+created or cleaned by this local task. Historical checkpoint details follow.
+
 ## Joint owned operations package — local preparation, 2026-10-31
 
 Canonical source/repository unchanged. Alma release independently permits J0;
