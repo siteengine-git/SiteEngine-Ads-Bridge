@@ -43,7 +43,7 @@ file_put_contents( $GLOBALS['jx_path'] . '.next', 'interrupted' );
 set_error_handler( function() { throw new RuntimeException( 'file collision' ); } );
 refuses_x( function() { jx_save( $GLOBALS['jx_path'], array() ); }, 'interrupted .next refuses overwrite' ); restore_error_handler();
 check_x( jx_json( $GLOBALS['jx_path'] )['pending']['operation'] === 'adopt', 'earlier receipt survives secondary persistence failure' ); unlink( $GLOBALS['jx_path'] . '.next' );
-$a = array( 'tables' => array( 'forms' => 'fixture_forms', 'submissions' => 'fixture_submissions', 'contacts' => 'fixture_contacts', 'details' => 'fixture_details', 'meta' => 'fixture_meta', 'pivot' => 'fixture_pivot', 'inquiries' => 'fixture_inquiries' ),
+$a = array( 'prefix'=>'fixture_', 'tables' => array( 'forms' => 'fixture_forms', 'submissions' => 'fixture_submissions', 'contacts' => 'fixture_contacts', 'details' => 'fixture_details', 'meta' => 'fixture_meta', 'pivot' => 'fixture_pivot', 'inquiries' => 'fixture_inquiries' ),
     'form_id' => 3, 'marker' => 'fixture_marker', 'logical_references' => array( array( 'table' => 'fixture_foreign_jobs', 'column' => 'subscriber_id', 'kind' => 'contact' ) ), 'reference_map_reviewed' => true );
 $j = array( 'contacts' => array( 'A' => 9 ), 'entries' => array(), 'inquiries' => array(), 'audit' => array(), 'baseline' => array( 'form_fields' => 'original', 'active_plugins_sha256' => hash( 'sha256', serialize( get_option( '' ) ) ) ) );
 \FluentCrm\App\Models\Subscriber::$rows[9] = (object) array( 'email' => 'fixture_marker.a@example.invalid' );
@@ -60,7 +60,7 @@ foreach ( array( 'pending', 'failed', 'null', 'malformed', 'unknown', 'unsigned'
 check_x( jx_stage( 'J2', array(), $stages )['status'] === 'PASS', 'complete simulated stage verdict positive control' );
 $stages['head']['revision'] = 4;
 refuses_x( function() use ( &$stages ) { jx_stage( 'J2', array(), $stages ); }, 'extra fourth capture cannot satisfy finite three-capture stage evidence' );
-check_x( hash_file( 'sha256', dirname( __DIR__ ) . '/tools/acceptance/joint-owned-observer.php' ) === 'bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48', 'frozen observer unchanged' );
+check_x( strpos(file_get_contents(dirname(__DIR__).'/tools/acceptance/joint-owned-observer.php'), 'seab_joint_target(')!==false, 'derivative observer requires exact independently allocated target' );
 unlink( $GLOBALS['jx_path'] ); rmdir( $temp );
 echo "PASS {$count} harness-only assertions; installed operations NOT RUN\n";
 }

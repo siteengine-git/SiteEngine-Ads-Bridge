@@ -60,6 +60,11 @@
       "table": "<ACTUAL_PREFIX_FROM_J0>se_ads_inquiries",
       "column": "submission_id",
       "kind": "entry"
+    },
+    {
+      "table": "<ACTUAL_PREFIX_FROM_J0>fluentform_submission_meta",
+      "column": "response_id",
+      "kind": "entry"
     }
   ],
   "browser": {

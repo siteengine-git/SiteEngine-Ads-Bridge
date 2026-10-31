@@ -1,3 +1,58 @@
+## Joint harness r4 derivative — 2026-10-31 local-only checkpoint
+
+Completed Alma J0 supersedes the earlier setup-delta block below; no completed
+setup or background-receipt investigation was repeated. Original allocation and
+29-check reference map remain unchanged, verified locally. Runtime source2846305,
+both runtime ZIPs and r3 ZIP remain unchanged; all21 Ads payload hashes match.
+
+Four scoped harness corrections: exact stored HTTP / browser HTTPS identity checks
+with privately pinned companion (database identity excluded from Git); typed and
+visible-only business controls with authenticated existing-browser attachment;
+retained CLI guard hash verified before child spawn and WP-CLI --require bootstrap;
+explicit response_id metadata retention with durable nonclean closure. No metadata
+delete authority. J7 cannot PASS with retained/unresolved rows; fixture graph and
+controls remain for Alma Codex. Consent audit/head/withdrawal barriers retained.
+
+Actual focused results:33 context/guard/metadata +24 harness PHP assertions,
+9 Python tests,39 Node checks,6 PHP lint and3 JS syntax PASS. Browser/SQL/WP-CLI
+boundaries are local doubles; no installed/bootstrap/browser/native evidence.
+Previous25 Consent callback assertions carry forward as historical, not rerun.
+See tools/acceptance/REVIEW-R4.md, RUNBOOK-JOINT.md and derivative manifest/delivery.
+
+J1–J6 HELD: pinned Consent scj_owned/scj_context still compare HTTP home_url with
+HTTPS browser site. Copies unchanged; CONSENT-TARGET-HANDBACK-R4.md asks the owner
+for a published exact-target correction through Aubrey. Actual existing browser
+attachment and authenticated DOM marker remain unissued private executor inputs.
+Alma Codex sole server executor/cleanup owner; no server commands, fixtures, setup,
+bootstrap, runtime changes or live delivery. One scoped derivative commit on the
+existing maintenance branch; exact pin is the commit containing this entry.
+
+## Alma J0 Ads setup delta — local command/document preparation, 2026-10-31
+
+Read actual Alma handback ALMA-JOINT-J0-20261031.md + partial site-inputs/J0-result.
+J0 BLOCKED, no new application/bootstrap/fixtures from this task. Local operator
+sheet ../joint-acceptance-20261031/ALMA-J0-ADS-SETUP-DELTA-20261031.md records exact
+existing inquiry migration preview/apply (no --dry-run),34 columns/11 indexes,
+physical InnoDB verification (DDL does not force ENGINE), and a single guarded
+Settings::save delta for form4 with all six automation/transport flags false.
+No Ads config guard/unfinished coordination schema. Known form selectors map ten
+canonical roles; response path data.insert_id is source-only, live untested.
+
+Effective override authority, actual Consent policy, term IDs/titles and CRM custom
+field definitions remain unobserved in the handback, not asserted absent. Sheet
+supplies one bounded names/types/hash-only read projection for Alma to resolve them
+before approving writes. Unverified optional field names are not guessed. Required
+r3 custom slugs/types and actual tag/source/DNC mappings are explicit gates; no
+blind provision-fields --apply. Notifications56/57/58/feed52 stay Alma-owned/enabled
+until its controls; no instruction here changes them. Fresh-process verification
+and guarded non-destructive recovery preserve table/data/audit/withdrawal barriers.
+
+Runtime2846305, both candidate packages and r3 manifest/ZIP unchanged. No site
+commands, runtime edit, repeated tests, migration or settings write executed.
+Return local sheet through Aubrey to Alma Helper for the existing narrow J0 release;
+Alma Codex sole executor/cleanup owner. J1–J6 remain unreleased. Detailed site-specific
+sheet stays local; no external message sent or detailed evidence published.
+
 ## Joint Consent-owned tooling integration — 2026-10-31, local only
 
 Integrated published Consent operations ae2fe50dcaaa18d581ea41c06b14db3ac68f1e47;

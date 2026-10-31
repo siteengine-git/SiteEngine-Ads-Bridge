@@ -1,25 +1,36 @@
 {
   "assignment": "ALMA-JOINT-CONSENT-ADS-20261031",
-  "source_commit": "524cc1f38a3da4ab0a383fca122de98eac99ab57",
-  "acceptance": "LOCAL_INTEGRATION_ONLY_INSTALLED_NOT_RUN",
+  "revision": "r4",
+  "base_checkpoint": "f1b78846367b8d9d331c02f1da28ab14ccd1368d",
+  "base_tooling_commit": "524cc1f38a3da4ab0a383fca122de98eac99ab57",
+  "derivative_pin": "independently supplied Git commit containing this manifest; member hashes bind exact bytes",
+  "acceptance": "LOCAL_ONLY_J1_J6_HELD_CONSENT_TARGET_CORRECTION_REQUIRED",
   "consent_tooling_commit": "ae2fe50dcaaa18d581ea41c06b14db3ac68f1e47",
   "consent_original_manifest_sha256": "0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51",
   "files": {
-    "joint-owned-observer.php": "bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48",
-    "joint-ops.php": "a0bfdf56b11c22604826786934499a7ed75323b2305a90134908514b64667021",
-    "joint-run.py": "3650e251059ccb2fcacf5e41444e2aee032a4f44680feea6c71d8ca8f7dedf10",
-    "joint-browser.cjs": "175df9d3868f9fa8b0a508352b226a5f65d33db7960b53d63a82e737a31fc211",
-    "allocation.template.json": "62d379034893d026b57b3c807654aa6bb53e6a2bebb6bddc547c6c0828f87eb9",
-    "RUNBOOK-JOINT.md": "795537b2f18334626194f4020e80d9af7b81a77b2453836632e05beb0b8cb0bf",
+    "joint-owned-observer.php": "fcf00256870d32f26f9c6c0b873b89173b65b34e748edceffc795220408d7996",
+    "joint-ops.php": "4185e70b4f0fb1c6e0606d7a9cd680d24842504b6ae001b08e54f045ed9474d2",
+    "joint-run.py": "c5d8de9a8bdda7a31f05ed8b0e0b708ec412d72913934360473333f76979676c",
+    "joint-browser.cjs": "8a9a3abe254593652fefa7f7cd31007ca29f140e0612c9f8468647439e61b7a8",
+    "allocation.template.json": "6e8490b24e032d9233a2e637247dcf55f3e75933c7bfa644df81721cbdc1e754",
+    "RUNBOOK-JOINT.md": "9153029f96f0980cefa1de16b2fa543a6aa93e772244f20e145b36df4fe40168",
     "consent-pinned/CONSENT-OPERATIONS.md": "cc2a7da431dd9a4bc6808f9ced7f6953f970529e464d9a71e3dfd13c12d67f3b",
     "consent-pinned/CONSENT-TOOLING-MANIFEST.json": "0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51",
     "consent-pinned/consent-joint.php": "7bf5653787a7569d015d0db5e2fc2d3b4fc3638f135c39c309c616e662f6e0e7",
-    "consent-pinned/consent-browser.js": "b5969d67e38a3ddd93c3a2eba00cbf95be55a0042c02bf053c0af40c47791c26"
+    "consent-pinned/consent-browser.js": "b5969d67e38a3ddd93c3a2eba00cbf95be55a0042c02bf053c0af40c47791c26",
+    "joint-target.php": "2b7a5bf897dd22c1ca7a629b88566b4c9f9589e0f9f3eb8a4e2d62cfe191f117",
+    "joint-startup.php": "d4fb6925b0d8b2b57d32cc8ee0b470c964c2628e30fb01d959d4b4a7cfe61c16",
+    "joint-browser-controls.cjs": "1a281f03e3e158af640cab518b2e8eaa35dbfffe036acd9ffe877e775a4907ca",
+    "context.template.json": "80cd8f1c264db0821ce61c5385dd4aa87c664e136ca48dc5e446817c1d498d83",
+    "CONSENT-TARGET-HANDBACK-R4.md": "04f585dec208126179434a41ed10968932f174bf29d3679a2feedecb4d1a4fcb",
+    "REVIEW-R4.md": "77e176d3d4ee4927ef78009786364679c55093794754381faf2fb4f09a8568a1",
+    "OPERATIONS-RESULTS.json": "2884feec84a8f26831ea97149adf9a0999427268fe61489c09f79f58eabc06e9"
   },
   "focused_tests": {
-    "tests/joint-operations-acceptance.php": "b21488aaf8e9724ef41981f95d80c02e6d04bcaaf2b4779001b3bad2f40b651c",
+    "tests/joint-operations-acceptance.php": "937493b833c883aa7163646cbbfd495765b3d56188aedef009cdf6b990852b91",
     "tests/joint-consent-integration.php": "bbc35bc3de53909fc4f67fc18c3a7680d99ce7c786f5b448080337285b9f7ba3",
-    "tests/joint-run-acceptance.py": "feed35b71ecdfc1fe3c5f3529ad76cec87593d5420c94f1ae043b0464dcd9590",
-    "tests/joint-browser-acceptance.cjs": "6320c832837e28a4baaf8d47b80bb003b85dae46173c2c8828208a95961d3f69"
+    "tests/joint-run-acceptance.py": "e54a90bbe68a528b56856b1e40ea0cd59b80959c847a0ba19c681c5680d0da32",
+    "tests/joint-browser-acceptance.cjs": "0cacf8042cdc40a592d734d742576fa1974c6e9d2502042d5c648de81cf95596",
+    "tests/joint-context-acceptance.php": "64f80a4ab3d037d6c62ac2d7435663f09025b839a62f518ef3719af613347b8b"
   }
 }

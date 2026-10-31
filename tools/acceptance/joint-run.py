@@ -3,16 +3,46 @@ import hashlib, json, os, pathlib, selectors, signal, subprocess, sys, time
 
 OPS = {'admit', 'form', 'contact', 'attest', 'milestone', 'adopt', 'prepare', 'probe',
        'dispatch', 'consent', 'restore', 'rejection', 'fault', 'missing', 'policy', 'dnc-on', 'dnc-off', 'archive', 'unarchive', 'rebind', 'browser-evidence', 'begin', 'stage', 'close'}
+GUARD_SHA = 'f3702f4570a67ccdfb0973e3d3b0e4bc9411bf5b5fb33550e569382c562dde8f'
 RUN = '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01'
 
-def command(op, label, argument, allocation, digest, journal_pin, release_pin, here):
+def command(op, label, argument, allocation, digest, journal_pin, release_pin, context_file, context_pin, here):
     if op not in OPS or label not in {'-', 'A', 'B', 'C', 'J0', 'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7'} or len(argument) > 32:
         raise ValueError('unallowlisted operation/label')
     validate_pins(op, digest, journal_pin, release_pin)
+    if not valid_pin(context_pin): raise ValueError('independent private context pin required')
     argv = ['/usr/local/lsws/lsphp83/bin/php', '/usr/bin/wp',
-            '--path=/home/alma.siteengine.space/public_html']
+            '--path=/home/alma.siteengine.space/public_html', '--require='+str(here/'joint-startup.php')]
     if op == 'missing': argv += ['--skip-plugins=siteengine-consent']
-    return argv + ['eval-file', str(here / 'joint-ops.php'), op, label, argument, str(allocation), digest, journal_pin, release_pin]
+    return argv + ['eval-file', str(here / 'joint-ops.php'), op, label, argument, str(allocation), digest, journal_pin, release_pin, str(context_file), context_pin]
+
+def valid_pin(value):
+    return isinstance(value,str) and len(value)==64 and all(c in '0123456789abcdef' for c in value)
+
+def verify_guard(path, expected_path=RUN+'/cli-control.php', expected_hash=GUARD_SHA):
+    p=pathlib.Path(path)
+    if str(p)!=expected_path or p.is_symlink() or not p.is_file(): raise ValueError('retained guard omitted/unreadable')
+    try: raw=p.read_bytes()
+    except OSError: raise ValueError('retained guard unreadable') from None
+    if hashlib.sha256(raw).hexdigest()!=expected_hash: raise ValueError('retained guard hash mismatch')
+    return True
+
+def private_context(file, pin, allocation, run):
+    p=pathlib.Path(file)
+    if p.is_symlink() or (os.name == 'posix' and p.stat().st_mode & 0o777 != 0o600) or str(p)!=str(run/'context.json') or not valid_pin(pin) or hashlib.sha256(p.read_bytes()).hexdigest()!=pin:
+        raise ValueError('independent private context mismatch')
+    c=json.loads(p.read_text())
+    if c['allocation_sha256']!=hashlib.sha256((run/'allocation.json').read_bytes()).hexdigest() or c['assignment']!=allocation['assignment']:
+        raise ValueError('context is not bound to completed allocation')
+    if c.get('guard_path')!=RUN+'/cli-control.php' or c.get('guard_sha256')!=GUARD_SHA: raise ValueError('retained guard binding missing')
+    verify_guard(c['guard_path'])
+    ref=(run/'reference-map-reviewed.json').read_bytes()
+    if hashlib.sha256(ref).hexdigest()!=allocation['reference_map_sha256'] or c['reference_map_sha256']!=allocation['reference_map_sha256']:
+        raise ValueError('reviewed reference-map pin mismatch')
+    reviewed=json.loads(ref)
+    if reviewed['logical_references']!=allocation['logical_references'] or len(allocation['logical_references'])!=29:
+        raise ValueError('completed 29-check reference map mismatch')
+    return c
 
 def validate_pins(op, allocation, journal, release):
     def pin(x): return isinstance(x,str) and len(x)==64 and all(c in '0123456789abcdef' for c in x)
@@ -43,8 +73,8 @@ def private_json(path, value):
         os.chmod(path, 0o600); json.dump(value, f); f.flush(); os.fsync(f.fileno())
 
 def main():
-    if len(sys.argv) != 8: raise ValueError('usage: joint-run.py OP LABEL ARG allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA')
-    op, label, argument, filename, digest, journal_pin, release_pin = sys.argv[1:]
+    if len(sys.argv) != 10: raise ValueError('usage: joint-run.py OP LABEL ARG allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA context.json CONTEXT_SHA')
+    op, label, argument, filename, digest, journal_pin, release_pin, context_file, context_pin = sys.argv[1:]
     here = pathlib.Path(__file__).resolve().parent
     allocation = pathlib.Path(filename).resolve()
     if str(allocation.parent) != RUN or allocation.stat().st_mode & 0o777 != 0o600:
@@ -54,6 +84,7 @@ def main():
     if hashlib.sha256(allocation.read_bytes()).hexdigest() != digest: raise ValueError('allocation provenance')
     verify_members(here)
     run = allocation.parent
+    private_context(context_file, context_pin, a, run)
     verify_current_pins(op, run, digest, journal_pin, release_pin)
     if (run / 'runner-stop.json').exists(): raise ValueError('previous failure retained; no automatic retry/cleanup')
     attempts = list(run.glob('attempt-*.json'))
@@ -63,8 +94,8 @@ def main():
     sequence = len(attempts) + 1
     if sequence > 64: raise ValueError('finite command ceiling64')
     receipt = run / ('attempt-%02d.json' % sequence)
-    private_json(receipt, {'operation': op, 'label': label, 'status': 'PENDING', 'started': time.time(), 'allocation_sha256':digest, 'journal_before_sha256':journal_pin, 'release_sha256':release_pin})
-    process = subprocess.Popen(command(op, label, argument, allocation, digest, journal_pin, release_pin, here),
+    private_json(receipt, {'operation': op, 'label': label, 'status': 'PENDING', 'started': time.time(), 'allocation_sha256':digest, 'journal_before_sha256':journal_pin, 'release_sha256':release_pin, 'context_sha256':context_pin, 'guard_sha256':GUARD_SHA})
+    process = subprocess.Popen(command(op, label, argument, allocation, digest, journal_pin, release_pin, context_file, context_pin, here),
                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                start_new_session=True, cwd=RUN)
     selector = selectors.DefaultSelector()

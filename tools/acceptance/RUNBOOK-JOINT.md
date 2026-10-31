@@ -1,10 +1,80 @@
-# Integrated joint J0–J7 operations — local tooling, installed NOT RUN
+# Joint J0–J7 r4 derivative — local tooling; fixtures HELD
 
 Alma Codex is sole server executor/cleanup owner; Aubrey is the proposed browser
 operator and communication route. J0 proceeds independently under its recorded
 release. J1–J6 remain UNRELEASED until Alma reviews THIS integrated package.
 No deployment, WordPress bootstrap, installed fixture, export or server command
-was run during this local integration. Prior r2 ZIP and both runtime ZIPs retained.
+was run during this local integration. Prior r2/r3 ZIPs and both runtime ZIPs retained. Completed J0 carries forward; no repeated setup or receipt investigation.
+
+
+## r4 installed-context corrections and release blockers
+
+Completed J0 is retained from Alma's fixture-release handback. Its original allocation
+and 29-check reference map remain immutable. Do NOT reissue setup, reinstall either
+runtime, investigate unowned background receipts, or start fixtures under r3 authority.
+J1–J6 remain held pending Alma review and the Consent-owned correction below.
+
+**Target companion:** Alma reviews a separate private context.json0600 from
+context.template.json, bound to the ORIGINAL allocation and reference-map hashes.
+The separately transmitted CPIN is required before spawn, rechecked by PHP, carried
+into pending intent, and bound by fixture-release.context_sha256. Preserve original
+allocation bytes. Target checks require exact host/owner/UID/root/database hash,
+database server and prefix; no actual database identity belongs in this repository.
+Stored home and siteurl are exactly HTTP, effective home has trailing slash, and
+browser origin is exactly HTTPS; do not rewrite options or filter home_url.
+
+**Consent owner blocker:** pinned consent-joint.php scj_owned and scj_context still
+compare home_url('/') to the HTTPS browser site. This correctly refuses the present
+HTTP storage context. Ads does not patch it, add URL filters, alter Consent scope,
+or bypass either check. Ask Consent Helper through Aubrey for a published derivative
+that validates the separate exact identities. Its browser controller's HTTPS origin
+check remains correct and unchanged. No execution release is implied by this package.
+
+**Actual browser capability inputs still required:** Alma/Aubrey identify an EXISTING
+loopback CDP endpoint, exact context_index/page_index, exclusive controlled tab and
+reviewed authenticated_selector (visible only to the authenticated test session).
+The private context prepared locally deliberately leaves these unissued values null.
+Do not start a debugging endpoint, create a profile, or guess selectors. If that
+capability is unavailable, stop and return that exact executor input gap. Aubrey may
+log in manually in that tab after the driver's page route is active; credentials,
+cookies and storage are neither captured nor exported. Type `access JHASH` first;
+only ACCESS_VERIFIED permits grant/submission commands. Redirects, non200, absent
+authentication marker or wrong form fail before capture. Routes affect this exclusive
+tab only. Preserve ordinary worker/SDK/browser isolation requirements from Alma J0.
+
+Use allocation.browser.required_fields unchanged from completed J0. Each entry has
+selector, value, control_type (radio/select/text/tel/email), visible_only. Radios
+match the exact value, native selects use selectOption, text/tel/email use fill;
+read back every selection/value. Hidden conditional fields skip only when explicitly
+visible_only=true; unexpected, ambiguous or disabled controls fail. Never populate
+consent authority fields, even via an innocent selector alias. Exact vendor response
+path remains data.insert_id, source-verified; the first actual response must prove it.
+
+**Pre-bootstrap startup:** every supervised command, including missing-plugin mode,
+uses existing WP-CLI --require=<OPS>/joint-startup.php. The wrapper checks exact
+retained run/cli-control.php against SHA256
+f3702f4570a67ccdfb0973e3d3b0e4bc9411bf5b5fb33550e569382c562dde8f,
+loads that existing file, and checks its before_wp_load hook before application
+bootstrap. The launcher verifies the same file BEFORE attempt creation or child
+spawn. Missing/unreadable/symlink/mismatched bytes stop. Never invoke joint-ops.php
+without the startup wrapper. No permanent plugin is installed; this does not cover
+ordinary web requests, direct SDK sockets or other workers. Local ordering evidence
+uses the actual hash-checked hook body with an explicit plugin.php filesystem double
+and WP-CLI/filter shims; installed startup behavior is NOT RUN here.
+
+**Metadata/closure:** mandatory reference is prefix+fluentform_submission_meta,
+response_id -> exact admitted entry ID. The completed 29-check map already includes
+it; do not replace that map with the smaller generic template. Before destruction,
+close verifies owned parent submissions, then reads id/response_id for each owned
+submission (512 rows maximum; sentinel513 fails). Unknown/foreign/duplicate/read
+failure leaves durable pending and UNRESOLVED_NOT_CLEAN. Verified rows are recorded
+by exact IDs in retained_resources.submission_meta with RETAIN_NO_DELETE_AUTHORITY.
+No metadata deletion is authorized or implemented. The whole fixture graph, form
+and controls remain, closure is RETAINED_NOT_CLEAN, J7 fails/awaits Alma disposition;
+remaining reference/FK checks are NOT RUN if this earlier retention stops closure.
+No claim of clean closure or deletion of a parent with unexplained metadata is allowed.
+Alma Codex owns recovery/cleanup and any separate narrow deletion release. All Consent
+receipts, links, chain/head, audit events and withdrawal barriers remain retained.
 
 ## Exact dependencies and admission
 
@@ -17,8 +87,9 @@ Consent operations ae2fe50dcaaa18d581ea41c06b14db3ac68f1e47, copied EXACTLY unde
 consent-pinned/ with original manifest SHA256
 0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51.
 Its CONSENT-OPERATIONS.md is incorporated for context/fault/retention semantics.
-The retained read-only observer bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48
-is unchanged; only its provenance/functions are reused. No competing Consent
+The derivative observer now requires the independently pinned private target context.
+The original observer remains preserved byte-for-byte in r3; derivative member hashes
+are authoritative for this package. No competing Consent
 capture or fault implementation remains in this driver.
 
 J0 remains Alma's independently released package/target/nonoverlap/backups/controls,
@@ -42,7 +113,7 @@ hashed into immutable allocation.json0600. Logical reference map must be owner
 reviewed and complete before admission; mandatory edges are supplied in template.
 Fill all template placeholders from actual site evidence; it deliberately refuses
 unfilled inputs. Fixture-release.json0600 must contain status:RELEASED_J1_J6_J7,
-allocation_sha256 and operations_manifest_sha256; its SHA is supplied independently.
+allocation_sha256, context_sha256 and operations_manifest_sha256; its SHA is supplied independently.
 Nothing here self-approves that release. Directory0700 and files0600/current owner.
 
 ## Exact edits and bounds
@@ -102,10 +173,12 @@ print('PASS pinned members; no WordPress loaded')
 PY
 ALLOC="$RUN/allocation.json"
 APIN='<independent allocation SHA256>'
+CONTEXT="$RUN/context.json"
+CPIN='<independent reviewed private context SHA256>'
 JPIN=-
 RPIN=-
 j() {
-  RESULT=$(/usr/bin/python3 "$OPS/joint-run.py" "$@" "$ALLOC" "$APIN" "$JPIN" "$RPIN") || { printf '%s\n' "$RESULT"; return 1; }
+  RESULT=$(/usr/bin/python3 "$OPS/joint-run.py" "$@" "$ALLOC" "$APIN" "$JPIN" "$RPIN" "$CONTEXT" "$CPIN") || { printf '%s\n' "$RESULT"; return 1; }
   printf '%s\n' "$RESULT"
   NEXT=$(printf '%s' "$RESULT" | /usr/bin/python3 -c 'import sys,json;print(json.load(sys.stdin)["journal_sha256"])')
   ACTUAL=$(sha256sum "$RUN/journal.json" | cut -d ' ' -f1)
@@ -116,7 +189,7 @@ j() {
 
 Initial admit uses '-' journal/release pins only and no fixtures. After admit,
 set RPIN to Alma's independently reviewed fixture-release SHA before first J1
-command. Every later operation carries APIN/JPIN/RPIN explicitly. The launcher
+command. Every later operation carries APIN/JPIN/RPIN/CPIN explicitly. The launcher
 checks pins BEFORE attempt creation/spawn; PHP rechecks under the owner/private
 operations.lock BEFORE pending intent. Stale pins do not rewrite the journal.
 After every operation j() compares the child pin to an independent file hash and
@@ -125,7 +198,7 @@ Copy that current journal privately to the browser PC and transmit JPIN before e
 browser action; never serve the journal/receipt files from the website.
 
 Every fault calls scj_context in the existing supervised PHP child, with the shared
-lock held and durable pending intent storing all three input pins. scj_with_fault
+lock held and durable pending intent storing all four input pins. scj_with_fault
 receives the ORIGINAL admitted journal and passes a projected COPY only to the
 actual Ads consumer/browser/builders/synthetic-dispatch callback. scj_snapshot
 and real API prove historical hashes and positive baseline before injection.
@@ -139,15 +212,17 @@ route. Set the actual local paths/pins and run:
 
 ```powershell
 $env:NODE_PATH='C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules'
-& 'C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' "$LocalOps\joint-browser.cjs" $PrivateAllocation $AllocationPin $PrivateRelease $ReleasePin $PrivateJournal $CurrentJournalPin
+& 'C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' "$LocalOps\joint-browser.cjs" $PrivateAllocation $AllocationPin $PrivateRelease $ReleasePin $PrivateJournal $CurrentJournalPin $PrivateContext $ContextPin
 ```
 
-Driver verifies independent files/controller hash, creates ONE fresh context with
-service workers blocked, aborts cross-origin requests BEFORE navigation, loads
+Driver verifies independent files/controller hash and attaches ONLY to an existing
+reviewed controlled CDP context/tab. It never launches Chrome or creates a context
+or page. It refuses a site service worker, aborts cross-origin page requests BEFORE
+navigation, verifies authenticated access and the exact form, then loads
 exact consent-browser.js and calls SiteEngineJointConsent.start. All capture,
 withdrawal, pending/failure/restoration/retry, submit and admit actions delegate to
 that pinned owner controller. Business/email fields come from allocated synthetic
-inputs; driver never fills the receipt field. No raw bearer, token or cookie dump.
+typed inputs; driver never fills any consent authority or receipt field. No raw bearer, token or cookie dump.
 
 Each command ends with current independent JHASH, not a literal placeholder.
 Driver reads/hashes the private current journal before every command; refresh the
@@ -187,7 +262,7 @@ replace JHASH with the current independent pin. Stop on first unexpected result.
 | J4 | `j probe A deny`; `j probe C allow`; `j prepare C -`; `j dispatch C allow`; `j consent A withdrawn`; `j consent B denied`; `j consent C eligible`; `j stage J4 -` | current head3; A withdrawn, B denied, C eligible; personalization differs independently |
 | J5 | `j missing C -`; `j restore C -`; `j fault C unavailable-head`; `j fault C failed-current-read`; `j stage J5 -` | request-only skip then immediate NORMAL request positive restoration; head faults preserve historical verification and block all actual consumers/dispatch |
 | J6 | `j policy C -`; `j dnc-on C -`; `j probe C dnc`; `j dispatch C deny`; `j dnc-off C -`; `j archive A -`; `j probe A deny`; `j unarchive A -`; `j rebind A restore`; `j stage J6 -` | policy/DNC restored; A immutable inquiry despite pointer B, active C vs archived reached-stage A; Denied A/Granted C personalization;21/94 |
-| J7 | `j begin J7 -`; browser close JHASH; `j close - -` | reference checks FIRST, exact-ID cleanup/form restoration, retain audit/head/barriers |
+| J7 | `j begin J7 -`; browser close JHASH; `j close - -` | prove parents + metadata first; retain graph if metadata present; otherwise reference checks then exact-ID cleanup |
 | J7 owner | restore only scoped J0 controls after owned work ceased; independent closure-owner receipt below | actual zero delivery/baseline comparison evidence |
 | J7 | `j stage J7 -` | earlier stages PASS, exactly3 retained audit links/head3, verified closure |
 
@@ -223,7 +298,8 @@ Policy is request-local Config only, restored in finally and positively reprobed
 J7 checks frozen responses/details, owner emails/inquiry identities, immutable
 Consent receipts/links and nondecreasing barriers, complete logical references and
 actual FK metadata BEFORE any restore/delete. Foreign/unknown/cross-DB references
-stop cleanup. Only owned entries/details,contacts/meta/pivots,inquiries are removed;
+stop cleanup. Only when submission metadata is absent and every reference check passes,
+owned entries/details,contacts/meta/pivots,inquiries may be removed;
 original form bytes guarded/restored and activation/config/package hashes compared.
 ALL3 receipts/links and chain/head/barriers remain Consent-owned, with exact IDs
 retained privately. No purge, uninstall, whole-DB restore or old-head rollback.
@@ -236,28 +312,29 @@ No fabricated measurements; J7 refuses incomplete prior stages or audit counts.
 Later stages remain NOT RUN on failure. Recovery is an explicit Alma/Helper decision,
 never an automatic replay or broad cleanup of retained/foreign allocations.
 
-## Focused local checks and copyable handback
+## Focused local checks and handback
 
-From canonical Ads checkout, existing PHP8.3.36 -n runs
- tests/joint-operations-acceptance.php and
- tests/joint-consent-integration.php ../consent-rc2-review-20261029.
-The latter verifies exact retained authority/continuity/SQL-fixture hashes and
-executes NEW integration callbacks only: real Consent/Ads evidence algorithms,
-synthetic SQL and consumer/HTTP boundaries. It is not native/installed evidence.
-Existing Python runs tests/joint-run-acceptance.py; existing Node runs
- tests/joint-browser-acceptance.cjs and --check tools/acceptance/joint-browser.cjs.
-Lint the two PHP tests, joint-ops.php and pinned consent-joint.php with -n -l.
-Actual local results:24 ownership/pin/stage assertions +25 integrated callback
-assertions;7 Python tests;8 actual-driver admission fixtures +10 exact-ID parser
-checks;4 PHP lint +2 JS syntax checks PASS. Launch/consumer/SQL boundaries in these
-checks are explicitly doubled; installed WordPress/Linux/browser behavior NOT RUN.
-No unchanged candidate suite, database provisioning, browser or WP bootstrap.
+Exact local commands from the canonical Ads source (never installed execution):
 
-Through Aubrey to Alma coordinator: integrate/pin this package against Consent
-operations ae2fe50 and manifest0798f8f6. Owner controller and scj_with_fault are used
-unchanged. Exact remaining site inputs are J0's actual vendor response ID path,
-allocated form/terms/reference map and independent allocation/release/journal pins;
-if the response exposes no correlatable ID, that specific vendor admission gap is
-the blocker. Review/release J1–J6 only after these inputs and controls are recorded.
-J0 independent; Alma Codex remains sole executor/cleanup owner. Advertising API
-neither authorizes email nor derives permission from email subscription status.
+```powershell
+$Php='../local-test-runtime/php-8.3.36/php.exe'
+$Python='C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$Node='C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe'
+& $Php -n tests/joint-context-acceptance.php '<local retained cli-control.php source path>'
+& $Php -n tests/joint-operations-acceptance.php
+& $Python -B tests/joint-run-acceptance.py
+& $Node tests/joint-browser-acceptance.cjs
+```
+
+Results are recorded in REVIEW-R4.md. All SQL, browser, filter and WP-CLI boundaries
+are local doubles, not installed proof. The unchanged 25 real-Consent algorithm /
+synthetic-storage callback checks from r3 are historical evidence, not rerun here.
+No unchanged runtime suite, database provisioning, browser or bootstrap executed.
+
+Consent handback is CONSENT-TARGET-HANDBACK-R4.md, for Aubrey to relay. Completed J0
+and original 29-check map carry forward. Alma Codex remains sole server executor
+and cleanup owner. Exact response path is source-verified; actual first response
+remains untested. Review J1–J6 only after Consent publishes the target correction,
+Alma pins/reviews its derivative and private context, and the existing authenticated
+browser capability inputs and fixture release are issued. Advertising API neither
+authorizes email nor derives permission from email subscription status.

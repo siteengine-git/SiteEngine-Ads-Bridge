@@ -59,6 +59,8 @@ function jx_allocation( array $a ) {
         }
         jx_assert( $found, 'required logical reference edge missing' );
     }
+    $edge = false; foreach ( $a['logical_references'] as $ref ) { if ( $ref['table'] === $a['prefix'] . 'fluentform_submission_meta' && $ref['column'] === 'response_id' && $ref['kind'] === 'entry' ) { $edge = true; } }
+    jx_assert( $edge, 'reviewed submission_meta.response_id edge required' );
     return $a;
 }
 function jx_pin( $path, $sha ) {
@@ -170,7 +172,7 @@ function jx_execute( $op, $label, array $a, array &$j ) {
     }
     if ( $op === 'admit' ) {
         jx_assert( ! $j, 'journal already initialized' );
-        seab_joint_observe( array( 'site' => $a['site'], 'prefix' => $a['prefix'], 'form_id' => $a['form_id'], 'cases' => array(), 'assignment' => $a['assignment'], 'phase' => 'J1' ) );
+        seab_joint_observe( array( 'site' => $a['site'], 'prefix' => $a['prefix'], 'form_id' => $a['form_id'], 'cases' => array(), 'assignment' => $a['assignment'], 'phase' => 'J1', 'target_context' => $a['_context']['target'] ) );
         foreach ( array( 'receipts', 'events', 'chains' ) as $key ) {
             $engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s', $t[$key] ) );
             jx_assert( strtoupper( (string) $engine ) === 'INNODB' && ! $wpdb->last_error, 'InnoDB prerequisite' );
@@ -370,12 +372,37 @@ function jx_execute( $op, $label, array $a, array &$j ) {
     if ( $op === 'close' ) { return jx_close( $a, $j ); }
     throw new RuntimeException( 'unrecognized operation' );
 }
+function jx_submission_meta( array $a, array &$j ) {
+    global $wpdb; $retained = array(); $table = $a['prefix'] . 'fluentform_submission_meta';
+    try {
+    foreach ( $j['entries'] as $label => $entry ) {
+        $rows = $wpdb->get_results( $wpdb->prepare( "SELECT id,response_id FROM `{$table}` WHERE response_id=%d ORDER BY id LIMIT 513", $entry['id'] ), ARRAY_A );
+        jx_assert( is_array( $rows ) && ! $wpdb->last_error && count( $rows ) <= 512, 'submission metadata incomplete/unreadable; retain resources' );
+        foreach ( $rows as $row ) {
+            jx_assert( isset( $row['id'], $row['response_id'] ) && ctype_digit( (string) $row['id'] ) && (int) $row['id'] > 0
+                && (string) $row['response_id'] === (string) $entry['id'] && ! isset( $retained[(string) $row['id']] ), 'ambiguous/foreign submission metadata; retain resources' );
+            $retained[(string) $row['id']] = array( 'response_id' => $entry['id'], 'entry_label' => $label );
+        }
+    }
+    } catch ( Throwable $e ) {
+        $j['closure_disposition'] = 'UNRESOLVED_NOT_CLEAN';
+        $j['submission_meta_evidence'] = array( 'status' => 'UNRESOLVED', 'delete_authority' => false ); jx_intent( $j ); throw $e;
+    }
+    if ( $retained ) {
+        $j['retained_resources']['submission_meta'] = array( 'table' => $table, 'rows' => $retained, 'disposition' => 'RETAIN_NO_DELETE_AUTHORITY', 'cleanup_owner' => 'Alma Codex' );
+        $j['closure_disposition'] = 'RETAINED_NOT_CLEAN'; jx_intent( $j );
+        throw new JX_Stop( 'submission metadata retained: no cleanup authorization; fixture graph/controls retained, J7 not clean' );
+    }
+    $j['submission_meta_evidence'] = array( 'status' => 'VERIFIED_ABSENT', 'delete_authority' => false );
+    return array( 'submission_meta' => 'VERIFIED_ABSENT', 'delete_actions' => 0 );
+}
 function jx_close( array $a, array &$j ) {
     global $wpdb; $t = $a['tables']; jx_assert( empty( $j['dnc'] ) && empty( $j['pointer_rebound'] ), 'restore owned pointer/DNC membership before closure' );
     $entries = array_column( $j['entries'], 'id' ); $contacts = array_values( $j['contacts'] ); $inquiries = array_values( $j['inquiries'] );
     foreach ( $j['entries'] as $label => $e ) { jx_owned_entry( $a, $j, $label ); }
     if ( isset( $j['entries']['A'] ) ) { jx_audit( $a, $j, jx_owned_entry( $a, $j, 'A' ) ); }
     foreach ( $j['contacts'] as $label => $id ) { jx_contact( $a, $j, $label ); }
+    jx_submission_meta( $a, $j );
     // J0 supplies reviewed logical references; discover actual FK edges too. Unknown references stop deletion.
     $fk = $wpdb->get_results( $wpdb->prepare( 'SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE() AND REFERENCED_TABLE_NAME IN (%s,%s,%s) LIMIT 65', $t['contacts'], $t['submissions'], $t['inquiries'] ), ARRAY_A );
     jx_assert( is_array( $fk ) && count( $fk ) < 65 && ! $wpdb->last_error && ( $a['reference_map_reviewed'] ?? false ) === true, 'reference coverage incomplete' );
@@ -402,7 +429,7 @@ function jx_close( array $a, array &$j ) {
         $r = SiteEngine_Ads_Bridge_Inquiries::get( $id );
         jx_assert( is_array( $r ) && (int) $r['contact_id'] === $j['contacts'][$label] && (int) $r['submission_id'] === $j['entries'][$label]['id'], 'cleanup inquiry provenance changed' );
     }
-    seab_joint_observe( array( 'site' => $a['site'], 'prefix' => $a['prefix'], 'form_id' => $a['form_id'], 'cases' => array() ) );
+    seab_joint_observe( array( 'site' => $a['site'], 'prefix' => $a['prefix'], 'form_id' => $a['form_id'], 'cases' => array(), 'target_context' => $a['_context']['target'] ) );
     $cfg = SiteEngine_Ads_Bridge_Config::instance(); $cp = new ReflectionProperty( $cfg, 'config' ); $cp->setAccessible( true );
     jx_assert( hash( 'sha256', serialize( $cp->getValue( $cfg ) ) ) === $j['baseline']['config_sha256'], 'configuration drift; retain resources' );
     $form = jx_db_row( $t['forms'], $a['form_id'] );
@@ -446,7 +473,7 @@ function jx_stage( $stage, array $a, array &$j ) {
             $has( 'rebind', 'A', 'B' ); $has( 'rebind', 'A', 'restore' ); $has( 'archive', 'A' ); $has( 'unarchive', 'A' ); $has( 'dispatch', 'C', 'deny' );
             jx_assert( $j['prepared']['A']['values'][16] === 'Granted' && $j['prepared']['C']['values'][16] === 'Granted' && $j['prepared']['C']['values'][17] === 'Granted' && $j['prepared']['A']['values'][17] === 'Denied', 'effective personalization boundary evidence missing' ); break;
         case 'J7':
-            jx_assert( ! empty( $j['closed'] ), 'owned cleanup not complete' );
+            jx_assert( ! empty( $j['closed'] ) && empty( $j['retained_resources'] ), 'owned cleanup not clean; retained submission metadata/resources prevent PASS' );
             foreach ( array( 'J1', 'J2', 'J3', 'J4', 'J5', 'J6' ) as $prior ) { jx_assert( $j['stages'][$prior] === 'PASS', 'earlier stage incomplete' ); }
             $file = $a['run_dir'] . '/closure-owner.json'; $v = jx_json( $file );
             jx_assert( hash_file( 'sha256', $file ) === trim( file_get_contents( $file . '.sha256' ) )
@@ -460,13 +487,17 @@ function jx_stage( $stage, array $a, array &$j ) {
 if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
     $path = null; $j = array(); $lock = null; $journal_authorized = false;
     try {
-        jx_assert( defined( 'WP_CLI' ) && WP_CLI && isset( $args ) && count( $args ) === 7, 'WP eval-file: op label argument allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA' );
-        list( $op, $label, $argument, $file, $sha, $journal_sha, $release_sha ) = $args;
+        jx_assert( defined( 'SEAB_JOINT_PREBOOT_GUARD_VERIFIED' ) && SEAB_JOINT_PREBOOT_GUARD_VERIFIED === true, 'verified retained pre-bootstrap guard required' );
+        jx_assert( defined( 'WP_CLI' ) && WP_CLI && isset( $args ) && count( $args ) === 9, 'WP eval-file: op label argument allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA context.json CONTEXT_SHA' );
+        list( $op, $label, $argument, $file, $sha, $journal_sha, $release_sha, $context_file, $context_sha ) = $args;
         jx_assert( preg_match( '/^[a-f0-9]{64}$/D', $sha ) && hash_file( 'sha256', $file ) === $sha, 'allocation hash mismatch' );
         $a = jx_allocation( jx_json( $file ) ); $a['_sha256'] = $sha; $a['_argument'] = $argument; $a['_release_sha256'] = $release_sha;
+        jx_assert( ! is_link( $context_file ) && ( fileperms( $context_file ) & 0777 ) === 0600 && fileowner( $context_file ) === posix_geteuid(), 'private context owner/mode mismatch' );
+        jx_pin( $context_file, $context_sha ); $a['_context'] = jx_json( $context_file );
+        jx_assert( realpath( $context_file ) === $a['run_dir'] . '/context.json' && $a['_context']['allocation_sha256'] === $sha && $a['_context']['assignment'] === $a['assignment'], 'private context binding mismatch' );
         jx_assert( ! is_link( $file ) && realpath( $file ) === $a['run_dir'] . '/allocation.json' && realpath( dirname( $file ) ) === $a['run_dir'] && posix_geteuid() === $a['owner_uid'] && ( fileperms( dirname( $file ) ) & 0777 ) === 0700, 'owner/private path mismatch' );
         jx_assert( ( fileperms( $file ) & 0777 ) === 0600, 'allocation must be0600' );
-        global $wpdb; jx_assert( home_url( '/' ) === $a['site'] && $wpdb->prefix === $a['prefix'], 'target mismatch' );
+        global $wpdb; seab_joint_target( $a['_context']['target'] ); jx_assert( $wpdb->prefix === $a['prefix'] && $a['owner_uid'] === $a['_context']['target']['owner_uid'], 'target allocation mismatch' );
         $lockpath = $a['run_dir'] . '/operations.lock';
         if ( ! file_exists( $lockpath ) ) { jx_assert( $op === 'admit', 'initial admission must create owned lock' ); $lock = fopen( $lockpath, 'x+' ); chmod( $lockpath, 0600 ); }
         else { jx_assert( ! is_link( $lockpath ) && fileowner( $lockpath ) === $a['owner_uid'] && ( fileperms( $lockpath ) & 0777 ) === 0600, 'shared lock owner/mode mismatch' ); $lock = fopen( $lockpath, 'r+' ); }
@@ -477,10 +508,11 @@ if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
         if ( $op !== 'admit' ) {
             $review = jx_json( $a['run_dir'] . '/fixture-release.json' );
             $review_pin = $release_sha;
-            jx_assert( $review['status'] === 'RELEASED_J1_J6_J7' && $review['allocation_sha256'] === $sha
+            jx_assert( $review['status'] === 'RELEASED_J1_J6_J7' && $review['allocation_sha256'] === $sha && ( $review['context_sha256'] ?? '' ) === $context_sha
                 && preg_match( '/^[a-f0-9]{64}$/D', $review_pin )
                 && hash_file( 'sha256', $a['run_dir'] . '/fixture-release.json' ) === $review_pin
                 && $review['operations_manifest_sha256'] === hash_file( 'sha256', __DIR__ . '/OPERATIONS-MANIFEST.json' ), 'fixture execution not released for this allocation/package' );
+            jx_assert( ( $j['context_sha256'] ?? '' ) === $context_sha, 'journal private context pin mismatch' );
             jx_assert( ! empty( $j ) && $j['allocation_sha256'] === $sha && ( empty( $j['closed'] ) || ( $op === 'stage' && $label === 'J7' ) ), 'journal identity/closure' );
             jx_assert( count( $j['results'] ) < 64, 'finite operation ceiling' );
             jx_assert( empty( $j['pending'] ) && empty( $j['stopped'] ), 'pending/failure requires explicit reviewed recovery; no replay' );
@@ -491,7 +523,7 @@ if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
             if ( $op === 'policy' ) { $j['active_stage'] = 'J6'; }
             if ( $op === 'dispatch' && $label === 'A' && ( $j['head']['revision'] ?? 0 ) === 2 ) { $j['active_stage'] = 'J3'; }
             if ( $op === 'stage' ) { $j['active_stage'] = $label; }
-            $j['pending'] = array( 'operation' => $op, 'label' => $label, 'argument' => $argument, 'at' => gmdate( 'c' ), 'allocation_sha256' => $sha, 'release_sha256' => $release_sha, 'journal_before_sha256' => $journal_sha );
+            $j['pending'] = array( 'operation' => $op, 'label' => $label, 'argument' => $argument, 'at' => gmdate( 'c' ), 'allocation_sha256' => $sha, 'release_sha256' => $release_sha, 'journal_before_sha256' => $journal_sha, 'context_sha256' => $context_sha );
             if ( $op === 'adopt' ) { $j['pending']['inquiry_id'] = 'inq_' . wp_generate_uuid4(); $j['pending']['event_id'] = 'evt_' . wp_generate_uuid4(); }
             jx_save( $path, $j );
         }
@@ -501,6 +533,7 @@ if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
         add_filter( 'pre_http_request', $no_http, PHP_INT_MAX, 3 ); add_filter( 'pre_wp_mail', $no_mail, PHP_INT_MAX, 2 );
         try { $r = jx_execute( $op, $label, $a, $j ); }
         finally { remove_filter( 'pre_http_request', $no_http, PHP_INT_MAX ); remove_filter( 'pre_wp_mail', $no_mail, PHP_INT_MAX ); }
+        if ( $op === 'admit' ) { $j['context_sha256'] = $context_sha; }
         $j['pending'] = null; $j['results'][] = array( 'operation' => $op, 'label' => $label, 'argument' => $argument, 'status' => 'PASS', 'at' => gmdate( 'c' ), 'result' => $r ); jx_save( $path, $j );
         echo json_encode( array( 'operation' => $op, 'label' => $label, 'status' => 'PASS', 'journal_sha256' => hash_file( 'sha256', $path ), 'result' => $r ) ) . "\n";
     } catch ( Throwable $e ) {

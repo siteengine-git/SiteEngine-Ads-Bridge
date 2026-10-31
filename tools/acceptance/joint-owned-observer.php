@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/joint-target.php";
 /** Local preparation only. Installed observer: SELECTs/pure builders, no fixtures/transport/cleanup. */
 function seab_joint_ledger( $json ) {
     if ( ! is_string( $json ) || strlen( $json ) > 32768 ) { throw new RuntimeException( 'ledger byte limit' ); }
@@ -39,7 +40,9 @@ function seab_joint_observe( array $m ) {
         throw new RuntimeException( 'requires separately authorized installed WP-CLI context' );
     }
     global $wpdb;
-    if ( home_url( '/' ) !== $m['site'] || $wpdb->prefix !== $m['prefix'] ) { throw new RuntimeException( 'site/prefix mismatch' ); }
+    if ( ! is_array( $m['target_context'] ?? null ) ) { throw new RuntimeException( 'independently verified target context required' ); }
+    seab_joint_target( $m['target_context'] );
+    if ( $wpdb->prefix !== $m['prefix'] ) { throw new RuntimeException( 'prefix mismatch' ); }
     // Stock primary/autocommit is a release prerequisite; fail rather than holding head locks across this run.
     foreach ( array( 'SELECT @@read_only' => '0', 'SELECT @@autocommit' => '1' ) as $sql => $expected ) {
         if ( (string) $wpdb->get_var( $sql ) !== $expected || $wpdb->last_error ) { throw new RuntimeException( 'primary/autocommit prerequisite failed' ); }
