@@ -1,0 +1,22 @@
+{
+  "source_commit": "251764d8f50db3b7b81b062141d4b6cd49b064f8",
+  "package": "joint-consent-ads-operations-20261031.zip",
+  "zip_sha256": "4b12458597d5b51928b6fd393ecde5a3b6aa9a90b77966b9be4e869d81e5937b",
+  "package_manifest_sha256": "5db433032adabc81af80ce300aec7bec717322d31c6b50da494a3dbe574d2bc7",
+  "operations_manifest_sha256": "60019717b845212b382c6f6d84a89344b955f0584ea4f587785cbbc097795c7f",
+  "verified_zip_members": 10,
+  "validation": {
+    "php_harness_assertions": 39,
+    "python_unittest_cases": 6,
+    "php_lint_passes": 2,
+    "javascript_syntax_passes": 1,
+    "candidate_payload_files_unchanged": 21,
+    "observer_sha256": "bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48",
+    "installed_acceptance": "NOT RUN",
+    "native_linux_sql_browser_evidence": "NOT RUN",
+    "server_actions": 0
+  },
+  "published_checkpoint": "recorded by subsequent Git commit; see branch history",
+  "remaining": "Consent owner review of capture/ACK faults/retention; actual Alma allocation and fixture release; J0 independent, J1-J7 NOT RUN",
+  "resource_owner": "Alma Codex; Consent audit/barrier retention owner Consent"
+}

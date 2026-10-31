@@ -1,0 +1,13 @@
+{
+  "assignment": "ALMA-JOINT-CONSENT-ADS-20261031",
+  "source_commit": "251764d8f50db3b7b81b062141d4b6cd49b064f8",
+  "acceptance": "LOCAL_HARNESS_ONLY_INSTALLED_NOT_RUN",
+  "files": {
+    "joint-owned-observer.php": "bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48",
+    "joint-ops.php": "d5d8751dc4dcbc7e9dacef707531214255fd612bdb2158e64c914bf0ed0925b5",
+    "joint-run.py": "7c219d27b7949a89aa9a89b264fe9381cc221b98cb121d56ffb4617b89e39cbd",
+    "joint-browser.cjs": "e69e824f9cc36110b0c70713e08b18c35882871d8dce36dcee876d3534566f33",
+    "allocation.template.json": "b747c1282e59207ce9f687786b19be8d2b87df84c981fdd1b81576e25f51e172",
+    "RUNBOOK-JOINT.md": "5902e79e61b0af8fdeeb5f03a5e649bc0a0c5974f03a2ae1009aa1b05d3742fb"
+  }
+}
