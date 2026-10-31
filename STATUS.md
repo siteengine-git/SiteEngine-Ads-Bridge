@@ -1,3 +1,18 @@
+## Joint acceptance coordinator intake — 2026-10-31
+
+Alma queue records ALMA-JOINT-CONSENT-ADS-20261031, local preparation complete,
+site mutation release HELD. Both candidate ZIP hashes verified. Read-only owned-ID
+observer and offline guard suite prepared in tools/acceptance/ and tests/;
+15 offline guards +2 PHP lint PASS, installed observer NOT RUN. This test-only
+checkpoint does not change candidate runtime/ZIP source2846305 or its hashes.
+Observer is not complete browser/form/fault-control implementation; owner review
+and Alma Helper's concrete release/window/resources are required before fixtures.
+J0 NOT RUN (local provenance PASS); J1-J7 NOT RUN. No server resources created,
+cleanup due0. Site executor proposed Alma Codex; local Ads harness owner this
+Codex, Consent capture/fault scope its owner. No external messages sent.
+Detailed local intake ../joint-acceptance-20261031/COORDINATOR-INTAKE.md.
+Existing untracked native material preserved, not executed or committed.
+
 ## Helper reconciliation — 2026-10-29
 
 The repeated rc.2 implementation request matches the already completed candidate.
