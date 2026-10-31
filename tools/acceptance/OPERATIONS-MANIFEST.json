@@ -1,13 +1,13 @@
 {
   "assignment": "ALMA-JOINT-CONSENT-ADS-20261031",
-  "source_commit": "251764d8f50db3b7b81b062141d4b6cd49b064f8",
+  "source_commit": "a27912b4fb7229c78010a7b8ee5dc77e68a9dce3",
   "acceptance": "LOCAL_HARNESS_ONLY_INSTALLED_NOT_RUN",
   "files": {
     "joint-owned-observer.php": "bff8339e0a3faff075069f84e1f62e1e64eab4afb9b616d81bb8a851f6470f48",
     "joint-ops.php": "d5d8751dc4dcbc7e9dacef707531214255fd612bdb2158e64c914bf0ed0925b5",
     "joint-run.py": "7c219d27b7949a89aa9a89b264fe9381cc221b98cb121d56ffb4617b89e39cbd",
-    "joint-browser.cjs": "e69e824f9cc36110b0c70713e08b18c35882871d8dce36dcee876d3534566f33",
+    "joint-browser.cjs": "ad16a89bb4d887c0e6d184b0f24a897af23d6d5aec958d658e1731544799f9af",
     "allocation.template.json": "b747c1282e59207ce9f687786b19be8d2b87df84c981fdd1b81576e25f51e172",
-    "RUNBOOK-JOINT.md": "5902e79e61b0af8fdeeb5f03a5e649bc0a0c5974f03a2ae1009aa1b05d3742fb"
+    "RUNBOOK-JOINT.md": "4c12f78bd8c56517e78249792af5be287a44a41e88077e482146638f7869975e"
   }
 }

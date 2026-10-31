@@ -15,14 +15,16 @@ One form/chain,2 contacts,10 receipt/link/submission ceilings,one head/10 revisi
 4 inquiries;64 finite server commands. Pending/failed ACK injection restores fetch
 before the explicit same-event retry. Permanent audit/barriers are retained.
 
-Tooling pin251764d8f50db3b7b81b062141d4b6cd49b064f8. Local checks PASS:
-39 PHP assertions,6 Python cases,2 PHP lint,1 JS syntax; all21 candidate payload
-files unchanged. Operations ZIP joint-consent-ads-operations-20261031.zip (10 members)
-SHA2564b12458597d5b51928b6fd393ecde5a3b6aa9a90b77966b9be4e869d81e5937b.
-Package-manifest5db433032adabc81af80ce300aec7bec717322d31c6b50da494a3dbe574d2bc7;
-operations-manifest60019717b845212b382c6f6d84a89344b955f0584ea4f587785cbbc097795c7f.
+Tooling pina27912b4fb7229c78010a7b8ee5dc77e68a9dce3. Local checks PASS:
+39 PHP assertions,6 Python cases,5 actual-driver VM admission fixtures (launch stub),
+2 PHP lint,1 JS syntax; all21 candidate payload files unchanged.
+Final operations ZIP joint-consent-ads-operations-20261031-r2.zip (11 members)
+SHA256e78f6f45f40a81345764a977974561830a2f63663d6da25125eefa5cfd645c23.
+Package-manifest5e1a4a582f122e33dee33a9579eac944d085164c99b1ce416245ad90f2903502;
+operations-manifestb2eb53a1676286a5ae27336add1d7b3418e7f4b54284118fd77bd82e0ef4832a.
 Final member pins/results: tools/acceptance/OPERATIONS-MANIFEST.json and
 OPERATIONS-RESULTS.json. ZIP/full manifest/hash sheet remain sibling deliverables.
+The earlier local package is retained unchanged; r2 supersedes it, never staged.
 These are harness-only checks, not installed acceptance. Finite next step through
 Aubrey: Consent owner reviews exact browser ACK/fault/retention boundary; Alma
 fills actual J0 inputs/reference map and pins this package for fixture release.
