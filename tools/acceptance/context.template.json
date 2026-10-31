@@ -19,11 +19,8 @@
   "reference_map_sha256": "<INDEPENDENT_COMPLETED_29_CHECK_MAP_SHA256>",
   "submission_meta_disposition": "RETAIN_NO_DELETE_AUTHORITY",
   "browser_access": {
-    "mode": "existing-cdp",
-    "endpoint": null,
-    "context_index": null,
-    "page_index": null,
-    "exclusive_tab": false,
-    "authenticated_selector": null
+    "mode": "manual-firefox",
+    "authentication": "body.logged-in AND visible #wpadminbar AND exact allocated form; verify in actual session",
+    "control": "reviewed temporary firefox-control/manifest.json; existing profile/tab only; native probe and guarded reload before capture"
   }
 }

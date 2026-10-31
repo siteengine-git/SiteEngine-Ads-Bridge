@@ -65,7 +65,7 @@ def verify_members(here):
         if path.is_absolute() or '..' in path.parts or '\\' in name or (here/name).is_symlink() or hashlib.sha256((here/name).read_bytes()).hexdigest()!=expected:
             raise ValueError('operations package member provenance')
     cm=here/'consent-pinned/CONSENT-TOOLING-MANIFEST.json'
-    if hashlib.sha256(cm.read_bytes()).hexdigest()!='0798f8f605b97afd03bbc41f7dd81068af9c5af7de89480510e941781058ab51':
+    if hashlib.sha256(cm.read_bytes()).hexdigest()!='964557de4920cbcb682b5ec0c86f0cbce8ab7cd94601824419d85558877c8883':
         raise ValueError('published Consent tooling pin mismatch')
 
 def private_json(path, value):

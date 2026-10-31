@@ -1,23 +1,24 @@
 {
   "assignment": "ALMA-JOINT-CONSENT-ADS-20261031",
   "status": "LOCAL_TOOLING_ONLY_INSTALLED_NOT_RUN",
-  "checkpoint": "consent-joint-operations-local-20261031",
-  "base_commit": "b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f",
+  "checkpoint": "consent-target-context-local-20261031-r4",
+  "base_commit": "ae2fe50dcaaa18d581ea41c06b14db3ac68f1e47",
   "runtime_commit": "1c0a42000927db720cfc60934ea5e2b31db28533",
   "runtime_zip_sha256": "8471e4761eef927bb10d44967ab88205ef0890a3b6bf90888b8d1ef2c182b619",
   "ads_runtime_commit": "2846305d19d550997295f85e58c7312b736925bd",
   "ads_handoff_commit": "409df8334a2715fe8b0d0603d174872f84a84304",
   "ads_consent_helper_sha256": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0",
   "tests": {
-    "php": 32,
-    "browser_tooling": 13,
+    "fresh_target_correction": 39,
+    "fresh_affected_tooling": 32,
+    "retained_browser_tooling_not_rerun": 13,
     "installed": "NOT RUN"
   },
   "files": [
     {
       "path": "tools/acceptance/consent-joint.php",
-      "bytes": 16402,
-      "sha256": "7bf5653787a7569d015d0db5e2fc2d3b4fc3638f135c39c309c616e662f6e0e7"
+      "bytes": 20305,
+      "sha256": "05bdc93e43241e65048d189e96d632ed78fd870977f3953191a0c4a83781100a"
     },
     {
       "path": "tools/acceptance/consent-browser.js",
@@ -26,18 +27,37 @@
     },
     {
       "path": "tools/acceptance/CONSENT-OPERATIONS.md",
-      "bytes": 22215,
-      "sha256": "cc2a7da431dd9a4bc6808f9ced7f6953f970529e464d9a71e3dfd13c12d67f3b"
+      "bytes": 23162,
+      "sha256": "089936722eeca86c25ebbab9e6e7ee7c04d53d05b4a5d4ad14825b8bb06a7a79"
     },
     {
       "path": "tests/joint-operations.php",
-      "bytes": 8804,
-      "sha256": "a81f4cfe6b822fbb997cf7ae50d2e870ce1ab603308a6f6df623a5c83133404c"
+      "bytes": 9113,
+      "sha256": "6ee8b0feb999d7018451688190873da14f859b2924a1fd7e438849c4e535bf4b"
     },
     {
       "path": "tests/joint-browser.cjs",
       "bytes": 7571,
       "sha256": "1ea34970489640f49dcf09579d83445ee7988c0d13c8468388c46f8602ca9e3e"
+    },
+    {
+      "path": "tests/joint-target.php",
+      "bytes": 5290,
+      "sha256": "d4070288f292c042f8224548263e495a3d8ba81c41a9f446ddb7f8e29d067f81"
+    },
+    {
+      "path": "tests/fixtures/joint-target-boundary.php",
+      "bytes": 4469,
+      "sha256": "f0664fbc960afa145d304acd8fe1d63a2937eaf5080de978a2122415c8afd437"
+    },
+    {
+      "path": "tools/acceptance/CONSENT-TARGET-CORRECTION-R4.md",
+      "bytes": 7508,
+      "sha256": "a802d279230e581978c120e0a2dabed7f56205856a2c58a7319e3aac0288b8bd"
     }
-  ]
+  ],
+  "ads_target_contract_commit": "09a96e132fe73d02b499dfa9fc3b7ee23d8b2acb",
+  "ads_joint_target_sha256": "2b7a5bf897dd22c1ca7a629b88566b4c9f9589e0f9f3eb8a4e2d62cfe191f117",
+  "ads_context_template_sha256": "80cd8f1c264db0821ce61c5385dd4aa87c664e136ca48dc5e446817c1d498d83",
+  "standalone_arguments": "op label mode allocation.json APIN JPIN RPIN context.json CPIN"
 }

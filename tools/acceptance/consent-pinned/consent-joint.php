@@ -1,6 +1,59 @@
 <?php
 /** Test operations only. No bootstrap, database writer, transport or cleanup. Alma executor only. */
 function scj_require($condition, string $reason): void { if (!$condition) throw new RuntimeException($reason); }
+/** Same private allocation/context/release pin contract as Ads R4; no target configuration copy. */
+function scj_private_json(string $path, string $pin, int $uid): array {
+    scj_require(preg_match('/^[a-f0-9]{64}$/D', $pin) && is_file($path) && !is_link($path)
+        && filesize($path) <= 1048576 && (fileperms($path) & 0777) === 0600
+        && fileowner($path) === $uid && posix_geteuid() === $uid, 'private context companion owner/mode/pin invalid');
+    $bytes = file_get_contents($path);
+    scj_require(is_string($bytes) && hash_equals($pin, hash('sha256', $bytes)), 'private context companion hash mismatch');
+    $value = json_decode($bytes, true); scj_require(is_array($value), 'private context companion JSON invalid');
+    return $value;
+}
+function scj_target(array $a): string {
+    $dir = $a['run_dir'] ?? '';
+    scj_require($dir === '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01'
+        && realpath($dir) === $dir && (fileperms($dir) & 0777) === 0700
+        && is_int($a['owner_uid'] ?? null) && $a['owner_uid'] > 0, 'private target run identity invalid');
+    $allocation = scj_private_json($dir . '/allocation.json', $a['_sha256'] ?? '', $a['owner_uid']);
+    foreach ($allocation as $key => $value) scj_require(array_key_exists($key, $a) && $a[$key] === $value, 'verified allocation differs');
+    $release = scj_private_json($dir . '/fixture-release.json', $a['_release_sha256'] ?? '', $a['owner_uid']);
+    scj_require(($release['status'] ?? '') === 'RELEASED_J1_J6_J7' && ($release['allocation_sha256'] ?? '') === $a['_sha256'], 'context fixture release binding invalid');
+    $pin = $release['context_sha256'] ?? '';
+    scj_require(is_string($pin), 'context pin missing');
+    $context = scj_private_json($dir . '/context.json', $pin, $a['owner_uid']);
+    scj_require(($context['assignment'] ?? '') === ($a['assignment'] ?? null)
+        && ($context['allocation_sha256'] ?? '') === $a['_sha256'] && is_array($context['target'] ?? null)
+        && isset($a['_context']) && $a['_context'] === $context, 'missing/unverified supplied context');
+    if (isset($a['_context_sha256'])) scj_require($a['_context_sha256'] === $pin, 'independent context pin differs');
+    $helper = __DIR__ . '/joint-target.php';
+    $helper_pin = '2b7a5bf897dd22c1ca7a629b88566b4c9f9589e0f9f3eb8a4e2d62cfe191f117';
+    if (!function_exists('seab_joint_target')) {
+        scj_require(is_file($helper) && hash_file('sha256', $helper) === $helper_pin, 'pinned Ads joint-target.php required beside standalone tooling');
+        require_once $helper;
+    }
+    scj_require(hash_file('sha256', (new ReflectionFunction('seab_joint_target'))->getFileName()) === $helper_pin, 'loaded Ads target helper pin mismatch');
+    scj_require(($a['site'] ?? '') === 'https://alma.siteengine.space/'
+        && $a['site'] === ($context['target']['browser_origin'] ?? '') . '/'
+        && ($a['prefix'] ?? null) === ($context['target']['prefix'] ?? null)
+        && $a['owner_uid'] === ($context['target']['owner_uid'] ?? null), 'allocation/browser/private target mismatch');
+    seab_joint_target($context['target']);
+    return $pin;
+}
+/** Standalone CPIN and RPIN come from independent executor arguments, never an injected array. */
+function scj_cli_context(array $a, string $path, string $context_pin, string $release_pin): array {
+    scj_require($path === ($a['run_dir'] ?? '') . '/context.json' && realpath($path) === $path, 'standalone context path mismatch');
+    $a['_context'] = scj_private_json($path, $context_pin, $a['owner_uid']);
+    $a['_context_sha256'] = $context_pin; $a['_release_sha256'] = $release_pin;
+    scj_target($a);
+    return $a;
+}
+function scj_cli_arguments(array $args): array {
+    scj_require(count($args) === 9, 'eval-file: inspect|fault LABEL MODE allocation.json APIN JPIN RPIN context.json CPIN');
+    foreach ([4,5,6,8] as $index) scj_require(is_string($args[$index]) && preg_match('/^[a-f0-9]{64}$/D', $args[$index]), 'independent file pin required');
+    return $args;
+}
 function scj_allocation(array $a, array $j): void {
     scj_require(($a['assignment'] ?? '') === 'ALMA-JOINT-CONSENT-ADS-20261031'
         && ($a['site'] ?? '') === 'https://alma.siteengine.space/'
@@ -27,7 +80,7 @@ function scj_allocation(array $a, array $j): void {
 function scj_owned(array $a, array $j, string $label): array {
     global $wpdb;
     scj_allocation($a, $j);
-    scj_require(home_url('/') === $a['site'] && $wpdb->prefix === $a['prefix'], 'target mismatch');
+    scj_require(($j['context_sha256'] ?? null) === scj_target($a) && $wpdb->prefix === $a['prefix'], 'target/journal context mismatch');
     scj_require(in_array($label, ['A','B','C'], true) && isset($j['entries'][$label]), 'entry not admitted by exact ID');
     $entry = $j['entries'][$label]; $table = $a['tables']['submissions'];
     $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM `{$table}` WHERE id = %d", $entry['id']), ARRAY_A);
@@ -147,8 +200,8 @@ function scj_with_fault(array $a, array $j, string $label, string $mode, callabl
 function scj_context(array $a): void {
     global $wpdb;
     scj_require(defined('WP_CLI') && WP_CLI && defined('SE_CONSENT_VERSION') && SE_CONSENT_VERSION === '0.6.1-rc.2'
-        && rtrim(ABSPATH, '/') === '/home/alma.siteengine.space/public_html'
-        && home_url('/') === $a['site'] && $wpdb->prefix === $a['prefix'], 'installed target/runtime mismatch');
+        && $wpdb->prefix === $a['prefix'], 'installed target/runtime mismatch');
+    scj_target($a);
     foreach (['SELECT @@read_only' => '0', 'SELECT @@autocommit' => '1'] as $sql => $expected) scj_require((string) $wpdb->get_var($sql) === $expected && !$wpdb->last_error, 'primary/autocommit unavailable');
     foreach (['SiteEngine_Consent_Authority' => '6d49bfe9006fc108d198dea7309b6dae88e123466d2e0767a2aa74391e4488c9',
         'SiteEngine_Consent_Continuity' => '660c83315e50ae6f159ddcb3f97f28b1f960c726bb5c9be62a0cdccd2507fe3d'] as $class => $hash) {
@@ -158,9 +211,8 @@ function scj_context(array $a): void {
 if (!defined('SCJ_LIBRARY_ONLY')) {
     $lock = null;
     try {
-        scj_require(defined('WP_CLI') && WP_CLI && isset($args) && count($args) === 7, 'eval-file: inspect|fault LABEL MODE allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA');
-        [$op,$label,$mode,$path,$sha,$journal_sha,$release_sha] = $args;
-        foreach ([$sha,$journal_sha,$release_sha] as $pin) scj_require((bool) preg_match('/^[a-f0-9]{64}$/D', $pin), 'independent file pin required');
+        scj_require(defined('WP_CLI') && WP_CLI && isset($args) && is_array($args), 'authorized WP eval-file context required');
+        [$op,$label,$mode,$path,$sha,$journal_sha,$release_sha,$context_file,$context_sha] = scj_cli_arguments($args);
         scj_require(is_file($path) && filesize($path) <= 1048576 && hash_file('sha256', $path) === $sha, 'allocation pin mismatch');
         $a = json_decode(file_get_contents($path), true); scj_require(is_array($a), 'allocation JSON invalid'); $a['_sha256'] = $sha;
         $dir = $a['run_dir'] ?? ''; scj_require($dir === '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01' && realpath(dirname($path)) === $dir, 'private run path mismatch');
@@ -176,6 +228,7 @@ if (!defined('SCJ_LIBRARY_ONLY')) {
         $lock = fopen($dir . '/operations.lock', 'r+'); scj_require(is_resource($lock) && flock($lock, LOCK_EX | LOCK_NB), 'joint operation already active');
         scj_require(hash_file('sha256', $dir . '/journal.json') === $journal_sha, 'journal pin mismatch');
         $j = json_decode(file_get_contents($dir . '/journal.json'), true); scj_require(is_array($j) && empty($j['pending']), 'pending operation; no retry');
+        $a = scj_cli_context($a, $context_file, $context_sha, $release_sha);
         scj_allocation($a,$j); scj_context($a);
         if ($op === 'inspect') {
             scj_require(in_array($mode, ['eligible','withdrawn','denied'], true), 'inspect requires explicit expected reason');

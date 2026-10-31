@@ -1,5 +1,7 @@
 # Consent J1–J6 operations — 2026-10-31, local tooling complete
 
+R4 target correction: [CONSENT-TARGET-CORRECTION-R4.md](CONSENT-TARGET-CORRECTION-R4.md) separates pinned stored/effective HTTP identity from HTTPS browser identity. Completed J0 is preserved, not rerun. Callback and standalone commands require the existing authenticated private context contract below.
+
 No installed case was run. The coordinator release allows J0 preparation/installation only; its J1–J6 fixture gate remains closed. Alma Codex alone executes server operations/cleanup. Aubrey is the proposed browser operator. This tooling adds no runtime feature and changes no candidate/package byte. Deliver this document through Aubrey; no external messages were sent.
 
 Dependencies: Consent implementation `1c0a42000927db720cfc60934ea5e2b31db28533`, docs `b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f`, ZIP SHA256 `8471e4761eef927bb10d44967ab88205ef0890a3b6bf90888b8d1ef2c182b619`. Ads implementation `2846305d19d550997295f85e58c7312b736925bd`, final handoff `409df8334a2715fe8b0d0603d174872f84a84304`. Do not rebuild/install Consent for this task.
@@ -20,7 +22,7 @@ Actual IDs do not exist before vendor creation. Obtain each exact ID from that o
 
 J0 must allocate the exact `browser.page_url` and `browser.form_selector` and verify the selected Fluent Forms node has the matching `data-form_id`, normal AJAX submission, a real `se_consent_receipt_id` echo that survives sanitization, and the two Ads-owned hidden fields `se_joint_marker` / `se_joint_case`. No fields are added by Consent. J0 records their exact master-form field IDs and notification/feed/provider/cache controls. Business fields/contact mapping come from the same allocation (A/B contact A, C contact C); the two synthetic contacts remain Ads-owned. Browser analytics/advertising delivery must already be blocked before page load. Never use this helper to certify egress isolation.
 
-Use a fresh operator-only browser context for first capture, preserve it throughout, and do not clear storage between cases. Load `consent-browser.js` as a reviewed DevTools Snippet (paste the file verbatim; loading it performs no capture). The helper uses actual `SiteEngineConsent.saveConsent(input, method)`, `rejectNonEssential()`, `getConsent()` and `retryAudit()`; no forged browser ACK or separate continuity token is issued. It never prints the raw bearer key/token. Obtain reviewed private JSON files through Alma’s approved local handling; do not serve them from the site or upload them.
+Use only the existing coordinator-controlled browser attachment and authenticated DOM marker from the private context; do not provision a browser/profile/environment. Preserve that context throughout and do not clear storage between cases. Controller refusal requires review, not a new environment. Load `consent-browser.js` as a reviewed DevTools Snippet (paste the file verbatim; loading it performs no capture). The helper uses actual `SiteEngineConsent.saveConsent(input, method)`, `rejectNonEssential()`, `getConsent()` and `retryAudit()`; no forged browser ACK or separate continuity token is issued. It never prints the raw bearer key/token. Obtain reviewed private JSON files through Alma’s approved local handling; do not serve them from the site or upload them.
 
 Paste these helpers once, then choose the corresponding private files. The SHA values are independent pins from Alma, not self-approval of selected bytes:
 
@@ -91,10 +93,10 @@ Resume refuses unknown/pending/failed state, a different receipt, journal/curren
 
 ## Exact server command interface (Alma only, after fixture release)
 
-PHP file: private `$Run/consent-joint.php`, source hash pinned by the tooling manifest. Actual CLI arguments are **seven** after the eval-file path:
+PHP file: private `$Run/consent-joint.php`, source hash pinned by the tooling manifest. Actual CLI arguments are **nine** after the eval-file path:
 
 ```text
-inspect|fault LABEL MODE allocation.json ALLOCATION_SHA JOURNAL_SHA RELEASE_SHA
+inspect|fault LABEL MODE allocation.json APIN JPIN RPIN context.json CPIN
 ```
 
 Use the already recorded profile/shared owner route, not a new SSH script. These are paste-ready argument arrays for the canonical runner; the assigned profile and reviewed pins must be supplied by Alma:
@@ -105,9 +107,10 @@ $Run = '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261
 $AllocationSha = '<Alma-reviewed allocation SHA256>'
 $JournalSha = '<current exact-ID journal SHA256>'
 $ReleaseSha = '<Alma-reviewed fixture-release SHA256>'
+$ContextSha = '<independent private context SHA256>'
 $InvokeSiteWp = 'D:\SiteEngine\Agency\AI-Workspace\Invoke-Site-Wp.ps1'
 $Arguments = @('eval-file', "$Run/consent-joint.php", 'inspect', 'A', 'eligible',
-  "$Run/allocation.json", $AllocationSha, $JournalSha, $ReleaseSha)
+  "$Run/allocation.json", $AllocationSha, $JournalSha, $ReleaseSha, "$Run/context.json", $ContextSha)
 & $InvokeSiteWp -SiteProfile $Profile -TimeoutSeconds 20 -WpArguments $Arguments
 ```
 
@@ -117,11 +120,11 @@ Standalone J2/J5 fault probe example (set mode from the table, exact owned label
 
 ```powershell
 $Arguments = @('eval-file', "$Run/consent-joint.php", 'fault', 'C', 'failed-current-read',
-  "$Run/allocation.json", $AllocationSha, $JournalSha, $ReleaseSha)
+  "$Run/allocation.json", $AllocationSha, $JournalSha, $ReleaseSha, "$Run/context.json", $ContextSha)
 & $InvokeSiteWp -SiteProfile $Profile -TimeoutSeconds 20 -WpArguments $Arguments
 # Positive original-state readback after success OR a failed probe:
 $Arguments = @('eval-file', "$Run/consent-joint.php", 'inspect', 'C', 'eligible',
-  "$Run/allocation.json", $AllocationSha, $JournalSha, $ReleaseSha)
+  "$Run/allocation.json", $AllocationSha, $JournalSha, $ReleaseSha, "$Run/context.json", $ContextSha)
 & $InvokeSiteWp -SiteProfile $Profile -TimeoutSeconds 20 -WpArguments $Arguments
 ```
 
@@ -129,7 +132,7 @@ Do not execute direct commands until the joint runner’s owner has integrated t
 
 ## Fault table and callable Ads integration
 
-`scj_with_fault(array $allocation, array $journal, string $label, string $mode, callable $callback): array` takes only original admitted journal evidence. A successfully reviewed caller invokes `scj_context($allocation)` first, holds the shared operations lock, validates the independently pinned allocation/release/current journal and records its pending operation before calling. Load with `define('SCJ_LIBRARY_ONLY', true); require $Run . '/consent-joint.php';`. Set allocation `_sha256` to the independently verified allocation pin. The callback receives a **copy** of the journal with only projected response_sha256 adjusted; global `$wpdb` is the temporary read view. It never replaces a real original hash in the private journal.
+`scj_with_fault(array $allocation, array $journal, string $label, string $mode, callable $callback): array` takes only original admitted journal evidence. A successfully reviewed caller invokes `scj_context($allocation)` first, holds the shared operations lock, validates the independently pinned allocation/release/current journal/context and records its pending operation before calling. Load with `define('SCJ_LIBRARY_ONLY', true); require $Run . '/consent-joint.php';`. Set allocation `_sha256` to APIN, `_release_sha256` to RPIN, `_context` to the exact authenticated context companion, and journal `context_sha256` to CPIN. Reuse Ads R4 joint-target.php; do not equate effective home_url with browser site. The callback receives a **copy** of the journal with only projected response_sha256 adjusted; global `$wpdb` is the temporary read view. It never replaces a real original hash in the private journal.
 
 | Mode / label | Injected view, expected result | Persistent mutations |
 | --- | --- | --- |
@@ -178,8 +181,8 @@ Run focused local tooling checks only:
 $PHP = 'D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\local-test-runtime\php-8.3.36\php.exe'
 $Consent = 'D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Consent\source'
 $Ads = 'D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\source'
-& $PHP -n "$Consent/tests/joint-operations.php" "$Ads/includes/class-siteengine-ads-bridge-consent.php"
+& $PHP -n "$Consent/tests/joint-operations.php" "$Ads/includes/class-siteengine-ads-bridge-consent.php" "$Ads/tools/acceptance/joint-target.php"
 node "$Consent/tests/joint-browser.cjs"
 ```
 
-These execute no installed WordPress/browser/SQL. The 32 PHP + 13 browser-tooling checks passed; two new PHP files lint and both JavaScript files syntax-check clean. Existing runtime suites were not repeated. The actual pinned Ads helper matches implementation2846305 (line endings normalized); only the SQL/DOM/storage/transport boundaries are doubled.
+Add tests/joint-target.php with the same two dependency arguments for the 39 focused R4 target checks. These execute no installed WordPress/browser/SQL. The 32 PHP + 13 browser-tooling checks passed; two new PHP files lint and both JavaScript files syntax-check clean. Existing runtime suites were not repeated. The actual pinned Ads helper matches implementation2846305 (line endings normalized); only the SQL/DOM/storage/transport boundaries are doubled.

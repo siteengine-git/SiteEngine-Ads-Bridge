@@ -26,14 +26,14 @@ foreach ( array( 'includes/class-siteengine-consent-authority.php' => '6d49bfe90
     require $external . '/' . $file;
 }
 require dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-consent.php';
-require dirname( __DIR__ ) . '/tools/acceptance/joint-ops.php';
+define('SCJ_LIBRARY_ONLY',true); require dirname(__DIR__).'/tools/acceptance/consent-pinned/consent-joint.php';
 class SiteEngine_Ads_Bridge_Config {
     private $config = array( 'consent.required_policy_version' => SE_CONSENT_POLICY_VERSION ); private static $instance;
     public static function instance() { return self::$instance ?? ( self::$instance = new self() ); }
     public function get( $k, $fallback = null ) { return $this->config[$k] ?? $fallback; }
 }
 class SiteEngine_Ads_Bridge_Inquiries { public static $rows = array(); public static function get( $id ) { return self::$rows[$id] ?? null; } }
-function integration_current( $entry ) { global $wpdb; return SiteEngine_Ads_Bridge_Consent::current( $entry, 3, 'fixture_fluentform_submissions', $wpdb, SE_CONSENT_POLICY_VERSION ); }
+function integration_current( $entry ) { global $wpdb; return SiteEngine_Ads_Bridge_Consent::current( $entry, 3, 'wp_fluentform_submissions', $wpdb, SE_CONSENT_POLICY_VERSION ); }
 class SiteEngine_Ads_Bridge_Runtime {
     public static function inject_confirmation_payload( $r, $form, $c, $entry, $data ) { return integration_current( $entry )['allowed'] ? array( 'siteengine_ads_bridge' => array() ) : array(); }
 }
@@ -57,7 +57,7 @@ class SiteEngine_Ads_Bridge_CLI {
     }
 }
 class Integration_DB {
-    public $prefix = 'fixture_', $last_error = '', $entries = array(), $seed;
+    public $prefix = 'wp_', $last_error = '', $entries = array(), $seed;
     public function __construct( $seed ) { $this->seed = $seed; }
     public function prepare( $q, ...$args ) { foreach ( $args as $v ) { $q = preg_replace_callback( '/%[sd]/', static function( $m ) use ( $v ) { return $m[0] === '%d' ? (string) (int) $v : "'" . str_replace( "'", "''", (string) $v ) . "'"; }, $q, 1 ); } return $q; }
     public function get_row( $q, $format = null ) {
@@ -76,7 +76,7 @@ class Integration_DB {
     public function get_var( $q ) { return $q === 'SELECT @@autocommit' ? '1' : '0'; }
 }
 set_error_handler( static function( $n, $s ) { throw new \ErrorException( $s, 0, $n ); } );
-$wpdb = new Receipt_Fixture_DB(); $authority = new SiteEngine_Consent_Authority( array( 'cookie_days' => 390, 'policy_version' => SE_CONSENT_POLICY_VERSION, 'banner_version' => 'synthetic' ) );
+$wpdb = new Receipt_Fixture_DB(); $wpdb->prefix='wp_'; $authority = new SiteEngine_Consent_Authority( array( 'cookie_days' => 390, 'policy_version' => SE_CONSENT_POLICY_VERSION, 'banner_version' => 'synthetic' ) );
 $stamps = array(); $ack = null;
 foreach ( array( 'A' => true, 'B' => false, 'C' => true ) as $label => $grant ) {
     $ack = $authority->save( array( 'event_id' => sprintf( '12345678-1234-4123-8123-%012d', count( $stamps ) + 1 ), 'continuity_key' => hash( 'sha256', 'one-synthetic-chain' ), 'continuity_token' => $ack['continuity']['token'] ?? '',
@@ -84,8 +84,8 @@ foreach ( array( 'A' => true, 'B' => false, 'C' => true ) as $label => $grant ) 
     if ( is_wp_error( $ack ) ) { throw new \RuntimeException( 'synthetic seed failed' ); } $stamps[$label] = SiteEngine_Consent_Authority::seal_stamp( $authority->resolve( $ack ), 3 );
 }
 $db = new Integration_DB( $wpdb ); $wpdb = $db;
-$a = array( 'assignment' => 'ALMA-JOINT-CONSENT-ADS-20261031', 'site' => home_url( '/' ), 'prefix' => 'fixture_', 'form_id' => 3, 'marker' => 'jct_' . str_repeat( 'a', 32 ), '_sha256' => str_repeat( 'e', 64 ), 'run_dir' => '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01',
-    'tables' => array( 'submissions' => 'fixture_fluentform_submissions', 'receipts' => 'fixture_se_consent_receipts', 'events' => 'fixture_se_consent_events', 'chains' => 'fixture_se_consent_chains' ) );
+$a = array( 'assignment' => 'ALMA-JOINT-CONSENT-ADS-20261031', 'site' => home_url( '/' ), 'prefix' => 'wp_', 'form_id' => 3, 'marker' => 'jct_' . str_repeat( 'a', 32 ), '_sha256' => str_repeat( 'e', 64 ), 'run_dir' => '/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01',
+    'tables' => array( 'submissions' => 'wp_fluentform_submissions', 'receipts' => 'wp_se_consent_receipts', 'events' => 'wp_se_consent_events', 'chains' => 'wp_se_consent_chains' ) );
 $j = array( 'assignment' => $a['assignment'], 'marker' => $a['marker'], 'allocation_sha256' => $a['_sha256'], 'entries' => array(), 'audit' => array(), 'contacts' => array( 'A' => 501, 'C' => 502 ), 'inquiries' => array(), 'chain_id' => $stamps['A']['chain_id'], 'pending' => array( 'operation' => 'fault', 'pins' => 'synthetic-independent' ) );
 foreach ( $stamps as $label => $stamp ) {
     $id = 1000 + $stamp['receipt_row_id']; $response = wp_json_encode( array( 'se_joint_marker' => $a['marker'], 'se_joint_case' => $label, '_se_consent_server' => $stamp ) );
@@ -95,30 +95,40 @@ foreach ( $stamps as $label => $stamp ) {
 foreach ( $j['contacts'] as $label => $id ) { $s = new \FluentCrm\App\Models\Subscriber(); $s->id = $id; $s->email = $a['marker'] . '.' . strtolower( $label ) . '@example.invalid'; $s->entry = $j['entries'][$label]['id']; \FluentCrm\App\Models\Subscriber::$rows[$id] = $s; }
 foreach ( $db->seed->rows as $id => $row ) { $j['audit'][(string) $id] = array( 'receipt_id' => $row['receipt_id'], 'sha256' => hash( 'sha256', wp_json_encode( $row ) ), 'link_sha256' => hash( 'sha256', wp_json_encode( $db->seed->links[$id] ) ) ); }
 $j['head'] = array( 'revision' => 3, 'sha256' => hash( 'sha256', wp_json_encode( $db->seed->heads[$j['chain_id']] ) ) );
+// Published Consent target boundary doubles native OS/private files, not authority algorithms.
+$argv[2]=dirname(__DIR__).'/tools/acceptance/joint-target.php';
+$boundary=dirname(__DIR__).'/tools/acceptance/consent-pinned/tests/fixtures/joint-target-boundary.php';
+if(hash_file('sha256',$boundary)!=='f0664fbc960afa145d304acd8fe1d63a2937eaf5080de978a2122415c8afd437')throw new \RuntimeException('published target fixture pin');
+require $boundary;
+require dirname(__DIR__).'/tools/acceptance/joint-ops.php';
+// Run the actual Ads callback/operation function bodies in the published boundary namespace.
+$code=file_get_contents(dirname(__DIR__).'/tools/acceptance/joint-ops.php');
+$start=strpos($code,'function jx_consent_fault(');$end=strpos($code,'function jx_submission_meta(',$start);
+eval('namespace SCJTargetFixture; use \\Throwable; use \\JX_Stop; use \\ReflectionProperty; use \\SiteEngine_Ads_Bridge_Config; use \\SiteEngine_Ads_Bridge_Consent; use \\SiteEngine_Consent_Authority;'.substr($code,$start,$end-$start));
 $temp = sys_get_temp_dir() . '/joint-integration-' . bin2hex( random_bytes( 8 ) ); mkdir( $temp, 0700 ); $GLOBALS['jx_path'] = $temp . '/journal.json';
 $lock = fopen( $temp . '/operations.lock', 'x+' ); flock( $lock, LOCK_EX ); $GLOBALS['jx_operation_lock'] = $lock; jx_save( $GLOBALS['jx_path'], $j );
 $count = 0; function integration_check( $ok, $message ) { global $count; if ( ! $ok ) { throw new \RuntimeException( $message ); } $count++; }
-scj_context( $a ); $positive = jx_probe( $a, $j, 'C' ); jx_expect( $positive, true );
+\SCJTargetFixture\scj_context( $a ); $positive = jx_probe( $a, $j, 'C' ); jx_expect( $positive, true );
 $j['prepared']['C'] = array( 'values' => $positive['values'], 'context' => $positive['context'] );
 integration_check( jx_append( $j['prepared']['C'] )['synthetic_calls'] === 1, 'positive synthetic transport control' );
-$j['missing_restore_required'] = true; $restored = jx_execute( 'restore', 'C', $a, $j );
+$j['missing_restore_required'] = true; $restored = \SCJTargetFixture\jx_execute( 'restore', 'C', $a, $j );
 integration_check( empty( $j['missing_restore_required'] ) && $restored['normal_current_readback'] === 'eligible', 'normal-request restoration handler positive readback; missing-plugin launch itself NOT RUN' );
 foreach ( array( 'null', 'malformed', 'unknown', 'unsigned', 'tampered', 'pending', 'failed', 'unavailable-head', 'failed-current-read' ) as $mode ) {
-    $a['_argument'] = $mode; $r = jx_execute( 'fault', 'C', $a, $j );
+    $a['_argument'] = $mode; $r = \SCJTargetFixture\jx_execute( 'fault', 'C', $a, $j );
     integration_check( $r['restoration'] === 'VERIFIED' && $r['projection_hits'] > 0 && $r['result']['actual_consumer_browser_builders_dispatch_blocked'], 'actual integrated callback success and restoration: ' . $mode );
-    integration_check( $wpdb === $db && scj_inspect( $a, $j, 'C' )['current']['allowed'], 'fresh positive original-state readback' );
+    integration_check( $wpdb === $db && \SCJTargetFixture\scj_inspect( $a, $j, 'C' )['current']['allowed'], 'fresh positive original-state readback' );
 }
 \FluentCrm\App\Models\Subscriber::$rows[501]->entry = $j['entries']['B']['id']; $j['pointer_rebound'] = true;
-jx_execute( 'rejection', 'B', $a, $j ); $a['_argument'] = 'conflicting-flat';
-integration_check( jx_execute( 'fault', 'B', $a, $j )['restoration'] === 'VERIFIED', 'real negative B callbacks preserve no-fallback veto' );
-try { jx_consent_fault( $a, $j, 'C', 'failed-current-read', static function() { throw new \RuntimeException( 'owned callback failure' ); } ); throw new \LogicException( 'must fail' ); }
+\SCJTargetFixture\jx_execute( 'rejection', 'B', $a, $j ); $a['_argument'] = 'conflicting-flat';
+integration_check( \SCJTargetFixture\jx_execute( 'fault', 'B', $a, $j )['restoration'] === 'VERIFIED', 'real negative B callbacks preserve no-fallback veto' );
+try { \SCJTargetFixture\jx_consent_fault( $a, $j, 'C', 'failed-current-read', static function() { throw new \RuntimeException( 'owned callback failure' ); } ); throw new \LogicException( 'must fail' ); }
 catch ( JX_Stop $e ) { integration_check( $j['fault_failure']['primary'] === 'CALLBACK_FAILED' && $j['fault_failure']['restoration'] === 'VERIFIED', 'throwing callback retains separate verified restoration' ); }
-integration_check( ! empty( jx_json( $GLOBALS['jx_path'] )['pending'] ) && scj_inspect( $a, $j, 'C' )['current']['allowed'], 'pending receipt survives callback exception and original-state readback' );
+integration_check( ! empty( jx_json( $GLOBALS['jx_path'] )['pending'] ) && \SCJTargetFixture\scj_inspect( $a, $j, 'C' )['current']['allowed'], 'pending receipt survives callback exception and original-state readback' );
 $head = $db->seed->heads[$j['chain_id']];
-try { jx_consent_fault( $a, $j, 'C', 'failed-current-read', static function() use ( $db, $j ) { $db->seed->heads[$j['chain_id']]['revision']++; } ); throw new \LogicException( 'must fail' ); }
+try { \SCJTargetFixture\jx_consent_fault( $a, $j, 'C', 'failed-current-read', static function() use ( $db, $j ) { $db->seed->heads[$j['chain_id']]['revision']++; } ); throw new \LogicException( 'must fail' ); }
 catch ( JX_Stop $e ) { integration_check( $j['fault_failure']['restoration'] === 'UNKNOWN_OR_FAILED' && ! empty( jx_json( $GLOBALS['jx_path'] )['pending'] ), 'failed final readback retains pending and never claims restoration' ); }
 $db->seed->heads[$j['chain_id']] = $head; // Synthetic PHP object only; not a database operation.
-integration_check( scj_inspect( $a, $j, 'A' )['current']['reason'] === 'withdrawn' && scj_inspect( $a, $j, 'B' )['current']['reason'] === 'denied' && scj_inspect( $a, $j, 'C' )['current']['reason'] === 'eligible', 'one chain three revisions, immutable old-event barriers' );
+integration_check( \SCJTargetFixture\scj_inspect( $a, $j, 'A' )['current']['reason'] === 'withdrawn' && \SCJTargetFixture\scj_inspect( $a, $j, 'B' )['current']['reason'] === 'denied' && \SCJTargetFixture\scj_inspect( $a, $j, 'C' )['current']['reason'] === 'eligible', 'one chain three revisions, immutable old-event barriers' );
 flock( $lock, LOCK_UN ); fclose( $lock ); unlink( $temp . '/operations.lock' ); unlink( $GLOBALS['jx_path'] ); rmdir( $temp );
 echo "PASS {$count} integrated callback assertions; real Consent/Ads evidence, synthetic SQL and consumer/HTTP boundaries; installed NOT RUN\n";
 }

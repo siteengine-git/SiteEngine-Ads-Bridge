@@ -26,8 +26,9 @@ class Launcher(unittest.TestCase):
     def test_finite_runbook_sequence(self):
         import re
         doc=(path.parent/'RUNBOOK-JOINT.md').read_text(encoding='utf-8')
-        commands=re.findall(r'`j ([^`]+)`', doc)
-        self.assertEqual(len(commands),64)
+        matrix=doc.split('## Ordered executable matrix',1)[1].split('## Retained closure',1)[0]
+        commands=re.findall(r'`j ([^`]+)`', matrix)
+        self.assertEqual(len(commands),63)
         for command in commands:
             op,label,argument=command.split()
             self.assertEqual(m.command(op,label,argument,'allocation.json','a'*64,'-' if op=='admit' else 'b'*64,'-' if op=='admit' else 'c'*64,'context.json','d'*64,path.parent)[-9:-6],[op,label,argument])
@@ -70,5 +71,6 @@ class Launcher(unittest.TestCase):
     def test_actual_sources_compile_without_execution(self):
         import ast
         ast.parse(path.read_text())
+        m.verify_members(path.parent)
         self.assertEqual(len((path.parent/'allocation.template.json').read_bytes())<32768,True)
 if __name__ == '__main__': unittest.main()

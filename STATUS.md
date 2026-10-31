@@ -1,3 +1,34 @@
+## Joint r5 final integrated tooling — local-only 2026-10-31
+
+One derivative of09a96e1 on existing maintenance branch; exact pin is the commit
+containing this entry and DELIVERY-R5.json. Runtime source2846305 and both candidate
+ZIPs unchanged; all21 payload hashes match. J0/original allocation/reference map and
+r3/r4 artifacts preserved. No setup/receipt investigation/unchanged suites repeated.
+
+Consent tooling7a54433cf5eba4583071c3b25dc6b99b8e548454, exact manifest
+964557de4920cbcb682b5ec0c86f0cbce8ab7cd94601824419d85558877c8883; all8 published
+members verified. Corrected target context and nine-argument CLI contract integrated;
+APIN/RPIN/CPIN/current JPIN remain independently authenticated. Published browser
+controller and exact Ads target helper unchanged; no Consent-source patch.
+
+Firefox manual path replaces mandatory CDP: existing authenticated session, native
+private-file inputs, typed controls, pinned capture controller and bounded actual
+vendor-response data.insert_id evidence. ONE future setup prerequisite: Alma review/
+load temporary single-tab Firefox blocker/response observer, native cancellation
+probe and guarded reload before captures. No new profile, endpoint or discovery.
+
+Fresh checks:39 Consent target +25 integrated callback +24 response/retention PHP
+assertions;46 Firefox API/DOM/stream checks;9 Python tests;5 PHP lint+5 JS syntax PASS.
+Native/file/SQL/browser boundaries are local doubles; installed NOT RUN. Pre-bootstrap
+guard and all bounds remain. No server/bootstrap/browser/fixture/runtime actions.
+
+J1–J6 HELD pending final package/browser-path review. Retained closure is explicit:
+Functional results reported; closure incomplete—resources retained. Exact future
+metadata/response_id and graph IDs/form hashes/control ownership go into the journal;
+no deletion or automatic restoration, no clean J7 PASS. Alma Codex sole executor /
+graph-control cleanup owner; Consent owns audit/head/withdrawal barriers. See
+RUNBOOK-JOINT.md, FIREFOX-OPERATOR.md and REVIEW-R5.md under tools/acceptance.
+
 ## Joint harness r4 derivative — 2026-10-31 local-only checkpoint
 
 Completed Alma J0 supersedes the earlier setup-delta block below; no completed

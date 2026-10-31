@@ -2,8 +2,8 @@
 /** Review-only installed operations. Run ONLY by Alma Codex after the corresponding release. */
 define( 'SEAB_JOINT_LIBRARY_ONLY', true );
 require __DIR__ . '/joint-owned-observer.php';
-define( 'SCJ_LIBRARY_ONLY', true );
-require __DIR__ . '/consent-pinned/consent-joint.php';
+if ( ! defined('SCJ_LIBRARY_ONLY') ) { define('SCJ_LIBRARY_ONLY',true); }
+require_once __DIR__ . '/consent-pinned/consent-joint.php';
 
 class JX_Stop extends RuntimeException {}
 function jx_assert( $condition, $reason ) { if ( ! $condition ) { throw new JX_Stop( $reason ); } }
@@ -65,6 +65,24 @@ function jx_allocation( array $a ) {
 }
 function jx_pin( $path, $sha ) {
     jx_assert( is_string( $sha ) && preg_match( '/^[a-f0-9]{64}$/D', $sha ) && is_file( $path ) && hash_file( 'sha256', $path ) === $sha, 'independent file pin mismatch' );
+}
+function jx_browser_receipt( array $b, array $a, $label, $id, array $stamp, $journal_pin ) {
+    jx_assert( ($b['status'] ?? '') === 'PASS' && ($b['operation'] ?? '') === 'submit ' . $label
+        && ($b['label'] ?? '') === $label && ($b['entry_id'] ?? null) === $id && ($b['form_id'] ?? null) === $a['form_id']
+        && is_string($b['receipt_id'] ?? null) && $b['receipt_id'] !== '' && strlen($b['receipt_id']) <= 256
+        && $b['receipt_id'] === ($stamp['receipt_id'] ?? null) && ($b['receipt_revision'] ?? null) === array('A'=>1,'B'=>2,'C'=>3)[$label]
+        && ($b['advertising_payload'] ?? null) === ($label !== 'B')
+        && array_key_exists('transaction_id',$b) && $b['transaction_id'] === ($label === 'B' ? null : 'ff:'.$a['form_id'].':'.$id), 'exact vendor/capture/payload evidence mismatch' );
+    foreach ( array('allocation_sha256'=>'_sha256','release_sha256'=>'_release_sha256','context_sha256'=>'_context_sha256') as $key=>$input ) {
+        jx_assert( ($b[$key] ?? null) === ($a[$input] ?? false), 'browser independent pin mismatch: '.$key );
+    }
+    jx_assert( ($b['journal_before_sha256'] ?? '') === $journal_pin && ($b['response_complete'] ?? false) === true && ($b['http_status'] ?? 0) === 200
+        && is_int($b['response_bytes'] ?? null) && $b['response_bytes'] > 0 && $b['response_bytes'] <= 1048576
+        && preg_match('/^[a-f0-9]{64}$/D',$b['response_sha256'] ?? '') && preg_match('/^[a-f0-9]{64}$/D',$b['control_evidence_sha256'] ?? '')
+        && preg_match('/^[a-f0-9-]{36}$/D',$b['control_id'] ?? '')
+        && is_string($b['request_id'] ?? null) && strlen($b['request_id']) > 0 && strlen($b['request_id']) <= 128, 'incomplete bounded response/control/current-journal evidence' );
+    if ($label === 'B') { jx_assert(($b['pending_failed_ack_verified'] ?? false) === true,'actual pending/failed ACK restoration required'); }
+    return true;
 }
 function jx_admission_row( array $a, array $j, $label, $exact ) {
     global $wpdb;
@@ -209,6 +227,7 @@ function jx_execute( $op, $label, array $a, array &$j ) {
         jx_owned_entry( $a, $j, $label ); $file = $a['run_dir'] . '/browser-' . $label . '.json';
         $b = jx_json( $file ); $pin = trim( file_get_contents( $file . '.sha256' ) );
         $stamp = json_decode( jx_owned_entry( $a, $j, $label )['response'], true )['_se_consent_server'];
+        jx_browser_receipt( $b, $a, $label, $j['entries'][$label]['id'], $stamp, $j['entries'][$label]['browser_journal_sha256'] );
         jx_assert( hash_file( 'sha256', $file ) === $pin && $b['status'] === 'PASS' && $b['operation'] === 'submit ' . $label
             && $b['entry_id'] === $j['entries'][$label]['id'] && $b['receipt_id'] === $stamp['receipt_id'] && $b['advertising_payload'] === ( $label !== 'B' ), 'browser receipt not matched to genuine persisted event' );
         if ( $label === 'B' ) { jx_assert( ( $b['pending_failed_ack_verified'] ?? false ) === true, 'real pending/failed ACK evidence required' ); }
@@ -244,8 +263,10 @@ function jx_execute( $op, $label, array $a, array &$j ) {
         $row = jx_admission_row( $a, $j, $label, $a['_argument'] );
         $bfile = $a['run_dir'] . '/browser-' . $label . '.json'; $b = jx_json( $bfile ); jx_pin( $bfile, trim( file_get_contents( $bfile . '.sha256' ) ) );
         $stamp = json_decode( $row['response'], true )['_se_consent_server'];
+        jx_browser_receipt( $b, $a, $label, (int)$row['id'], $stamp, $j['pending']['journal_before_sha256'] );
         jx_assert( $b['status'] === 'PASS' && $b['operation'] === 'submit ' . $label && $b['entry_id'] === (int) $row['id'] && $b['receipt_id'] === $stamp['receipt_id'] && $b['allocation_sha256'] === $a['_sha256'] && $b['release_sha256'] === $a['_release_sha256'], 'exact vendor response/capture evidence not correlated' );
         $j['entries'][$label] = array( 'id' => (int) $row['id'], 'contact' => $label === 'C' ? 'C' : 'A', 'response_sha256' => hash( 'sha256', $row['response'] ) );
+        $j['entries'][$label]['browser_journal_sha256'] = $b['journal_before_sha256'];
         $details = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$t['details']}` WHERE submission_id=%d ORDER BY id LIMIT 129", $row['id'] ), ARRAY_A );
         jx_assert( is_array( $details ) && count( $details ) > 0 && count( $details ) <= 128 && ! $wpdb->last_error, 'owned serialized details absent/over bound' );
         $j['entries'][$label]['details_sha256'] = hash( 'sha256', wp_json_encode( $details ) );
@@ -402,6 +423,7 @@ function jx_close( array $a, array &$j ) {
     foreach ( $j['entries'] as $label => $e ) { jx_owned_entry( $a, $j, $label ); }
     if ( isset( $j['entries']['A'] ) ) { jx_audit( $a, $j, jx_owned_entry( $a, $j, 'A' ) ); }
     foreach ( $j['contacts'] as $label => $id ) { jx_contact( $a, $j, $label ); }
+    if ( ($a['_context']['submission_meta_disposition'] ?? '') === 'RETAIN_NO_DELETE_AUTHORITY' ) { return jx_retain_graph($a,$j); }
     jx_submission_meta( $a, $j );
     // J0 supplies reviewed logical references; discover actual FK edges too. Unknown references stop deletion.
     $fk = $wpdb->get_results( $wpdb->prepare( 'SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE() AND REFERENCED_TABLE_NAME IN (%s,%s,%s) LIMIT 65', $t['contacts'], $t['submissions'], $t['inquiries'] ), ARRAY_A );
@@ -457,6 +479,27 @@ function jx_close( array $a, array &$j ) {
     $j['closed'] = true;
     return array( 'fixture_cleanup' => 'PASS', 'audit_retained' => array( 'chain_id' => $j['chain_id'] ?? null, 'receipt_ids' => array_keys( $j['audit'] ) ), 'cleanup_owner' => 'Alma Codex', 'retention' => 'Consent review; never delete heads/barriers/events' );
 }
+function jx_retain_graph( array $a, array &$j ) {
+    global $wpdb;
+    // No DELETE/UPDATE or restoration on the accepted retained-graph path.
+    try { jx_submission_meta($a,$j); }
+    catch (Throwable $e) { if (($j['closure_disposition'] ?? '') !== 'RETAINED_NOT_CLEAN') { throw $e; } }
+    $retained=array('entries'=>$j['entries'],'contacts'=>$j['contacts'],'inquiries'=>$j['inquiries'],'details'=>array(),'meta'=>array(),'pivot'=>array());
+    foreach (array('details'=>array('submission_id',array_column($j['entries'],'id')),'meta'=>array('subscriber_id',array_values($j['contacts'])),'pivot'=>array('subscriber_id',array_values($j['contacts']))) as $key=>$spec) {
+        foreach ($spec[1] as $parent) {
+            $rows=$wpdb->get_results($wpdb->prepare("SELECT id,`{$spec[0]}` FROM `{$a['tables'][$key]}` WHERE `{$spec[0]}`=%d ORDER BY id LIMIT 513",$parent),ARRAY_A);
+            jx_assert(is_array($rows)&&!$wpdb->last_error&&count($rows)<=512,'retained graph read incomplete/over budget');
+            foreach($rows as $row){jx_assert(isset($row['id'],$row[$spec[0]])&&ctype_digit((string)$row['id'])&&(int)$row['id']>0&&(string)$row[$spec[0]]===(string)$parent&&!isset($retained[$key][$row['id']]),'ambiguous retained reference');$retained[$key][$row['id']]=$row;}
+        }
+    }
+    $form=jx_db_row($a['tables']['forms'],$a['form_id']);jx_assert(is_array($form)&&isset($form['form_fields']),'retained form read failed');
+    $retained['form']=array('id'=>$a['form_id'],'original_sha256'=>hash('sha256',$j['baseline']['form_fields']),'patched_sha256'=>isset($j['patched_fields'])?hash('sha256',$j['patched_fields']):null,'current_sha256'=>hash('sha256',$form['form_fields']));
+    $retained['audit']=array('rows'=>$j['audit'],'chain_id'=>$j['chain_id']??null,'head'=>$j['head']??null,'owner'=>'Consent; Alma Codex retains all barriers');
+    $retained['controls']=array('disposition'=>'retain J0 controls and patched form; no automatic restoration','owner'=>'Alma Codex');
+    $j['retained_resources']['fixture_graph']=$retained;$j['closure_disposition']='RETAINED_NOT_CLEAN';$j['closed']=false;$j['stages']['J7']='NOT RUN';
+    $j['closure_statement']='Functional results reported; closure incomplete—resources retained.';jx_intent($j);
+    return array('closure'=>'RETAINED_NOT_CLEAN','J7'=>'NOT RUN','statement'=>$j['closure_statement'],'cleanup_owner'=>'Alma Codex','reference_checks'=>'remaining foreign-reference/FK deletion clearance NOT RUN; no deletion attempted');
+}
 function jx_stage( $stage, array $a, array &$j ) {
     $has = static function( $op, $label, $arg = null, $minimum = 1, $revision = null ) use ( &$j ) {
         $n = 0; foreach ( $j['results'] as $r ) { if ( $r['operation'] === $op && $r['label'] === $label && ( $arg === null || ( $r['argument'] ?? null ) === $arg ) && $r['status'] === 'PASS' && ( $revision === null || ( $r['result']['head_revision'] ?? null ) === $revision ) ) { $n++; } }
@@ -493,7 +536,7 @@ if ( ! defined( 'JX_LIBRARY_ONLY' ) ) {
         jx_assert( preg_match( '/^[a-f0-9]{64}$/D', $sha ) && hash_file( 'sha256', $file ) === $sha, 'allocation hash mismatch' );
         $a = jx_allocation( jx_json( $file ) ); $a['_sha256'] = $sha; $a['_argument'] = $argument; $a['_release_sha256'] = $release_sha;
         jx_assert( ! is_link( $context_file ) && ( fileperms( $context_file ) & 0777 ) === 0600 && fileowner( $context_file ) === posix_geteuid(), 'private context owner/mode mismatch' );
-        jx_pin( $context_file, $context_sha ); $a['_context'] = jx_json( $context_file );
+        jx_pin( $context_file, $context_sha ); $a['_context_sha256'] = $context_sha; $a['_context'] = jx_json( $context_file );
         jx_assert( realpath( $context_file ) === $a['run_dir'] . '/context.json' && $a['_context']['allocation_sha256'] === $sha && $a['_context']['assignment'] === $a['assignment'], 'private context binding mismatch' );
         jx_assert( ! is_link( $file ) && realpath( $file ) === $a['run_dir'] . '/allocation.json' && realpath( dirname( $file ) ) === $a['run_dir'] && posix_geteuid() === $a['owner_uid'] && ( fileperms( dirname( $file ) ) & 0777 ) === 0700, 'owner/private path mismatch' );
         jx_assert( ( fileperms( $file ) & 0777 ) === 0600, 'allocation must be0600' );
