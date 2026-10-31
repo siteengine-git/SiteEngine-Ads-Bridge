@@ -1,0 +1,74 @@
+{
+  "assignment": "ALMA-JOINT-CONSENT-ADS-20261031",
+  "site": "https://alma.siteengine.space/",
+  "run_dir": "/home/alma.siteengine.space/.se-joint-acceptance/joint-consent-ads-20261031-01",
+  "owner_uid": 0,
+  "prefix": "<ACTUAL_PREFIX_FROM_J0>",
+  "form_id": 0,
+  "marker": "<NEW_COLLISION_CHECKED_jct_32hex>",
+  "site_instance_id": "<ALLOCATED_STABLE_TEST_SITE_ID>",
+  "j0_result_sha256": "<ALMA_J0_RESULT_SHA256>",
+  "tables": {
+    "forms": "<ACTUAL_PREFIX_FROM_J0>fluentform_forms",
+    "submissions": "<ACTUAL_PREFIX_FROM_J0>fluentform_submissions",
+    "details": "<ACTUAL_PREFIX_FROM_J0>fluentform_entry_details",
+    "contacts": "<ACTUAL_PREFIX_FROM_J0>fc_subscribers",
+    "meta": "<ACTUAL_PREFIX_FROM_J0>fc_subscriber_meta",
+    "pivot": "<ACTUAL_PREFIX_FROM_J0>fc_subscriber_pivot",
+    "tags": "<ACTUAL_PREFIX_FROM_J0>fc_tags",
+    "lists": "<ACTUAL_PREFIX_FROM_J0>fc_lists",
+    "inquiries": "<ACTUAL_PREFIX_FROM_J0>se_ads_inquiries",
+    "receipts": "<ACTUAL_PREFIX_FROM_J0>se_consent_receipts",
+    "events": "<ACTUAL_PREFIX_FROM_J0>se_consent_events",
+    "chains": "<ACTUAL_PREFIX_FROM_J0>se_consent_chains"
+  },
+  "fixture_qualified_at": "<REVIEWED_SYNTHETIC_UTC_DATE_TIME>",
+  "fixture_closed_date": "<REVIEWED_SYNTHETIC_DATE>",
+  "won_tag_id": 0,
+  "form_lead_tag_id": 0,
+  "dnc_list_id": 0,
+  "lifecycle_tag_ids": {
+    "new": 0,
+    "qualified": 0,
+    "unqualified": 0,
+    "won": 0
+  },
+  "marker_fields": [],
+  "reference_map_reviewed": false,
+  "logical_references": [
+    {
+      "table": "<ACTUAL_PREFIX_FROM_J0>fluentform_entry_details",
+      "column": "submission_id",
+      "kind": "entry"
+    },
+    {
+      "table": "<ACTUAL_PREFIX_FROM_J0>fc_subscriber_meta",
+      "column": "subscriber_id",
+      "kind": "contact"
+    },
+    {
+      "table": "<ACTUAL_PREFIX_FROM_J0>fc_subscriber_pivot",
+      "column": "subscriber_id",
+      "kind": "contact"
+    },
+    {
+      "table": "<ACTUAL_PREFIX_FROM_J0>se_ads_inquiries",
+      "column": "contact_id",
+      "kind": "contact"
+    },
+    {
+      "table": "<ACTUAL_PREFIX_FROM_J0>se_ads_inquiries",
+      "column": "submission_id",
+      "kind": "entry"
+    }
+  ],
+  "browser": {
+    "page_url": "<ALLOCATED_SAME_ORIGIN_PAGE_URL>",
+    "submit_url": "<ACTUAL_FF_AJAX_URL>",
+    "form_selector": "<ACTUAL_FORM_SELECTOR>",
+    "submit_selector": "<ACTUAL_SUBMIT_SELECTOR>",
+    "submission_request_token": "<OBSERVED_FORM_ID_POST_TOKEN>",
+    "email_selector": "<ACTUAL_EMAIL_FIELD_SELECTOR>",
+    "required_fields": []
+  }
+}

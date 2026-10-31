@@ -1,3 +1,27 @@
+## Joint owned operations package — local preparation, 2026-10-31
+
+Canonical source/repository unchanged. Alma release independently permits J0;
+this local work neither executes J0 nor releases J1–J6. Alma Codex remains sole
+server executor/cleanup owner. tools/acceptance/RUNBOOK-JOINT.md maps J0–J7 to
+exact commands/browser actions, with immutable allocation/release pins, durable
+pending intent and exact-ID foreign-reference cleanup. Runtime/package source
+2846305 and both candidate ZIPs unchanged; observer bff8339e remains byte-identical.
+No server access, WordPress bootstrap, browser/fixtures, exports or native suite.
+
+New local tooling: joint-ops.php, joint-run.py, joint-browser.cjs and allocation
+template. Request-local faults/synthetic append use actual installed gates;
+real capture/withdraw/regrant remains actual Consent frontend/vendor persistence.
+One form/chain,2 contacts,10 receipt/link/submission ceilings,one head/10 revisions,
+4 inquiries;64 finite server commands. Pending/failed ACK injection restores fetch
+before the explicit same-event retry. Permanent audit/barriers are retained.
+
+Focused validation and final package pins are in tools/acceptance/OPERATIONS-RESULTS.json.
+These are harness-only checks, not installed acceptance. Finite next step through
+Aubrey: Consent owner reviews exact browser ACK/fault/retention boundary; Alma
+fills actual J0 inputs/reference map and pins this package for fixture release.
+J0 installed result not supplied here; J1–J7 NOT RUN. Server resources created0;
+retained local/native work untouched and excluded from the scoped commit/package.
+
 ## Joint acceptance coordinator intake — 2026-10-31
 
 Alma queue records ALMA-JOINT-CONSENT-ADS-20261031, local preparation complete,
