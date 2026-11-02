@@ -1,3 +1,39 @@
+<!-- ADS-DIRECT-DELIVERY-AUTHORITY-20261102 -->
+## Current Ads ownership and execution authority
+
+Aubrey's direct instruction of 2026-11-02 supersedes older Master/ALMA approval,
+routing and sole-executor requirements for Ads work in this file and historical
+project guidance. Controlling Helper: _(AB) Ads Helper - 10.
+Canonical source: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\source.
+Permitted server role: execute the authorized Ads plugin installation, explicit
+additive guard migration and synthetic/native verification on Alma using existing
+access. Coordination prevents overlapping writes; it is not another approval gate.
+Preserve completed evidence, configuration, journals, Consent barriers and disabled
+real delivery/exports. This authority does not permit production rollout, unrelated
+plugin/shared-server changes, new privileges or another access method. Report
+implemented, packaged, installed, verified and released separately. Ads Codex owns
+its task's backup/evidence and selective recovery; preexisting retained resources
+keep their recorded owners. Inspect actual state before retrying uncertain writes.
+<!-- END ADS-DIRECT-DELIVERY-AUTHORITY-20261102 -->
+
+<!-- SITEENGINE-ROLES-AUTHORITY-BEGIN -->
+## Roles and authority
+
+Historical governance record: Ads approval/routing/executor restrictions in this block are superseded by the current Ads authority section above.
+
+Effective November 2, 2026. This section explicitly supersedes conflicting older workflow, ownership, helper-role, retry-approval and deployment-executor instructions in this file and historical project documents. Preserve historical evidence and all nonconflicting technical, privacy and access requirements. Later explicit task authorizations remain applicable; this governance update itself authorizes no deployment or real delivery.
+
+- Controlling Helper: _(AB) Ads Helper - 10.
+- Canonical source / working home: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\source.
+- Permitted server role: Plugin source/build/test owner. No independent shared-server changes; Alma Codex installs/tests unless Master explicitly delegates a bounded server task.
+- Aubrey remains final authority. The Master server chat sets priorities, owns shared-server coordination and decides server/resource conflicts. Each named plugin Helper owns its product requirements, implementation decisions, acceptance criteria and delivery; its dedicated Codex owns its canonical source, tests, GitHub changes and packages. A coordination request does not transfer plugin ownership to Master or Alma Codex.
+- Shared Project context is reference material, not delegated execution authority. Treat each chat according to its name. Return plugin-source corrections to its owning Helper/Codex; do not create a competing source master.
+- Plugin Helpers continue independent authorized implementation while awaiting a server slot. Existing authorization covers routine invocation and test-tool corrections within scope; inspect actual state before retrying, never blindly replay uncertain writes, and do not create repeated approval loops.
+- Only one executor changes overlapping server resources at a time. Alma Codex owns assigned dev-server installation, backups, scoped controls, installed verification and cleanup; other execution requires an explicit bounded delegation. AWS production operations require their own concrete scope.
+- Preserve completed evidence. Expand testing only for a demonstrated failure or concrete unresolved requirement. Diagnose first and use the smallest adequate correction; do not start another general tooling or infrastructure campaign.
+- Messages intended for another chat start with TO / FROM / SUBJECT. Preparing a handoff is not delivery or acknowledgment. Do not claim another chat received or acted on a message without evidence.
+- Report implemented, packaged, installed, verified and released separately; none implies the next. PC/GitHub remain source authority. The live Alma dev site is the continuing test/integration destination; keep its approved verified plugin versions current under assigned installation scope, without inferring client-production release.
+<!-- SITEENGINE-ROLES-AUTHORITY-END -->
 # SiteEngine Ads Bridge — repository working rules
 
 Canonical editable checkout:

@@ -1,3 +1,33 @@
+## 2026-11-02 — direct Ads execution; successor installed/migrated
+
+Current runtime/package remains 0.6.4-rc.1 at 8de3333fc2a30bc8e046c37406321dc7052f8abb;
+ZIP SHA-256 7eb646c0950335756238bcd44ecb9a3423fb0a9f417faa7612934a820196dc06.
+Aubrey delegates Ads server execution directly to _(AB) Ads Helper - 10 / Ads Codex;
+current AGENTS.md supersedes earlier approval/routing/sole-executor restrictions.
+No extra coordination approval requested; common executor lock prevented overlap.
+
+Actual Alma owner preflight PASS. All 25 candidate payloads were already installed
+and matched, so no redundant replacement/re-activation. Fresh pinned staging verified
+26 ZIP members and 14 candidate/installed PHP lint passes on PHP 8.3.36. Exactly one
+default migration preview and one explicit apply created the absent empty InnoDB
+guard. Physical 5 columns/1 PRIMARY/0 rows and existing inquiry schema 2 verified.
+Fresh-process installed manifest/profile/pending readback PASS.
+
+29 native/installed assertions PASS: independent connections, exclusion, open-session
+release/subsequent acquisition, no reconnect while protected, foreign-lock preservation,
+physical/current readback, six delivery flags false and actual missing-evidence browser
+suppression. MariaDB 10.11.19; primary/autocommit/no ambient transaction/flush 1.
+Settings/activation/inquiry+Consent checksums/cron/form controls unchanged. Executor
+released exit 0; foreign CRM maintenance/MU and prior backups/fixtures/audit untouched.
+
+Implemented/packaged/installed verified separately; rc.1 NOT stable/production released.
+No new positive capture, journal-recovery fault, vendor/CRM installation, export,
+transport or withdrawal/re-grant claim. Accepted lead A not replayed. CRM retains its
+binding/vendor-session/checkpoint work. No source defect found. Task-owned empty guard
+and private stage/evidence retained; preexisting cleanup ownership unchanged.
+See successor/INSTALLED-RESULTS-20261102.md; detailed local delivery-20261102/RESULTS.json
+is outside Git. All old evidence below is historical where this entry supersedes it.
+
 ##0.6.4-rc.1 coordination successor — local-only,2026-11-02
 
 Canonical source/repository/maintenance branch unchanged. Integrates retained4c448ec
