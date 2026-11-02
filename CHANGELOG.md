@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.4 — 2026-11-02
+
+- Finalize the Consent-repaired contract-1 successor after Alma setup/migration,
+  installed checks and native interrupted-journal recovery.
+- Correct recovery ordering: verify completed earlier receipts while a later step
+  is inflight; do not repeat writes or bypass unresolved intent/readback drift.
+- Explicit additive guard migration; PHP 8.3 minimum. No activation migration.
+- Preserve all disabled delivery/export controls and Consent withdrawal barriers.
+
 ## 0.6.4-rc.1 — UNACCEPTED coordination successor, 2026-11-02
 
 - Integrate configuration-coordination contract1 from retained4c448ec into the

@@ -1,4 +1,4 @@
-# Ads0.6.4-rc.1 — installable, UNACCEPTED coordination successor
+# Ads Bridge 0.6.4 — installation and recovery
 
 Canonical source remains the existing Ads checkout. Integrates retained4c448ec into
 current Consent-repaired1eec02e. No historical source checkout replaced the current
@@ -34,11 +34,11 @@ Ads installation alone is not CRM installation or vendor-session acceptance.
 
 ## Ordered Alma slot — commands are preparation, NOT executed here
 
-Alma Codex is executor/cleanup owner in the recorded slot; coordinate through
-Master/Aubrey. Preserve the separate first-A assignment against the EXISTING installed
-candidates. Do not replace files during its guarded browser/submission/admission.
-Master decides the slot ordering and exclusion window; no duplicate approval is needed
-for work already recorded. Existing controls/holds and unrelated maintenance remain.
+Ads Codex executes authorized Ads installation/migration/verification directly under
+_(AB) Ads Helper - 10 using existing access. Coordination prevents overlapping
+writes; it is not another approval gate. Use the common executor lock and Ads
+destination protection for changes; preserve foreign controls and journals. The
+earlier accepted lead-A exercise is closed and must not be replayed.
 
 1. Preserve restricted Ads/Consent evidence, current Ads plugin files, settings/
    override authority and database/schema/journal state. Do not copy an active
@@ -96,9 +96,9 @@ for work already recorded. Existing controls/holds and unrelated maintenance rem
    protected physical/session inspection. Complete=true,state=none,write_permission=false
    is required; a version option or command exit alone is insufficient. Existing
    prepared/activating inquiries or pending configuration remain blockers for CRM.
-8. Alma owns actual native two-connection exclusion, supported deadline/no-reconnect,
-   interrupted operation/native SQL and installed Consent/browser eligibility checks
-   in its slot. Local doubles are NOT those results. The retained opt-in native
+8. Carry completed Alma two-connection/session proof and native interrupted-journal
+   recovery. CRM vendor/checkpoint and further browser acceptance retain their own
+   scope. Local doubles are NOT native results. The retained opt-in native
    sources target ONLY a separately approved dedicated loopback test DB, not WPDB;
    no database provisioning/Windows initialization was attempted here. CRM must prove
    all actual vendor/core/ORM/cache/hooks share the protected installed session and
@@ -132,5 +132,36 @@ review and continued exclusion of noncooperating writers. Retain new tables/data
 successor/RESULTS.json records fresh local checks, all explicit SQL/WordPress/vendor
 boundaries doubled. Stable designation follows actual installed verification, not
 ZIP production, historical Golden checks or CRM's separate local90-assertion report.
-This local work deployed nothing, changed no site settings/schema or other plugin,
-ran no server/native database/browser, fixture, export or customer send.
+The rc.1 local implementation itself performed no site writes. Subsequent authorized
+Alma migration/setup and bounded native recovery are recorded in release results.
+No export, customer send, accepted lead-A replay or other-plugin source edit occurred.
+
+## Stable release evidence and upgrade delta
+
+0.6.4 retains the rc.1 migration and all Consent enforcement. It corrects one
+recovery-order condition: earlier completed receipts can be verified while a later
+step is inflight; no duplicate writes or clearing of uncertain intent is permitted.
+Fresh local regression covers receipt drift, unknown outcomes and ordered replay.
+Actual Alma recovery used the identical durable request in a fresh process, with
+zero repeated effects. Three marked test tables and both journals remain retained.
+
+Existing Alma guard/inquiry migration is complete: do not repeat it for this
+release. Fresh Doctor has zero FAIL/PENDING, module Ready with nine explicit warnings.
+Two existing lists were adopted and only four genuinely missing Ads fields were
+created, preserving all existing definitions. No warning was suppressed. Live
+timezone/feed-mapping/provider readiness remains an operator prerequisite before
+separately authorized delivery. All six lifecycle/Sheets/export flags stay false.
+
+Verify release ZIP and independent embedded manifest hash before installation.
+Retain a restricted backup of Ads files/configuration. Replace only reviewed
+payloads under the existing executor and destination locks, preserving active
+client configuration and unrelated files. No reactivation, migration, queue run or
+provider setup. For metadata-only changes run affected bootstrap/package checks,
+lint changed PHP and verify every installed member; carry earlier evidence forward.
+Use successor-readiness.php in a fresh guarded process with the delivered manifest
+pin. Stable packaging does not complete CRM vendor/session/checkpoint acceptance.
+
+On rollback preserve guard/inquiry/Consent tables, journals, pending intent and
+barriers. Restore only task-backed files after cessation and compatibility review;
+never roll back to a nonparticipating build while work is pending. No whole DB
+restore, uninstall, purge, journal deletion or operation-ID reset.

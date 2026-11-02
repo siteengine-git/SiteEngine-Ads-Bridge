@@ -1,0 +1,65 @@
+{
+  "version": "0.6.4",
+  "correction_commit": "1c570daf52ca84c06e8226262e848b9a1aac7a99",
+  "setup": {
+    "adopted_lists": 2,
+    "created_fields": 4,
+    "existing_fields_preserved": 17,
+    "doctor": {
+      "PASS": 33,
+      "WARN": 9,
+      "FAIL": 0,
+      "PENDING": 0
+    },
+    "module_status": "ready"
+  },
+  "native_recovery": {
+    "create": 9,
+    "interruption": 12,
+    "recovery": 10,
+    "total": 31,
+    "first_effect_writes": 2,
+    "recovery_effect_writes": 0,
+    "test_tables": 3,
+    "inquiry_rows": 0,
+    "journals": "interrupted and complete retained",
+    "counterexample": "Old ordering refused earlier completed receipt while later step inflight; actual assertion failed. Exact journal/effects preserved. One condition corrected; identical fresh-process recovery then succeeded."
+  },
+  "local_assertions": {
+    "new_recovery_order": 6,
+    "coordination": 55,
+    "consent_consumer": 104,
+    "consent_dispatch": 32,
+    "stable_bootstrap": 19,
+    "stable_static": 85,
+    "total": 301,
+    "after_correction_failures": 0
+  },
+  "carried_evidence": {
+    "package_members": 26,
+    "original_guard_physical": "verified",
+    "installed_lints": 14,
+    "native_assertions": 29,
+    "not_repeated": true
+  },
+  "limits": [
+    "Synthetic effects/native SQL in three marked owned tables only",
+    "No CRM vendor/checkpoint acceptance repeated",
+    "No accepted lead-A replay or historical browser harness",
+    "No production rollout or real delivery",
+    "Nine Doctor warnings retained"
+  ],
+  "installed_final_bytes": {
+    "version": "0.6.4",
+    "members_verified": 26,
+    "fresh_process_readiness": "PASS",
+    "pending_state": "none",
+    "configuration_and_original_tables_preserved": true,
+    "original_prefix_restored": true,
+    "common_executor_lock": "released exit0",
+    "affected_candidate_php_lint": 3,
+    "zip_sha256": "00032ac65bfb118621741209bee5888b1d4a76185de14a10f34556781ef01c19",
+    "embedded_manifest_sha256": "fa7a75bc043d39e526c5c64bbc16ae26be3695fa0054b1df5f72943de4c415e5"
+  },
+  "documentation_encoding": "Prepublication encoding error corrected from exact UTF-8 Git baseline. Preliminary artifacts retained separately; final documents/manifest installed and all26 members reverified. PHP bytes unchanged."
+}

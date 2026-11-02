@@ -1,6 +1,6 @@
 # Ads shared-configuration coordination — contract 1
 
-Successor 0.6.4-rc.1, UNACCEPTED until installed/native review. Integrates retained
+Stable successor 0.6.4 after Alma installed/native verification. Integrates retained
 4c448ec48bda60bcbba87dc97255fe215502b9a3 into Consent-repaired source1eec02e,
 rather than replacing that runtime. Inquiry adapters remain contract1/schema2;
 configuration tree2; coordination storage1. Preserves capability/inspection/batch/
@@ -284,3 +284,17 @@ from this assignment. No Windows database investigation was restarted.
 Stable designation follows installed verification. No deployment, site settings or
 schema write, fixture, transport enablement, enrollment, customer send or hold release
 was performed by the local successor work. Old archives/manifests remain preserved.
+
+## Stable 0.6.4 recovery correction / installed evidence
+
+Completed earlier steps may perform exact receipt readback while a later step is
+inflight. They cannot write or clear that later intent. Receipt drift and unknown
+create outcomes still block; uncompleted unrelated steps cannot bypass inflight
+work. This corrects the demonstrated native two-step counterexample. Alma preserved
+the interrupted journal, then recovered the identical request in a fresh process
+with zero duplicate effect writes. Actual SQL used isolated marked tables, not CRM
+vendor/checkpoint or original inquiry/Consent data. See releases/0.6.4/RESULTS.json.
+CRM must review/bind the corrected implementation hash; prior bindings are not
+silently substituted. No Ads release establishes CRM installation or real delivery.
+Earlier local-only and assigned-slot statements describe retained rc.1 history;
+current direct Ads execution authority is recorded in AGENTS.md.

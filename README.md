@@ -1,9 +1,9 @@
-> Current source: **0.6.4-rc.1, unaccepted coordination successor**, PHP8.3 minimum.
+> Current source: **0.6.4, stable configuration-coordination successor**, PHP8.3 minimum.
 > Preserves Consent0.6.1-rc.2 current-eligibility repair and adds configuration-
 > coordination contract1 with explicit additive guard migration. Read
 > [successor installation and recovery](docs/COORDINATION-SUCCESSOR.md).
-> Accepted0.6.3 and maintenance0.6.3.1-rc.1 archives remain preserved. Stable follows
-> Alma installed/native verification; this package does not install CRM.
+> Accepted0.6.3 and maintenance0.6.3.1-rc.1 archives remain preserved. Alma installed/native verification passed.
+> This package does not install CRM or authorize production/delivery.
 
 # SiteEngine Ads Bridge
 

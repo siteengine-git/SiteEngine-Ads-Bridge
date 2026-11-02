@@ -1,3 +1,43 @@
+## 2026-11-02 — stable 0.6.4 installed and released
+
+Source/tag: v0.6.4, exact published commit containing this entry and releases/0.6.4.
+Correction checkpoint 1c570daf52ca84c06e8226262e848b9a1aac7a99; Consent repair retained.
+ZIP SHA-256 00032ac65bfb118621741209bee5888b1d4a76185de14a10f34556781ef01c19.
+Package pins and dependencies: releases/0.6.4/DELIVERY.json / MANIFEST.json.
+
+Adopted existing Customers and Future Customers lists, created only four genuinely
+missing Ads export definitions, preserved all 17 existing fields. Fresh Doctor:
+33 PASS / 9 WARN / 0 FAIL / 0 PENDING; actual module Ready. Warnings remain honest
+(timezones, disabled/unspecified sinks, optional referral tag and feed verification).
+No settings or transport flag changed; no credentials/account setup supplied.
+
+The native two-step counterexample exposed receipt ordering while a later step
+was inflight. One condition corrected; earlier completed receipts now require exact
+readback without writes, while new steps/drift/unknown create remain blocked.
+31 native assertions across create/interruption/fresh identical recovery PASS:
+two synthetic effects initially, ZERO repeated writes on recovery, completed native
+journal. The initial failed native receipt, interrupted/complete journals and three
+marked owned test tables are retained. No original inquiry/Consent or CRM journal
+was reset; no vendor/checkpoint suite repeated. Ads Codex owns these test resources.
+
+Fresh affected local assertions: 6 recovery +55 coordination +104 Consent consumer
++32 dispatch +19 final bootstrap +85 static/package =301 PASS. Prior physical guard,
+14 installed lints and 29 native assertions carried forward, not rerun. Three affected
+package PHP lint PASS. Final ZIP independently staged/hashed; exact stable bytes
+installed under common executor and Ads destination locks without reactivation or
+migration replay. All26 members + fresh-process version/profile/pending readback PASS.
+Original tables/settings/activation/cron/unrelated files unchanged across install.
+Common lock released exit0; foreign controls/backups and prior cleanup owners intact.
+
+Implemented, packaged, installed, verified and stable tagged release are distinct
+completed outputs; no production rollout or real delivery authorized/performed.
+No accepted lead-A replay, historical browser harness, external export or barrier
+change. CRM must review/rebind corrected implementation/package pins in its own
+adapter/profile; this does not prevent Ads release or establish CRM installation.
+Detailed evidence/scripts remain local in ../release-0.6.4-20261102 and owner-private
+on Alma. Exact test IDs/table names are excluded from public Git. Final deliverables
+are in the explicitly requested Plugins..Deliverables/PLUGIN — SiteEngine Ads-Bridge.
+
 ## 2026-11-02 — finalization: setup complete; recovery-order correction
 
 Adopted existing Customers/Future Customers lists and created only four missing Ads
