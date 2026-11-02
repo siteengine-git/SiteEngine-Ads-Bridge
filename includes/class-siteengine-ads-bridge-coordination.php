@@ -327,7 +327,9 @@ final class SiteEngine_Ads_Bridge_Coordination {
     public static function step($binding,$id,$write,$readback) {
         $j=self::current($binding);
         if (!isset($j['manifest'][$id]) || !is_callable($write) || !is_callable($readback)) self::fail('coordination_step_invalid');
-        if ($j['inflight']!==null && $j['inflight']!==$id) self::fail('coordination_inflight_requires_readback');
+        // Completed earlier steps may be verified while a later step is uncertain.
+        // Their receipt still requires exact readback; no write or intent is cleared.
+        if ($j['inflight']!==null && $j['inflight']!==$id && !isset($j['receipts'][$id])) self::fail('coordination_inflight_requires_readback');
         if (isset($j['receipts'][$id]) || $j['inflight']===$id) {
             self::assert_owner(); $observed=call_user_func($readback); self::assert_owner();
             if (is_array($observed) && ($observed['state']??'')==='verified' && self::hash($observed['hash']??null)) {

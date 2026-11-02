@@ -1,3 +1,21 @@
+## 2026-11-02 — finalization: setup complete; recovery-order correction
+
+Adopted existing Customers/Future Customers lists and created only four missing Ads
+export fields through the supported FluentCRM manager, preserving 17 existing fields.
+Fresh Doctor 33 PASS / 9 WARN / 0 FAIL / 0 PENDING; actual module Ready.
+
+The bounded native two-step test found an Ads recovery-order defect: a completed
+first step could not read back while the later step was inflight. Both native
+synthetic effects and pending intent survived; failed journal/receipts retained.
+No original inquiry/Consent/CRM journal was altered by this isolated test. Fixed
+only the ordering condition so completed receipts can be verified without writes;
+new/uncompleted steps remain blocked until uncertain work is resolved. Completed
+receipt drift and unknown create still block. Focused local 6 new +55 coordination
++104 Consent consumer +32 Consent dispatch assertions PASS. Native correction
+verification and stable metadata/package/install remain pending at this checkpoint.
+The shared executor lock was released before local correction; no foreign worker
+or journal was reset. All prior evidence/archives remain retained.
+
 ## 2026-11-02 — direct Ads execution; successor installed/migrated
 
 Current runtime/package remains 0.6.4-rc.1 at 8de3333fc2a30bc8e046c37406321dc7052f8abb;
