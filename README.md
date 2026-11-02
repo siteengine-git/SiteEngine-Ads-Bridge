@@ -1,10 +1,11 @@
-> Current source: **0.6.3.1-rc.1, unaccepted maintenance candidate**. Requires
-> Consent0.6.1-rc.2 at1c0a420 (current eligibility result contract2). Historical
-> grant verification alone no longer permits advertising. Read
-> [maintenance release notes](docs/MAINTENANCE-RELEASE.md) before upgrade.
-> Accepted installable0.6.3 remains preserved; no deployment is implied.
+> Current source: **0.6.4-rc.1, unaccepted coordination successor**, PHP8.3 minimum.
+> Preserves Consent0.6.1-rc.2 current-eligibility repair and adds configuration-
+> coordination contract1 with explicit additive guard migration. Read
+> [successor installation and recovery](docs/COORDINATION-SUCCESSOR.md).
+> Accepted0.6.3 and maintenance0.6.3.1-rc.1 archives remain preserved. Stable follows
+> Alma installed/native verification; this package does not install CRM.
 
-# SiteEngine Ads Bridge 0.6.3
+# SiteEngine Ads Bridge
 
 SiteEngine Ads Bridge connects a configured Fluent Forms master lead form to FluentCRM and exports append-only lead lifecycle data to Google Sheets for Google Ads Data Manager.
 

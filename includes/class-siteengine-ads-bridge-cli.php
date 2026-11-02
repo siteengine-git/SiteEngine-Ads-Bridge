@@ -7931,6 +7931,36 @@ class SiteEngine_Ads_Bridge_CLI {
         }
 
         /**
+         * Explicit additive configuration-guard migration or protected inspection.
+         *
+         * ## OPTIONS
+         *
+         * <operation>
+         * : migrate (preview by default) or inspect. No implicit activation migration.
+         *
+         * [--apply]
+         * : Create ONLY an absent guard table; never alter/reset existing storage.
+         *
+         * @subcommand configuration-admin
+         * @alias configuration_admin
+         */
+        public function configuration_admin( $args, $assoc_args ) {
+                $op = $args[0] ?? '';
+                if ( count($args) !== 1 || !in_array($op,array('migrate','inspect'),true)
+                        || array_diff(array_keys($assoc_args),array('apply')) ) {
+                        WP_CLI::error('Usage: se-ads configuration-admin <migrate|inspect> [--apply]');
+                }
+                $apply = (bool) WP_CLI\Utils\get_flag_value($assoc_args,'apply',false);
+                if ($op === 'inspect' && $apply) { WP_CLI::error('configuration-admin inspect does not accept --apply.'); }
+                $result = $op === 'migrate' ? seab_configuration_migrate($apply)
+                        : seab_configuration_inspect_pending(seab_configuration_capability());
+                WP_CLI::line(wp_json_encode($result));
+                if (($result['status'] ?? '') === 'blocked' || ($op === 'inspect' && empty($result['complete']))) {
+                        WP_CLI::error('Configuration guard blocked: '.$result['reason_code']);
+                }
+        }
+
+        /**
          * Runtime consent plugin policy version, used for diagnostics only.
          * Side-effect-free: reads the mu-plugin constant (its default_config() source of
          * truth) first, then a persisted option. Never instantiates the consent

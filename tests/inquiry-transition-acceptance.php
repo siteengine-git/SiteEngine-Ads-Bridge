@@ -79,12 +79,15 @@ $GLOBALS['wpdb']->deny_locks=false;
 $GLOBALS['wpdb']->lock_unavailable=true; $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
 check_inq('retry'===$result['status'] && 'contact_lock_unavailable'===$result['reason_code'],'unavailable database locks fail closed');
 $GLOBALS['wpdb']->lock_unavailable=false;
+// Unknown acquisition discarded the session; model a fresh request before loss.
+$acquire_poison=new ReflectionProperty(SiteEngine_Ads_Bridge_Inquiries::class,'connection_unusable');
+$acquire_poison->setAccessible(true); $acquire_poison->setValue(null,false); seab_test_reset_coordination_request();
 $GLOBALS['wpdb']->lose_lock=true; $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
 check_inq('retry'===$result['status'] && 'contact_lock_lost'===$result['reason_code'] && $calls===$contact->field_write_calls,'lost session lock is detected before the transition writes');
 $GLOBALS['wpdb']->lose_lock=false;
 // A lost session poisons that PHP request. Model a new request explicitly.
 $poison=new ReflectionProperty(SiteEngine_Ads_Bridge_Inquiries::class,'connection_unusable');
-$poison->setAccessible(true); $poison->setValue(null,false);
+$poison->setAccessible(true); $poison->setValue(null,false); seab_test_reset_coordination_request();
 $nested=null;
 $contact->on_field_write=function() use($activation,&$nested) { $nested=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation); };
 $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
@@ -129,7 +132,7 @@ $GLOBALS['wpdb']->fail_release=true;
 $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
 check_inq('retry'===$result['status'] && 'contact_lock_release_failed'===$result['reason_code'] && array()===$GLOBALS['wpdb']->locks,'an unconfirmed lock release closes the connection and withholds success');
 $calls=$contact->field_write_calls;
-$GLOBALS['wpdb']->fail_release=false; $poison->setValue(null,false);
+$GLOBALS['wpdb']->fail_release=false; $poison->setValue(null,false); seab_test_reset_coordination_request();
 $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
 check_inq('committed'===$result['status'] && 'already_committed'===$result['reason_code'] && $calls===$contact->field_write_calls,'a fresh-request retry recovers the durable commit without resetting again');
 

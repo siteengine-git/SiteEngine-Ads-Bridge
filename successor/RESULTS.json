@@ -1,0 +1,75 @@
+{
+  "candidate": "0.6.4-rc.1",
+  "status": "UNACCEPTED_LOCAL_ONLY",
+  "runtime_base": "1eec02e00af6273f91445d4b8d6952e98fd903e7",
+  "retained_coordination": "4c448ec48bda60bcbba87dc97255fe215502b9a3",
+  "php": "8.3.36 -n",
+  "local_assertions": 429,
+  "failures": 0,
+  "cases": [
+    {
+      "test": "static-acceptance.php",
+      "exit": 0,
+      "summary": "\nSUMMARY: 85 PASS, 0 FAIL",
+      "log_sha256": "f6dca83f76c83ac88a43148794961d36ed270e49b1bfce6c3d15f22018f0b7a7"
+    },
+    {
+      "test": "consent-consumer-acceptance.php",
+      "exit": 0,
+      "summary": "PASS: missing API subprocess explicitly passes its blocked assertion\nRESULT: 104 PASS / 0 FAIL (synthetic storage; actual pinned authority; no native SQL/WP claim)",
+      "log_sha256": "ae49cd90f7598acd3ccbdf3b962c285cfa8a7343ddb0eaec0f33d009796f0c36"
+    },
+    {
+      "test": "consent-dispatch-acceptance.php",
+      "exit": 0,
+      "summary": "PASS: isolated fault-response rejection with real historical verifier: revision\nRESULT: 32 PASS / 0 FAIL (real rc.2; simulated SQL and transport, no native/WP claim)",
+      "log_sha256": "bc1040800092eadf00926acbb3a8570b61ba04fb2416136bf7d0b63ab5fed586"
+    },
+    {
+      "test": "inquiry-acceptance.php",
+      "exit": 0,
+      "summary": "\nSUMMARY: 43 PASS, 0 FAIL",
+      "log_sha256": "5e7e2083a4fb4e233f64653ed494900db3d9ff255b14a14f78df5c99ba606efd"
+    },
+    {
+      "test": "inquiry-transition-acceptance.php",
+      "exit": 0,
+      "summary": "\nSUMMARY: 50 PASS, 0 FAIL",
+      "log_sha256": "e02a9576d8e09a1e9a7b5517dd88080151a03e41757ce9f7e38d73118cc937b5"
+    },
+    {
+      "test": "configuration-coordination-acceptance.php",
+      "exit": 0,
+      "summary": "\nSUMMARY: 55 PASS, 0 FAIL",
+      "log_sha256": "d1502c67f57b9714ae33dcb0827b788c7a9ac3639bc0b5d59dad2a9f41782afc"
+    },
+    {
+      "test": "configuration-migration-acceptance.php",
+      "exit": 0,
+      "summary": "PASS: migration has no destructive repair/reset operation\nSUMMARY: 16 PASS, 0 FAIL; migration SQL/session doubles only",
+      "log_sha256": "922af24ffc5becc93f898071fbb5511a4b8582be7474cdd220b46bc717a3797b"
+    },
+    {
+      "test": "successor-bootstrap-acceptance.php",
+      "exit": 0,
+      "summary": "PASS 19 successor bootstrap/CLI checks; WordPress/native boundaries doubled",
+      "log_sha256": "45ea8d9af226c42174d7fbba82b87ef06359c34b7fb21ba358cdc75cd8e8e295"
+    },
+    {
+      "test": "joint-consent-integration.php",
+      "exit": 0,
+      "summary": "PASS 25 integrated callback assertions; real Consent/Ads evidence, synthetic SQL and consumer/HTTP boundaries; installed NOT RUN",
+      "log_sha256": "f81f1d8e358abdcc10c07b9d69630f6d664338834430dc78299e2e48d6b212a9"
+    }
+  ],
+  "lint_files": 23,
+  "packaged_php_lint": 14,
+  "consent_algorithms_and_existing_dispatch_bytes": "UNCHANGED",
+  "native_sql": "NOT RUN; assigned Alma slot",
+  "native_installed_and_browser": "NOT RUN",
+  "server_actions": 0,
+  "crm_adapter": "NOT MODIFIED; owner must rebind retained implementation hash before installed use",
+  "initial_test_failure": "old static assertion expected19 CLI commands; corrected to20 including configuration-admin; affected run then passed",
+  "historical_archives": "preserved; no replacement",
+  "bootstrap_and_sql_boundaries": "local doubles only; no WordPress/DB execution"
+}

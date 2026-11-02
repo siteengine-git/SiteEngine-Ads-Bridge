@@ -149,7 +149,11 @@ namespace {
         }
     }
 
-    final class SEAB_Inquiry_Test_WPDB {
+    require_once dirname(__DIR__) . '/includes/class-siteengine-ads-bridge-coordination.php';
+    require_once __DIR__ . '/coordination-fake.php';
+    if (!defined('DB_NAME')) define('DB_NAME','seab_inquiry_acceptance');
+    final class SEAB_Inquiry_Test_WPDB implements SiteEngine_Ads_Bridge_Coordination_Driver {
+        use SEAB_Coordination_Fake;
         public $prefix = 'wp_';
         public $rows = array();
         public $submissions = array();
@@ -160,6 +164,7 @@ namespace {
         public $locks = array();
         public $deny_locks = false;
         public $lock_unavailable = false;
+        public $lose_acquire_response = false;
         public $lose_lock = false;
         public $fail_release = false;
         public $storage_engine = 'InnoDB';
@@ -178,7 +183,9 @@ namespace {
             return $query;
         }
         public function get_var( $sql ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('get_var',$sql);
             if (preg_match("/SELECT GET_LOCK\\('([^']+)', 0\\)/",$sql,$m)) {
+                if ($this->lose_acquire_response) { $this->locks[$m[1]]=1; return null; }
                 if ($this->lock_unavailable) return null;
                 if ($this->deny_locks || (isset($this->locks[$m[1]]) && 1!==$this->locks[$m[1]])) return 0;
                 $this->locks[$m[1]]=1;
@@ -213,6 +220,7 @@ namespace {
         }
         private function unquote( $s ) { return str_replace( "''", "'", trim( $s, "'" ) ); }
         public function get_row( $sql, $format = null ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('get_row',$sql);
             unset( $format );
             if (false!==strpos($sql,'SHOW TABLE STATUS WHERE Name')) return array('Engine'=>$this->storage_engine);
             if ( preg_match( '/SELECT id, form_id FROM `wp_fluentform_submissions` WHERE id = (\d+)/', $sql, $m ) ) {
@@ -268,6 +276,7 @@ namespace {
             return $n;
         }
         public function query( $sql ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('query',$sql);
             if ($sql===$this->fail_query) return false;
             if ('START TRANSACTION'===$sql) $this->transaction_rows=$this->rows;
             if ('COMMIT'===$sql) $this->transaction_rows=null;
@@ -279,6 +288,7 @@ namespace {
             $this->transaction_rows=null; $this->locks=array(); return true;
         }
         public function get_results( $sql, $format = null ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('get_results',$sql);
             unset($format);
             if(false!==strpos($sql,'SHOW COLUMNS FROM')) return $this->missing_recovery_columns ? array() : array(
                 array('Field'=>'projection_plan','Type'=>'longtext','Null'=>'YES'),

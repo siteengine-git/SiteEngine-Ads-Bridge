@@ -2,8 +2,8 @@
 /**
  * Plugin Name: SiteEngine Ads Bridge
  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
- * Version: 0.6.3.1-rc.1
- * Requires PHP: 7.4
+ * Version: 0.6.4-rc.1
+ * Requires PHP: 8.3
  * Requires Plugins: siteengine-base
  * Author: SiteEngine
  * Text Domain: siteengine-ads-bridge
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SEAB_VERSION', '0.6.3.1-rc.1' );
+define( 'SEAB_VERSION', '0.6.4-rc.1' );
 define( 'SEAB_PLUGIN_FILE', __FILE__ );
 define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -31,6 +31,7 @@ require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-settings.ph
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-config.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-runtime.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-lifecycle.php';
+require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-coordination.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-inquiries.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-doctor.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-admin.php';
@@ -46,11 +47,11 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
  * represented in the SiteEngine UI and exports remain disabled by default.
  */
 function seab_activate_plugin() {
-	if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '8.3', '<' ) ) {
 		deactivate_plugins( SEAB_PLUGIN_BASENAME );
 
 		wp_die(
-			esc_html__( 'SiteEngine Ads Bridge requires PHP 7.4 or newer.', 'siteengine-ads-bridge' ),
+			esc_html__( 'SiteEngine Ads Bridge requires PHP 8.3 or newer.', 'siteengine-ads-bridge' ),
 			esc_html__( 'Plugin activation failed', 'siteengine-ads-bridge' ),
 			array( 'back_link' => true )
 		);
@@ -119,4 +120,25 @@ function seab_inquiry_prepare_reconciliation( $payload ) {
  */
 function seab_inquiry_commit_activation( $payload ) {
 	return SiteEngine_Ads_Bridge_Inquiries::commit_activation( $payload );
+}
+
+/** Coordination contract 1; discovery is not installation/write authorization. */
+function seab_configuration_capability() {
+    return SiteEngine_Ads_Bridge_Coordination::capability();
+}
+/** Complete destination-wide observation; never a write permission. */
+function seab_configuration_inspect_pending( $request ) {
+    return SiteEngine_Ads_Bridge_Coordination::inspect( $request );
+}
+/** Finite same-process protected batch; no transport or vendor operation added. */
+function seab_configuration_with_batch( $request, callable $callback ) {
+    return SiteEngine_Ads_Bridge_Coordination::batch( $request, $callback );
+}
+/** Explicit future migration DDL only; this callable performs no SQL. */
+function seab_configuration_schema_sql() {
+    return SiteEngine_Ads_Bridge_Coordination::schema_sql();
+}
+/** Explicit administrative provisioning only; defaults to preview, never activation. */
+function seab_configuration_migrate( $apply = false ) {
+    return SiteEngine_Ads_Bridge_Coordination::migrate( $apply );
 }

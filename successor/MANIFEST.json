@@ -1,0 +1,143 @@
+{
+  "candidate": "0.6.4-rc.1",
+  "designation": "UNACCEPTED",
+  "runtime_base_commit": "1eec02e00af6273f91445d4b8d6952e98fd903e7",
+  "retained_coordination_commit": "4c448ec48bda60bcbba87dc97255fe215502b9a3",
+  "source_pin": "The published Git commit containing successor/MANIFEST.json; base commit is lineage, not this successor code pin.",
+  "php_minimum": "8.3",
+  "inquiry_schema": "2",
+  "inquiry_adapter_contract": "1",
+  "configuration_tree_schema": "2",
+  "coordination_contract": "1",
+  "guard_schema": "1",
+  "consent_implementation": "1c0a42000927db720cfc60934ea5e2b31db28533",
+  "consent_contract_documentation": "b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f",
+  "migration": "Explicit se-ads configuration-admin migrate preview; --apply additive guard only. No activation migration.",
+  "payload": [
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 16993,
+      "sha256": "2884e326b85f70acd1b45aaca7f4c9ae7ff51079943a64314a85dcae0ce1d822"
+    },
+    {
+      "path": "README.md",
+      "bytes": 16014,
+      "sha256": "3c8a709f7cc799d9039571dccd67fc8288f41f4484f069879c762d62745101a7"
+    },
+    {
+      "path": "config/client.example.php",
+      "bytes": 4241,
+      "sha256": "454920ae8a0fc11594847166255c130b1f6b769d729839691631d1e8940aeb6d"
+    },
+    {
+      "path": "contracts/CONFIGURATION-COORDINATION.md",
+      "bytes": 19559,
+      "sha256": "41d10d58758ca191c0aee90a92a0223469e64ef53b5cefea35fe3f457a379b86"
+    },
+    {
+      "path": "docs/COORDINATION-SUCCESSOR.md",
+      "bytes": 9163,
+      "sha256": "65a9d2fd3843f80acd857bf176023cdf5e5ca16b0414ee0e09013061e0d15338"
+    },
+    {
+      "path": "docs/CRM-OPS-INQUIRY-CONTRACT.md",
+      "bytes": 16126,
+      "sha256": "f903176c8a563899e3a09f22ea5fcb609c46ddd58758fbd531469f5bf0bd010f"
+    },
+    {
+      "path": "docs/MAINTENANCE-RELEASE.md",
+      "bytes": 9293,
+      "sha256": "c2aa55f51230b86c2d0231ea04cd61525175e91bf77d46da83c12105765afc8a"
+    },
+    {
+      "path": "docs/OPERATIONS.md",
+      "bytes": 5290,
+      "sha256": "deeb250b788c5b4544338d531f4d96a20c463787278c1689b08c2632109bc7ad"
+    },
+    {
+      "path": "docs/headers/all-leads-key-map.csv",
+      "bytes": 2702,
+      "sha256": "71334173dd3105b5cc926595d34aaf21c058f5994db8e64703eea9175a2dbdfd"
+    },
+    {
+      "path": "docs/headers/all-leads.csv",
+      "bytes": 1575,
+      "sha256": "148c0462162c597a2869b73f7d8144aee9a602cb50e65e4cbcaf557fe5527d99"
+    },
+    {
+      "path": "docs/headers/google-data-manager-key-map.csv",
+      "bytes": 581,
+      "sha256": "c3cd7cb8f050492e0c03c77b9fcda50ec4a57376a1e380ca3a9e2b6e6f912a8f"
+    },
+    {
+      "path": "docs/headers/google-data-manager.csv",
+      "bytes": 295,
+      "sha256": "84e146d30f6d8266df556ce975d4a8cfe31d55f63e54d4dde6078c84c478dd16"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-admin.php",
+      "bytes": 38737,
+      "sha256": "e995acaa462ba314e8d7faad5584c47c6f2efa3295bd15d41e90860ee076c02d"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-cli.php",
+      "bytes": 466790,
+      "sha256": "481ebff662e49f4f03391ae769ce84fa15be7ff6abea3072024edc71e35d59b9"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-config.php",
+      "bytes": 38625,
+      "sha256": "d860a0fd93010f5e37ab77cb052bb81ee6b9fef0a7ba4b3c19aa52001e5148c2"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-consent.php",
+      "bytes": 12083,
+      "sha256": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-coordination.php",
+      "bytes": 27097,
+      "sha256": "04dee70c9c107690d92d260a2003ebca63eb2fc55101c3ee6edd375d3b6130c9"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-doctor.php",
+      "bytes": 50353,
+      "sha256": "ab977846dc1b3e8b60a27834fb7e0fcc09c0a4fe12af2635b5d8db3ab4675b5d"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-inquiries.php",
+      "bytes": 79966,
+      "sha256": "94716250aff3dd282605df6eae25ba96688e0afb64e52023e7b9b37890fb4097"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-lifecycle.php",
+      "bytes": 19606,
+      "sha256": "a5ca5e96e8bec01b4736c5dfb71775fd0aec38491d9034b4cf5782cac5b752c7"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-runtime.php",
+      "bytes": 6620,
+      "sha256": "b396f71fc8cd703de51d6de1350b22855c1eb1b3e9b2f96c48696830f5e588cb"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-settings.php",
+      "bytes": 12429,
+      "sha256": "89e4b96c7f25d1a8219afae17b4f3fc8e689bf92cfdc2b8ca834fab85d826a7f"
+    },
+    {
+      "path": "siteengine-ads-bridge.php",
+      "bytes": 5409,
+      "sha256": "959f1c79ae2cfc7149a515dc66c59c6f834e49d4acca311db68b0a49e95098dc"
+    },
+    {
+      "path": "tools/successor-readiness.php",
+      "bytes": 2195,
+      "sha256": "db00e0e6c0592262080ba8d82884a2f47200c33d2b132ca448dbdb97645d4fd1"
+    },
+    {
+      "path": "uninstall.php",
+      "bytes": 610,
+      "sha256": "809d117536df4c1b3fc8e3fb0c440df7b18d94c2efedf5dea9d4a1338b32f097"
+    }
+  ]
+}

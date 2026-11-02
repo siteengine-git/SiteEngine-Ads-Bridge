@@ -105,15 +105,27 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		if ( isset( self::$held_locks[ $contact_id ] ) ) {
 			return array( 'ok' => false, 'reason' => 'contact_transition_reentrant' );
 		}
+		$coordination = SiteEngine_Ads_Bridge_Coordination::enter_reconciliation();
+		if ( ! $coordination['ok'] ) { return $coordination; }
 		global $wpdb;
 		$database = defined( 'DB_NAME' ) ? DB_NAME : '';
 		$name = 'seab_i_' . substr( hash( 'sha256', $database . '|' . $wpdb->prefix . '|' . (int) $contact_id ), 0, 48 );
 		try {
 			$got = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $name ) );
+			$error = (string) $wpdb->last_error;
 		} catch ( \Throwable $e ) {
+			self::discard_connection();
+			SiteEngine_Ads_Bridge_Coordination::release();
+			return array( 'ok' => false, 'reason' => 'contact_lock_unavailable' );
+		}
+		if ( '' !== $error || ! in_array( (string) $got, array( '0', '1' ), true ) ) {
+			// A lost response may hide a granted lock. Never reuse that session.
+			self::discard_connection();
+			SiteEngine_Ads_Bridge_Coordination::release();
 			return array( 'ok' => false, 'reason' => 'contact_lock_unavailable' );
 		}
 		if ( '1' !== (string) $got ) {
+			if ( ! SiteEngine_Ads_Bridge_Coordination::release() ) { self::discard_connection(); }
 			return array( 'ok' => false, 'reason' => '0' === (string) $got ? 'contact_transition_busy' : 'contact_lock_unavailable' );
 		}
 		self::$held_locks[ $contact_id ] = $name;
@@ -125,6 +137,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @return void
 	 */
 	private static function assert_contact_lock( $contact_id ) {
+		SiteEngine_Ads_Bridge_Coordination::assert_owner();
 		global $wpdb;
 		if ( self::$connection_unusable || ! isset( self::$held_locks[ $contact_id ] ) || '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT IS_USED_LOCK(%s) = CONNECTION_ID()', self::$held_locks[ $contact_id ] ) ) ) {
 			throw new \RuntimeException( 'contact_lock_lost' );
@@ -136,21 +149,17 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @return bool
 	 */
 	private static function release_contact_lock( $contact_id ) {
-		global $wpdb;
-		if ( ! isset( self::$held_locks[ $contact_id ] ) ) {
-			return false;
-		}
-		$name = self::$held_locks[ $contact_id ];
-		unset( self::$held_locks[ $contact_id ] );
-		if ( self::$connection_unusable ) {
-			return false;
-		}
-		try {
-			return '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) );
-		} catch ( \Throwable $e ) {
-			return false;
-		}
-	}
+        global $wpdb;
+        $released=false;
+        try {
+            if ( !self::$connection_unusable && isset(self::$held_locks[$contact_id]) ) {
+                $released='1'===(string)$wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)',self::$held_locks[$contact_id]));
+            }
+        } catch (\Throwable $e) { $released=false; }
+        unset(self::$held_locks[$contact_id]);
+        $destination_released=SiteEngine_Ads_Bridge_Coordination::release();
+        return $released && $destination_released;
+    }
 
 	/**
 	 * Close the failed session so uncommitted changes/locks cannot leak.
@@ -1292,6 +1301,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			'created_at_utc'              => $now,
 			'updated_at_utc'              => $now,
 		);
+		self::assert_contact_lock( (int) $subscriber->id );
 		$ok = $wpdb->insert( $table, $data );
 		return false === $ok ? array( 'ok' => false, 'reason' => 'legacy_snapshot_persistence_failed' ) : array( 'ok' => true, 'reason' => '' );
 	}

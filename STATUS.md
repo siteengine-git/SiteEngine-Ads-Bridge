@@ -1,3 +1,35 @@
+##0.6.4-rc.1 coordination successor — local-only,2026-11-02
+
+Canonical source/repository/maintenance branch unchanged. Integrates retained4c448ec
+contract1 into Consent-repaired1eec02e, not a historical runtime replacement.
+Coordination APIs/capability/same-session/durable recovery retained; inquiry adapter1 /
+schema2 / config tree2 / guard1. Explicit configuration-admin migrate previews by
+default; --apply creates ONLY an absent InnoDB guard. Existing/partial/pending data
+is never repaired/reset. No activation/traffic migration. PHP minimum8.3 matches
+stock wpdb/mysqli support; native MariaDB/profile proof remains Alma-owned.
+
+Fresh429 assertions across9 affected cases,0 failures;23 PHP lint/all14 packaged
+PHP. Consent helper/runtime and preexisting CLI/dispatch bytes unchanged exactly.
+SQL/WP/vendor/native boundaries are local doubles; no database initialized/provisioned
+or server/browser/bootstrap/fixture/export/send executed. Initial stale19-command
+assertion corrected for command20, then the affected run passed; logs retained locally.
+See successor/RESULTS.json. Stable designation follows installed verification.
+
+Version/ZIP/contract/implementation/member hashes:successor/MANIFEST.json and
+successor/DELIVERY.json; exact source pin is their containing published commit.
+All prior archives/manifests and diagnostic allocations retained; no main merge.
+CRM still hard-pins retained implementation69bc74d9...e7576d; its owner must bind the
+new successor and prove installed destination session/checkpoint/cessation before
+using its adapter. Ads packaging does NOT complete CRM installation. No CRM source edit.
+
+Alma performs native additive migration/physical schema/installation checks in the
+assigned slot under existing controls. Preserve existing first-A browser assignment
+against its installed candidates, nonoverlap and all Consent barriers/retained graph.
+Read actual local Alma status: r5 operations admission PASS; browser interception/
+leadA not yet verified in that record. No fresh installed claim. Concrete handback
+through Aubrey:successor/CRM-ALMA-HANDBACK.md; Master dispatch not confirmed by this chat.
+No automatic remaining-checklist execution; user retains its completion/interpretation.
+
 ## Joint r5 final integrated tooling — local-only 2026-10-31
 
 One derivative of09a96e1 on existing maintenance branch; exact pin is the commit

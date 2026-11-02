@@ -1,0 +1,36 @@
+{
+  "candidate": "0.6.4-rc.1",
+  "designation": "UNACCEPTED",
+  "package": "siteengine-ads-bridge-0.6.4-rc.1-UNACCEPTED-20261102.zip",
+  "package_sha256": "7eb646c0950335756238bcd44ecb9a3423fb0a9f417faa7612934a820196dc06",
+  "external_manifest": "siteengine-ads-bridge-0.6.4-rc.1-UNACCEPTED-20261102.manifest.json",
+  "external_manifest_sha256": "53fec640a16ff93fc60023a737e24d2242a444ed031f3af3d1953524fc656d3e",
+  "embedded_manifest_sha256": "414c372237370116099ef783168ed0cf1deb55b9f5cdf2a694de5eb9c6494782",
+  "runtime_base_commit": "1eec02e00af6273f91445d4b8d6952e98fd903e7",
+  "retained_coordination_commit": "4c448ec48bda60bcbba87dc97255fe215502b9a3",
+  "source_commit": "Published Git commit containing this file; no self-referential hash.",
+  "critical_hashes": {
+    "contracts/CONFIGURATION-COORDINATION.md": "41d10d58758ca191c0aee90a92a0223469e64ef53b5cefea35fe3f457a379b86",
+    "includes/class-siteengine-ads-bridge-coordination.php": "04dee70c9c107690d92d260a2003ebca63eb2fc55101c3ee6edd375d3b6130c9",
+    "includes/class-siteengine-ads-bridge-inquiries.php": "94716250aff3dd282605df6eae25ba96688e0afb64e52023e7b9b37890fb4097",
+    "siteengine-ads-bridge.php": "959f1c79ae2cfc7149a515dc66c59c6f834e49d4acca311db68b0a49e95098dc"
+  },
+  "dependencies": {
+    "consent_version": "0.6.1-rc.2",
+    "consent_implementation": "1c0a42000927db720cfc60934ea5e2b31db28533",
+    "consent_contract_documentation": "b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f",
+    "consent_zip_sha256": "8471e4761eef927bb10d44967ab88205ef0890a3b6bf90888b8d1ef2c182b619",
+    "php_minimum": "8.3",
+    "native_profile": "MariaDB10.11 primary/autocommit/no reconnect; installed evidence Alma-owned"
+  },
+  "validation": {
+    "local_assertions": 429,
+    "failed_assertions": 0,
+    "php_lint_pass": 23,
+    "packaged_php": 14,
+    "native_sql": "NOT RUN",
+    "installed": "NOT RUN",
+    "browser": "NOT RUN"
+  },
+  "crm_gate": "CRM owner must review/rebind the new implementation hash in place of 69bc74d9cdf81384415083f2445ffe20ea8c4ab39b4e6a6426e760f0a5e7576d; Ads installation is not CRM installation."
+}

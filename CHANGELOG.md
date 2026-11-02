@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.4-rc.1 — UNACCEPTED coordination successor, 2026-11-02
+
+- Integrate configuration-coordination contract1 from retained4c448ec into the
+  Consent-repaired maintenance runtime; preserve inquiry adapter1/schema2/tree2.
+- Serialize cooperating inquiry writers with destination protection, same-session
+  no-reconnect behavior and durable interrupted configuration-operation recovery.
+- Add explicit preview/apply guard migration: create absent InnoDB storage only;
+  never repair/reset existing data. No automatic activation/traffic migration.
+- Require PHP8.3 for the supported stock wpdb/mysqli coordination profile.
+- Preserve current Consent rc.2 eligibility and per-dispatch advertising gates.
+- Alma native/installed checks and CRM-owned source binding remain required.
+
 ## 0.6.3.1-rc.1 — UNACCEPTED maintenance candidate, 2026-10-29
 
 - Preserve signed canonical v1 evidence and require real Consent rc.2 contract2
