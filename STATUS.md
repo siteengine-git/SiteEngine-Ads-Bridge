@@ -1,3 +1,29 @@
+## 2026-11-03 - direct 0.6.4.2 continuation: exact prior-job release unproven
+
+Continue runtime from d78ddcf. No feature/source-runtime changes or new package.
+Direct installation of the exact 0.6.4.2 candidate supersedes the unnecessary
+0.6.4.1 intermediate requirement; administrator procedure corrected accordingly.
+Retained candidate ZIP remains SHA256
+500e5fbc97c0e72a0dddc3aff192467673c7f18e526a70de7a2847ba22ec0079.
+The documentation correction is not folded into this unchanged candidate ZIP;
+its original member manifest remains the installation authority.
+
+One bounded ownership investigation found the executor free and a different
+current durable job complete. Neither proves release of the specific previously
+blocking job. Its exact administrator archive remains at review, with last plan
+request exiting 0 / PLAN_ONLY; no exact durable completion or safe-handoff record
+was found among retained job archives/completion records. No site mutation or
+installed acceptance was attempted. Do not infer completion from these facts.
+Detailed exact IDs/hashes and record summaries remain local outside public Git in
+../reusable-setup-20261103/*continuation*, *record-discovery*, *evidence-summary*,
+*archive-summary* and *completion-summary*. No repeated temporal polling.
+
+Next prerequisite: the owning CRM executor's completion/safe-handoff evidence for
+that exact prior job, including the remaining review boundary. Then install the
+exact 0.6.4.2 ZIP directly and run authenticated administrator acceptance only.
+Implemented/packaged remains true; installed/native verified/released remain false.
+Campbell untouched; no tests rerun because no runtime correction was made.
+
 ## 2026-11-03 - reusable administrator setup: local candidate; Alma blocked
 
 Canonical source/repository/branch unchanged. Source checkpoint is the published
@@ -34,7 +60,7 @@ native-stage-a.py and __pycache__ remain untouched and excluded from publication
 Detailed owner/job/process and failed attempt evidence stays outside public Git in
 ../reusable-setup-20261103. One bounded conflict diagnosis; no repeated polling.
 Next: after the owning CRM job safely finishes/hands off, verify actual installed
-hashes under ownership, install/verify reporting correction then exact candidate,
+hashes under ownership, install/verify the exact 0.6.4.2 candidate directly,
 and run only bounded administrator storage/mapping acceptance. This milestone
 remains incomplete until installed verification passes; no later milestone begun.
 

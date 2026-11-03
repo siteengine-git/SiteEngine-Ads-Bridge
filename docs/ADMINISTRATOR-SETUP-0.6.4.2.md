@@ -81,7 +81,7 @@ installed. Output, values and operator error messages are escaped.
 
 ## Remaining Alma acceptance
 
-Install and freshly verify 0.6.4.1, then the exact 0.6.4.2 package under the existing
+Install the exact reviewed 0.6.4.2 package directly under the existing
 ownership controls. Test the administrator handlers with real WordPress nonces and
 capabilities; demonstrate missing-storage initialization and missing lifecycle
 selection in bounded owned fixtures. Verify idempotency and preserve original
