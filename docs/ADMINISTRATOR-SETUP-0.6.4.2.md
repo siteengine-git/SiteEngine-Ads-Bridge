@@ -1,8 +1,7 @@
 # Reusable administrator setup, 0.6.4.2
 
-Status: locally verified, UNACCEPTED. Installation and native administrator verification
-on Alma are blocked by another active shared configuration executor. This document
-describes the implemented controls; it does not claim an installed acceptance pass.
+Status: accepted after actual authenticated administrator verification on Alma.
+Install 0.6.4.2 directly; no intermediate 0.6.4.1 upgrade is required.
 
 ## Fresh client installation
 
@@ -79,12 +78,23 @@ shared executor/durable job when available and uses the Ads destination lock to
 reject pending inquiries or configuration journals. No new coordination service is
 installed. Output, values and operator error messages are escaped.
 
-## Remaining Alma acceptance
+## Completed Alma acceptance and limits
 
-Install the exact reviewed 0.6.4.2 package directly under the existing
-ownership controls. Test the administrator handlers with real WordPress nonces and
-capabilities; demonstrate missing-storage initialization and missing lifecycle
-selection in bounded owned fixtures. Verify idempotency and preserve original
-settings, inquiry/Consent records, journals and all disabled delivery/export flags.
-Reuse existing evidence. No browser acceptance campaign or client-site development
-is part of this milestone. Until these checks pass, 0.6.4.2 is not an accepted release.
+The exact candidate was installed directly from 0.6.4. Actual HTTPS wp-login cookie
+sessions and administrator admin-post requests passed 60 focused assertions with
+real WordPress capabilities/nonces and MariaDB storage: initial/repeat storage,
+selector save/fresh readback and invalid identity rejection, each missing field's
+own destination, deliberate external import/file preservation/unexposed values,
+America/Chicago retention, drift disclosure, and permission/nonce rejection for
+all three mutating handlers. Physical inquiry storage:34 columns/11 indexes;
+guard storage:5 columns, both InnoDB. Fixtures used separate owned tables/options
+and authenticated users; existing storage was never cleared. Original Ads settings,
+inquiry/Consent tables and journals remained byte/checksum-identical. Owned test
+users, options, tables, MU request control and password ledger were removed.
+
+Completed local147 assertions are retained evidence, not a substitute for these
+installed checks. No client installation, production rollout, real export/delivery,
+new consent evidence or broader browser acceptance campaign is claimed. Existing
+partial/unsupported schemas still require migration review; initialization does
+not repair or reset pending work. Final package changes after the verified
+candidate are release documentation/manifest only; runtime bytes are unchanged.

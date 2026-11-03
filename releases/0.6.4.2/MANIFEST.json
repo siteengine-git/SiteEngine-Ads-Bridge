@@ -11,20 +11,20 @@
   "migration": "Explicit se-ads configuration-admin migrate preview; --apply additive guard only. No activation migration.",
   "recovery_correction_commit": "1c570daf52ca84c06e8226262e848b9a1aac7a99",
   "candidate": "0.6.4.2",
-  "designation": "UNACCEPTED_LOCAL_VERIFIED_ALMA_BLOCKED",
+  "designation": "ACCEPTED_ALMA_ADMINISTRATOR_VERIFIED",
   "runtime_base_commit": "b2dacd9d5b70c28fd705f87a3c57de35bda84b6e",
-  "source_pin": "Published commit containing releases/0.6.4.2/MANIFEST.json",
-  "scope": "Reusable administrator storage/lifecycle/explicit external-authority migration; no Consent or delivery changes",
+  "source_pin": "Stable v0.6.4.2 tag / containing published release checkpoint",
+  "scope": "Reusable administrator setup; installed authenticated HTTP/native acceptance passed; final documentation/manifest only after exact verified candidate",
   "payload": [
     {
       "path": "CHANGELOG.md",
-      "bytes": 18638,
-      "sha256": "88a057dc80cb97fd2b6018e343e7c7fc5ea899ef7d5b25629d794dc838d276e2"
+      "bytes": 18732,
+      "sha256": "a3a36e169a9a593b41d8f5425cb28c5850704d844a9a935f2bbae7a660778b30"
     },
     {
       "path": "README.md",
-      "bytes": 16082,
-      "sha256": "6f6e2c0ec4ae62f7c0714165ce5b3e8011c7b68e6dbef2a58acc8b50516f4fc1"
+      "bytes": 16020,
+      "sha256": "1bf76af33a1fb7ab60e3f4dad511da558820de329d26f30ad18883decfbd3c2e"
     },
     {
       "path": "config/client.example.php",
@@ -153,8 +153,8 @@
     },
     {
       "path": "docs/ADMINISTRATOR-SETUP-0.6.4.2.md",
-      "bytes": 6020,
-      "sha256": "2ba208f9c05c805d64f2d12c67de90e2893e408415f30d7c15f179f83ebf6f24"
+      "bytes": 6714,
+      "sha256": "6ad525a518d9a35c6ab2474966ace1a4830a05dcb0d37464c91b892ffe57fca9"
     }
   ]
 }

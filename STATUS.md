@@ -1,3 +1,36 @@
+## 2026-11-03 - 0.6.4.2 accepted administrator setup; installed verified
+
+Current user instruction supersedes the historical exact-job-archive prerequisite:
+authoritative current deployment record/ownership and unresolved Ads operations
+were checked once and permitted work. Historical review/PLAN_ONLY archives were
+preserved unchanged. No Base investigation or Campbell commands in this milestone.
+
+Exact candidate d78ddcf / ZIP500e5fbc97c0e72a0dddc3aff192467673c7f18e526a70de7a2847ba22ec0079
+installed directly from0.6.4. Real authenticated WordPress HTTPS/native acceptance:
+60 assertions PASS. Storage initial/repeat; lifecycle selectors/save/fresh readback
+and invalid identity; every missing field with its own destination; explicit external
+import/file preservation/unexposed values/Chicago retention/drift; all three handlers'
+capability and nonce failures. No doubles substitute for this installed evidence.
+Physical fixture schema34 inquiry columns/11 indexes;5 guard columns, InnoDB.
+
+Original Ads settings, inquiry/Consent data/journals, six disabled flags and active
+configuration preserved. Owned2 users/3 options/2 tables/MU/password ledger removed.
+Fresh actual module Ready;Doctor33 PASS/9 WARN/0 FAIL/0 PENDING. Existing valid site
+timezone preserved; fixture America/Chicago preserved in migrated settings. No real
+exports, sends, client rollout or storage-clearing simulation. Native evidence is
+releases/0.6.4.2/INSTALLED-ACCEPTANCE.json; detailed private artifacts remain outside Git.
+Retained147 local checks reused; no runtime defect or source-runtime change.
+
+Final stable ZIP 4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380
+Manifest b0c89fb00558b8a731ba14b6737905f8220398a1bfd2f9d39413654e6c5c84ff
+29 final members exact-installed/readback verified. Only README/CHANGELOG/admin
+instructions/manifest differ from tested candidate; no repeated runtime acceptance.
+Canonical delivery D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+Exactly one ZIP; previous requested/historical delivery packages hash-archived in
+project delivery-history. Source/repository/branch unchanged. Implemented, packaged,
+installed, verified, accepted YES; stable publication recorded separately after push.
+Tag v0.6.4.2 will pin the accepted checkpoint. No main/history rewrite or new milestone.
+
 ## 2026-11-03 - direct 0.6.4.2 continuation: exact prior-job release unproven
 
 Continue runtime from d78ddcf. No feature/source-runtime changes or new package.

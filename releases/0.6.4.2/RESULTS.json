@@ -11,8 +11,25 @@
     "failures": 0
   },
   "php_lint": 9,
-  "boundaries": "Actual handlers/resolver/coordination, real local filesystem locks; WordPress, vendor and SQL doubles. No installed/native/browser pass.",
+  "boundaries": "147 retained local assertions;60 fresh authenticated HTTPS WordPress administrator/native assertions. No browser UI campaign, real export/customer delivery or client deployment.",
   "historical_evidence": "Retained prior evidence reused; no browser campaign or unchanged Consent/export tests repeated.",
-  "site_mutations": 0,
-  "package_files_staged_only": "Existing owner-private Ads evidence directory on Alma; 0.6.4.1 package and installation/readback scripts staged. No installed replacement occurred."
+  "installed_authenticated_http_assertions": 60,
+  "installed_physical_schema": {
+    "inquiry_columns": 34,
+    "inquiry_indexes": 11,
+    "guard_columns": 5,
+    "engine": "InnoDB"
+  },
+  "installed_doctor": {
+    "PASS": 33,
+    "WARN": 9,
+    "FAIL": 0,
+    "PENDING": 0
+  },
+  "installed_module": "Ready",
+  "original_configuration_and_history_preserved": true,
+  "owned_test_resources_removed": true,
+  "runtime_defects": 0,
+  "final_package_runtime_changes": 0,
+  "client_deployment": false
 }

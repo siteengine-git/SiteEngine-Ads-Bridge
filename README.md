@@ -1,8 +1,8 @@
-> Current source: **0.6.4.2, reusable administrator setup - UNACCEPTED / NOT INSTALLED**, PHP 8.3 minimum.
-> Reports every setup validation failure with field labels and settings destinations.
-> Preserves stable 0.6.4 coordination/recovery and Consent behavior. Local reporting
-> checks passed; this correction is packaged, not installed by this assignment.
-> Read [administrator setup steps](docs/ADMINISTRATOR-SETUP-0.6.4.2.md). Alma installation/native verification is blocked by a foreign executor; this is not an accepted release.
+> Current source: **0.6.4.2, accepted administrator setup**, PHP 8.3 minimum.
+> Installed and verified on Alma through actual authenticated administrator HTTP requests.
+> Storage initialization, lifecycle selection, actionable errors, explicit external migration/drift, and permission/nonce rejection passed.
+> Consent, inquiry history and disabled delivery/export flags preserved. No client rollout.
+> Read [administrator setup steps](docs/ADMINISTRATOR-SETUP-0.6.4.2.md).
 
 # SiteEngine Ads Bridge
 

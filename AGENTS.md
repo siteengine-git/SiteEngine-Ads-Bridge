@@ -1,3 +1,15 @@
+## Current Ads-only setup completion authority - November 3, 2026
+
+The latest direct instruction supersedes historical exact-archive-release gates and
+unrelated Base assignments. Current authoritative deployment ownership and unresolved
+Ads operations determine admission; a historical review/PLAN_ONLY archive is not an
+independent reservation and must be preserved. The bounded0.6.4.2 administrator
+milestone has passed installed authenticated HTTP/native verification. Finalize its
+stable package/release only; no client rollout or additional milestone is authorized.
+Canonical delivery is D:\SiteEngine\Plugins..Deliverables\PLUGIN - SiteEngine Ads-Bridge
+(actual folder uses the existing em dash). No slash between Plugins and ..Deliverables.
+Preserve all configuration/history/journals/Consent and disabled delivery flags.
+
 ## Immediate instruction priority — November 3, 2026
 
 New user instructions take priority over the current plan, tests and cleanup.
