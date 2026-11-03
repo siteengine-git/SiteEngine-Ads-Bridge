@@ -13,8 +13,11 @@
   "final_documentation_package_installation": "PASS exact 29 members and fresh process readback; runtime unchanged",
   "authenticated_http_assertions": 60,
   "local_assertions_retained": 147,
-  "released": false,
+  "released": true,
   "destination": "D:\\SiteEngine\\Plugins..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
   "verified": true,
-  "accepted": true
+  "accepted": true,
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.2",
+  "accepted_commit": "1d5c995a4ea2d77c3cc09cda3143a047860dd36e",
+  "publication_verified": true
 }

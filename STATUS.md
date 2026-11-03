@@ -1,3 +1,26 @@
+## RELEASED - Ads Bridge 0.6.4.2 administrator milestone complete - 2026-11-03
+
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.2
+Stable tag v0.6.4.2 pins 1d5c995a4ea2d77c3cc09cda3143a047860dd36e.
+Implemented/packaged/installed/verified/accepted/released YES. Exact final stable
+29-member package installed under ownership and fresh readback passed.60 real
+HTTP/native assertions PASS; cleanup and original-state preservation PASS. Doctor
+33 PASS/9 WARN/0 FAIL/0 PENDING; module Ready; six delivery/export flags disabled.
+No runtime defect; final docs/manifest-only delta from tested candidate. Prior
+147 local assertions retained without repeating unrelated suites. No client rollout.
+
+ZIP SHA256 4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380
+Manifest SHA256 b0c89fb00558b8a731ba14b6737905f8220398a1bfd2f9d39413654e6c5c84ff
+Current delivery D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+contains exactly one stable installable ZIP plus matching manifest/checksum/admin
+instructions/release records. GitHub four asset digests match exact local files.
+Historical candidates/earlier packages preserved in project delivery-history.
+Original Ads configuration/records/journals/Consent unchanged; two test users,
+three options, two fixture tables, request MU and password ledger removed. No
+active Ads test reservation. Owner-private backups/evidence retained by Ads Codex.
+Campbell untouched. Source main/history/other work preserved; maintenance branch
+and stable tag published. No additional milestone started or pending in this scope.
+
 ## 2026-11-03 - 0.6.4.2 accepted administrator setup; installed verified
 
 Current user instruction supersedes the historical exact-job-archive prerequisite:

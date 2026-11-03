@@ -1,0 +1,39 @@
+{
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.2",
+  "published_at": "2026-11-03T19:32:28Z",
+  "tag": "v0.6.4.2",
+  "accepted_commit": "1d5c995a4ea2d77c3cc09cda3143a047860dd36e",
+  "draft": false,
+  "prerelease": false,
+  "published_state_verified": true,
+  "assets": [
+    {
+      "name": "siteengine-ads-bridge-0.6.4.2.zip",
+      "sha256": "4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380",
+      "size": 212137,
+      "github_digest": "sha256:4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.6.4.2/siteengine-ads-bridge-0.6.4.2.zip"
+    },
+    {
+      "name": "MANIFEST.json",
+      "sha256": "b0c89fb00558b8a731ba14b6737905f8220398a1bfd2f9d39413654e6c5c84ff",
+      "size": 5810,
+      "github_digest": "sha256:b0c89fb00558b8a731ba14b6737905f8220398a1bfd2f9d39413654e6c5c84ff",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.6.4.2/MANIFEST.json"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "sha256": "5a872277fd1da9275f7867e0d90efe2b1d49ea12d36f2e3852e40fdc2b22c32f",
+      "size": 180,
+      "github_digest": "sha256:5a872277fd1da9275f7867e0d90efe2b1d49ea12d36f2e3852e40fdc2b22c32f",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.6.4.2/SHA256SUMS.txt"
+    },
+    {
+      "name": "ADMINISTRATOR-STEPS.md",
+      "sha256": "6ad525a518d9a35c6ab2474966ace1a4830a05dcb0d37464c91b892ffe57fca9",
+      "size": 6714,
+      "github_digest": "sha256:6ad525a518d9a35c6ab2474966ace1a4830a05dcb0d37464c91b892ffe57fca9",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.6.4.2/ADMINISTRATOR-STEPS.md"
+    }
+  ]
+}
