@@ -136,21 +136,20 @@ final class SiteEngine_Ads_Bridge_Admin {
 	public static function module_status() {
 		$config = SiteEngine_Ads_Bridge_Config::instance();
 		$source = $config->configuration_source();
-
-		if ( 'setup' === $source || ! SiteEngine_Ads_Bridge_Settings::exists() && 'local_file' !== $source && 'external' !== $source ) {
+		$issues = self::setup_issues( $config );
+		if ( $issues ) {
+			$messages = array();
+			foreach ( $issues as $issue ) {
+				$messages[] = $issue['label'] . ': ' . $issue['message'] . ' Open ' . $issue['destination'] . '.';
+			}
+			if ( 'external' === $source ) {
+				$messages[] = 'External configuration is active; UI saves do not replace SEAB_CONFIG_FILE. Review the override in Ads Bridge Migration.';
+			}
 			return array(
 				'status'  => 'setup_required',
 				'label'   => 'Setup Required',
-				'message' => 'Complete Ads Bridge setup before enabling exports.',
-			);
-		}
-
-		$errors = $config->validate();
-		if ( ! empty( $errors ) ) {
-			return array(
-				'status'  => 'setup_required',
-				'label'   => 'Setup Required',
-				'message' => (string) reset( $errors ),
+				'message' => implode( ' ', $messages ),
+				'setup_errors' => $issues,
 			);
 		}
 
@@ -183,6 +182,56 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 		$message = empty( $summary['WARN'] ) ? 'Configuration and runtime checks are healthy.' : sprintf( 'Ready with %d doctor warning(s).', (int) $summary['WARN'] );
 		return array( 'status' => 'ready', 'label' => 'Ready', 'message' => $message );
+	}
+
+	/** Reporting only: retain every validation failure and stored Base prerequisite. */
+	public static function setup_issues( $config = null ) {
+		$config = $config ?: SiteEngine_Ads_Bridge_Config::instance();
+		$shared = array( 'client.name' => array( 'business_name', 'Business Name' ), 'client.timezone' => array( 'timezone', 'Business Timezone' ), 'client.currency' => array( 'currency', 'Currency' ), 'client.google_ads_customer_id' => array( 'google_ads_customer_id', 'Google Ads Customer ID' ) );
+		$labels = array( 'setup' => 'Ads setup', 'client.slug' => 'Client Slug', 'client.short_name' => 'Short Name', 'consent.required_policy_version' => 'Required Consent Policy Version', 'fluent_forms.form_id' => 'Master Fluent Form' );
+		foreach ( $shared as $key => $definition ) { $labels[ $key ] = $definition[1]; }
+		foreach ( array( 'new', 'qualified', 'unqualified', 'won' ) as $role ) { $labels[ 'fluentcrm.tags.lifecycle.' . $role ] = ucfirst( $role ) . ' lifecycle tag'; }
+		$issues = array();
+		$add = static function( $key, $message ) use ( &$issues, $shared, $labels ) {
+			$base = isset( $shared[ $key ] );
+			$tab = 'setup';
+			if ( strpos( $key, 'fluentcrm.' ) === 0 ) { $tab = 'lifecycle'; }
+			if ( strpos( $key, 'fluent_forms.fields.' ) === 0 ) { $tab = 'fields'; }
+			if ( strpos( $key, 'exports.' ) === 0 ) { $tab = 'exports'; }
+			if ( strpos( $key, 'google_sheets.' ) === 0 ) { $tab = 'sheets'; }
+			$issues[] = array( 'key' => $key, 'label' => $labels[ $key ] ?? ( $key ? ucwords( str_replace( array( '.', '_' ), ' ', $key ) ) : 'Ads configuration' ), 'message' => (string) $message, 'destination' => $base ? 'Business Data' : 'Ads setup', 'url' => admin_url( $base ? 'admin.php?page=business-data' : 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tab ) );
+		};
+		$source = $config->configuration_source();
+		if ( 'setup' === $source || ( ! SiteEngine_Ads_Bridge_Settings::exists() && ! in_array( $source, array( 'local_file', 'external' ), true ) ) ) {
+			$add( 'setup', 'Settings have not been saved. Complete and save Ads setup; review every failure below.' );
+		}
+		if ( function_exists( 'siteengine_has' ) ) {
+			foreach ( $shared as $key => $definition ) {
+				if ( ! siteengine_has( $definition[0] ) ) { $add( $key, 'No explicit value is saved in Business Data. A runtime fallback does not complete this prerequisite.' ); }
+			}
+		}
+		foreach ( $config->validate() as $error ) {
+			preg_match( '/\b(?:client|fluent_forms|fluentcrm|exports|google_sheets|consent|diagnostics)\.[a-z_]+(?:\.[a-z_]+)*/', (string) $error, $match );
+			$key = $match[0] ?? '';
+			if ( ! $key ) {
+				foreach ( array( 'client_name' => 'client.name', 'timezone' => 'client.timezone', 'currency' => 'client.currency', 'google_ads_cid' => 'client.google_ads_customer_id', 'client_slug' => 'client.slug', 'client_short_name' => 'client.short_name' ) as $legacy => $canonical ) {
+					if ( preg_match( '/\b' . preg_quote( $legacy, '/' ) . '\b/', (string) $error ) ) { $key = $canonical; break; }
+				}
+			}
+			$add( $key, $error );
+		}
+		return $issues;
+	}
+
+	/** Escaped, actionable list for the Ads screen; module messages stay plain text. */
+	public static function render_setup_issues( $config ) {
+		$issues = self::setup_issues( $config );
+		if ( ! $issues ) { return; }
+		echo '<div class="notice notice-error inline"><h2>Complete Ads Bridge setup</h2><ul>';
+		foreach ( $issues as $issue ) {
+			echo '<li><strong>' . esc_html( $issue['label'] ) . ':</strong> ' . esc_html( $issue['message'] ) . ' <a href="' . esc_url( $issue['url'] ) . '">Open ' . esc_html( $issue['destination'] ) . '</a></li>';
+		}
+		echo '</ul></div>';
 	}
 
 	/**
@@ -225,6 +274,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 		echo '<div class="wrap seab-admin"><h1>SiteEngine Ads Bridge</h1>';
 		self::render_source_banner( $config );
+		self::render_setup_issues( $config );
 
 		if ( isset( $_GET['seab_saved'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success is-dismissible"><p>Ads Bridge settings saved.</p></div>';
@@ -280,7 +330,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		$label = isset( $labels[ $source ] ) ? $labels[ $source ] : $source;
 		echo '<p><strong>Configuration authority:</strong> ' . esc_html( $label ) . '.</p>';
 		if ( 'external' === $source ) {
-			echo '<div class="notice notice-warning inline"><p><strong>External override active.</strong> You may import its values here, but UI changes will not become authoritative until the external <code>SEAB_CONFIG_FILE</code> definition is retired.</p></div>';
+			echo '<div class="notice notice-warning inline"><p><strong>External override active.</strong> You may import its values here, but UI changes will not become authoritative until the external <code>SEAB_CONFIG_FILE</code> definition is retired. <a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration' ) ) . '">Review configuration authority in Migration</a>.</p></div>';
 		} elseif ( 'local_file' === $source ) {
 			echo '<div class="notice notice-info inline"><p>An existing plugin-local PHP config is active. Use the Migration tab to import it into Base-managed settings.</p></div>';
 		}

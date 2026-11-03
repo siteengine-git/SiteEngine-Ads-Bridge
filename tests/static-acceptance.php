@@ -484,7 +484,7 @@ namespace {
 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
-	check( false !== strpos( $main_source, 'Version: 0.6.4' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.4'" ), 'candidate version is 0.6.4 in header and runtime constant' );
+	check( false !== strpos( $main_source, 'Version: 0.6.4.1' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.4.1'" ), 'candidate version is 0.6.4.1 in header and runtime constant' );
 
 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
 	exit( 0 === $fails ? 0 : 1 );

@@ -1,3 +1,34 @@
+## 2026-11-03 — 0.6.4.1 setup reporting, locally verified / packaged
+
+Canonical source/repository/branch unchanged; stable v0.6.4 history retained.
+Exact correction pin is the published commit containing releases/0.6.4.1.
+ZIP SHA-256 f1325169c411bdf54a717d2100b9cea6be9a0b284181792855e5f4963361c5d7. Package/manifests:
+releases/0.6.4.1/DELIVERY.json. Correction not installed by this assignment.
+
+Fresh client dev diagnosis from existing project/profile records: installed Ads0.6.4,
+Base2.2.2, Consent0.6.1-rc.2 and CRM0.3.6. Saved Base timezone, WordPress timezone,
+Base shared API/presence and effective Ads timezone all confirm valid America/Chicago.
+All four declared Ads shared prerequisites present. No Base save/lookup defect found.
+Actual external authority and saved Ads settings both lack exactly lifecycle.new,
+lifecycle.qualified and lifecycle.unqualified mappings under fluentcrm.tags.
+Won remains present. No repeated save, field/mapping creation or config change.
+
+Reporting now retains every validation failure even before settings are saved,
+uses readable labels and Business Data / correct Ads tab links, distinguishes stored
+Base presence from fallback and explains external precedence/Migration. Existing
+validation, Doctor failure behavior, Consent/coordination/runtime/export bytes remain
+unchanged. 30 focused reporting +10 settings +19 bootstrap +85 static assertions
+PASS (144);4 PHP lint PASS. WordPress/Base/Doctor boundaries doubled in local tests.
+No acceptance campaign, fixtures, browser harness, export or production rollout.
+
+Client diagnosis uses existing scoped CLI PHP7.4.33. Unrelated CRM constructor syntax
+fails there; the read-only diagnostic excluded only CRM for that process, without
+activation/access changes. This does not establish client web PHP or installed UI
+behavior of the correction. Full diagnostic/versions/errors and copyable Base note
+remain local in ../setup-reporting-20261103. Source Base not edited; no external
+message was sent. Delivery folder retains one latest ZIP; previous artifacts archived
+under the existing Ads project to preserve stable0.6.4 and preliminary evidence.
+
 ## 2026-11-02 — stable 0.6.4 installed and released
 
 Source/tag: v0.6.4, exact published commit containing this entry and releases/0.6.4.

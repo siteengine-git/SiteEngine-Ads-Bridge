@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.4.1 — 2026-11-03
+
+- Show all unsaved/invalid setup failures with readable field labels and actions.
+- Link Base-owned prerequisites to Business Data and Ads-owned fields to Ads setup.
+- Distinguish explicit Base presence from runtime fallback and explain external
+  configuration precedence instead of recommending ineffective repeated resaves.
+- Preserve validation rules, Doctor failures, Consent, coordination and exports.
+
 ## 0.6.4 — 2026-11-02
 
 - Finalize the Consent-repaired contract-1 successor after Alma setup/migration,

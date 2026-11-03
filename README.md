@@ -1,9 +1,8 @@
-> Current source: **0.6.4, stable configuration-coordination successor**, PHP8.3 minimum.
-> Preserves Consent0.6.1-rc.2 current-eligibility repair and adds configuration-
-> coordination contract1 with explicit additive guard migration. Read
-> [successor installation and recovery](docs/COORDINATION-SUCCESSOR.md).
-> Accepted0.6.3 and maintenance0.6.3.1-rc.1 archives remain preserved. Alma installed/native verification passed.
-> This package does not install CRM or authorize production/delivery.
+> Current source: **0.6.4.1, setup-reporting correction**, PHP 8.3 minimum.
+> Reports every setup validation failure with field labels and settings destinations.
+> Preserves stable 0.6.4 coordination/recovery and Consent behavior. Local reporting
+> checks passed; this correction is packaged, not installed by this assignment.
+> Read [setup-reporting notes](docs/SETUP-REPORTING-0.6.4.1.md).
 
 # SiteEngine Ads Bridge
 
