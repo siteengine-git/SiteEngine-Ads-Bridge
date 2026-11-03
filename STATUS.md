@@ -1,3 +1,37 @@
+## 2026-11-03 — client install/mapping task: active foreign job, no mutation
+
+Reviewed runtime/package remains b2dacd9d5b70c28fd705f87a3c57de35bda84b6e,
+0.6.4.1 ZIP SHA-256 f1325169c411bdf54a717d2100b9cea6be9a0b284181792855e5f4963361c5d7.
+Independently verified the existing ZIP and canonical delivery directory; exactly
+one ZIP is present. Current build instructions/path resolver now explicitly use
+`D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
+The older path without the separator in historical entries is not authoritative.
+No package rebuild or runtime source change.
+
+Fresh client readback through the existing scoped runner and installed PHP8.3.36:
+Ads0.6.4, Base2.2.2, Consent0.6.1-rc.2, CRM0.3.7. External configuration remains
+authoritative; exactly new/qualified/unqualified lifecycle mappings are absent.
+All three standard tags now exist uniquely in the vendor inventory; no tag creation
+is needed if that inventory remains unchanged when exclusive ownership is obtained.
+Won, valid America/Chicago and all six disabled automation/Sheet/export flags remain
+unchanged. Doctor32 PASS/8 WARN/6 FAIL/0 PENDING: all six FAIL rows are the three
+missing mappings reported by two checks. Current module reports Setup Required.
+Detailed identifiers, owner/job/checkpoint and diagnostics remain outside public Git
+in ../campbell-install-20261103.
+
+Installation and mapping writes have NOT run: the existing common durable CRM job
+is active with inflight work, a live identity-matching supervisor, and advancing
+checkpoints across repeated bounded inspections. Its ownership spans invocations;
+free executor-lock moments do not permit replacement of pinned Ads dependencies.
+No job takeover, worker termination, configuration write, migration, activation,
+fixture, browser replay or delivery. The owning CRM executor must safely complete
+or explicitly hand off its existing job before this authorized Ads task continues.
+No new general approval is required. Refresh tags/configuration and reverify actual
+installed hashes under ownership before applying the three-leaf delta and exact ZIP.
+
+Fresh local path checks pass: canonical hierarchy, exactly-one-ZIP, pinned SHA-256.
+Prior144 reporting assertions/4 PHP lints carried forward; no unchanged suites rerun.
+
 ## 2026-11-03 — 0.6.4.1 setup reporting, locally verified / packaged
 
 Canonical source/repository/branch unchanged; stable v0.6.4 history retained.
