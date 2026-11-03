@@ -1,17 +1,18 @@
 # Canonical Ads delivery directory
 
-Use `tools/Get-DeliveryDirectory.ps1` to resolve the directory. Its construction
-keeps the directory separator explicit:
+Use `tools/Get-DeliveryDirectory.ps1` to resolve the exact directory:
 
 ```powershell
 $delivery = & .\tools\Get-DeliveryDirectory.ps1 -VerifyCurrentZip
 ```
 
 The canonical path is:
-`D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
-`..Deliverables` is a literal directory immediately inside `Plugins`. Do not append
-that name to `Plugins` without a separator. Historical one-off build commands and
-receipts are evidence, not the current build procedure.
+`D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
+`Plugins..Deliverables` is one literal directory name immediately inside
+`D:\SiteEngine`. It is a sibling of `Plugins`. The older directory
+`D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge` is not the
+delivery destination. Historical build commands and receipts remain evidence,
+not the current build procedure.
 
 Release source uses `releases/<version>/MANIFEST.json` and `DELIVERY.json`. Preserve
 their exact payload/embedded-manifest bytes and independent package hashes. A pinned
@@ -21,6 +22,7 @@ exactly one current ZIP there, including subdirectories; preserve older artifact
 under the existing project's delivery-history outside the delivery directory.
 No active configuration, credentials, logs or client data belong in an archive.
 
-For 0.6.4.1 the runtime source pin is b2dacd9d5b70c28fd705f87a3c57de35bda84b6e and
-ZIP SHA-256 is f1325169c411bdf54a717d2100b9cea6be9a0b284181792855e5f4963361c5d7.
-This path/tooling correction does not rebuild or change that reviewed package.
+Accepted stable 0.6.4.2 is pinned by tag `v0.6.4.2`; ZIP SHA-256 is
+`4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380`.
+This path/tooling correction does not rebuild the accepted ZIP, change its
+manifest/release assets, alter runtime, repeat acceptance or perform site operations.

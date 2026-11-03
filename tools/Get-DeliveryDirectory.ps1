@@ -1,8 +1,8 @@
 [CmdletBinding()]
 param([switch]$VerifyCurrentZip)
 $ErrorActionPreference = 'Stop'
-# '..Deliverables' is a literal child of Plugins, not a suffix of its name.
-$directory = Join-Path 'D:\SiteEngine\Plugins' '..Deliverables\PLUGIN — SiteEngine Ads-Bridge'
+# 'Plugins..Deliverables' is the exact sibling directory of Plugins.
+$directory = Join-Path 'D:\SiteEngine\Plugins..Deliverables' 'PLUGIN — SiteEngine Ads-Bridge'
 if (!(Test-Path -LiteralPath $directory -PathType Container)) { throw 'Canonical Ads delivery directory is missing.' }
 if ($VerifyCurrentZip) {
     $zips = @(Get-ChildItem -LiteralPath $directory -Filter '*.zip' -File -Recurse)

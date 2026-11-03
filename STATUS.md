@@ -1,3 +1,15 @@
+## Delivery location correction - 2026-11-03
+
+Required exact physical destination: D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+Verified exactly one installable ZIP; SHA256 4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380.
+Accepted ZIP/release/installed evidence unchanged. No rebuild, runtime edit,
+acceptance repetition or site operation. Existing ZIP and six release sidecars
+already occupied the required path; the notice-only folder was the separate
+Plugins/..Deliverables path. Its notice was hash-archived in project delivery-history.
+Corrected Get-DeliveryDirectory.ps1, BUILD-DELIVERY.md and the older local packaging
+script to use the exact Plugins..Deliverables root. Historical packages preserved.
+This supersedes conflicting older build-location instructions. Assignment complete.
+
 ## RELEASED - Ads Bridge 0.6.4.2 administrator milestone complete - 2026-11-03
 
 https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.2
