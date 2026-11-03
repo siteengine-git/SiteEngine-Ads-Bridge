@@ -1,0 +1,18 @@
+{
+  "fresh_local_assertions": {
+    "administrator_handlers": 18,
+    "setup_destination_lock": 9,
+    "reporting": 30,
+    "settings": 10,
+    "coordination": 55,
+    "ordered_recovery": 6,
+    "bootstrap": 19,
+    "total": 147,
+    "failures": 0
+  },
+  "php_lint": 9,
+  "boundaries": "Actual handlers/resolver/coordination, real local filesystem locks; WordPress, vendor and SQL doubles. No installed/native/browser pass.",
+  "historical_evidence": "Retained prior evidence reused; no browser campaign or unchanged Consent/export tests repeated.",
+  "site_mutations": 0,
+  "package_files_staged_only": "Existing owner-private Ads evidence directory on Alma; 0.6.4.1 package and installation/readback scripts staged. No installed replacement occurred."
+}

@@ -1,3 +1,55 @@
+## Immediate instruction priority — November 3, 2026
+
+New user instructions take priority over the current plan, tests and cleanup.
+A stop, pause or scope correction immediately stops launching commands and
+mutations. Report any already-running process or uncertain write without extended
+cleanup. Do not resume superseded work from older conversation or queued plans.
+The application message queue is outside the agent's control; never claim otherwise.
+These rules explicitly supersede conflicting older continuation/cleanup guidance.
+
+Current bounded milestone: reusable administrator setup on Alma only. Earlier
+Campbell external-configuration patches and direct client development are superseded.
+Preserve their evidence/journals. Canonical source remains this project's source
+folder. One bounded ownership check on contention; no repeated polling. No new
+coordination framework or browser acceptance campaign.
+## Deployment ownership - permanent rule, November 2, 2026
+
+Aubrey's "Fix this forever" instruction supersedes conflicting per-command
+handoff/approval behavior. Plugin Helpers own decisions and their Codex executes;
+Alma is not a plugin approval gate.
+
+Treat a finite multi-batch installation/import and its final readback/reopening as
+ONE deployment job. Extend and reuse the existing supervisor/executor lock: retain
+job ownership across related phases, including dependency version pins. A different
+plugin may not replace those dependencies between batches merely because one PHP
+process exited. Do not hold a SQL named lock across separate PHP sessions.
+
+Every cooperating mutating entry point must check the same durable job ownership
+record under the existing executor lock before changing shared files, definitions,
+schemas or maintenance controls. The record identifies project/job, protected
+resources, dependency hashes, process identity and the safe checkpoint; it contains
+no credentials or customer data. Implement this in the existing supervisor/launcher,
+not a new service, framework, permissions system or alternate connection route.
+Documentary rules alone are not proof that runtime enforcement is implemented.
+
+Handle normal contention with bounded waits and independent local work, then
+recheck actual owner state. Discover the owning package/commit/hashes from existing
+local delivery records; do not ask Aubrey for routine handoffs or another approval.
+Do not delete/steal a live lock, kill foreign workers, or infer cessation from time.
+
+At a completed safe checkpoint, a reviewed compatible dependency update may be
+bound under standing task authorization. Preserve original envelopes, operation
+IDs, receipts and checkpoints unchanged; refresh the installed profile and create
+new exact plans only for remaining work. An interrupted operation must first use
+its supported exact recovery path. Never bypass a source mismatch or blindly replay
+an uncertain save. Verify the actually installed sources after acquiring ownership.
+
+Release ownership only after the job's safe completion/handoff is recorded. The
+owning executor restores only its own temporary maintenance control; outbound and
+enrollment holds remain unless separately authorized. Add a focused two-executor
+regression proving that a second deployment cannot change pinned dependencies
+between the first job's phases, then can proceed after that job finishes.
+
 <!-- ADS-DIRECT-DELIVERY-AUTHORITY-20261102 -->
 ## Current Ads ownership and execution authority
 

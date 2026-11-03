@@ -31,6 +31,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		add_filter( 'siteengine_readme_tabs', array( __CLASS__, 'register_help_tab' ) );
 		add_action( 'admin_post_seab_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_seab_import_config', array( __CLASS__, 'handle_import' ) );
+		add_action( 'admin_post_seab_initialize_storage', array( __CLASS__, 'handle_storage' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_base_missing_notice' ) );
 	}
 
@@ -99,6 +100,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '<p>Ads Bridge reconciles the configured Fluent Form and FluentCRM lifecycle into append-only Google Sheets feeds for Google Ads Data Manager. The Golden Account model standardizes SE | Qualified Lead and SE | Converted Lead on one Google_Ads_Import worksheet. Google Ads API upload remains disabled.</p>';
 
 		echo '<h3>Setup checklist</h3><ol>';
+		echo '<li><strong>Storage:</strong> In Ads Bridge &rarr; Storage, confirm and select Initialize Required Ads Storage. This reuses the explicit inquiry and guard migrations without adopting contacts or enabling delivery. Existing incomplete schemas and pending work require review.</li>';
 		echo '<li><strong>Business Data:</strong> In <a href="' . esc_url( admin_url( 'admin.php?page=business-data' ) ) . '">SiteEngine &rarr; Business Data</a>, configure Business Name, Business Timezone, Currency, and Google Ads Customer ID.</li>';
 		echo '<li><strong>Setup:</strong> In <a href="' . esc_url( $ads_url ) . '">SiteEngine &rarr; Ads Bridge</a>, set the stable client slug, short name, master Fluent Form, and consent policy version.</li>';
 		echo '<li><strong>CRM &amp; Lifecycle:</strong> Map Customers, Future Customers, DNC, and the four authoritative lifecycle tags: New, Qualified, Unqualified, and Won. Optional lifecycle automation keeps those states mutually exclusive and stamps milestone dates.</li>';
@@ -111,7 +113,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '</ol>';
 
 		echo '<h3>Configuration authority</h3>';
-		echo '<p>Normal installations use WordPress Ads Bridge settings plus shared SiteEngine Base data. Legacy external <code>SEAB_CONFIG_FILE</code> remains the highest-precedence compatibility override; plugin-local <code>config/client.php</code> is supported only as a migration fallback.</p>';
+		echo '<p>Normal installations use WordPress Ads Bridge settings plus shared SiteEngine Base data. Legacy external <code>SEAB_CONFIG_FILE</code> controls values until an administrator deliberately imports and switches authority in Migration. This choice is bound to the reviewed file path/hash; later file changes visibly restore external authority. Plugin-local <code>config/client.php</code> is supported as a migration fallback.</p>';
 
 		echo '<h3>Export safety rules</h3><ul>';
 		echo '<li>Writes require explicit <code>--apply</code>; preview modes write nothing.</li>';
@@ -199,7 +201,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 			if ( strpos( $key, 'fluent_forms.fields.' ) === 0 ) { $tab = 'fields'; }
 			if ( strpos( $key, 'exports.' ) === 0 ) { $tab = 'exports'; }
 			if ( strpos( $key, 'google_sheets.' ) === 0 ) { $tab = 'sheets'; }
-			$issues[] = array( 'key' => $key, 'label' => $labels[ $key ] ?? ( $key ? ucwords( str_replace( array( '.', '_' ), ' ', $key ) ) : 'Ads configuration' ), 'message' => (string) $message, 'destination' => $base ? 'Business Data' : 'Ads setup', 'url' => admin_url( $base ? 'admin.php?page=business-data' : 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tab ) );
+			if ( strpos( $key, 'storage.' ) === 0 ) { $tab = 'storage'; }
+			$names = array( 'setup' => 'Setup', 'lifecycle' => 'CRM & Lifecycle', 'fields' => 'Field Mapping', 'exports' => 'Exports', 'sheets' => 'Google Sheets', 'storage' => 'Storage' );
+			$issues[] = array( 'key' => $key, 'label' => $labels[ $key ] ?? ( $key ? ucwords( str_replace( array( '.', '_' ), ' ', $key ) ) : 'Ads configuration' ), 'message' => (string) $message, 'destination' => $base ? 'Business Data' : 'Ads setup > ' . $names[ $tab ], 'url' => admin_url( $base ? 'admin.php?page=business-data' : 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tab ) );
 		};
 		$source = $config->configuration_source();
 		if ( 'setup' === $source || ( ! SiteEngine_Ads_Bridge_Settings::exists() && ! in_array( $source, array( 'local_file', 'external' ), true ) ) ) {
@@ -219,6 +223,26 @@ final class SiteEngine_Ads_Bridge_Admin {
 				}
 			}
 			$add( $key, $error );
+		}
+		if ( class_exists( 'SiteEngine_Ads_Bridge_Inquiries' ) && class_exists( 'SiteEngine_Ads_Bridge_Coordination' ) ) {
+			if ( method_exists( $config, 'get' ) ) {
+				global $wpdb;
+				foreach ( SiteEngine_Ads_Bridge_Config::lifecycle_roles() as $role ) {
+					$key = 'fluentcrm.tags.lifecycle.' . $role;
+					$title = $config->get( $key, '' );
+					if ( ! is_string( $title ) || '' === trim( $title ) ) { continue; }
+					$table = $wpdb->prefix . 'fc_tags';
+					$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM `{$table}` WHERE BINARY title = %s", $title ) );
+					if ( $wpdb->last_error || ! is_array( $ids ) || count( $ids ) !== 1 ) { $add( $key, 'The selected title must match exactly one existing FluentCRM tag. Create missing tags or resolve duplicate titles in FluentCRM > Contacts > Tags, then select the tag in CRM & Lifecycle.' ); }
+				}
+				if ( (int) $config->get( 'fluent_forms.form_id', 0 ) <= 0 ) { $add( 'fluent_forms.form_id', 'Select the existing master form in Ads Bridge > Setup.' ); }
+			}
+			if ( ! SiteEngine_Ads_Bridge_Inquiries::table_exists() || ! SiteEngine_Ads_Bridge_Inquiries::schema_ready() ) {
+				$add( 'storage.inquiries', 'Required inquiry storage is not initialized at schema 2. Use Initialize Required Ads Storage; existing incomplete schemas require migration review.' );
+			} else {
+				$guard = SiteEngine_Ads_Bridge_Coordination::migrate( false );
+				if ( $guard['status'] !== 'preview' || empty( $guard['exists_before'] ) ) { $add( 'storage.configuration_guard', 'Required configuration guard storage is missing, incomplete or blocked: ' . $guard['reason_code'] . '. Open Storage for initialization or pending-work diagnosis.' ); }
+			}
 		}
 		return $issues;
 	}
@@ -267,6 +291,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 			'compliance'  => 'Lead Compliance',
 			'diagnostics' => 'Diagnostics',
 			'migration'   => 'Migration',
+			'storage'     => 'Storage',
 		);
 		if ( ! isset( $tabs[ $tab ] ) ) {
 			$tab = 'setup';
@@ -312,6 +337,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 			case 'migration':
 				self::render_migration( $config );
 				break;
+			case 'storage':
+				self::render_storage();
+				break;
 			default:
 				self::render_setup( $config );
 		}
@@ -330,7 +358,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 		$label = isset( $labels[ $source ] ) ? $labels[ $source ] : $source;
 		echo '<p><strong>Configuration authority:</strong> ' . esc_html( $label ) . '.</p>';
 		if ( 'external' === $source ) {
-			echo '<div class="notice notice-warning inline"><p><strong>External override active.</strong> You may import its values here, but UI changes will not become authoritative until the external <code>SEAB_CONFIG_FILE</code> definition is retired. <a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration' ) ) . '">Review configuration authority in Migration</a>.</p></div>';
+			if ( get_option( SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION, array() ) ) { echo '<div class="notice notice-error inline"><p>The external file no longer matches the reviewed migration binding. External authority has resumed. Review Migration before any further settings save.</p></div>'; }
+
+			echo '<div class="notice notice-warning inline"><p><strong>External override active.</strong> Settings saves are blocked while this file controls values. In Migration, deliberately import and switch authority to WordPress settings, or retain the external authority. <a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration' ) ) . '">Review configuration authority in Migration</a>.</p></div>';
 		} elseif ( 'local_file' === $source ) {
 			echo '<div class="notice notice-info inline"><p>An existing plugin-local PHP config is active. Use the Migration tab to import it into Base-managed settings.</p></div>';
 		}
@@ -419,7 +449,10 @@ final class SiteEngine_Ads_Bridge_Admin {
 			'won'         => 'Won',
 		);
 		foreach ( $labels as $role => $label ) {
-			self::text_row( $label, 'tag_' . $role, $config->get( 'fluentcrm.tags.lifecycle.' . $role, '' ), '', 'seab-tag-options' );
+			$value = (string) $config->get( 'fluentcrm.tags.lifecycle.' . $role, '' );
+			echo '<tr><th><label for="seab-tag-' . esc_attr( $role ) . '">' . esc_html( $label ) . ' lifecycle tag</label></th><td><select required id="seab-tag-' . esc_attr( $role ) . '" name="tag_' . esc_attr( $role ) . '"><option value="">Select an existing tag</option>';
+			foreach ( $tags as $title ) { echo '<option value="' . esc_attr( $title ) . '" ' . selected( $value, $title, false ) . '>' . esc_html( $title ) . '</option>'; }
+			echo '</select><p class="description">Field: fluentcrm.tags.lifecycle.' . esc_html( $role ) . '. Missing tags: create them in FluentCRM &rarr; Contacts &rarr; Tags, then return here. Duplicate titles must be resolved there first.</p></td></tr>';
 		}
 		echo '</tbody></table><h2>Lifecycle Compliance Automation</h2><table class="form-table"><tbody>';
 		self::checkbox_row( 'Enable Lifecycle Compliance Automation', 'lifecycle_automation_enabled', (bool) $config->get( 'fluentcrm.lifecycle_automation.enabled', false ), 'When enabled: new master-form contacts receive New; lifecycle tags are kept mutually exclusive; Qualified stamps qualified_at; Unqualified stamps unqualified_at; Won stamps qualified_at and closed_date when blank. Invoice amount is never fabricated.' );
@@ -532,15 +565,22 @@ final class SiteEngine_Ads_Bridge_Admin {
 			echo '<p>Ads Bridge can copy the currently resolved schema-v2 configuration into WordPress settings. Shared client values will then be supplied by SiteEngine Base.</p>';
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="seab_import_config">';
 			wp_nonce_field( 'seab_import_config' );
+			if ( 'external' === $source ) {
+
+				echo '<p><label><input required type="checkbox" name="switch_authority" value="1"> Import the current effective values and make WordPress settings authoritative for this external file.</label></p>';
+				echo '<input type="hidden" name="external_sha256" value="' . esc_attr( is_file( SEAB_CONFIG_FILE ) ? hash_file( 'sha256', SEAB_CONFIG_FILE ) : '' ) . '">';
+			}
 			submit_button( 'Import Current Configuration', 'primary', 'submit', false );
 			echo '</form>';
 			if ( 'external' === $source ) {
-				echo '<div class="notice notice-warning inline"><p>The import does not edit <code>wp-config.php</code>. The external <code>SEAB_CONFIG_FILE</code> definition will continue to override imported settings until you deliberately retire that legacy override.</p></div>';
+
+				echo '<div class="notice notice-warning inline"><p>This deliberate switch preserves the external file and wp-config.php. It binds your choice to the current file path and SHA-256. If that file changes later, external authority resumes visibly and must be reviewed again. Shared business facts then come from Business Data. Export and automation flags are copied as configured; review them before switching.</p></div>';
 			} else {
 				echo '<p>For plugin-local config installations, imported settings become authoritative on the next request. The old file may remain as an inert fallback until cleanup.</p>';
 			}
 		} elseif ( 'settings' === $source ) {
 			echo '<p>Ads Bridge is already using Base-managed WordPress settings. No config migration is required.</p>';
+			if ( SiteEngine_Ads_Bridge_Setup::settings_authority() ) { echo '<p>The administrator deliberately migrated the external configuration to settings. The preserved external file is inactive while its reviewed hash matches. Business Data controls shared facts; Ads Bridge tabs control Ads values.</p>'; }
 		} else {
 			echo '<p>No legacy PHP configuration is active. Complete setup using the other tabs.</p>';
 		}
@@ -556,7 +596,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 			wp_die( 'Permission denied.' );
 		}
 		check_admin_referer( 'seab_save_settings' );
+		if ( SiteEngine_Ads_Bridge_Config::instance()->external_override_active() ) { wp_die( 'External SEAB_CONFIG_FILE controls these values. Use Ads Bridge > Migration to import and deliberately switch authority before saving settings.' ); }
 		$tab = isset( $_POST['seab_tab'] ) ? sanitize_key( wp_unslash( $_POST['seab_tab'] ) ) : 'setup';
+		$saved_before = SiteEngine_Ads_Bridge_Settings::get();
 
 		if ( SiteEngine_Ads_Bridge_Settings::exists() ) {
 			$data = SiteEngine_Ads_Bridge_Settings::get();
@@ -580,6 +622,8 @@ final class SiteEngine_Ads_Bridge_Admin {
 			foreach ( SiteEngine_Ads_Bridge_Config::lifecycle_roles() as $role ) {
 				$data['fluentcrm']['tags']['lifecycle'][ $role ] = self::post_text( 'tag_' . $role );
 			}
+			try { SiteEngine_Ads_Bridge_Setup::validate_lifecycle( $data['fluentcrm']['tags']['lifecycle'] ); }
+			catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
 			$data['fluentcrm']['lifecycle_automation']['enabled'] = self::post_bool( 'lifecycle_automation_enabled' );
 			$data['fluentcrm']['lifecycle_automation']['unqualified_reason_field'] = self::post_text( 'unqualified_reason_field' );
 			$data['fluentcrm']['lifecycle_automation']['unqualified_at_field'] = self::post_text( 'unqualified_at_field' );
@@ -608,7 +652,11 @@ final class SiteEngine_Ads_Bridge_Admin {
 			$data['google_sheets']['credentials_path'] = self::post_text( 'credentials_path' );
 		}
 
-		SiteEngine_Ads_Bridge_Settings::save( $data );
+		try { SiteEngine_Ads_Bridge_Setup::with_configuration( static function() use ( $data, $saved_before ) {
+			if ( SiteEngine_Ads_Bridge_Settings::get() !== $saved_before ) { throw new RuntimeException( 'Ads settings changed during this request. Reload the tab before saving.' ); }
+			SiteEngine_Ads_Bridge_Settings::save( $data );
+			if ( SiteEngine_Ads_Bridge_Settings::get() !== SiteEngine_Ads_Bridge_Settings::sanitize_config( $data ) ) { throw new RuntimeException( 'Settings readback failed. Inspect current values before retrying.' ); }
+		} ); } catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
 		$url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tab . '&seab_saved=1' );
 		wp_safe_redirect( $url );
 		exit;
@@ -625,8 +673,49 @@ final class SiteEngine_Ads_Bridge_Admin {
 			wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration' ) );
 			exit;
 		}
-		SiteEngine_Ads_Bridge_Settings::save( $config->all() );
+		try { SiteEngine_Ads_Bridge_Setup::with_configuration( static function() use ( $config ) {
+			$choice = null;
+			if ( $config->external_override_active() ) {
+				$hash = self::post_text( 'external_sha256' );
+				if ( self::post_text( 'switch_authority' ) !== '1' || ! is_file( SEAB_CONFIG_FILE ) || ! hash_equals( hash_file( 'sha256', SEAB_CONFIG_FILE ), $hash ) ) { throw new RuntimeException( 'Confirm the deliberate authority switch in Migration. The external file must still match the displayed review.' ); }
+				$choice = array( 'path' => SEAB_CONFIG_FILE, 'sha256' => $hash );
+			}
+			$data = $config->all();
+			foreach ( SiteEngine_Ads_Bridge_Config::lifecycle_roles() as $role ) { $data['fluentcrm']['tags']['lifecycle'][ $role ] = $config->get( 'fluentcrm.tags.lifecycle.' . $role, '' ); }
+			$data = SiteEngine_Ads_Bridge_Settings::sanitize_config( $data );
+			SiteEngine_Ads_Bridge_Settings::save( $data );
+			if ( SiteEngine_Ads_Bridge_Settings::get() !== $data ) { throw new RuntimeException( 'Imported settings readback failed; external authority has not been changed.' ); }
+			if ( null !== $choice ) {
+				update_option( SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION, $choice, false );
+				if ( get_option( SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION ) !== $choice ) { throw new RuntimeException( 'Authority switch readback failed. Review Migration before retrying.' ); }
+			}
+		} ); } catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
 		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration&seab_imported=1' ) );
+		exit;
+	}
+
+	public static function render_storage() {
+		echo '<h2>Required Ads Storage</h2><p>Inquiry history (schema 2) and the configuration guard (schema 1) are required. Initialization reuses the explicit plugin migrations. It creates absent storage, preserves existing records and journals, and never adopts inquiries, enables delivery or exports, or changes Consent.</p>';
+		$ready = SiteEngine_Ads_Bridge_Inquiries::table_exists() && SiteEngine_Ads_Bridge_Inquiries::schema_ready();
+		echo '<p><strong>storage.inquiries:</strong> ' . esc_html( $ready ? 'Schema 2 ready' : 'Initialization or migration review required' ) . '</p>';
+		if ( $ready ) {
+			$guard = SiteEngine_Ads_Bridge_Coordination::migrate( false );
+			echo '<p><strong>storage.configuration_guard:</strong> ' . esc_html( $guard['reason_code'] ) . '</p>';
+		}
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="seab_initialize_storage">';
+		wp_nonce_field( 'seab_initialize_storage' );
+		echo '<p><label><input required type="checkbox" name="confirm_storage" value="1"> Initialize required Ads storage on this site. Preserve all existing history and pending work.</label></p>';
+		submit_button( 'Initialize Required Ads Storage' );
+		echo '</form><p>Existing incomplete or unsupported schemas fail closed and require the supported inquiry-admin migration review. Pending inquiries/configuration journals must be recovered by their owner; initialization never resets them.</p>';
+	}
+
+	public static function handle_storage() {
+		if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Permission denied.' ); }
+		check_admin_referer( 'seab_initialize_storage' );
+		if ( self::post_text( 'confirm_storage' ) !== '1' ) { wp_die( 'Confirm storage initialization in Ads Bridge > Storage.' ); }
+		try { SiteEngine_Ads_Bridge_Setup::initialize_storage(); }
+		catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=storage' ) );
 		exit;
 	}
 

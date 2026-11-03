@@ -1,3 +1,43 @@
+## 2026-11-03 - reusable administrator setup: local candidate; Alma blocked
+
+Canonical source/repository/branch unchanged. Source checkpoint is the published
+commit containing releases/0.6.4.2. Implemented and packaged 0.6.4.2 UNACCEPTED;
+NOT installed, NOT native verified, NOT released. Last verified Alma remains 0.6.4;
+0.6.4.1 reporting install attempt was denied by a newly active foreign executor
+before backup/install intent, plugin replacement or database changes.
+
+New bounded product controls: explicit Storage initialization reusing existing
+migrations; four validated existing lifecycle-tag selectors; named field/destination
+reporting; deliberate external-to-settings import bound to reviewed file path/hash.
+External PHP/wp-config files are preserved; drift visibly restores external authority.
+Capability/nonces, existing shared executor/durable job and Ads destination locks
+protect mutations. No new coordination framework or external access method.
+
+Fresh focused results:147 assertions PASS across administrator18, setup lock9,
+reporting30, settings10, coordination55, recovery6 and bootstrap19;9 PHP lint PASS.
+Actual product handlers/resolver/lock algorithms; WordPress/vendor/SQL doubles.
+No installed/native/browser pass. Historical Consent/export evidence reused.
+Original inquiry/Consent/history/journals, valid timezone and disabled flags were
+not changed. Campbell received no commands or mutations under this assignment.
+
+ZIP:siteengine-ads-bridge-0.6.4.2-UNACCEPTED.zip
+SHA256:500e5fbc97c0e72a0dddc3aff192467673c7f18e526a70de7a2847ba22ec0079
+Embedded/external manifest SHA256:44ee4a24ad80c1bec7c130bae690688841aff20000065e5fc2f8d0c4f73824ce
+29 ZIP members CRC/hash verified. Exactly one latest ZIP in the canonical
+Plugins/..Deliverables/PLUGIN - SiteEngine Ads-Bridge directory (actual folder uses
+an em dash). Earlier ZIPs retained under this project's delivery-history.
+Exact administrator steps:docs/ADMINISTRATOR-SETUP-0.6.4.2.md.
+
+Immediate instruction priority recorded in both project/source AGENTS.md and
+explicitly supersedes older continuation/cleanup guidance. Existing untracked
+native-stage-a.py and __pycache__ remain untouched and excluded from publication.
+Detailed owner/job/process and failed attempt evidence stays outside public Git in
+../reusable-setup-20261103. One bounded conflict diagnosis; no repeated polling.
+Next: after the owning CRM job safely finishes/hands off, verify actual installed
+hashes under ownership, install/verify reporting correction then exact candidate,
+and run only bounded administrator storage/mapping acceptance. This milestone
+remains incomplete until installed verification passes; no later milestone begun.
+
 ## 2026-11-03 — client install/mapping task: active foreign job, no mutation
 
 Reviewed runtime/package remains b2dacd9d5b70c28fd705f87a3c57de35bda84b6e,

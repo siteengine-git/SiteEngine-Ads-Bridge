@@ -230,9 +230,9 @@ class SiteEngine_Ads_Bridge_Config {
 	 */
 	private function load() {
 		// An explicitly defined SEAB_CONFIG_FILE remains the highest-precedence
-		// authority for backward compatibility. UI settings are intentionally
-		// inert until the operator removes that explicit override.
-		if ( defined( 'SEAB_CONFIG_IS_EXTERNAL' ) && SEAB_CONFIG_IS_EXTERNAL ) {
+		// authority for backward compatibility unless an administrator deliberately
+		// migrates this exact reviewed file to WordPress settings.
+		if ( defined( 'SEAB_CONFIG_IS_EXTERNAL' ) && SEAB_CONFIG_IS_EXTERNAL && ! ( class_exists( 'SiteEngine_Ads_Bridge_Setup' ) && SiteEngine_Ads_Bridge_Setup::settings_authority() ) ) {
 			$this->source = 'external';
 			$this->load_php_config( SEAB_CONFIG_FILE );
 			return;

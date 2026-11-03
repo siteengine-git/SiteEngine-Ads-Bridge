@@ -1,0 +1,18 @@
+{
+  "version": "0.6.4.2",
+  "designation": "UNACCEPTED_LOCAL_VERIFIED_ALMA_BLOCKED",
+  "source_commit": "Published commit containing this file",
+  "package": "siteengine-ads-bridge-0.6.4.2-UNACCEPTED.zip",
+  "sha256": "500e5fbc97c0e72a0dddc3aff192467673c7f18e526a70de7a2847ba22ec0079",
+  "embedded_and_external_manifest_sha256": "44ee4a24ad80c1bec7c130bae690688841aff20000065e5fc2f8d0c4f73824ce",
+  "verified_members": 29,
+  "implemented": true,
+  "packaged": true,
+  "installed": false,
+  "native_verified": false,
+  "released": false,
+  "local_assertions": 147,
+  "php_lint": 9,
+  "Alma_blocker": "Active foreign shared configuration job; install stopped before intent/file/database changes",
+  "admin_steps": "docs/ADMINISTRATOR-SETUP-0.6.4.2.md"
+}

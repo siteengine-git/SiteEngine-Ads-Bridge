@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SiteEngine Ads Bridge
  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
- * Version: 0.6.4.1
+ * Version: 0.6.4.2
  * Requires PHP: 8.3
  * Requires Plugins: siteengine-base
  * Author: SiteEngine
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SEAB_VERSION', '0.6.4.1' );
+define( 'SEAB_VERSION', '0.6.4.2' );
 define( 'SEAB_PLUGIN_FILE', __FILE__ );
 define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -28,6 +28,7 @@ if ( ! defined( 'SEAB_CONFIG_FILE' ) ) {
 }
 
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-settings.php';
+require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-setup.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-config.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-runtime.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-lifecycle.php';

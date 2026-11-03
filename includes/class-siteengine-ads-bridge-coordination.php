@@ -269,6 +269,30 @@ final class SiteEngine_Ads_Bridge_Coordination {
             return array('ok'=>false,'reason'=>$reason);
         }
     }
+    /** Administrator setup uses the same destination lock; no pending work bypass. */
+    public static function enter_setup($storage=false) {
+        $acquired=false;
+        try {
+            self::acquire('configuration'); $acquired=true;
+            global $wpdb;
+            $table=self::table();
+            $exists=self::rows($wpdb->prepare('SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s',$table));
+            if ($exists) {
+                $row=self::guard_row();
+                if ($row && $row['state']!=='complete') self::fail('coordination_configuration_recovery_required');
+            } elseif (!$storage) self::fail('coordination_schema_unsupported');
+            if (SiteEngine_Ads_Bridge_Inquiries::table_exists()) {
+                if (!SiteEngine_Ads_Bridge_Inquiries::schema_ready()) self::fail('coordination_schema_unsupported');
+                if (self::pending_inquiries()) self::fail('coordination_pending_inquiry');
+            } elseif (!$storage) self::fail('coordination_schema_unsupported');
+            self::assert_owner();
+            return array('ok'=>true,'reason'=>'');
+        } catch (Throwable $e) {
+            $reason=self::reason($e);
+            if ($acquired && !self::release()) $reason='coordination_release_failed';
+            return array('ok'=>false,'reason'=>$reason);
+        }
+    }
     private static function persist($state,$journal) {
         global $wpdb;
         self::assert_owner();

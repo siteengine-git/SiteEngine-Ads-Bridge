@@ -1,8 +1,8 @@
-> Current source: **0.6.4.1, setup-reporting correction**, PHP 8.3 minimum.
+> Current source: **0.6.4.2, reusable administrator setup - UNACCEPTED / NOT INSTALLED**, PHP 8.3 minimum.
 > Reports every setup validation failure with field labels and settings destinations.
 > Preserves stable 0.6.4 coordination/recovery and Consent behavior. Local reporting
 > checks passed; this correction is packaged, not installed by this assignment.
-> Read [setup-reporting notes](docs/SETUP-REPORTING-0.6.4.1.md).
+> Read [administrator setup steps](docs/ADMINISTRATOR-SETUP-0.6.4.2.md). Alma installation/native verification is blocked by a foreign executor; this is not an accepted release.
 
 # SiteEngine Ads Bridge
 

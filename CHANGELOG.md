@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.4.2 - 2026-11-03 (unaccepted; Alma installation blocked)
+
+- Add explicit Storage controls using the existing inquiry and configuration-guard migrations.
+- Select and validate distinct existing lifecycle tags; explain missing mappings and destinations.
+- Import external configuration with an explicit administrator choice to use WordPress settings, bound to the reviewed file path/hash. Preserve the PHP file and report authority drift.
+- Gate setup writes on the existing shared executor/job and destination locks; preserve pending history/journals.
+- Local focused tests only. Alma install attempt for preceding 0.6.4.1 stopped on an active foreign executor before file/database mutation. No client changes.
+
+
 ## 0.6.4.1 — 2026-11-03
 
 - Show all unsaved/invalid setup failures with readable field labels and actions.
