@@ -7,12 +7,13 @@ $delivery = & .\tools\Get-DeliveryDirectory.ps1 -VerifyCurrentZip
 ```
 
 The canonical path is:
-`D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
-`Plugins..Deliverables` is one literal directory name immediately inside
-`D:\SiteEngine`. It is a sibling of `Plugins`. The older directory
-`D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge` is not the
-delivery destination. Historical build commands and receipts remain evidence,
-not the current build procedure.
+`D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
+`..Deliverables` is one literal child directory inside `D:\SiteEngine\Plugins`.
+The different directory `D:\SiteEngine\Plugins..Deliverables` is not the delivery
+root. This explicit user clarification supersedes conflicting historical path
+instructions. Populate repositories normally; deliver only the last known
+installable plugin version and matching release documents here. Historical build
+commands and receipts remain evidence, not the current build procedure.
 
 Release source uses `releases/<version>/MANIFEST.json` and `DELIVERY.json`. Preserve
 their exact payload/embedded-manifest bytes and independent package hashes. A pinned

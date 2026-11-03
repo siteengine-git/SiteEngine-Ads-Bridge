@@ -1,3 +1,12 @@
+## Authoritative installable delivery root - latest user clarification
+
+Populate plugin repositories normally. Deliver only the last known installable
+version per plugin, plus matching release documents, to:
+`D:\SiteEngine\Plugins\..Deliverables\[appropriate folder]`.
+`..Deliverables` is a literal child of `Plugins`; `Plugins..Deliverables` is a
+different directory and must not receive deliveries. Archive historical packages
+outside this delivery area. This explicitly supersedes conflicting older paths.
+
 ## Current Ads-only setup completion authority - November 3, 2026
 
 The latest direct instruction supersedes historical exact-archive-release gates and

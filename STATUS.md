@@ -1,3 +1,12 @@
+## Latest delivery-root clarification applied
+
+Filesystem destination: D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+Exactly one stable installable ZIP; SHA256 4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380.
+Accepted ZIP/runtime/release assets unchanged; no rebuild or server operation.
+Wrong-root duplicate files and prior location metadata were hash-archived outside
+delivery. Resolver, build documentation and local packaging paths now use the
+literal child Plugins/..Deliverables root. This supersedes older path notices.
+
 ## Delivery location correction - 2026-11-03
 
 Required exact physical destination: D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge
