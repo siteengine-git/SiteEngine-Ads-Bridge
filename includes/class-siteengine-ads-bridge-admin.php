@@ -32,6 +32,8 @@ final class SiteEngine_Ads_Bridge_Admin {
 		add_action( 'admin_post_seab_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_seab_import_config', array( __CLASS__, 'handle_import' ) );
 		add_action( 'admin_post_seab_initialize_storage', array( __CLASS__, 'handle_storage' ) );
+		add_action('admin_post_seab_verify_setup',array(__CLASS__,'handle_verification'));
+		add_action('admin_post_seab_provision_fields',array(__CLASS__,'handle_fields'));
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_base_missing_notice' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_doctor_failures' ) );
 	}
@@ -156,6 +158,27 @@ final class SiteEngine_Ads_Bridge_Admin {
 			);
 		}
 
+		$doctor  = new SiteEngine_Ads_Bridge_Doctor( $config );
+		$results = $doctor->run();
+		$summary = $doctor->summary();
+		$failures=self::doctor_failures($results);
+		if ( $failures ) {
+			$diagnostics = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=diagnostics' );
+			$messages = array();
+			foreach ( $failures as $failure ) {
+				$message = $failure['check'] . ': ' . $failure['message'];
+				if ( $failure['corrective_url'] ) { $message .= ' Review ' . $failure['corrective_label'] . ': ' . $failure['corrective_url']; }
+				$messages[] = $message;
+			}
+			return array(
+				'status'  => 'error',
+				'label'   => 'Needs Attention',
+				'message' => sprintf( '%d Doctor failure(s). ', count( $failures ) ) . implode( ' ', $messages ) . ' Open Ads Bridge Diagnostics: ' . $diagnostics,
+				'doctor_failures' => $failures,
+				'diagnostics_url' => $diagnostics,
+			);
+		}
+
 		if ( 'local_file' === $source ) {
 			return array(
 				'status'  => 'warning',
@@ -172,27 +195,6 @@ final class SiteEngine_Ads_Bridge_Admin {
 			);
 		}
 
-		$doctor  = new SiteEngine_Ads_Bridge_Doctor( $config );
-		$results = $doctor->run();
-		$summary = $doctor->summary();
-		if ( ! empty( $summary['FAIL'] ) ) {
-			$failures = self::doctor_failures( $results );
-			$diagnostics = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=diagnostics' );
-			$messages = array();
-			foreach ( $failures as $failure ) {
-				$message = $failure['check'] . ': ' . $failure['message'];
-				if ( $failure['corrective_url'] ) { $message .= ' Review ' . $failure['corrective_label'] . ': ' . $failure['corrective_url']; }
-				$messages[] = $message;
-			}
-			return array(
-				'status'  => 'error',
-				'label'   => 'Needs Attention',
-				'message' => sprintf( '%d Doctor failure(s). ', (int) $summary['FAIL'] ) . implode( ' ', $messages ) . ' Open Ads Bridge Diagnostics: ' . $diagnostics,
-				'doctor_failures' => $failures,
-				'diagnostics_url' => $diagnostics,
-			);
-		}
-
 		$message = empty( $summary['WARN'] ) ? 'Configuration and runtime checks are healthy.' : sprintf( 'Ready with %d doctor warning(s).', (int) $summary['WARN'] );
 		return array( 'status' => 'ready', 'label' => 'Ready', 'message' => $message );
 	}
@@ -206,9 +208,10 @@ final class SiteEngine_Ads_Bridge_Admin {
 			'Inquiry attribution layer' => 'storage', 'Consent policy version' => 'setup',
 			'Export family: qualified_leads' => 'exports', 'Export family: converted_leads' => 'exports',
 			'Export family: all_leads' => 'exports', 'Export tab uniqueness' => 'exports',
+			'FluentCRM custom fields' => 'fields', 'Google Ads timezone' => 'setup', 'submission_id pipeline' => 'fields',
 			'Google Sheets sink' => 'sheets', 'Google Sheets credentials' => 'sheets', 'Google Sheets value input' => 'sheets',
 		);
-		$labels = array( 'setup' => 'Ads Bridge Setup', 'lifecycle' => 'Ads Bridge CRM & Lifecycle', 'storage' => 'Ads Bridge Storage', 'exports' => 'Ads Bridge Exports', 'sheets' => 'Ads Bridge Google Sheets' );
+		$labels = array( 'setup' => 'Ads Bridge Setup', 'lifecycle' => 'Ads Bridge CRM & Lifecycle', 'storage' => 'Ads Bridge Storage', 'exports' => 'Ads Bridge Exports', 'fields' => 'Ads Bridge Field Mapping', 'sheets' => 'Ads Bridge Google Sheets' );
 		$out = array();
 		foreach ( (array) $results as $row ) {
 			if ( ! is_array( $row ) || ( $row['status'] ?? '' ) !== 'FAIL' ) { continue; }
@@ -458,9 +461,10 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '</tbody></table>';
 		self::form_close();
 
+        self::verification_form('timezone',$config);
 		$cron = self::cron_guidance();
 		echo '<hr><h2>Scheduled Export / Cron</h2>';
-		echo '<p>Recommended schedule: <strong>every 10 minutes</strong>. Use <code>export-enabled</code> so intake, lifecycle-ledger snapshots, Qualified Leads, and Converted Leads run from one scheduler.</p>';
+		echo '<p>When delivery is separately authorized and exports are enabled: <strong>every 10 minutes</strong>. Keep unscheduled while disabled. Use <code>export-enabled</code> so intake, lifecycle-ledger snapshots, Qualified Leads, and Converted Leads run from one scheduler.</p>';
 		echo '<table class="widefat striped" style="max-width:1100px"><tbody>';
 		echo '<tr><th style="width:220px">Minute</th><td><code>*/10</code></td></tr><tr><th>Hour / Day / Month / Weekday</th><td><code>* &nbsp; * &nbsp; * &nbsp; *</code></td></tr>';
 		echo '<tr><th>Detected site PHP</th><td><code>' . esc_html( PHP_VERSION ) . '</code> &mdash; <code>' . esc_html( $cron['php'] ) . '</code></td></tr>';
@@ -478,14 +482,15 @@ final class SiteEngine_Ads_Bridge_Admin {
 	private static function cron_guidance() {
 		$version = explode( '.', PHP_VERSION );
 		$ea_php  = '/opt/cpanel/ea-php' . ( isset( $version[0] ) ? (int) $version[0] : 8 ) . ( isset( $version[1] ) ? (int) $version[1] : 2 ) . '/root/usr/bin/php';
-		$php     = is_executable( $ea_php ) ? $ea_php : PHP_BINARY;
-		$wp      = is_executable( '/usr/local/bin/wp' ) ? '/usr/local/bin/wp' : '/usr/local/bin/wp';
+		$ls_php='/usr/local/lsws/lsphp'.$version[0].$version[1].'/bin/php';
+		$php = is_executable($ea_php)?$ea_php:(is_executable($ls_php)?$ls_php:(PHP_SAPI==='cli'?PHP_BINARY:''));
+		$wp = is_executable('/usr/bin/wp')?'/usr/bin/wp':(is_executable('/usr/local/bin/wp')?'/usr/local/bin/wp':'');
 		$path    = untrailingslashit( ABSPATH );
 		$home    = dirname( $path );
 		if ( preg_match( '#^(/home/[^/]+)(?:/|$)#', $path, $m ) ) {
 			$home = $m[1];
 		}
-		$command = $php . ' -d memory_limit=512M ' . $wp . ' se-ads export-enabled --apply --limit=25 --path=' . $path . ' >> ' . $home . '/se-ads-export-enabled.log 2>&1';
+		$command = $php!==''&&$wp!=='' ? escapeshellarg($php).' -d memory_limit=512M '.escapeshellarg($wp).' --path='.escapeshellarg($path).' se-ads export-enabled --apply --limit=25 >> '.escapeshellarg($home.'/se-ads-export-enabled.log').' 2>&1' : 'CLI PHP / WP-CLI path unresolved; ask the site administrator. Do not schedule this placeholder.';
 		return array( 'php' => $php, 'command' => $command );
 	}
 
@@ -513,6 +518,12 @@ final class SiteEngine_Ads_Bridge_Admin {
 			foreach ( $tags as $title ) { echo '<option value="' . esc_attr( $title ) . '" ' . selected( $value, $title, false ) . '>' . esc_html( $title ) . '</option>'; }
 			echo '</select><p class="description">Field: fluentcrm.tags.lifecycle.' . esc_html( $role ) . '. Missing tags: create them in FluentCRM &rarr; Contacts &rarr; Tags, then return here. Duplicate titles must be resolved there first.</p></td></tr>';
 		}
+        echo '</tbody></table><h2>Optional Source Tags</h2><p>Informational only. Select an existing title (for example Referral) or leave unused.</p><table class="form-table"><tbody>';
+        foreach(['call'=>'Call','form'=>'Form','referral'=>'Referral','walk_in'=>'Walk in']as$role=>$label){
+            echo '<tr><th>'.esc_html($label).'</th><td><select name="source_'.esc_attr($role).'"><option value="">Unused</option>';
+            foreach($tags as$title){echo '<option value="'.esc_attr($title).'" '.selected((string)$config->get('fluentcrm.tags.sources.'.$role,''),$title,false).'>'.esc_html($title).'</option>';}
+            echo '</select></td></tr>';
+        }
 		echo '</tbody></table><h2>Lifecycle Compliance Automation</h2><table class="form-table"><tbody>';
 		self::checkbox_row( 'Enable Lifecycle Compliance Automation', 'lifecycle_automation_enabled', (bool) $config->get( 'fluentcrm.lifecycle_automation.enabled', false ), 'When enabled: new master-form contacts receive New; lifecycle tags are kept mutually exclusive; Qualified stamps qualified_at; Unqualified stamps unqualified_at; Won stamps qualified_at and closed_date when blank. Invoice amount is never fabricated.' );
 		self::text_row( 'Unqualified Reason Field', 'unqualified_reason_field', $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ), 'Existing FluentCRM custom-field slug. Canonical choices: Wrong Area, Wrong Service, Wrong Product, Wrong Price, Spam / Junk, Other.' );
@@ -524,6 +535,11 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 	/** @return void */
 	private static function render_fields( $config ) {
+        echo '<h2>Required CRM Definitions</h2><p>Preview and deliberately create missing definitions only. Existing fields, types and contact values are never replaced. Conflicting definitions require CRM-owner review.</p>';
+        try{$plan=SiteEngine_Ads_Bridge_Fields::provision(false);echo '<ul>';foreach($plan['missing']as$f)echo '<li>'.esc_html($f['slug'].' — '.$f['type']).'</li>';foreach($plan['conflicts']as$f)echo '<li>'.esc_html($f.' — existing type conflict; unchanged').'</li>';echo '</ul>';}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';}
+        echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_provision_fields">';wp_nonce_field('seab_provision_fields');
+        echo '<label><input type="checkbox" name="confirm" value="1" required> Create only missing standard Ads fields, including unqualified_at as date_time.</label>';submit_button('Create Missing CRM Fields');echo '</form>';
+        self::verification_form('submission',$config);
 		self::form_open( 'fields' );
 		echo '<h2>Fluent Form Field Mapping</h2><p>Map Ads Bridge canonical keys to the field names used by the configured master Fluent Form. Defaults match the standard SiteEngine lead form.</p>';
 		echo '<table class="widefat striped" style="max-width:900px"><thead><tr><th>Canonical Key</th><th>Fluent Forms Field Name</th></tr></thead><tbody>';
@@ -683,6 +699,11 @@ final class SiteEngine_Ads_Bridge_Admin {
 			}
 			try { SiteEngine_Ads_Bridge_Setup::validate_lifecycle( $data['fluentcrm']['tags']['lifecycle'] ); }
 			catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
+            foreach(['call','form','referral','walk_in']as$role){
+                $key='source_'.$role;if(!array_key_exists($key,$_POST))continue;$value=self::post_text($key);
+                if($value!==''){global $wpdb;$ids=$wpdb->get_col($wpdb->prepare("SELECT id FROM `{$wpdb->prefix}fc_tags` WHERE BINARY title=%s",$value));if($wpdb->last_error||!is_array($ids)||count($ids)!==1)wp_die('Optional source mapping must identify exactly one existing tag.');}
+                $data['fluentcrm']['tags']['sources'][$role]=$value;
+            }
 			$data['fluentcrm']['lifecycle_automation']['enabled'] = self::post_bool( 'lifecycle_automation_enabled' );
 			$data['fluentcrm']['lifecycle_automation']['unqualified_reason_field'] = self::post_text( 'unqualified_reason_field' );
 			$data['fluentcrm']['lifecycle_automation']['unqualified_at_field'] = self::post_text( 'unqualified_at_field' );
@@ -767,6 +788,28 @@ final class SiteEngine_Ads_Bridge_Admin {
 		submit_button( 'Initialize Required Ads Storage' );
 		echo '</form><p>Existing incomplete or unsupported schemas fail closed and require the supported inquiry-admin migration review. Pending inquiries/configuration journals must be recovered by their owner; initialization never resets them.</p>';
 	}
+
+    private static function verification_form($kind,$config) {
+        echo '<h2>'.esc_html($kind==='timezone'?'Google Ads Account Timezone — Manual Verification':'Submission ID Feed — Operator Verification').'</h2>';
+        $v=SiteEngine_Ads_Bridge_Setup::verification($kind,$config);echo '<p>'.esc_html($v['reason']).'</p>';
+        if($v['valid'])echo '<p>'.esc_html('Operator #'.$v['record']['user_id'].'; '.gmdate('Y-m-d H:i:s',$v['record']['timestamp']).' UTC; method: manual_operator').'</p>';
+        try{$pin=SiteEngine_Ads_Bridge_Setup::verification_context($kind,$config);}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';return;}
+        echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_verify_setup"><input type="hidden" name="kind" value="'.esc_attr($kind).'"><input type="hidden" name="context" value="'.esc_attr($pin).'">';wp_nonce_field('seab_verify_setup');
+        if($kind==='timezone')echo '<p>Inspect Google Ads &gt; Admin &gt; Account settings for account '.esc_html($config->get('client.google_ads_customer_id','')).'. Effective conversion timezone: '.esc_html($config->get('client.timezone','')).'. This plugin does not query Google Ads.</p><label>Account IANA timezone <input required name="account_timezone"></label>';
+        else echo '<p>Inspect Fluent Forms &gt; master form Integrations &gt; FluentCRM: map {submission.id} to submission_id. Confirmation is bound to this form, field mapping and saved form/feed metadata. Optional exact IDs add stored-linkage readback only; no submission or export runs.</p><label>Contact ID (optional) <input type="number" min="1" name="contact_id"></label><label>Submission ID (optional) <input type="number" min="1" name="submission_id"></label>';
+        echo '<p><label><input required type="checkbox" name="confirm" value="1"> I inspected these exact inputs. Record my manual confirmation.</label></p>';submit_button('Record Operator Verification');echo '</form>';
+    }
+    public static function handle_verification() {
+        if(!current_user_can('manage_options'))wp_die('Permission denied.');check_admin_referer('seab_verify_setup');
+        if(self::post_text('confirm')!=='1')wp_die('Explicit operator confirmation required.');$kind=self::post_text('kind');
+        try{SiteEngine_Ads_Bridge_Setup::record_verification($kind,self::post_text('context'),['account_timezone'=>self::post_text('account_timezone'),'contact_id'=>self::post_int('contact_id'),'submission_id'=>self::post_int('submission_id')]);}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
+        wp_safe_redirect(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab='.($kind==='timezone'?'setup':'fields')));exit;
+    }
+    public static function handle_fields() {
+        if(!current_user_can('manage_options'))wp_die('Permission denied.');check_admin_referer('seab_provision_fields');if(self::post_text('confirm')!=='1')wp_die('Explicit provisioning confirmation required.');
+        try{SiteEngine_Ads_Bridge_Setup::with_configuration(static function(){return SiteEngine_Ads_Bridge_Fields::provision(true);});}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
+        wp_safe_redirect(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=fields'));exit;
+    }
 
 	public static function handle_storage() {
 		if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Permission denied.' ); }

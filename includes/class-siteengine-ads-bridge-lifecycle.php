@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once __DIR__ . '/class-siteengine-ads-bridge-time.php';
+
 final class SiteEngine_Ads_Bridge_Lifecycle {
 
 	/** @var bool Recursion guard for tag mutations triggered by our own hook. */
@@ -173,19 +175,19 @@ final class SiteEngine_Ads_Bridge_Lifecycle {
 			$unqualified = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 
 			if ( 'qualified' === $active ) {
-				self::stamp_if_blank( $subscriber, $qualified, current_time( 'mysql' ) );
+				self::stamp_if_blank( $subscriber, $qualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
 			} elseif ( 'unqualified' === $active ) {
 				// Under the 0.5.1 lifecycle, Qualified and Unqualified are competing
 				// lead-quality outcomes. If the client corrects a lead to Unqualified
 				// before export, do not leave a stale qualification milestone that can
 				// later generate a false positive Google signal.
 				self::clear_if_set( $subscriber, $qualified );
-				self::stamp_if_blank( $subscriber, $unqualified, current_time( 'mysql' ) );
+				self::stamp_if_blank( $subscriber, $unqualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
 			} elseif ( 'won' === $active ) {
 				// A sale is necessarily a qualified lead. Preserve an earlier
 				// qualified_at when one exists; otherwise stamp it now.
-				self::stamp_if_blank( $subscriber, $qualified, current_time( 'mysql' ) );
-				self::stamp_if_blank( $subscriber, $closed, current_time( 'Y-m-d' ) );
+				self::stamp_if_blank( $subscriber, $qualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
+				self::stamp_if_blank( $subscriber, $closed, SiteEngine_Ads_Bridge_Time::business_date() );
 			}
 		} finally {
 			self::$mutating = false;
@@ -239,13 +241,13 @@ final class SiteEngine_Ads_Bridge_Lifecycle {
 			$unqualified = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 
 			if ( 'qualified' === $active ) {
-				self::stamp_if_blank( $subscriber, $qualified, current_time( 'mysql' ) );
+				self::stamp_if_blank( $subscriber, $qualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
 			} elseif ( 'unqualified' === $active ) {
 				self::clear_if_set( $subscriber, $qualified );
-				self::stamp_if_blank( $subscriber, $unqualified, current_time( 'mysql' ) );
+				self::stamp_if_blank( $subscriber, $unqualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
 			} elseif ( 'won' === $active ) {
-				self::stamp_if_blank( $subscriber, $qualified, current_time( 'mysql' ) );
-				self::stamp_if_blank( $subscriber, $closed, current_time( 'Y-m-d' ) );
+				self::stamp_if_blank( $subscriber, $qualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
+				self::stamp_if_blank( $subscriber, $closed, SiteEngine_Ads_Bridge_Time::business_date() );
 			}
 		} finally {
 			self::$mutating = false;

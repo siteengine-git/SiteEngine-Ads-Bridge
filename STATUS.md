@@ -1,3 +1,40 @@
+## 2026-11-04 — portable setup/timezone product correction in verification
+
+0.6.4.4 corrects demonstrated site-wall-time versus conversion-zone parsing;
+prior installation alignment is historical evidence, not a product correction.
+Existing configuration precedence and all Consent/transport gates retained.
+New explicit setup actions record input-bound manual account/feed verification,
+select optional existing source tags/unused, provision missing standard CRM fields
+through shared CLI/vendor logic, and explain credential/runtime/action failures.
+Existing shared field type conflicts are preserved for CRM-owner review.
+Module counts and details use the same Doctor rows, including external authority.
+
+34 new product assertions plus affected18 lifecycle,16 Doctor reporting,30 setup
+reporting,10 settings,18 administrator,19 bootstrap,104 Consent consumer and32
+Consent dispatch assertions pass locally. Storage/vendor/WordPress boundaries are
+synthetic; exact pinned Consent implementation is real. Initial wrong-CWD child
+failures retained locally; corrected-CWD consumer/dispatch runs pass without edits.
+Nine changed/package PHP lint pass. No client target accessed in this task.
+Candidate package/manifest are releases/0.6.4.4; installation/portable fixture results
+remain pending. Alma-only initial inspection: shared job complete, Ads pending none.
+Detailed evidence outside Git: ../product-correction-20261104. Do not call this
+installed/accepted/released until actual package and owned setup checks complete.
+
+## 2026-11-04 — Timezone root cause identified; Alma aligned
+
+User selected America/Chicago. Initial Base/Ads New York versus WordPress +00:00
+was a real independent-clock mismatch: Base saves its own field without syncing
+WordPress; Ads lifecycle current_time stamps can be reinterpreted in Base's zone.
+Installed nonpersisted parser probe reproduced a five-hour shift before alignment.
+Base independently changed to Chicago during investigation; guarded write rejected
+stale state, then this task changed ONLY core WordPress timezone_string/gmt_offset
+under existing ownership locks. Fresh Base/WordPress/Ads Chicago, timezone Doctor
+PASS, parser shift zero. Protected options/history checksums unchanged. No plugin
+code/package/runtime deployment, historic timestamp rewrite or warning suppression.
+Reusable clock policy remains unresolved; accepted package remains 0.6.4.3.
+Full retained private evidence: parent timezone-investigation-20261104/FINDINGS.md.
+Fresh Doctor has unrelated FAILs: missing unqualified_at CRM field and unreadable
+configured Sheets credentials. Google Ads account timezone remains unconfirmed.
 ## RELEASED - Doctor reporting correction0.6.4.3 - 2026-11-04
 
 https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.3

@@ -87,4 +87,55 @@ final class SiteEngine_Ads_Bridge_Setup {
             $seen[ $title ] = true;
         }
     }
+
+    const VERIFICATIONS_OPTION = 'seab_operator_verifications_v1';
+    /** Bind operator evidence to the effective authority, never alter its precedence. */
+    public static function verification_context($kind,$config=null) {
+        $c=$config?:SiteEngine_Ads_Bridge_Config::instance();
+        if($kind==='timezone')return hash('sha256',json_encode([(string)$c->get('client.google_ads_customer_id',''),(string)$c->get('client.timezone','')]));
+        if($kind!=='submission')throw new RuntimeException('Unknown verification kind.');
+        global $wpdb;$id=(int)$c->get('fluent_forms.form_id',0);
+        $form=$wpdb->get_var($wpdb->prepare("SELECT form_fields FROM `{$wpdb->prefix}fluentform_forms` WHERE id=%d",$id));
+        if($wpdb->last_error||!is_string($form)||$form==='')throw new RuntimeException('Master-form definition unavailable; verification cannot be established.');
+        $meta=$wpdb->get_results($wpdb->prepare("SELECT meta_key,value FROM `{$wpdb->prefix}fluentform_form_meta` WHERE form_id=%d ORDER BY id LIMIT 101",$id),ARRAY_A);
+        if($wpdb->last_error||!is_array($meta)||count($meta)>100)throw new RuntimeException('Form/feed configuration unavailable or exceeds bounded verification scope.');
+        return hash('sha256',json_encode([$id,$c->get('fluent_forms.fields',[]),$form,$meta]));
+    }
+    public static function verification($kind,$config=null) {
+        try{$context=self::verification_context($kind,$config);}catch(Throwable $e){return ['valid'=>false,'reason'=>$e->getMessage()];}
+        $all=get_option(self::VERIFICATIONS_OPTION,[]);$r=is_array($all)?($all[$kind]??[]):[];
+        $valid=is_array($r)&&($r['method']??null)==='manual_operator'&&isset($r['context'])&&hash_equals($context,$r['context'])&&is_int($r['user_id']??null)&&$r['user_id']>0&&is_int($r['timestamp']??null);
+        return ['valid'=>$valid,'reason'=>$valid?'Recorded manual operator confirmation; not an automatic external check.':'Not confirmed for current inputs, or inputs changed.','record'=>$valid?$r:[]];
+    }
+    public static function record_verification($kind,$pin,$input=[]) {
+        return self::with_configuration(static function()use($kind,$pin,$input){
+            $c=SiteEngine_Ads_Bridge_Config::instance();$context=self::verification_context($kind,$c);
+            if(!is_string($pin)||!hash_equals($context,$pin))throw new RuntimeException('Verification inputs changed; reload before confirming.');
+            $detail=[];
+            if($kind==='timezone'){
+                $cid=preg_replace('/[^0-9]/','',(string)$c->get('client.google_ads_customer_id',''));
+                $zone=(string)$c->get('client.timezone','');
+                if(strlen($cid)!==10||!in_array($zone,timezone_identifiers_list(),true)||($input['account_timezone']??'')!==$zone)throw new RuntimeException('Inspect the specified Google Ads account Settings. Enter its exact IANA timezone; resolve any account/conversion mismatch without changing WordPress.');
+                $detail=['scope'=>'Google Ads account and effective conversion timezone manually compared'];
+            }elseif($kind==='submission'){
+                // Optional readback of one administrator-specified pair, never latest/marker discovery.
+                $contact=(int)($input['contact_id']??0);$submission=(int)($input['submission_id']??0);
+                if(($contact>0)!==($submission>0))throw new RuntimeException('Supply both exact IDs or neither.');
+                $detail=['scope'=>'Feed maps {submission.id} to submission_id; manually inspected','runtime_pair'=>'not supplied'];
+                if($contact>0){
+                    global $wpdb;$row=$wpdb->get_row($wpdb->prepare("SELECT id,form_id FROM `{$wpdb->prefix}fluentform_submissions` WHERE id=%d",$submission),ARRAY_A);
+                    if($wpdb->last_error||!$row||(int)$row['form_id']!==(int)$c->get('fluent_forms.form_id',0))throw new RuntimeException('Exact submission/master-form readback failed.');
+                    $person=\FluentCrm\App\Models\Subscriber::find($contact);$custom=$person?$person->custom_fields():[];
+                    if(!$person||!is_array($custom)||(string)($custom['submission_id']??'')!==(string)$submission)throw new RuntimeException('Exact contact submission_id readback failed; no fallback search.');
+                    $detail['runtime_pair']=['contact_id'=>$contact,'submission_id'=>$submission,'scope'=>'Stored numeric linkage and master-form membership only; does not prove every feed, identity, consent or future submission.'];
+                }
+            }else{throw new RuntimeException('Unknown verification kind.');}
+            $all=get_option(self::VERIFICATIONS_OPTION,[]);if(!is_array($all))throw new RuntimeException('Malformed operator-verification storage; inspect before saving.');
+            $all[$kind]=['method'=>'manual_operator','context'=>$context,'user_id'=>(int)get_current_user_id(),'timestamp'=>time(),'detail'=>$detail];
+            if($all[$kind]['user_id']<1)throw new RuntimeException('Authenticated administrator required.');
+            update_option(self::VERIFICATIONS_OPTION,$all,false);
+            if(get_option(self::VERIFICATIONS_OPTION)!==$all)throw new RuntimeException('Verification readback failed; inspect before retrying.');
+            return $all[$kind];
+        });
+    }
 }

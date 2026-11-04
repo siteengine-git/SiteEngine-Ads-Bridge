@@ -5,6 +5,9 @@
  */
 define( 'ABSPATH', __DIR__ . '/' );
 define( 'DAY_IN_SECONDS', 86400 );
+$fixture_started=time();
+function wp_timezone_string(){return 'America/Chicago';}
+function fresh_stamp($s){return preg_match('/[+-]\d{2}:\d{2}$/D',$s)&&strtotime($s)>=$GLOBALS['fixture_started']&&strtotime($s)<=time();}
 
 global $seab_actions;
 $seab_actions = array();
@@ -105,20 +108,20 @@ $check( array( 1 ) === $new->attached, 'configured master form seeds the New lif
 
 $qualified = new SEAB_Test_Subscriber();
 SiteEngine_Ads_Bridge_Lifecycle::on_contact_added_to_tags( $qualified, array( 2 ) );
-$check( '2026-10-23 09:30:00' === $qualified->custom['qualified_at'], 'Qualified automatically stamps qualified_at' );
+$check( fresh_stamp($qualified->custom['qualified_at']), 'Qualified automatically stamps qualified_at' );
 $check( in_array( 1, $qualified->detached, true ) && in_array( 3, $qualified->detached, true ) && in_array( 4, $qualified->detached, true ), 'Qualified removes competing lifecycle tags' );
 
 $unqualified = new SEAB_Test_Subscriber();
 $unqualified->custom = array( 'qualified_at' => '2026-10-22 14:00:00' );
 SiteEngine_Ads_Bridge_Lifecycle::on_contact_added_to_tags( $unqualified, array( 3 ) );
-$check( '2026-10-23 09:30:00' === $unqualified->custom['unqualified_at'], 'Unqualified automatically stamps unqualified_at' );
+$check( fresh_stamp($unqualified->custom['unqualified_at']), 'Unqualified automatically stamps unqualified_at' );
 $check( '' === ( $unqualified->custom['qualified_at'] ?? '' ), 'Unqualified clears a stale Qualified milestone before export' );
 $check( ! isset( $unqualified->custom['customer_rating'] ), 'plugin does not invent an Unqualified Reason' );
 
 $won = new SEAB_Test_Subscriber();
 SiteEngine_Ads_Bridge_Lifecycle::on_contact_added_to_tags( $won, array( 4 ) );
-$check( '2026-10-23 09:30:00' === $won->custom['qualified_at'], 'direct New-to-Won automatically preserves the Qualified milestone' );
-$check( '2026-10-23' === $won->custom['closed_date'], 'Won automatically stamps closed_date when blank' );
+$check( fresh_stamp($won->custom['qualified_at']), 'direct New-to-Won automatically preserves the Qualified milestone' );
+$check( gmdate('Y-m-d') === $won->custom['closed_date'], 'Won automatically stamps closed_date when blank' );
 $check( ! isset( $won->custom['invoiced_amount'] ), 'plugin never invents invoice revenue' );
 
 $won_existing = new SEAB_Test_Subscriber();
@@ -137,13 +140,13 @@ $won_save_order = new SEAB_Test_Subscriber();
 $won_save_order->tags = array( (object) array( 'id' => 4 ) );
 $won_save_order->custom = array( 'qualified_at' => '2026-10-23 09:30:00', 'closed_date' => '' );
 SiteEngine_Ads_Bridge_Lifecycle::on_contact_custom_data_updated( array( 'closed_date' => '' ), $won_save_order, array( 'closed_date' => '' ) );
-$check( '2026-10-23' === $won_save_order->custom['closed_date'], 'post-save reconciliation restores Won closed_date after a blank custom-field overwrite' );
+$check( gmdate('Y-m-d') === $won_save_order->custom['closed_date'], 'post-save reconciliation restores Won closed_date after a blank custom-field overwrite' );
 
 $qualified_save_order = new SEAB_Test_Subscriber();
 $qualified_save_order->tags = array( (object) array( 'id' => 2 ) );
 $qualified_save_order->custom = array( 'qualified_at' => '' );
 SiteEngine_Ads_Bridge_Lifecycle::on_contact_custom_data_updated( array( 'qualified_at' => '' ), $qualified_save_order, array( 'qualified_at' => '' ) );
-$check( '2026-10-23 09:30:00' === $qualified_save_order->custom['qualified_at'], 'post-save reconciliation restores Qualified timestamp after a blank custom-field overwrite' );
+$check( fresh_stamp($qualified_save_order->custom['qualified_at']), 'post-save reconciliation restores Qualified timestamp after a blank custom-field overwrite' );
 
 echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
 exit( $fails ? 1 : 0 );

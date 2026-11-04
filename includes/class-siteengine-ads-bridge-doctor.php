@@ -286,42 +286,11 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_wordpress_timezone() {
-		$config_timezone = $this->config->get( 'client.timezone', '' );
-		$wp_timezone     = function_exists( 'wp_timezone_string' ) ? wp_timezone_string() : '';
-
-		if ( '' === $wp_timezone ) {
-			$this->add_result(
-				self::STATUS_WARN,
-				'WordPress timezone',
-				'Could not resolve WordPress timezone via wp_timezone_string().'
-			);
-			return;
-		}
-
-		if ( $config_timezone === $wp_timezone ) {
-			$this->add_result(
-				self::STATUS_PASS,
-				'WordPress timezone',
-				sprintf( 'Config timezone matches WordPress timezone: %s', $wp_timezone )
-			);
-		} else {
-			$this->add_result(
-				self::STATUS_WARN,
-				'WordPress timezone',
-				sprintf(
-					'Config timezone (%s) does not match WordPress timezone (%s). Confirm which timezone should drive conversion timestamps.',
-					(string) $config_timezone,
-					(string) $wp_timezone
-				)
-			);
-		}
-
-		$this->add_result(
-			self::STATUS_WARN,
-			'Google Ads timezone',
-			'Operator must confirm the Google Ads account timezone matches the configured conversion timezone before live Data Manager imports.'
-		);
-	}
+        $site=function_exists('wp_timezone_string')?wp_timezone_string():'unavailable';
+        $this->add_result(self::STATUS_PASS,'WordPress timezone',sprintf('Site-local vendor timestamps use %s; conversion presentation uses %s. Different zones are supported; explicit offsets preserve instants. Historical naive fold values require review.',$site,$this->config->get('client.timezone','')));
+        $v=SiteEngine_Ads_Bridge_Setup::verification('timezone',$this->config);
+        $this->add_result($v['valid']?self::STATUS_PASS:self::STATUS_WARN,'Google Ads timezone',$v['valid']?'Manually confirmed by administrator for the current account/conversion timezone. Google Ads was NOT queried.':'Not manually confirmed for the current account and conversion timezone. Open Ads Bridge > Setup > Google Ads Account Timezone; inspect account settings and record confirmation.');
+    }
 
 	/**
 	 * Dependency presence checks.
@@ -598,9 +567,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 		foreach ( $sources as $role => $mapped_name ) {
 			if ( ! is_string( $mapped_name ) || '' === trim( $mapped_name ) ) {
 				$this->add_result(
-					self::STATUS_WARN,
+					self::STATUS_PASS,
 					'FluentCRM source tags (optional)',
-					sprintf( 'Source role unmapped: %s. Optional; set or remove the mapping.', $role )
+					sprintf( 'Source role %s deliberately unused (optional).', $role )
 				);
 				continue;
 			}
@@ -844,7 +813,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 			}
 		}
 
-		if ( empty( $missing ) ) {
+        $wrong=[];
+        foreach(SiteEngine_Ads_Bridge_Fields::required()as$required){foreach((array)$field_definitions as$definition){if(($definition['slug']??'')===$required['slug']&&($definition['type']??'')!==$required['type']){$wrong[]=$required['slug'];$this->add_result(self::STATUS_FAIL,'FluentCRM custom fields','Existing '.$required['slug'].' type differs from '.$required['type'].'. Preserved; coordinate correction with CRM owner. Ads Bridge > Field Mapping previews definitions.');}}}
+		if ( empty( $missing ) && empty($wrong) ) {
 			$this->add_result(
 				self::STATUS_PASS,
 				'FluentCRM custom fields',
@@ -897,7 +868,7 @@ class SiteEngine_Ads_Bridge_Doctor {
 			$won_bad && $won_enabled ? self::STATUS_FAIL : ( $won_bad ? self::STATUS_WARN : self::STATUS_PASS ),
 			'Export family: converted_leads',
 			$won_bad
-				? sprintf( 'Converted Lead/Won export is incomplete (shared tab: "%s", conversion_action: "%s").', $google_tab, $won_action )
+				? sprintf( 'Converted Lead/Won export is incomplete (shared tab: "%s", conversion_action: "%s"). Set exports.won_jobs.conversion_action in Ads Bridge > Exports > Converted Conversion Action. Qualified and Converted intentionally share one worksheet; they are distinct events.', $google_tab, $won_action )
 				: sprintf( 'converted_leads %s: shared tab "%s", conversion action "%s", value field "%s", date field "%s".', $won_enabled ? 'ENABLED' : 'declared (disabled)', $google_tab, $won_action, (string) $this->config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ), (string) $this->config->get( 'exports.won_jobs.date_field', 'closed_date' ) )
 		);
 		if ( ( $q_enabled || $won_enabled ) && '' !== $google_tab ) {
@@ -973,25 +944,13 @@ class SiteEngine_Ads_Bridge_Doctor {
 			);
 		}
 
-		if ( '' === $creds_path ) {
-			$this->add_result(
-				$enabled ? self::STATUS_FAIL : self::STATUS_WARN,
-				'Google Sheets credentials',
-				'google_sheets.credentials_path is missing.'
-			);
-		} elseif ( ! is_readable( $creds_path ) ) {
-			$this->add_result(
-				$enabled ? self::STATUS_FAIL : self::STATUS_WARN,
-				'Google Sheets credentials',
-				sprintf( 'Service-account JSON is not readable at "%s". Verify existence, ownership, and permissions for the PHP user.', $creds_path )
-			);
-		} else {
-			$this->add_result(
-				self::STATUS_PASS,
-				'Google Sheets credentials',
-				sprintf( 'Service-account JSON is readable at "%s" (contents never inspected or printed by doctor).', $creds_path )
-			);
-		}
+        $context='Context: PHP '.PHP_VERSION.' / '.PHP_SAPI.'; effective UID '.(function_exists('posix_geteuid')?posix_geteuid():'unavailable').'. Web and scheduler users may differ; verify each context. No secret contents read.';
+        if($creds_path===''){$state='Missing path: set google_sheets.credentials_path in Ads Bridge > Google Sheets.';$ok=false;}
+        elseif(is_file($creds_path)&&is_readable($creds_path)){$state='Credential file exists and is readable in this execution context.';$ok=true;}
+        elseif(file_exists($creds_path)){$state='Configured path exists but is not a readable regular file. Have the administrator inspect the intended file and context; no permission change is performed.';$ok=false;}
+        elseif(is_dir(dirname($creds_path))&&is_readable(dirname($creds_path))&&(DIRECTORY_SEPARATOR==='\\'||is_executable(dirname($creds_path)))){$state='Configured credential file is missing in an accessible directory. Supply the intended credential file outside the web root.';$ok=false;}
+        else{$state='File existence/readability cannot be established because its parent is unavailable or inaccessible. Ask the administrator to verify this exact execution context.';$ok=false;}
+        $this->add_result($ok?self::STATUS_PASS:($enabled?self::STATUS_FAIL:self::STATUS_WARN),'Google Sheets credentials',$state.' '.$context);
 
 		if ( in_array( $vio, array( 'RAW', 'USER_ENTERED' ), true ) ) {
 			$this->add_result(
@@ -1016,6 +975,12 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_cron_health() {
+        $enabled=(bool)$this->config->get('google_sheets.enabled',false)&&((bool)$this->config->get('exports.all_leads.enabled',false)||(bool)$this->config->get('exports.qualified_leads.enabled',false)||(bool)$this->config->get('exports.won_jobs.enabled',false));
+        if(!$enabled){$this->add_result(self::STATUS_WARN,'Scheduled export runtime','Disabled: sink or all export families disabled. Do not schedule or run exports to clear this state. Configure a ten-minute scheduler only after separate delivery authorization.');return;}
+        $attempt=get_option('seab_last_export_attempt',[]);
+        if(is_array($attempt)&&in_array($attempt['status']??'', ['running','failed'],true)){
+            $this->add_result(self::STATUS_WARN,'Scheduled export runtime',($attempt['status']==='failed'?'Failed aggregate operation recorded.':'Incomplete/running aggregate operation; outcome is not confirmed.').' Inspect retained CLI output/ledger before retrying; no automatic replay.');return;
+        }
 		$expected = max( 1, (int) $this->config->get( 'diagnostics.cron_expected_minutes', 10 ) );
 		$runtime  = get_option( 'seab_last_export_runtime', array() );
 		if ( ! is_array( $runtime ) || empty( $runtime['timestamp'] ) ) {
@@ -1046,7 +1011,7 @@ class SiteEngine_Ads_Bridge_Doctor {
 	/**
 	 * Consent policy authority: the configured required_policy_version is
 	 * authoritative. Runtime sources (SE_CONSENT_POLICY_VERSION constant,
-	 * se_consent_policy_version option) are observed and compared — never
+	 * se_consent_policy_version option) are observed and compared â€” never
 	 * silently substituted. The export-gate wiring to the config value lands
 	 * in Phase 3 with fixture proof; until then a mismatch is a reported
 	 * configuration/runtime mismatch.
@@ -1594,12 +1559,12 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_submission_id_pipeline() {
-		$this->add_result(
-			self::STATUS_WARN,
-			'submission_id pipeline',
-			'Operator verification required: confirm the Fluent Forms feed maps {submission.id} to the FluentCRM custom field submission_id. No supported API exposes feed mappings, so doctor cannot verify this automatically. The stored value must be the real Fluent Forms entry ID - never a random string or hard-coded value. Validate stored runtime fixtures with: wp se-ads inspect-contact / inspect-contact-submissions.'
-		);
-	}
+        $v=SiteEngine_Ads_Bridge_Setup::verification('submission',$this->config);
+        $message=$v['valid']?'Manually inspected feed mapping for the current form/field/feed fingerprint. This is operator evidence, not automatic end-to-end feed acceptance.':'Not confirmed for the current form/field/feed fingerprint. Open Ads Bridge > Field Mapping > Submission ID Feed; inspect {submission.id} -> submission_id and record operator confirmation.';
+        if($v['valid']&&is_array($v['record']['detail']['runtime_pair']??null))$message.=' Exact stored contact/submission linkage was read back when recorded; consent, future feeds and other contacts are not thereby accepted.';
+        if(!$v['valid'])$message.=' '.$v['reason'];
+        $this->add_result($v['valid']?self::STATUS_PASS:self::STATUS_WARN,'submission_id pipeline',$message);
+    }
 
 	/**
 	 * Check whether a full table name exists.
