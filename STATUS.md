@@ -1,3 +1,25 @@
+## RELEASED — Ads Bridge 0.6.4.5 — 2026-11-04
+
+Release/tag v0.6.4.5 pins 25579d6263a158231d943cd3b40093d5680288c4.
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.5
+Implemented / packaged / Alma-installed / verified / released: YES. No client rollout.
+ZIP SHA256 b2c77e31a00790df61e11fd44f3f64c6ee041488673e88bc76f441506994164b.
+Manifest SHA256 dbbbd4c60e7bf2de37e4df3546e0a8c76076c4035c8d040136967e9e35bd90de.
+All four published asset digests/sizes independently verified against local files.
+495 affected local assertions, 14 actual native assertions, 17 packaged PHP lints
+and 34 exact installed members PASS. Eight owned fixture tables/graph removed;
+original configuration, CRM data, Consent barriers and journals preserved.
+unqualified_at is no longer required/provisioned in CRM. Actual Unqualified marking
+records the internal inquiry event; All_Leads keeps 94 columns and its inquiry time.
+Both Google builders reject that Unqualified inquiry; zero outbound attempts.
+Normal Alma remains Needs Attention: Doctor 36 PASS / 4 WARN / 1 FAIL, with the
+remaining failure identifying inaccessible/unknown credentials-parent context.
+Four export-family flags remain false. Account/feed confirmations and optional
+source mapping remain site-specific; no Ready result was substituted.
+Canonical current ZIP: D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge.
+Release documents/results/publication accompany it. Private evidence/backups stay
+local or in the task's private Alma directory under Ads Codex ownership.
+
 ##2026-11-04 — final0.6.4.5 bytes and delivery
 
 Final ZIPb2c77e31a00790df61e11fd44f3f64c6ee041488673e88bc76f441506994164b;
