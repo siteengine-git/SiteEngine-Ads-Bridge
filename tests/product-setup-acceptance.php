@@ -36,9 +36,9 @@ $zone='America/Chicago';ck($convert('2026-11-01 01:30:00')['error']!==''&&$conve
 foreach(['2026-02-30','2026-01-01 garbage','2026-01-01T12:00:00+99:00']as$r)ck($convert($r)['error']!=='','invalid exact timestamp refused '.$r);
 ck($convert('2026-07-15')['value']==='2026-07-15 12:00:00-05:00','date-only business date retains configured-zone noon');
 $instant=strtotime('2026-11-01T06:30:00Z');$stamp=SiteEngine_Ads_Bridge_Time::event_stamp($instant);ck($stamp==='2026-11-01 01:30:00-05:00'&&strtotime($stamp)===$instant,'new lifecycle stamp has explicit offset');
-$plan=SiteEngine_Ads_Bridge_Fields::provision(false);ck(count($plan['missing'])===9&&$field_saves===0,'fresh preview creates nothing');$original=$registry[0];
-$r=SiteEngine_Ads_Bridge_Fields::provision(true);ck($r['created']===9&&$registry[0]===$original,'missing-only vendor save preserves existing exact definition');
-$u=array_values(array_filter($registry,static fn($f)=>$f['slug']==='unqualified_at'));ck(count($u)===1&&$u[0]['type']==='date_time','unqualified_at created date_time');
+$plan=SiteEngine_Ads_Bridge_Fields::provision(false);ck(count($plan['missing'])===8&&$field_saves===0,'fresh preview creates nothing');$original=$registry[0];
+$r=SiteEngine_Ads_Bridge_Fields::provision(true);ck($r['created']===8&&$registry[0]===$original,'missing-only vendor save preserves existing exact definition');
+$u=array_values(array_filter($registry,static fn($f)=>$f['slug']==='unqualified_at'));ck(count($u)===0,'unqualified_at is not provisioned');
 SiteEngine_Ads_Bridge_Fields::provision(true);ck($field_saves===1,'repeat provisioning writes zero');$registry[1]['type']='text';refuses(static fn()=>SiteEngine_Ads_Bridge_Fields::provision(true),'existing type conflict requires owner review');
 $registry[]=$registry[0];refuses(static fn()=>SiteEngine_Ads_Bridge_Fields::provision(true),'duplicate slug refuses write');array_pop($registry);
 $c=SiteEngine_Ads_Bridge_Config::instance();$pin=SiteEngine_Ads_Bridge_Setup::verification_context('timezone');

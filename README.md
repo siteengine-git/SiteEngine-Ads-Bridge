@@ -1,7 +1,5 @@
-> Current source: **0.6.4.4, portable timezone and administrator setup correction**, PHP 8.3 minimum.
-> Preserve instants across independent site/conversion zones; deliberate manual verification and missing-only setup controls.
-> Real Alma portability checks pass; site-specific credentials, account/feed verification and disabled delivery remain explicit.
-> Read [0.6.4.4 operator instructions](docs/PRODUCT-SETUP-0.6.4.4.md).
+> Current source: **0.6.4.5**, PHP8.3 minimum. Unqualified timing is internal to Ads inquiries; no required/new unqualified_at CRM field.
+> Includes the portable0.6.4.4 setup/timezone correction. Read [current operator instructions](docs/INTERNAL-UNQUALIFIED-0.6.4.5.md).
 
 # SiteEngine Ads Bridge
 

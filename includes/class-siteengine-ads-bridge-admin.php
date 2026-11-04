@@ -525,9 +525,9 @@ final class SiteEngine_Ads_Bridge_Admin {
             echo '</select></td></tr>';
         }
 		echo '</tbody></table><h2>Lifecycle Compliance Automation</h2><table class="form-table"><tbody>';
-		self::checkbox_row( 'Enable Lifecycle Compliance Automation', 'lifecycle_automation_enabled', (bool) $config->get( 'fluentcrm.lifecycle_automation.enabled', false ), 'When enabled: new master-form contacts receive New; lifecycle tags are kept mutually exclusive; Qualified stamps qualified_at; Unqualified stamps unqualified_at; Won stamps qualified_at and closed_date when blank. Invoice amount is never fabricated.' );
+		self::checkbox_row( 'Enable Lifecycle Compliance Automation', 'lifecycle_automation_enabled', (bool) $config->get( 'fluentcrm.lifecycle_automation.enabled', false ), 'When enabled: new master-form contacts receive New; lifecycle tags are kept mutually exclusive; Qualified stamps qualified_at; Unqualified records its event in Ads inquiry storage; Won stamps qualified_at and closed_date when blank. Invoice amount is never fabricated.' );
 		self::text_row( 'Unqualified Reason Field', 'unqualified_reason_field', $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ), 'Existing FluentCRM custom-field slug. Canonical choices: Wrong Area, Wrong Service, Wrong Product, Wrong Price, Spam / Junk, Other.' );
-		self::text_row( 'Unqualified Timestamp Field', 'unqualified_at_field', $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ), 'Hidden operational date/time field stamped automatically when Unqualified is selected.' );
+		echo '<p>Unqualified event time is owned by the active Ads inquiry, not a required CRM field. Existing historical CRM values are preserved.</p>';
 		self::text_row( 'Stale New Warning (days)', 'stale_new_days', $config->get( 'fluentcrm.lifecycle_automation.stale_new_days', 3 ), 'Lead Compliance flags New contacts older than this threshold.' );
 		echo '</tbody></table>';
 		self::form_close();
@@ -538,7 +538,7 @@ final class SiteEngine_Ads_Bridge_Admin {
         echo '<h2>Required CRM Definitions</h2><p>Preview and deliberately create missing definitions only. Existing fields, types and contact values are never replaced. Conflicting definitions require CRM-owner review.</p>';
         try{$plan=SiteEngine_Ads_Bridge_Fields::provision(false);echo '<ul>';foreach($plan['missing']as$f)echo '<li>'.esc_html($f['slug'].' — '.$f['type']).'</li>';foreach($plan['conflicts']as$f)echo '<li>'.esc_html($f.' — existing type conflict; unchanged').'</li>';echo '</ul>';}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';}
         echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_provision_fields">';wp_nonce_field('seab_provision_fields');
-        echo '<label><input type="checkbox" name="confirm" value="1" required> Create only missing standard Ads fields, including unqualified_at as date_time.</label>';submit_button('Create Missing CRM Fields');echo '</form>';
+        echo '<label><input type="checkbox" name="confirm" value="1" required> Create only missing standard Ads fields. Unqualified timing is internal; no unqualified_at CRM field is created.</label>';submit_button('Create Missing CRM Fields');echo '</form>';
         self::verification_form('submission',$config);
 		self::form_open( 'fields' );
 		echo '<h2>Fluent Form Field Mapping</h2><p>Map Ads Bridge canonical keys to the field names used by the configured master Fluent Form. Defaults match the standard SiteEngine lead form.</p>';
@@ -706,7 +706,6 @@ final class SiteEngine_Ads_Bridge_Admin {
             }
 			$data['fluentcrm']['lifecycle_automation']['enabled'] = self::post_bool( 'lifecycle_automation_enabled' );
 			$data['fluentcrm']['lifecycle_automation']['unqualified_reason_field'] = self::post_text( 'unqualified_reason_field' );
-			$data['fluentcrm']['lifecycle_automation']['unqualified_at_field'] = self::post_text( 'unqualified_at_field' );
 			$data['fluentcrm']['lifecycle_automation']['stale_new_days'] = max( 1, self::post_int( 'stale_new_days' ) );
 		} elseif ( 'fields' === $tab ) {
 			foreach ( SiteEngine_Ads_Bridge_Settings::default_field_map() as $key => $default ) {

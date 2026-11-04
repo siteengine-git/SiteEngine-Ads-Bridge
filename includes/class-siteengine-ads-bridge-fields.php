@@ -20,11 +20,6 @@ final class SiteEngine_Ads_Bridge_Fields {
                                 'type'  => 'date_time',
                         ),
                         array(
-                                'slug'  => 'unqualified_at',
-                                'label' => 'Unqualified At',
-                                'type'  => 'date_time',
-                        ),
-                        array(
                                 'slug'  => 'submission_id',
                                 'label' => 'Fluent Forms Submission ID',
                                 'type'  => 'text',

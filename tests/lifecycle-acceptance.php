@@ -114,7 +114,7 @@ $check( in_array( 1, $qualified->detached, true ) && in_array( 3, $qualified->de
 $unqualified = new SEAB_Test_Subscriber();
 $unqualified->custom = array( 'qualified_at' => '2026-10-22 14:00:00' );
 SiteEngine_Ads_Bridge_Lifecycle::on_contact_added_to_tags( $unqualified, array( 3 ) );
-$check( fresh_stamp($unqualified->custom['unqualified_at']), 'Unqualified automatically stamps unqualified_at' );
+$check( !isset($unqualified->custom['unqualified_at']), 'Unqualified never creates the retired CRM timestamp' );
 $check( '' === ( $unqualified->custom['qualified_at'] ?? '' ), 'Unqualified clears a stale Qualified milestone before export' );
 $check( ! isset( $unqualified->custom['customer_rating'] ), 'plugin does not invent an Unqualified Reason' );
 

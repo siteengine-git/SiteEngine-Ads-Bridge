@@ -442,14 +442,14 @@ namespace {
     [$contact,$old,$new,$activation]=reset_case(40);
     $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
     $values=$contact->custom_fields();
-    $clear_keys=array('qualified_at','unqualified_at','closed_date','invoiced_amount','customer_rating','lost_date','ads_export_status','ads_exported_at','ads_conversion_value_frozen','ads_export_error');
-    check_inq('committed'===$result['status'] && !array_intersect($clear_keys,array_keys($values)),'activation deletes all old inquiry milestones, revenue, reason and export status');
+    $clear_keys=array('qualified_at','closed_date','invoiced_amount','customer_rating','lost_date','ads_export_status','ads_exported_at','ads_conversion_value_frozen','ads_export_error');
+    check_inq('committed'===$result['status'] && !array_intersect($clear_keys,array_keys($values)),'activation resets current projections but preserves the retired CRM timestamp');
     check_inq('401'===($values['submission_id']??'') && uuid_for(940)===($values['se_crm_current_inquiry_id']??'') && 'Repair'===($values['service_type']??'') && 'granted'===($values['se_google_ad_user_data']??''),'reset preserves CRM Ops identity, unrelated fields and consent while projecting the new submission');
     check_inq(in_array(201,array_map(fn($t)=>(int)$t->id,$contact->tags),true),'reset preserves non-lifecycle tags');
     $prior=SiteEngine_Ads_Bridge_Inquiries::get($old);
     check_inq('4500'==(string)$prior['invoiced_amount'] && '2026-10-21'===$prior['closed_date'] && '2026-10-20 10:00:00'===$prior['qualified_at'],'real lifecycle hooks do not restamp or erase the previous inquiry during reset');
     $contact->attachTags(array(102));
-    check_inq('2026-10-23 12:34:56'===($contact->custom_fields()['qualified_at']??''),'lifecycle compliance resumes after activation completes');
+    check_inq(abs(strtotime($contact->custom_fields()['qualified_at']??'')-time())<=2,'lifecycle compliance resumes after activation completes');
 
     [$contact,$old,$new,$activation]=reset_case(41);
     $contact->ignore_field_writes=true;

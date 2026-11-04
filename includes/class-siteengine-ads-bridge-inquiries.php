@@ -896,8 +896,9 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 
 	/** @param object $subscriber @param array $tag_ids @return void */
 	public static function sync_from_tag_change( $subscriber, $tag_ids ) {
-		unset( $tag_ids );
-		self::sync_active_from_subscriber( $subscriber );
+		$map=SiteEngine_Ads_Bridge_Lifecycle::configured_tag_map();
+		$observed=!empty($map['unqualified']['id'])&&in_array((int)$map['unqualified']['id'],array_map('intval',(array)$tag_ids),true);
+		self::sync_active_from_subscriber( $subscriber, $observed );
 	}
 
 	/** @param array $new_values @param object $subscriber @param array $update_values @return void */
@@ -915,7 +916,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @param object $subscriber FluentCRM subscriber.
 	 * @return bool
 	 */
-	public static function sync_active_from_subscriber( $subscriber ) {
+	public static function sync_active_from_subscriber( $subscriber, $observed_unqualified = false ) {
 		if ( self::$connection_unusable || self::$reconciling || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! self::table_exists() ) {
 			return false;
 		}
@@ -928,7 +929,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			self::assert_contact_lock( $contact_id );
 			// Do not mirror a stale model captured before another inquiry switch.
 			$fresh = self::find_subscriber( $contact_id );
-			$synced = self::sync_active_locked( $fresh );
+			$synced = self::sync_active_locked( $fresh, $observed_unqualified );
 			self::assert_contact_lock( $contact_id );
 		} catch ( \Throwable $e ) {
 			$synced = false;
@@ -945,7 +946,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @param object $subscriber Fresh contact resolved under its lock.
 	 * @return bool
 	 */
-	private static function sync_active_locked( $subscriber ) {
+	private static function sync_active_locked( $subscriber, $observed_unqualified = false ) {
 		if ( self::$reconciling || ! self::table_exists() || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! method_exists( $subscriber, 'custom_fields' ) ) {
 			return false;
 		}
@@ -966,10 +967,15 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$vf     = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
 		$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
 		$lifecycle = self::subscriber_lifecycle_role( $subscriber );
+        // Only an observed tag-add can establish an event, never a historical refresh.
+        $unqualified_at=$row['unqualified_at']??null;
+        if(($unqualified_at===null||$unqualified_at==='')&&$observed_unqualified&&$lifecycle==='unqualified'){
+            $unqualified_at=self::mysql_datetime_or_null(SiteEngine_Ads_Bridge_Time::event_stamp());
+        }
 		$data = array(
 			'lifecycle'                   => $lifecycle,
 			'qualified_at'                => self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
-			'unqualified_at'              => self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
+			'unqualified_at'              => $unqualified_at,
 			'closed_date'                 => self::mysql_date_or_null( isset( $custom[ $cf ] ) ? $custom[ $cf ] : null ),
 			'invoiced_amount'             => self::positive_decimal_or_null( isset( $custom[ $vf ] ) ? $custom[ $vf ] : null ),
 			'customer_rating'             => self::nullable_string( isset( $custom[ $rf ] ) ? $custom[ $rf ] : null ),
@@ -1342,7 +1348,6 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$reset = array(
 			'submission_id'               => $entry_id,
 			'qualified_at'                => '',
-			'unqualified_at'              => '',
 			'closed_date'                 => '',
 			'invoiced_amount'             => '',
 			'customer_rating'             => '',
@@ -1355,7 +1360,6 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$config = SiteEngine_Ads_Bridge_Config::instance();
 		$fields = array(
 			'exports.qualified_leads.date_field' => 'qualified_at',
-			'fluentcrm.lifecycle_automation.unqualified_at_field' => 'unqualified_at',
 			'exports.won_jobs.date_field' => 'closed_date',
 			'exports.won_jobs.value_field' => 'invoiced_amount',
 			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',

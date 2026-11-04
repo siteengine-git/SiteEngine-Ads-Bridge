@@ -182,7 +182,7 @@ final class SiteEngine_Ads_Bridge_Lifecycle {
 				// before export, do not leave a stale qualification milestone that can
 				// later generate a false positive Google signal.
 				self::clear_if_set( $subscriber, $qualified );
-				self::stamp_if_blank( $subscriber, $unqualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
+				// Unqualified timing is recorded by the existing inquiry observer.
 			} elseif ( 'won' === $active ) {
 				// A sale is necessarily a qualified lead. Preserve an earlier
 				// qualified_at when one exists; otherwise stamp it now.
@@ -244,7 +244,7 @@ final class SiteEngine_Ads_Bridge_Lifecycle {
 				self::stamp_if_blank( $subscriber, $qualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
 			} elseif ( 'unqualified' === $active ) {
 				self::clear_if_set( $subscriber, $qualified );
-				self::stamp_if_blank( $subscriber, $unqualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
+				// Unqualified timing is recorded by the existing inquiry observer.
 			} elseif ( 'won' === $active ) {
 				self::stamp_if_blank( $subscriber, $qualified, SiteEngine_Ads_Bridge_Time::event_stamp() );
 				self::stamp_if_blank( $subscriber, $closed, SiteEngine_Ads_Bridge_Time::business_date() );
@@ -490,9 +490,6 @@ final class SiteEngine_Ads_Bridge_Lifecycle {
 					$parts[] = $reason_field . ' is blank';
 				} elseif ( ! in_array( $reason, $allowed_reasons, true ) ) {
 					$parts[] = $reason_field . ' has a non-standard value: ' . $reason;
-				}
-				if ( empty( $meta[ $unqualified_field ] ) ) {
-					$parts[] = $unqualified_field . ' is blank';
 				}
 				if ( ! empty( $parts ) ) {
 					$add_issue( 'unqualified_incomplete', implode( '; ', $parts ) . '.' );

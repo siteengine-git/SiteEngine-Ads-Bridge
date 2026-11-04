@@ -1,3 +1,17 @@
+##2026-11-04 —0.6.4.5 internal Unqualified timing correction
+
+Supersedes the0.6.4.4 CRM unqualified_at requirement. Provisioning/config/Doctor/UI
+no longer require/create it. Actual tag-add observation records the active inquiry's
+first Unqualified event under existing locks; refresh/repeat preserve it and cannot
+invent missing history. All_Leads94 reads that inquiry; existing CRM definitions/
+values and old frozen plans remain unchanged. New reset plans omit the retired field.
+Alma-only admission: current shared job complete, Ads pending none. Local affected
+inquiry43/recovery44/transition50/observer6/lifecycle18/product34/bootstrap19 and
+Consent dispatch32 assertions PASS (246). Initial expected old reset/stamp fixtures
+were corrected to new contract, with failed receipts preserved locally. No clients.
+Candidate0.6.4.5 package is local, installed verification pending. Previous release
+and all portable0.6.4.4 corrections retained. Evidence:../unqualified-internal-20261104.
+
 ## RELEASED — portable Ads Bridge0.6.4.4 — 2026-11-04
 
 v0.6.4.4 pins a76eef2c6d212aac19899ad435b5115790c495de.

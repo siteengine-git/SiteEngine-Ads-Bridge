@@ -9,7 +9,7 @@ if ($fails) { echo $bootstrap_log; exit(1); }
 $passes=0; $fails=0;
 
 // Stop after each possible field deletion. Replay must only send unfinished keys.
-for ($boundary=1; $boundary<=10; $boundary++) {
+for ($boundary=1; $boundary<=9; $boundary++) {
     [$contact,$old,$new,$activation]=reset_case(100+$boundary);
     $contact->throw_after_field_keys=$boundary;
     $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);

@@ -1,5 +1,11 @@
 # Changelog
 
+##0.6.4.5 —2026-11-04
+
+- Remove the unqualified_at CRM definition/mapping requirement and missing-field creation. Preserve existing definitions and historical values.
+- Record first observed Unqualified event in existing active inquiry storage, preserving repeat/historical timing and All_Leads94 columns.
+- Keep Unqualified internal; preserve all Google advertising gates and portable0.6.4.4 corrections. No implicit schema/adoption or historical repair.
+
 ## 0.6.4.4 - 2026-11-04
 
 - Fix site-local versus conversion-zone datetime reinterpretation; preserve explicit offsets and reject invalid/ambiguous DST wall times without historical rewrites.

@@ -6,7 +6,7 @@ try {
     $root=SEAB_PLUGIN_DIR;$file=$root.'SUCCESSOR-MANIFEST.json';
     if (!is_file($file)||hash_file('sha256',$file)!==$args[0]) throw new RuntimeException('installed_manifest_mismatch');
     $manifest=json_decode(file_get_contents($file),true);
-    if (!is_array($manifest)||($manifest['candidate']??'')!=='0.6.4.4'||SEAB_VERSION!=='0.6.4.4') throw new RuntimeException('candidate_mismatch');
+    if (!is_array($manifest)||($manifest['candidate']??'')!=='0.6.4.5'||SEAB_VERSION!=='0.6.4.5') throw new RuntimeException('candidate_mismatch');
     $count=0;foreach($manifest['payload'] as $row){$path=$row['path'];if(!is_string($path)||strpos($path,'..')!==false||strpos($path,'\\')!==false||$path[0]==='/'||!is_file($root.$path)||is_link($root.$path)||hash_file('sha256',$root.$path)!==$row['sha256'])throw new RuntimeException('installed_payload_mismatch');$count++;}
     if (PHP_VERSION_ID<80300||!extension_loaded('mysqli')||get_class($GLOBALS['wpdb'])!=='wpdb') throw new RuntimeException('stock_php83_mysqli_wpdb_profile_required');
     $cap=seab_configuration_capability();

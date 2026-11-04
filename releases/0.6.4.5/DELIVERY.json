@@ -1,0 +1,13 @@
+{
+  "version": "0.6.4.5",
+  "package": "siteengine-ads-bridge-0.6.4.5.zip",
+  "sha256": "d24c625736a9360eb1b4eb275b6e8e38df278880c13801bd9fca0c97b19076d9",
+  "manifest_sha256": "d0581280d52ed24fb7a17a4891ade798409d6c326727f205a446ba47f41e0e1d",
+  "members": 34,
+  "source_commit": "Published commit containing this file",
+  "implemented": true,
+  "packaged": true,
+  "installed": false,
+  "verified": false,
+  "released": false
+}

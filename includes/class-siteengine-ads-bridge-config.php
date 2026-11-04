@@ -974,13 +974,9 @@ class SiteEngine_Ads_Bridge_Config {
 
 		if ( true === (bool) $this->canonical_get( 'fluentcrm.lifecycle_automation.enabled', false ) ) {
 			$reason_field = trim( (string) $this->canonical_get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', '' ) );
-			$unqualified_at = trim( (string) $this->canonical_get( 'fluentcrm.lifecycle_automation.unqualified_at_field', '' ) );
 			$stale_days = (int) $this->canonical_get( 'fluentcrm.lifecycle_automation.stale_new_days', 0 );
 			if ( '' === $reason_field ) {
 				$errors[] = 'Lifecycle automation is enabled but fluentcrm.lifecycle_automation.unqualified_reason_field is empty.';
-			}
-			if ( '' === $unqualified_at ) {
-				$errors[] = 'Lifecycle automation is enabled but fluentcrm.lifecycle_automation.unqualified_at_field is empty.';
 			}
 			if ( $stale_days < 1 ) {
 				$errors[] = 'Lifecycle automation is enabled but fluentcrm.lifecycle_automation.stale_new_days is not a positive integer.';

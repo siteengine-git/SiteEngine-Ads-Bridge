@@ -2679,7 +2679,7 @@ class SiteEngine_Ads_Bridge_CLI {
                         ),
                         'unqualified' => array(
                                 'event' => 'Unqualified',
-                                'field' => trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) ),
+                                'field' => 'unqualified_at',
                                 'sink'  => 'all_leads_lifecycle_unqualified',
                                 'mode'  => 'field',
                         ),
@@ -5531,6 +5531,10 @@ class SiteEngine_Ads_Bridge_CLI {
                 // milestones from a later FluentCRM contact projection. The bound
                 // submission remains the identity/attribution authority, while the
                 // Ads inquiry row supplies the historical lifecycle/value snapshot.
+                if(!is_array($inquiry)&&$txn!==''&&class_exists('SiteEngine_Ads_Bridge_Inquiries')){
+                    $mapped=SiteEngine_Ads_Bridge_Inquiries::get_by_transaction_id($txn);
+                    if(is_array($mapped)&&!empty($mapped['inquiry_id']))$inquiry=$mapped;
+                }
                 $inquiry_id = '';
                 if ( is_array( $inquiry ) && ! empty( $inquiry['inquiry_id'] ) ) {
                         $inquiry_id = (string) $inquiry['inquiry_id'];
@@ -5541,11 +5545,6 @@ class SiteEngine_Ads_Bridge_CLI {
                         }
                         if ( ! empty( $inquiry['lifecycle'] ) ) {
                                 $membership['lifecycle'] = array( ucfirst( (string) $inquiry['lifecycle'] ) );
-                        }
-                } elseif ( '' !== $txn && class_exists( 'SiteEngine_Ads_Bridge_Inquiries' ) ) {
-                        $mapped = SiteEngine_Ads_Bridge_Inquiries::get_by_transaction_id( $txn );
-                        if ( is_array( $mapped ) && ! empty( $mapped['inquiry_id'] ) ) {
-                                $inquiry_id = (string) $mapped['inquiry_id'];
                         }
                 }
 
@@ -5673,7 +5672,7 @@ class SiteEngine_Ads_Bridge_CLI {
                         array( 'k' => 'se_loc',                  'h' => 'Google physical location criterion ID', 'v' => $pick( $form_values['se_loc'], $custom_value( 'se_loc' ) ) ),
                         array( 'k' => 'customer_rating',         'h' => 'Customer Rating',                'v' => $custom_value( $reason_field ) ),
                         array( 'k' => 'qualified_at',            'h' => 'Qualified at',                   'v' => $custom_value( $qualified_field ) ),
-                        array( 'k' => 'unqualified_at',          'h' => 'Unqualified at',                 'v' => $custom_value( $unqualified_field ) ),
+                        array( 'k' => 'unqualified_at',          'h' => 'Unqualified at',                 'v' => is_array($inquiry)?(string)($inquiry['unqualified_at']??''):$custom_value( $unqualified_field ) ),
                         array( 'k' => 'lifecycle_event',         'h' => 'Lifecycle event',                'v' => trim( (string) $lifecycle_event ) ),
                         array( 'k' => 'lifecycle_event_at',      'h' => 'Lifecycle event at',             'v' => trim( (string) $lifecycle_event_at ) ),
                         array( 'k' => 'inquiry_id',              'h' => 'Inquiry ID',                     'v' => $inquiry_id ),
