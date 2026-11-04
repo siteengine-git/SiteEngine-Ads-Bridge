@@ -9,12 +9,14 @@
   "packaged": true,
   "installed": true,
   "verified": true,
-  "released": false,
+  "released": true,
   "underlying_reported_single_failure": "UNKNOWN; initial Alma inspection zero failures",
   "candidate_scope": "Reporting only; no Doctor rules or functional repair",
   "local_assertions": 65,
   "installed_http_assertions": 19,
   "php_lint": 3,
   "destination": "D:\\SiteEngine\\Plugins..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
-  "source_commit": "Published checkpoint containing this file; release tag v0.6.4.3 pins verified source"
+  "source_commit": "bbe82704b0ad6c559241309ebbb3107804bdd7c8",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.3",
+  "publication_verified": true
 }

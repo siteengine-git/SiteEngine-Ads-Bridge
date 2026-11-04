@@ -1,3 +1,28 @@
+## RELEASED - Doctor reporting correction0.6.4.3 - 2026-11-04
+
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.3
+Tag v0.6.4.3 pins bbe82704b0ad6c559241309ebbb3107804bdd7c8. Implemented YES;
+packaged YES; installed YES on Alma; verified YES; released YES. No client rollout.
+Demonstrated cause:module_status discarded existing Doctor FAIL details and displayed
+only a count. Fixed full names/explanations and direct Diagnostics/supported corrective
+links. Doctor severity/rules/validation/Consent/configuration and flags unchanged.
+Initial Alma33 PASS/9 WARN/0 FAIL:underlying previously reported single failure remains
+UNKNOWN and no underlying functional repair is claimed.
+
+65 focused local assertions/3 package PHP lint PASS;19 actual authenticated HTTP/
+native one/multiple-failure assertions PASS. Protected Ads settings and five inquiry/
+guard/Consent tables unchanged; owned user/sessions/MU/context/secret ledger removed.
+Fresh normal request Ready/no FAIL; all six delivery/export flags disabled. Prior
+setup/Consent evidence reused without broad reruns.
+ZIP SHA256 89adbf7946bf9f2fe6558047590498b4dde8ee638f85461cfc9124a828222240
+Manifest SHA256 e63c3a3b421b42205eb10d69a5ba93ff66533881091ef7182b5ff728df635dd2
+30 exact installed members/fresh readback/tag payloads verified; GitHub four asset
+digests match local files. Exactly one latest ZIP in task-specific destination:
+D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+Source rules/build resolver/docs record this assignment-specific path; historical
+packages remain in project delivery-history and original stable release. No server
+or client work beyond this Alma correction; current assignment complete.
+
 ## 2026-11-04 - Doctor reporting correction0.6.4.3 installed verified
 
 Canonical source/repository/maintenance branch unchanged; accepted0.6.4.2 ZIP and
