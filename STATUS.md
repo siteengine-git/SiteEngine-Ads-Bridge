@@ -38,6 +38,10 @@ refused an unlisted native FluentForms table before DROP; exact source provenanc
 and empty state verified before including only that owned table. Details sanitized
 in releases/0.7.0/RESULTS.json; raw evidence remains local/private.
 
+Implementation checkpoint c1e8e6dfee732b0b310dd91b1a0aba884e0b1250 pushed and remote
+branch independently verified. CRM correction candidate40a0312/0.3.16 is scoped to
+its successor allowlists; native installed producer check still pending.
+
 Next:carry CRM-owned installed normal-export result forward, finalize scoped source
 pin/tag and deliver exact verified ZIP. No client rollout, real sends/exports or new
 acceptance campaign. Stable0.6.4.5 history and runtime/Consent/coordination preserved.

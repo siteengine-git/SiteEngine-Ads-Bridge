@@ -1,0 +1,19 @@
+{
+  "version": "0.7.0",
+  "package": "siteengine-ads-bridge-0.7.0.zip",
+  "sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
+  "manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
+  "members": 49,
+  "source_commit": "c1e8e6dfee732b0b310dd91b1a0aba884e0b1250",
+  "implemented": true,
+  "packaged": true,
+  "installed": true,
+  "verified": false,
+  "native_destination_workflow_verified": true,
+  "released": false,
+  "release_gate": "CRM-owned 0.3.16 installed normal export coexistence verification outstanding",
+  "CRM_binding_candidate_commit": "40a0312ce97b9d489c5aff4956f5579abed76f7e",
+  "previous_stable_delivery": "0.6.4.5 retained",
+  "verification": "182 focused local assertions; 27 packaged PHP lints; 49 exact Alma members; actual fresh browser/native imports, zero-save repeats, Keep/Replace and upgrade preservation; private fixture cleanup complete",
+  "limits": "No client rollout or delivery. No sender/queue acceptance. No CRM source edits."
+}
