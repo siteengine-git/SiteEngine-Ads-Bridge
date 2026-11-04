@@ -33,7 +33,8 @@ Normal administrator workflow:
    Unused. Required lifecycle selectors retain their existing distinct-ID checks.
 3. Field Mapping previews the existing provision-fields schema. The explicit Create
    Missing CRM Fields action uses the same vendor logic as CLI provision-fields.
-   Missing unqualified_at is date_time. Existing definitions/values are preserved;
+   As of0.6.4.5 Unqualified timing is internal; no unqualified_at CRM field is
+   required or created. Existing definitions/values are preserved;
    duplicate slugs/type conflicts stop the write for CRM-owner review. No blanket
    replacement, automatic activation provision or contact mutation is performed.
 4. Field Mapping > Submission ID Feed records explicit operator inspection of

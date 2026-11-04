@@ -23,7 +23,7 @@ When Lifecycle Compliance Automation is enabled:
 - new contacts created by the configured master Fluent Form receive `New` when no lifecycle state already exists;
 - lifecycle tags are mutually exclusive;
 - `Qualified` stamps `qualified_at` when blank;
-- `Unqualified` clears an unexported/stale `qualified_at` milestone and stamps `unqualified_at` when blank;
+- `Unqualified` clears an unexported/stale `qualified_at` milestone and records its first event in the active Ads inquiry;
 - `Won` stamps `qualified_at` when blank, because a sale is necessarily a qualified lead;
 - `Won` stamps `closed_date` when blank;
 - `Won` remains terminal if a lower-stage tag is accidentally added while Won is still attached; remove Won first to intentionally reopen/correct a record;
@@ -191,7 +191,7 @@ This is read-only. It flags common client-maintenance failures:
 - conflicting lifecycle states
 - stale `New` leads
 - Qualified leads missing `qualified_at`
-- Unqualified leads missing reason or `unqualified_at`
+- Unqualified leads missing a reason
 - Won leads missing invoice value, close date, or qualification timestamp
 
 CLI equivalent:
@@ -207,7 +207,6 @@ The purpose is to make client compliance visible without guessing whether a lead
 - `invoiced_amount` — number
 - `closed_date` — date
 - `qualified_at` — date_time
-- `unqualified_at` — date_time
 - `submission_id` — text
 - `ads_export_status` — text
 - `ads_exported_at` — date_time

@@ -2680,6 +2680,7 @@ class SiteEngine_Ads_Bridge_CLI {
                         'unqualified' => array(
                                 'event' => 'Unqualified',
                                 'field' => 'unqualified_at',
+                                'legacy_field' => trim((string)$config->get('fluentcrm.lifecycle_automation.unqualified_at_field','unqualified_at')),
                                 'sink'  => 'all_leads_lifecycle_unqualified',
                                 'mode'  => 'field',
                         ),
@@ -2730,7 +2731,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                         $subscribers = $selection['subscribers'];
                                         $legacy_skipped = $selection['ledger_skipped'];
                                 } else {
-                                        $found       = $this->discover_custom_field_subscribers( $stage['field'] );
+                                        $found       = $this->discover_custom_field_subscribers( $stage['legacy_field'] ?? $stage['field'] );
                                         $selection   = $this->select_current_unledgered_subscribers( $found, $stage['sink'], $remaining, $ledger_exists );
                                         $subscribers = $selection['subscribers'];
                                         $legacy_skipped = $selection['ledger_skipped'];
@@ -2790,7 +2791,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                         $record   = 'contact ' . $cid;
                                         $custom   = method_exists( $subscriber, 'custom_fields' ) ? (array) $subscriber->custom_fields() : array();
                                         $email    = isset( $subscriber->email ) ? (string) $subscriber->email : '';
-                                        $event_at = $this->get_contact_custom_value( $subscriber, $custom, $stage['field'] );
+                                        $event_at = $this->get_contact_custom_value( $subscriber, $custom, $stage['legacy_field'] ?? $stage['field'] );
                                 }
 
                                 if ( '' === trim( (string) $event_at ) ) {

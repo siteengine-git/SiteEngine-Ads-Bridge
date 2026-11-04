@@ -1,13 +1,15 @@
 {
   "version": "0.6.4.5",
   "package": "siteengine-ads-bridge-0.6.4.5.zip",
-  "sha256": "d24c625736a9360eb1b4eb275b6e8e38df278880c13801bd9fca0c97b19076d9",
-  "manifest_sha256": "d0581280d52ed24fb7a17a4891ade798409d6c326727f205a446ba47f41e0e1d",
+  "sha256": "b2c77e31a00790df61e11fd44f3f64c6ee041488673e88bc76f441506994164b",
+  "manifest_sha256": "dbbbd4c60e7bf2de37e4df3546e0a8c76076c4035c8d040136967e9e35bd90de",
   "members": 34,
-  "source_commit": "Published commit containing this file",
+  "source_commit": "Published final package checkpoint; initial runtime e81b3a9af61681bd5ec0358e6996d5fb116034a8",
   "implemented": true,
   "packaged": true,
-  "installed": false,
-  "verified": false,
-  "released": false
+  "installed": true,
+  "verified": true,
+  "released": false,
+  "verification": "495 affected local assertions;14 native vendor/hook assertions;17 packaged PHP lint verified (15 unchanged retained,CLI/example fresh);fixture cleanup PASS",
+  "final_delta": "Legacy contact-only selector compatibility plus README/guide/example comments aligned;canonical inquiry observer unchanged;static87 PASS;final34 members verified"
 }

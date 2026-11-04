@@ -328,6 +328,13 @@ namespace {
 	check( array_column( $all_spec, 'h' ) === $all['headers'], 'All_Leads built headers exactly match provisioning contract' );
 	check( 13 === $all['contact_id'], 'All_Leads row links the matching CRM contact without requiring it' );
 
+    $alias_config=new class($config){private $base;function __construct($base){$this->base=$base;}function get($k,$d=null){return $k==='fluentcrm.lifecycle_automation.unqualified_at_field'?'legacy_rejected_at':$this->base->get($k,$d);}};
+    $internal=['inquiry_id'=>'00000000-0000-4000-8000-000000000099','lifecycle'=>'unqualified','unqualified_at'=>'2026-11-04 12:00:00','submission_id'=>24];
+    $internal_row=invoke_private($cli,'build_all_leads_row',[$GLOBALS['wpdb']->submission_row(),'wp_fluentform_submissions',$alias_config,'Unqualified','2026-11-04 12:00:00',$internal]);
+    $indexed=array_combine(array_column($internal_row['spec'],'k'),array_column($internal_row['spec'],'v'));
+    check(count($internal_row['values'])===94,'inquiry Unqualified retains94-column contract with legacy CRM mapping');
+    check($indexed['unqualified_at']===$internal['unqualified_at'],'inquiry event wins independently of legacy CRM timestamp selector');
+
 	$unmatched_submission = $GLOBALS['wpdb']->submission_row();
 	$unmatched_submission['id'] = 25;
 	$unmatched_submission['response'] = json_encode( array( 'first_name' => 'No', 'last_name' => 'CRM Match' ) );
@@ -376,7 +383,7 @@ namespace {
 	$qualified = invoke_private( $cli, 'build_qualified_lead_import', array( $qualified_subscriber, $config, '12:00:00' ) );
 	check( true === $qualified['exportable'], 'qualified-lead builder exports a durable qualified_at milestone regardless of later lifecycle state' );
 	check( 'ff:3:24' === $qualified['order_id'], 'qualified and converted stages reuse the canonical Fluent Forms transaction ID' );
-	check( '2026-07-22 15:30:00-05:00' === $qualified['conversion_time'], 'qualified timestamp is emitted in the client timezone with offset' );
+	check( '2026-07-22 10:30:00-05:00' === $qualified['conversion_time'], 'site-local UTC qualification instant is converted to client timezone with offset' );
 	check( '250.00' === $qualified['conversion_value'], 'configured Qualified Lead proxy value is emitted when present' );
 	check( 'SE | Qualified Lead' === $qualified['values'][20], 'qualified row emits the standardized conversion action' );
 	check( 'form-gclid' === $qualified['values'][2], 'qualified attribution prefers canonical Fluent Forms submission over CRM fallback' );
@@ -484,7 +491,7 @@ namespace {
 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
-	check( false !== strpos( $main_source, 'Version: 0.6.4.1' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.4.1'" ), 'candidate version is 0.6.4.1 in header and runtime constant' );
+	check( false !== strpos( $main_source, 'Version: 0.6.4.5' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.4.5'" ), 'candidate version is 0.6.4.5 in header and runtime constant' );
 
 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
 	exit( 0 === $fails ? 0 : 1 );

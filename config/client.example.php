@@ -92,6 +92,7 @@ return array(
 		'lifecycle_automation' => array(
 			'enabled'                  => false,
 			'unqualified_reason_field' => 'customer_rating',
+			// Optional historical contact-only reader; never a required/provisioned CRM field.
 			'unqualified_at_field'     => 'unqualified_at',
 			'stale_new_days'           => 3,
 		),

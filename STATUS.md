@@ -1,3 +1,40 @@
+##2026-11-04 — final0.6.4.5 bytes and delivery
+
+Final ZIPb2c77e31a00790df61e11fd44f3f64c6ee041488673e88bc76f441506994164b;
+manifestdbbbd4c60e7bf2de37e4df3546e0a8c76076c4035c8d040136967e9e35bd90de.
+34 exact final Alma members/fresh readback PASS;original database preserved.
+Metadata-only README/guide/example comment alignment supersedes the previous724bd
+review package;all earlier packages/evidence retained. Current release uses canonical
+D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge.
+495 local/14 native assertions;17 packaged lints valid. Native fixture cleanup PASS.
+No client operations. Actual remaining Doctor failure is credentials context;the
+unqualified_at CRM-field failure is removed by code,not a definition/settings change.
+Published source/tag and release assets recorded at closeout;Aubrey installs clients.
+
+##2026-11-04 —0.6.4.5 Unqualified correction installed/verified
+
+Final ZIP724bd0f50ee71182b3e9b556b4739464666df8049d65c545eab27366587efe6b;
+manifestc4f024f52ac0aaaa8b9a89d8171008119b1eec73a84609391e4be0a2e4acc8f1.
+34 final members verified on Alma;17 packaged PHP lint valid,changed CLI freshly
+linted.495 affected local assertions/14 actual native vendor-hook assertions PASS.
+Without a CRM timestamp field, Unqualified records its inquiry event, preserves it
+on repeats/refresh, keeps historical CRM value compatibility,feeds All_Leads94 from
+that inquiry,and is ineligible for both Google builders. Zero outbound attempts.
+
+Initial owned fixture stopped before tag marking because isolated tag-table discovery
+was incomplete. Failure preserved; exact existing contact/inquiry/submission continued
+with four cloned existing tag definitions. No runtime assertion or guard relaxed.
+Cleanup PASS:8 marked tables and all owned fictional graph removed. Original options/
+Base/timezones/CRM definitions/contacts/inquiry/Consent/journals unchanged. Native
+resources/evidence/private backups retained only as files,owned by Ads Codex.
+
+Doctor36 PASS/4 WARN/1 FAIL:no unqualified_at requirement; credentials-parent access
+remains honest. All four exports false,other preexisting flags/config unchanged.
+No client operation,live exports,positive-consent fabrication,historical repair or
+browser campaign. New package retains the complete0.6.4.4 product correction.
+Source/runtime initial pine81b3a9; final release pin recorded after scoped publication.
+Detailed private evidence:../unqualified-internal-20261104;neutral results in releases/0.6.4.5.
+
 ##2026-11-04 —0.6.4.5 internal Unqualified timing correction
 
 Supersedes the0.6.4.4 CRM unqualified_at requirement. Provisioning/config/Doctor/UI

@@ -23,13 +23,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 15818,
-      "sha256": "c74a8e207235c939d679edac86e2aae014c04c59ccc664ec136b81568160ec17"
+      "bytes": 15782,
+      "sha256": "873c9a308f5d60ca5c164e21e58c84a8357fed31f1765af77a2acf9de6ec7200"
     },
     {
       "path": "config/client.example.php",
-      "bytes": 4241,
-      "sha256": "454920ae8a0fc11594847166255c130b1f6b769d729839691631d1e8940aeb6d"
+      "bytes": 4328,
+      "sha256": "1c1b7ff8ec88360e43ad1e0a4848aa1afe6d7fac060118855c8d035a63e0639a"
     },
     {
       "path": "contracts/CONFIGURATION-COORDINATION.md",
@@ -83,8 +83,8 @@
     },
     {
       "path": "includes/class-siteengine-ads-bridge-cli.php",
-      "bytes": 457022,
-      "sha256": "c4ff3143749b92a7c396123f1d8ef0448c79cd1cd38da743ed78f0cdc71c41e2"
+      "bytes": 457224,
+      "sha256": "cc4829ea46327c03fdbe0521bba3a7461bb1867004327f87437999fa1d10fed2"
     },
     {
       "path": "includes/class-siteengine-ads-bridge-config.php",
@@ -173,8 +173,8 @@
     },
     {
       "path": "docs/PRODUCT-SETUP-0.6.4.4.md",
-      "bytes": 4805,
-      "sha256": "7c7c6cbbf98d2cf954c8765daac6d12846d85e5a7a74904a5aaa102318d74650"
+      "bytes": 4868,
+      "sha256": "bd8697185e096fa39ae38d96e1a2347d73c615217ddf4deb4e28c54894a69a60"
     },
     {
       "path": "docs/INTERNAL-UNQUALIFIED-0.6.4.5.md",
