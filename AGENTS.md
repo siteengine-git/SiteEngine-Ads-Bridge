@@ -1,7 +1,7 @@
 ## Current November 4 Doctor-reporting assignment
 
 Fix reporting only on Alma; no customer/client or other plugin operations. Current
-specific delivery destination is `D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge`. This assignment-specific
+specific delivery destination is `D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`. This assignment-specific
 path supersedes the earlier general delivery default for this correction. Preserve
 prior accepted packages/evidence in archives. Underlying reported single failure
 is unknown unless demonstrated; initial Alma inspection found zero FAIL.
@@ -23,8 +23,8 @@ Ads operations determine admission; a historical review/PLAN_ONLY archive is not
 independent reservation and must be preserved. The bounded0.6.4.2 administrator
 milestone has passed installed authenticated HTTP/native verification. Finalize its
 stable package/release only; no client rollout or additional milestone is authorized.
-Canonical delivery is D:\SiteEngine\Plugins..Deliverables\PLUGIN - SiteEngine Ads-Bridge
-(actual folder uses the existing em dash). No slash between Plugins and ..Deliverables.
+Canonical delivery is D:\SiteEngine\Plugins\..Deliverables\PLUGIN - SiteEngine Ads-Bridge
+(actual folder uses the existing em dash). The separator between Plugins and ..Deliverables is required.
 Preserve all configuration/history/journals/Consent and disabled delivery flags.
 
 ## Immediate instruction priority — November 3, 2026

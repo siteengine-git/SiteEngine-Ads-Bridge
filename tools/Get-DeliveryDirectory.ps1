@@ -1,8 +1,8 @@
 [CmdletBinding()]
 param([switch]$VerifyCurrentZip)
 $ErrorActionPreference = 'Stop'
-# Exact task-specific destination for the November 4 Doctor correction.
-$directory = Join-Path 'D:\SiteEngine\Plugins..Deliverables' 'PLUGIN — SiteEngine Ads-Bridge'
+# Canonical delivery root: ..Deliverables is a literal child of Plugins.
+$directory = Join-Path 'D:\SiteEngine\Plugins\..Deliverables' ('PLUGIN ' + [char]0x2014 + ' SiteEngine Ads-Bridge')
 if (!(Test-Path -LiteralPath $directory -PathType Container)) { throw 'Canonical Ads delivery directory is missing.' }
 if ($VerifyCurrentZip) {
     $zips = @(Get-ChildItem -LiteralPath $directory -Filter '*.zip' -File -Recurse)
