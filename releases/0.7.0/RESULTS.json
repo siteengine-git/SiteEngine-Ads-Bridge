@@ -1,0 +1,143 @@
+{
+  "version": "0.7.0",
+  "package_sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
+  "manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
+  "local": {
+    "results": [
+      {
+        "suite": "crm-import-acceptance.php",
+        "assertions": 78,
+        "status": "PASS"
+      },
+      {
+        "suite": "crm-import-recovery.php",
+        "assertions": 15,
+        "status": "PASS"
+      },
+      {
+        "suite": "crm-import-archive.php",
+        "assertions": 9,
+        "status": "PASS"
+      },
+      {
+        "suite": "administrator-setup-acceptance.php",
+        "assertions": 19,
+        "status": "PASS"
+      },
+      {
+        "suite": "config-settings-acceptance.php",
+        "assertions": 10,
+        "status": "PASS"
+      },
+      {
+        "suite": "consent-dispatch-acceptance.php",
+        "assertions": 32,
+        "status": "PASS"
+      },
+      {
+        "suite": "successor-bootstrap-acceptance.php",
+        "assertions": 19,
+        "status": "PASS"
+      }
+    ],
+    "total_assertions": 182,
+    "native_claim": false,
+    "changed_php_lint": "PASS",
+    "javascript_syntax": "PASS"
+  },
+  "packaged": {
+    "status": "PASS",
+    "candidate": "0.7.0",
+    "package_sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
+    "manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
+    "verified_members": 49,
+    "php_lints": 27,
+    "PHP": "8.3.36",
+    "native_orm_acceptance_separate": true
+  },
+  "native_browser": {
+    "status": "PASS",
+    "environment": "Owned fresh WordPress/native MariaDB; actual browser admin UI over private loopback PHP server, not public OLS front-end",
+    "separate_CRM_plugin_absent": true,
+    "producer_export_zip_sha256": "822f2bd6411c3fe2657bdbb1b79423e48f880f9722ff80d716b031022ae9defc",
+    "source_configuration_sha256": "06f3ef235d5c59cd4477b8d5afb67997d8da52a7f7c9773338a73c9a954774e3",
+    "source_definitions": 117,
+    "content_objects": 93,
+    "exported_dependencies": 24,
+    "relationship_checks": 66,
+    "additional_standard_Ads_fields": 8,
+    "fresh_review_operations": 126,
+    "all_native_bodies_match": true,
+    "all_definitions_draft": true,
+    "repeat_native_saves": 0,
+    "repeat_IDs_unchanged": true,
+    "retained_upload_repeat_new_operation": true,
+    "previous_completed_journal_unchanged": true,
+    "native_template_Keep_saves": 0,
+    "native_template_Replace_saves": 1,
+    "Keep_Replace_evidence": "First isolated allocation; unchanged conflict engine retained in final package. Final fresh allocation additionally covers eight standard Ads definitions.",
+    "optional_sources_all_unused_saved": true,
+    "incomplete_lifecycle_with_automation_disabled_saved": true,
+    "automation_Sheets_four_export_families_disabled": true,
+    "all_operational_rows": 0,
+    "tokens_preview_editor_verified": true
+  },
+  "main_site_upgrade": {
+    "status": "PASS",
+    "members": 49,
+    "fresh_version": "0.7.0",
+    "original_options_native_data_inquiry_Consent_journals_preserved": true,
+    "activation_or_migration": false,
+    "inquiry_schema": 2,
+    "guard_schema": 1,
+    "four_export_families_disabled": true,
+    "other_preexisting_flags_preserved": true,
+    "Doctor": {
+      "PASS": 36,
+      "WARN": 4,
+      "FAIL": 1
+    },
+    "remaining_failure": "Credentials parent inaccessible/unknown in CLI context; no Ready substitution."
+  },
+  "producer_coexistence": {
+    "status": "BLOCKED_PENDING_CRM_INSTALLED_CHECK",
+    "observed_failure": "CRM 0.3.15 read-only export inventory rejects new Ads bootstrap: ads_successor_pin_mismatch",
+    "owner_update": "CRM 0.3.16 candidate reported 12 focused checks and 26 PHP lints; installed normal export still outstanding",
+    "failed_read_only_job_safely_finished": true,
+    "failure_evidence_preserved": true,
+    "Ads_or_CRM_native_replay": false
+  },
+  "cleanup": {
+    "status": "PASS",
+    "owned_isolated_allocations": 2,
+    "owned_tables_removed": 98,
+    "foreign_references": 0,
+    "owned_WordPress_copies_removed": 2,
+    "HTTP_listeners_remaining": 0,
+    "local_SSH_forwards_remaining": 0,
+    "only_owned_temporary_session_revoked": true,
+    "import_journals_and_failure_evidence_retained_privately": true,
+    "retention_owner": "Ads Codex",
+    "initial_refusal": "Cleanup refused unlisted ff_scheduled_actions before any DROP. Exact native migration/hash provenance and zero rows verified; only that exact table added to owned whitelist. Initial refusal retained."
+  },
+  "unchanged_baseline_files": {
+    "includes/class-siteengine-ads-bridge-consent.php": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0",
+    "includes/class-siteengine-ads-bridge-coordination.php": "90c8ef86bd06b2b05dc57bc7b887fa86e2a55782f348a26455e5ba35503dc18a",
+    "includes/class-siteengine-ads-bridge-inquiries.php": "d1cc0b1285b237f0866f79f7ea45968ac853f59a071c5503a077de56a6bf0454",
+    "includes/class-siteengine-ads-bridge-lifecycle.php": "27a560d638bf8949f844e8d321e42a4615239b58c0435cafd2252961b2461915",
+    "includes/class-siteengine-ads-bridge-time.php": "4ce7fc336271a51eaad62de9518534da2e6f9dd9489810ef0892a1bbe00a471d",
+    "includes/class-siteengine-ads-bridge-fields.php": "c5de808d37c963ea1008a77575a3e93b1591214c6a89e696b020fdf9b66d3625",
+    "includes/class-siteengine-ads-bridge-cli.php": "cc4829ea46327c03fdbe0521bba3a7461bb1867004327f87437999fa1d10fed2",
+    "includes/class-siteengine-ads-bridge-runtime.php": "b396f71fc8cd703de51d6de1350b22855c1eb1b3e9b2f96c48696830f5e588cb",
+    "includes/class-siteengine-ads-bridge-config.php": "c6b1ec99e66d1e452f73290e4f8fbb6dc38de6fd280b68bffdf63bc0eda9ed4f",
+    "includes/class-siteengine-ads-bridge-settings.php": "89e4b96c7f25d1a8219afae17b4f3fc8e689bf92cfdc2b8ca834fab85d826a7f",
+    "includes/class-siteengine-ads-bridge-doctor.php": "ac98646e6fb9d066feaac72294947913c5d7d26cd4d75589e151661f87d78a71"
+  },
+  "limits": [
+    "No client-site operations.",
+    "No contacts, enrollment, real mail, Sheet writes or Ads delivery.",
+    "Native content configuration acceptance is not sender/runtime acceptance.",
+    "Existing Consent/inquiry/coordination acceptance carried forward; only affected Consent dispatch regression rerun.",
+    "Final release remains held for CRM-owned installed normal export compatibility verification."
+  ]
+}

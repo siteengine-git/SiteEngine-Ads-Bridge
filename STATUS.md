@@ -1,3 +1,47 @@
+## 0.7.0 — native browser import verified; producer compatibility closeout pending — 2026-11-04
+
+Canonical source/repository/branch unchanged. Previous released 0.6.4.5 and all prior
+packages retained. Destination-only namespaced importer consumes native-export/2
+ZIP/1 through ordinary upload/mapping/review/automatic-batch UI; no separate CRM
+plugin, hand-created profile or manual MU/CLI setup is required on destinations.
+
+Exact ZIP SHA256 9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b;
+manifest 0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46.
+49 members/27 actual Alma PHP 8.3.36 lints PASS. 182 focused local assertions PASS,
+including actual pinned Consent authority with synthetic storage/transport; these
+local checks are distinct from actual native WordPress/browser import acceptance.
+
+Normal producer export/download from CRM 0.3.15 yielded the exact current accepted
+configuration ZIP (822f2bd6...), imported through the browser with CRM absent on two
+fresh owned destinations. Final fresh import completed 126/126:117 definitions plus
+eight standard Ads fields and settings;93 content objects/24 exported dependencies,
+66 relationships verified. Repeats made zero native saves and preserved IDs; retained
+upload repeat created a new operation without rewriting the previous completed
+journal. Native editor conflict Keep preserved the edit (zero saves), Replace restored
+source (one save). All sources Unused and incomplete disabled lifecycle setup saved.
+No contacts, enrollment, inquiry rows or actual delivery. Main Alma exact upgrade
+preserved original settings/native data/inquiry/Consent/journals. All four export
+families remain false; other preexisting flags unchanged. Doctor remains honest:
+36 PASS/4 WARN/1 FAIL, inaccessible/unknown credentials parent in CLI context.
+
+Main producer coexistence exposed CRM 0.3.15's old bootstrap allowlist. Its failed
+read-only inventory job was finished using existing supervisor after bounded proof;
+original failure preserved, no native replay. CRM owns the correction. User reports
+0.3.16 candidate passes12 focused checks/26 lints; installed normal export remains
+outstanding. No CRM source edited here. Final release/delivery replacement held for
+that exact check; the stable0.6.4.5 delivery remains intact.
+
+Cleanup PASS:98 exact owned tables/two WordPress copies removed, foreign refs zero,
+listeners/forwards gone; only this task's temporary login revoked. Import journals,
+backups and failures retained privately under Ads Codex ownership. Initial cleanup
+refused an unlisted native FluentForms table before DROP; exact source provenance
+and empty state verified before including only that owned table. Details sanitized
+in releases/0.7.0/RESULTS.json; raw evidence remains local/private.
+
+Next:carry CRM-owned installed normal-export result forward, finalize scoped source
+pin/tag and deliver exact verified ZIP. No client rollout, real sends/exports or new
+acceptance campaign. Stable0.6.4.5 history and runtime/Consent/coordination preserved.
+
 ## RELEASED — Ads Bridge 0.6.4.5 — 2026-11-04
 
 Release/tag v0.6.4.5 pins 25579d6263a158231d943cd3b40093d5680288c4.

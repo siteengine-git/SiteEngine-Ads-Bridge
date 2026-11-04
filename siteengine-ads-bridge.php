@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SiteEngine Ads Bridge
  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
- * Version: 0.6.4.5
+ * Version: 0.7.0
  * Requires PHP: 8.3
  * Requires Plugins: siteengine-base
  * Author: SiteEngine
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SEAB_VERSION', '0.6.4.5' );
+define( 'SEAB_VERSION', '0.7.0' );
 define( 'SEAB_PLUGIN_FILE', __FILE__ );
 define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -38,6 +38,7 @@ require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-coordinatio
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-inquiries.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-doctor.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-admin.php';
+require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-crm-import.php';
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-cli.php';
@@ -72,6 +73,7 @@ function seab_init_admin() {
 	SiteEngine_Ads_Bridge_Runtime::init();
 	SiteEngine_Ads_Bridge_Lifecycle::init();
 	SiteEngine_Ads_Bridge_Inquiries::init();
+	\SiteEngine\AdsBridge\Import\Admin::init();
 }
 add_action( 'plugins_loaded', 'seab_init_admin', 20 );
 

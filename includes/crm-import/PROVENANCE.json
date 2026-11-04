@@ -1,0 +1,10 @@
+{
+  "producer_commit": "7df6810",
+  "adapted_configuration_primitives": {
+    "tools/portable_configuration.php": "9248fe18c0108a2f66fe576c9010c2361894871ce52b14e74898ef6cf3a3a3bc",
+    "tools/native_sequences.php": "5fac265d0360c7bb9dd57bed860e9c6f95cb9ebae8b1cff00c8af382ccd96c11",
+    "tools/coordinated_dependencies.php": "1a86e68e4dddafb2c93311b1161ed549808656c11317885389a248e18ff39948",
+    "tools/leadgen_native.php": "0310afe814833188cb42916e5b4c7d85c4854203afde820d31f92958dd1e0967"
+  },
+  "excluded": "Operational engine, intake, contacts, sender, workflows, source profiles, deployment MU/CLI and journals are not copied."
+}

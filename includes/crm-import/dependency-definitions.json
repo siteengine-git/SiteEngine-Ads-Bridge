@@ -1,0 +1,251 @@
+{
+  "field.se_crm_first_contact_attempt_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_first_contact_attempt_at",
+      "label": "First Contact Attempt",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_last_contact_attempt_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_last_contact_attempt_at",
+      "label": "Last Contact Attempt",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_last_contacted_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_last_contacted_at",
+      "label": "Last Two-Way Contact",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_next_follow_up_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_next_follow_up_at",
+      "label": "Next Follow-Up",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_appointment_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_appointment_at",
+      "label": "Appointment Date & Time",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_appointment_status": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_appointment_status",
+      "label": "Appointment Status",
+      "type": "select-one",
+      "field_key": "single-select",
+      "group": "SiteEngine CRM Ops",
+      "options": [
+        "none",
+        "scheduled",
+        "completed",
+        "missed",
+        "cancelled"
+      ]
+    }
+  },
+  "field.se_crm_estimate_status": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_estimate_status",
+      "label": "Estimate Status",
+      "type": "select-one",
+      "field_key": "single-select",
+      "group": "SiteEngine CRM Ops",
+      "options": [
+        "none",
+        "preparing",
+        "sent",
+        "accepted",
+        "declined",
+        "expired"
+      ]
+    }
+  },
+  "field.se_crm_estimate_sent_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_estimate_sent_at",
+      "label": "Estimate Sent At",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_estimate_expires_on": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_estimate_expires_on",
+      "label": "Estimate Expiration Date",
+      "type": "date",
+      "field_key": "date",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "field.se_crm_service_status": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_service_status",
+      "label": "Job / Service Status",
+      "type": "select-one",
+      "field_key": "single-select",
+      "group": "SiteEngine CRM Ops",
+      "options": [
+        "not_scheduled",
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ]
+    }
+  },
+  "field.se_crm_service_completed_at": {
+    "kind": "field",
+    "body": {
+      "slug": "se_crm_service_completed_at",
+      "label": "Job / Service Completed At",
+      "type": "date_time",
+      "field_key": "date_time",
+      "group": "SiteEngine CRM Ops"
+    }
+  },
+  "list.customers": {
+    "kind": "list",
+    "body": {
+      "title": "Customers",
+      "slug": "customers",
+      "description": "",
+      "is_public": 0
+    }
+  },
+  "list.future-customers": {
+    "kind": "list",
+    "body": {
+      "title": "Future Customers",
+      "slug": "future-customers",
+      "description": "",
+      "is_public": 0
+    }
+  },
+  "list.dnc": {
+    "kind": "list",
+    "body": {
+      "title": "DNC",
+      "slug": "dnc",
+      "description": "",
+      "is_public": 0
+    }
+  },
+  "tag.new": {
+    "kind": "tag",
+    "body": {
+      "title": "New",
+      "slug": "new",
+      "description": ""
+    }
+  },
+  "tag.qualified": {
+    "kind": "tag",
+    "body": {
+      "title": "Qualified",
+      "slug": "qualified",
+      "description": ""
+    }
+  },
+  "tag.unqualified": {
+    "kind": "tag",
+    "body": {
+      "title": "Unqualified",
+      "slug": "unqualified",
+      "description": ""
+    }
+  },
+  "tag.won": {
+    "kind": "tag",
+    "body": {
+      "title": "Won",
+      "slug": "won",
+      "description": ""
+    }
+  },
+  "tag.call-lead": {
+    "kind": "tag",
+    "body": {
+      "title": "Call Lead",
+      "slug": "call-lead",
+      "description": ""
+    }
+  },
+  "tag.form-lead": {
+    "kind": "tag",
+    "body": {
+      "title": "Form Lead",
+      "slug": "form-lead",
+      "description": ""
+    }
+  },
+  "tag.referral": {
+    "kind": "tag",
+    "body": {
+      "title": "Referral",
+      "slug": "referral",
+      "description": ""
+    }
+  },
+  "tag.walk-in-lead": {
+    "kind": "tag",
+    "body": {
+      "title": "Walk In Lead",
+      "slug": "walk-in-lead",
+      "description": ""
+    }
+  },
+  "field.service_type": {
+    "kind": "field",
+    "body": {
+      "slug": "service_type",
+      "type": "text",
+      "field_key": "text",
+      "label": "Service"
+    }
+  },
+  "field.outcome_reason": {
+    "kind": "field",
+    "body": {
+      "slug": "customer_rating",
+      "type": "select-one",
+      "field_key": "single-select",
+      "label": "Outcome reason",
+      "options": [
+        "Wrong Area",
+        "Wrong Service",
+        "Wrong Product",
+        "Wrong Price",
+        "Spam / Junk",
+        "Other"
+      ]
+    }
+  }
+}

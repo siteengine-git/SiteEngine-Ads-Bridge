@@ -1,3 +1,12 @@
+## 0.7.0 — destination CRM configuration import
+
+- Package configuration-only validators/native adapters inside Ads; no destination dependency on the CRM builder.
+- Add upload, destination mapping, review, automatic batching, exact operation recovery and native editor links.
+- Reuse compatible objects, retain client edits, and require explicit Keep/Replace for conflicts.
+- Include missing standard Ads fields through the reviewed import; Unqualified timing stays internal.
+- Allow incomplete disabled lifecycle setup and all optional sources Unused.
+- Preserve Consent/current-eligibility, inquiry/coordination contracts, customer data and disabled delivery.
+
 # Changelog
 
 ##0.6.4.5 —2026-11-04

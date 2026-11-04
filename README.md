@@ -1,3 +1,7 @@
+# CRM configuration import — 0.7.0
+
+Ads Bridge now owns destination import. See [administrator instructions](docs/CRM-CONFIGURATION-IMPORT.md). The separate CRM Configuration plugin is not required on destination sites. Imported content remains inactive; importing never authorizes enrollment or email.
+
 > Current source: **0.6.4.5**, PHP8.3 minimum. Unqualified timing is internal to Ads inquiries; no required/new unqualified_at CRM field.
 > Includes the portable0.6.4.4 setup/timezone correction. Read [current operator instructions](docs/INTERNAL-UNQUALIFIED-0.6.4.5.md).
 

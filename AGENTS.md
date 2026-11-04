@@ -1,3 +1,19 @@
+## Current CRM configuration import assignment — November 4, 2026
+
+Controlling Helper: _(AB) Ads Helper - 10. Canonical source remains this checkout.
+Released baseline 0.6.4.5 / 25579d6 and all Consent/Unqualified repairs are retained.
+Ads owns destination configuration import and setup; CRM owns producer/export
+contract and content. Destination sites must not require the separate CRM plugin.
+This assignment supersedes the earlier standalone setup-patch plan and conflicting
+reporting-only scope. Reuse/adapt the current CRM importer primitives; do not edit
+CRM source or copy its operational application. Local development, scoped publish,
+packaging and isolated Alma export-to-browser-import acceptance are authorized.
+No client sites, real delivery/enrollment, historical rewrite or destructive cleanup.
+Preserve existing journals and packages. One writer per overlapping resource; no
+new general approval gate. Do not replace the current installable until the actual
+ordinary administrator workflow on a fresh isolated destination is verified.
+Delivery: D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge.
+
 ## Current November 4 Doctor-reporting assignment
 
 Fix reporting only on Alma; no customer/client or other plugin operations. Current

@@ -51,7 +51,11 @@ try {
  $_POST=['seab_tab'=>'lifecycle','tag_new'=>'New','tag_qualified'=>'Qualified','tag_unqualified'=>'Unqualified','tag_won'=>'Won','list_customers'=>'Customers','list_future_customers'=>'Future Customers','list_dnc'=>'DNC','unqualified_reason_field'=>'customer_rating','unqualified_at_field'=>'unqualified_at','stale_new_days'=>'3'];
  $before=$options['seab_settings_v2'];invoke('handle_save');$expected=$before;$expected['fluentcrm']['tags']['lifecycle']['new']='New';
  ok($options['seab_settings_v2']===$expected,'lifecycle handler resolves missing mapping without unrelated changes');
+ $_POST['tag_new']='';invoke('handle_save');ok($options['seab_settings_v2']['fluentcrm']['tags']['lifecycle']['new']==='','incomplete lifecycle saves while automation disabled');
+ $_POST['tag_new']='New';invoke('handle_save');
+ $_POST['lifecycle_automation_enabled']='1';
  foreach(['Missing','Ambiguous','Qualified']as$bad){$_POST['tag_new']=$bad;invoke('handle_save',$bad==='Qualified'?'distinct':'exactly one');ok($options['seab_settings_v2']===$expected,'invalid lifecycle identity blocked: '.$bad);}
+ unset($_POST['lifecycle_automation_enabled']);
  $_POST['tag_new']='New';SiteEngine_Ads_Bridge_Coordination::$blocked=true;invoke('handle_save','pending');ok($options['seab_settings_v2']===$expected,'pending destination prevents settings write');SiteEngine_Ads_Bridge_Coordination::$blocked=false;
  $job['state']='active';file_put_contents($fixture.'/deployment-job.json',json_encode($job));invoke('handle_save','unfinished shared');ok($options['seab_settings_v2']===$expected,'durable active job blocks between invocations');
  $job['state']='complete';file_put_contents($fixture.'/deployment-job.json',json_encode($job));$foreign=fopen($fixture.'/executor.lock','c');flock($foreign,LOCK_EX);invoke('handle_save','Another configuration executor');flock($foreign,LOCK_UN);fclose($foreign);

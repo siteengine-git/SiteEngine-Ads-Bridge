@@ -347,6 +347,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		$tabs   = array(
 			'setup'       => 'Setup',
 			'lifecycle'   => 'CRM & Lifecycle',
+			'crm-import'  => 'Import CRM Configuration',
 			'fields'      => 'Field Mapping',
 			'exports'     => 'Exports',
 			'sheets'      => 'Google Sheets',
@@ -361,7 +362,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 		echo '<div class="wrap seab-admin"><h1>SiteEngine Ads Bridge</h1>';
 		self::render_source_banner( $config );
-		self::render_setup_issues( $config );
+		if ( 'crm-import' !== $tab ) { self::render_setup_issues( $config ); }
 
 		if ( isset( $_GET['seab_saved'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success is-dismissible"><p>Ads Bridge settings saved.</p></div>';
@@ -378,6 +379,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '</nav>';
 
 		switch ( $tab ) {
+			case 'crm-import':
+				\SiteEngine\AdsBridge\Import\Admin::render();
+				break;
 			case 'lifecycle':
 				self::render_lifecycle( $config );
 				break;
@@ -514,7 +518,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		);
 		foreach ( $labels as $role => $label ) {
 			$value = (string) $config->get( 'fluentcrm.tags.lifecycle.' . $role, '' );
-			echo '<tr><th><label for="seab-tag-' . esc_attr( $role ) . '">' . esc_html( $label ) . ' lifecycle tag</label></th><td><select required id="seab-tag-' . esc_attr( $role ) . '" name="tag_' . esc_attr( $role ) . '"><option value="">Select an existing tag</option>';
+			echo '<tr><th><label for="seab-tag-' . esc_attr( $role ) . '">' . esc_html( $label ) . ' lifecycle tag</label></th><td><select id="seab-tag-' . esc_attr( $role ) . '" name="tag_' . esc_attr( $role ) . '"><option value="">Select an existing tag</option>';
 			foreach ( $tags as $title ) { echo '<option value="' . esc_attr( $title ) . '" ' . selected( $value, $title, false ) . '>' . esc_html( $title ) . '</option>'; }
 			echo '</select><p class="description">Field: fluentcrm.tags.lifecycle.' . esc_html( $role ) . '. Missing tags: create them in FluentCRM &rarr; Contacts &rarr; Tags, then return here. Duplicate titles must be resolved there first.</p></td></tr>';
 		}
@@ -697,8 +701,10 @@ final class SiteEngine_Ads_Bridge_Admin {
 			foreach ( SiteEngine_Ads_Bridge_Config::lifecycle_roles() as $role ) {
 				$data['fluentcrm']['tags']['lifecycle'][ $role ] = self::post_text( 'tag_' . $role );
 			}
-			try { SiteEngine_Ads_Bridge_Setup::validate_lifecycle( $data['fluentcrm']['tags']['lifecycle'] ); }
-			catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
+			if ( self::post_bool( 'lifecycle_automation_enabled' ) ) {
+				try { SiteEngine_Ads_Bridge_Setup::validate_lifecycle( $data['fluentcrm']['tags']['lifecycle'] ); }
+				catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
+			}
             foreach(['call','form','referral','walk_in']as$role){
                 $key='source_'.$role;if(!array_key_exists($key,$_POST))continue;$value=self::post_text($key);
                 if($value!==''){global $wpdb;$ids=$wpdb->get_col($wpdb->prepare("SELECT id FROM `{$wpdb->prefix}fc_tags` WHERE BINARY title=%s",$value));if($wpdb->last_error||!is_array($ids)||count($ids)!==1)wp_die('Optional source mapping must identify exactly one existing tag.');}

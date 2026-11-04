@@ -47,6 +47,10 @@ final class SiteEngine_Ads_Bridge_Setup {
     /** Guard configuration saves against unfinished Ads history and journals. */
     public static function with_configuration( callable $callback ) {
         return self::with_executor( static function() use ( $callback ) {
+            if ( class_exists('SiteEngine\\AdsBridge\\Import\\Store') && !\SiteEngine\AdsBridge\Import\Engine::$executing ) {
+                $import=\SiteEngine\AdsBridge\Import\Store::job();
+                if ($import && in_array($import['status'],['running','uncertain'],true)) { throw new RuntimeException('An active CRM configuration import owns Ads setup. Resume its saved operation before changing settings.'); }
+            }
             // Fresh setup can save first, while still checking any existing journal.
             $held = SiteEngine_Ads_Bridge_Coordination::enter_setup( true );
             if ( ! $held['ok'] ) { throw new RuntimeException( $held['reason'] ); }
