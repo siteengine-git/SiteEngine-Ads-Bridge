@@ -1,3 +1,17 @@
+## RELEASED — portable Ads Bridge0.6.4.4 — 2026-11-04
+
+v0.6.4.4 pins a76eef2c6d212aac19899ad435b5115790c495de.
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.4
+Implemented/packaged/Alma-installed/verified/released YES; no client rollout.
+Four published GitHub assets independently match local SHA256/size. Exact final
+ZIP06769fcb773a0ac19ff0e98d204c8daf59d6b5353e13ce81e3ab426155b02b91.
+390 local/65 installed assertions;17 installed PHP lint;33 exact members verified.
+All owned fixture resources removed; private backups/results retained by Ads Codex.
+Normal Alma remains Needs Attention for missing field and inaccessible credential
+parent; real account/feed confirmation still required. No substituted PASS/Ready,
+ordinary settings changes, live export, Base edit or historical rewrite. See versioned
+operator guide/RESULTS/PUBLICATION for portability evidence and precise limits.
+
 ## 2026-11-04 — final 0.6.4.4 package verified
 
 Final ZIP SHA25606769fcb773a0ac19ff0e98d204c8daf59d6b5353e13ce81e3ab426155b02b91;

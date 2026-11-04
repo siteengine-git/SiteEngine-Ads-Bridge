@@ -4,14 +4,15 @@
   "sha256": "06769fcb773a0ac19ff0e98d204c8daf59d6b5353e13ce81e3ab426155b02b91",
   "manifest_sha256": "d643e79ec688b0d0a19bc87d3da505b7a818203ad2af72f543202741154e7622",
   "members": 33,
-  "source_commit": "Published final package checkpoint containing this file",
+  "source_commit": "a76eef2c6d212aac19899ad435b5115790c495de",
   "implemented": true,
   "packaged": true,
   "installed": true,
   "verified": true,
-  "released": "Publication recorded separately in PUBLICATION.json",
+  "released": true,
   "verification": "65 actual Alma HTTP/native assertions;17 installed package PHP lints;390 local assertions;no client rollout",
   "installed_scope": "Alma only; actual normal configuration retains two honest FAILs, four WARNs; no site settings/field change for product acceptance",
   "runtime_implementation_commit": "ecfc94de5794e633cb8d371dd5cc7bb30a16ee2c",
-  "final_package_installation": "PASS;33 members/fresh version verified;final delta README/CHANGELOG/manifest only;all PHP bytes identical to installed-tested package"
+  "final_package_installation": "PASS;33 members/fresh version verified;final delta README/CHANGELOG/manifest only;all PHP bytes identical to installed-tested package",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.4"
 }
