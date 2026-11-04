@@ -1,8 +1,7 @@
-> Current source: **0.6.4.2, accepted administrator setup**, PHP 8.3 minimum.
-> Installed and verified on Alma through actual authenticated administrator HTTP requests.
-> Storage initialization, lifecycle selection, actionable errors, explicit external migration/drift, and permission/nonce rejection passed.
-> Consent, inquiry history and disabled delivery/export flags preserved. No client rollout.
-> Read [administrator setup steps](docs/ADMINISTRATOR-SETUP-0.6.4.2.md).
+> Current source: **0.6.4.3, Doctor failure reporting**, PHP 8.3 minimum.
+> Module status retains each failing check and explanation. Dashboard/Ads notices link directly to Diagnostics and supported corrective settings.
+> Doctor severity/validation, Consent and disabled export behavior are unchanged.
+> Read [Doctor reporting instructions](docs/DOCTOR-REPORTING-0.6.4.3.md).
 
 # SiteEngine Ads Bridge
 

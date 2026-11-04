@@ -33,6 +33,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		add_action( 'admin_post_seab_import_config', array( __CLASS__, 'handle_import' ) );
 		add_action( 'admin_post_seab_initialize_storage', array( __CLASS__, 'handle_storage' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_base_missing_notice' ) );
+		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_doctor_failures' ) );
 	}
 
 	/**
@@ -172,18 +173,76 @@ final class SiteEngine_Ads_Bridge_Admin {
 		}
 
 		$doctor  = new SiteEngine_Ads_Bridge_Doctor( $config );
-		$doctor->run();
+		$results = $doctor->run();
 		$summary = $doctor->summary();
 		if ( ! empty( $summary['FAIL'] ) ) {
+			$failures = self::doctor_failures( $results );
+			$diagnostics = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=diagnostics' );
+			$messages = array();
+			foreach ( $failures as $failure ) {
+				$message = $failure['check'] . ': ' . $failure['message'];
+				if ( $failure['corrective_url'] ) { $message .= ' Review ' . $failure['corrective_label'] . ': ' . $failure['corrective_url']; }
+				$messages[] = $message;
+			}
 			return array(
 				'status'  => 'error',
 				'label'   => 'Needs Attention',
-				'message' => sprintf( 'Doctor reports %d failing check(s).', (int) $summary['FAIL'] ),
+				'message' => sprintf( '%d Doctor failure(s). ', (int) $summary['FAIL'] ) . implode( ' ', $messages ) . ' Open Ads Bridge Diagnostics: ' . $diagnostics,
+				'doctor_failures' => $failures,
+				'diagnostics_url' => $diagnostics,
 			);
 		}
 
 		$message = empty( $summary['WARN'] ) ? 'Configuration and runtime checks are healthy.' : sprintf( 'Ready with %d doctor warning(s).', (int) $summary['WARN'] );
 		return array( 'status' => 'ready', 'label' => 'Ready', 'message' => $message );
+	}
+
+	/** Keep Doctor severity/text intact; only known check destinations are attached. */
+	public static function doctor_failures( $results ) {
+		$tabs = array(
+			'Config schema' => 'setup', 'Config shape' => 'setup',
+			'Lifecycle tags' => 'lifecycle', 'FluentCRM lifecycle tags' => 'lifecycle',
+			'FluentCRM lists' => 'lifecycle', 'FluentCRM source tags' => 'lifecycle',
+			'Inquiry attribution layer' => 'storage', 'Consent policy version' => 'setup',
+			'Export family: qualified_leads' => 'exports', 'Export family: converted_leads' => 'exports',
+			'Export family: all_leads' => 'exports', 'Export tab uniqueness' => 'exports',
+			'Google Sheets sink' => 'sheets', 'Google Sheets credentials' => 'sheets', 'Google Sheets value input' => 'sheets',
+		);
+		$labels = array( 'setup' => 'Ads Bridge Setup', 'lifecycle' => 'Ads Bridge CRM & Lifecycle', 'storage' => 'Ads Bridge Storage', 'exports' => 'Ads Bridge Exports', 'sheets' => 'Ads Bridge Google Sheets' );
+		$out = array();
+		foreach ( (array) $results as $row ) {
+			if ( ! is_array( $row ) || ( $row['status'] ?? '' ) !== 'FAIL' ) { continue; }
+			$row['corrective_label'] = '';
+			$row['corrective_url'] = '';
+			$check = (string) ( $row['check'] ?? '' );
+			if ( isset( $tabs[ $check ] ) ) {
+				$row['corrective_label'] = $labels[ $tabs[ $check ] ];
+				$row['corrective_url'] = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tabs[ $check ] );
+			} elseif ( in_array( $check, array( 'Config timezone', 'Google Ads CID', 'Currency' ), true ) ) {
+				$row['corrective_label'] = 'Business Data';
+				$row['corrective_url'] = admin_url( 'admin.php?page=business-data' );
+			} elseif ( in_array( $check, array( 'Fluent Forms', 'FluentCRM', 'SiteEngine Consent', 'SiteEngine Base', 'SiteEngine Business Data' ), true ) ) {
+				$row['corrective_label'] = 'Plugins';
+				$row['corrective_url'] = admin_url( 'plugins.php' );
+			}
+			$out[] = $row;
+		}
+		return $out;
+	}
+
+	/** Base renders status messages as plain text; supply clickable Ads-owned links. */
+	public static function maybe_show_doctor_failures() {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		if ( ! current_user_can( 'manage_options' ) || ! in_array( $page, array( self::PAGE_SLUG, 'siteengine-dashboard' ), true ) ) { return; }
+		$status = self::module_status();
+		if ( empty( $status['doctor_failures'] ) ) { return; }
+		echo '<div class="notice notice-error inline seab-doctor-failures"><h2>Ads Bridge needs attention</h2><ul>';
+		foreach ( $status['doctor_failures'] as $failure ) {
+			echo '<li><strong>' . esc_html( $failure['check'] ) . ':</strong> ' . esc_html( $failure['message'] );
+			if ( $failure['corrective_url'] ) { echo ' <a href="' . esc_url( $failure['corrective_url'] ) . '">' . esc_html( $failure['corrective_label'] ) . '</a>'; }
+			echo '</li>';
+		}
+		echo '</ul><p><a href="' . esc_url( $status['diagnostics_url'] ) . '">Open Ads Bridge Diagnostics</a></p></div>';
 	}
 
 	/** Reporting only: retain every validation failure and stored Base prerequisite. */

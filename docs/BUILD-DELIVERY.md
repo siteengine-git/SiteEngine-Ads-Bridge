@@ -7,13 +7,12 @@ $delivery = & .\tools\Get-DeliveryDirectory.ps1 -VerifyCurrentZip
 ```
 
 The canonical path is:
-`D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
-`..Deliverables` is one literal child directory inside `D:\SiteEngine\Plugins`.
-The different directory `D:\SiteEngine\Plugins..Deliverables` is not the delivery
-root. This explicit user clarification supersedes conflicting historical path
-instructions. Populate repositories normally; deliver only the last known
-installable plugin version and matching release documents here. Historical build
-commands and receipts remain evidence, not the current build procedure.
+`D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
+This is the exact task-specific destination explicitly named in the November 4
+Doctor-reporting assignment. It supersedes the earlier general child-directory
+default for this correction. Populate repositories normally; keep one latest
+installable ZIP and matching release documents here. Preserve historical packages
+outside delivery. Do not change a task's literal destination based on old receipts.
 
 Release source uses `releases/<version>/MANIFEST.json` and `DELIVERY.json`. Preserve
 their exact payload/embedded-manifest bytes and independent package hashes. A pinned
@@ -23,7 +22,7 @@ exactly one current ZIP there, including subdirectories; preserve older artifact
 under the existing project's delivery-history outside the delivery directory.
 No active configuration, credentials, logs or client data belong in an archive.
 
-Accepted stable 0.6.4.2 is pinned by tag `v0.6.4.2`; ZIP SHA-256 is
-`4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380`.
-This path/tooling correction does not rebuild the accepted ZIP, change its
-manifest/release assets, alter runtime, repeat acceptance or perform site operations.
+The prior accepted 0.6.4.2 ZIP remains hash-preserved in project archives and its
+GitHub release. The 0.6.4.3 correction's exact package hash and installed reporting
+evidence are in `releases/0.6.4.3/`. Packaging never regenerates an accepted ZIP
+just to change its delivery location.

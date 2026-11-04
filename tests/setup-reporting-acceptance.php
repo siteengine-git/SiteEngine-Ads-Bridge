@@ -8,7 +8,7 @@ function siteengine_get($k,$d=''){return $GLOBALS['base'][$k]??$d;}function site
 function sanitize_key($s){return preg_replace('/[^a-z0-9_\-]/','',strtolower($s));}function sanitize_text_field($s){return trim((string)$s);}function absint($v){return abs((int)$v);}
 function admin_url($p){return 'https://example.test/wp-admin/'.$p;}function esc_html($s){return htmlspecialchars((string)$s,ENT_QUOTES,'UTF-8');}function esc_url($s){return htmlspecialchars((string)$s,ENT_QUOTES,'UTF-8');}
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-settings.php';require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-config.php';require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-admin.php';
-class SiteEngine_Ads_Bridge_Doctor{public static $fail=0;function __construct($c){}function run(){}function summary(){return ['FAIL'=>self::$fail,'WARN'=>0];}}
+class SiteEngine_Ads_Bridge_Doctor{public static $fail=0,$rows=null;function __construct($c){}function run(){return self::$rows??array_fill(0,self::$fail,['status'=>'FAIL','check'=>'Fixture check','message'=>'Fixture explanation']);}function summary(){return ['FAIL'=>self::$fail,'WARN'=>0];}}
 $n=0;function ok($v,$m){global$n;if(!$v)throw new RuntimeException($m);$n++;echo "PASS $m\n";}
 function reset_config(){ $p=new ReflectionProperty('SiteEngine_Ads_Bridge_Config','instance');$p->setAccessible(true);$p->setValue(null,null);return SiteEngine_Ads_Bridge_Config::instance(); }
 function source_as($c,$v){$p=new ReflectionProperty($c,'source');$p->setAccessible(true);$p->setValue($c,$v);}

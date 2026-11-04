@@ -1,0 +1,50 @@
+{
+  "version": "0.6.4.3",
+  "status": "PASS",
+  "initial_alma_summary": {
+    "PASS": 33,
+    "WARN": 9,
+    "FAIL": 0,
+    "PENDING": 0
+  },
+  "underlying_reported_single_failure": "UNKNOWN; not present in current Alma inspection",
+  "demonstrated_defect": "module_status discarded Doctor results and displayed only FAIL count",
+  "underlying_functional_repair": false,
+  "local_assertions": 65,
+  "local_boundary": "Actual formatter/notice/resolver/bootstrap, WordPress/Base/Doctor doubles",
+  "installed_assertions": 19,
+  "installed_boundary": "Actual HTTPS WordPress administrator session and Base dashboard/Ads Diagnostics; actual Doctor algorithms with authenticated owned request-local config; no persisted malformed settings, no result-row injection.",
+  "checks": [
+    "actual authenticated WordPress administrator session",
+    "one fixture triggers exact real Doctor failure count without setup-validation bypass",
+    "one native module retains error status",
+    "one module retains every actual Doctor FAIL row",
+    "one module names/explains Google Sheets value input",
+    "one actual dashboard notice renders every failure",
+    "one actual notice has direct Diagnostics/Sheets anchors",
+    "single Sheets failure does not substitute generic Business Data instructions",
+    "multiple fixture triggers exact real Doctor failure count without setup-validation bypass",
+    "multiple native module retains error status",
+    "multiple module retains every actual Doctor FAIL row",
+    "multiple module names/explains Currency",
+    "multiple module names/explains Google Sheets value input",
+    "multiple actual dashboard notice renders every failure",
+    "multiple actual notice has direct Diagnostics/Sheets anchors",
+    "known currency failure also has correct Business Data destination",
+    "actual Ads Diagnostics preserves both failing rows and severity",
+    "fresh normal request restores actual baseline without persisted fixture values",
+    "normal dashboard has no fabricated failure notice"
+  ],
+  "cleanup": {
+    "status": "PASS",
+    "original_options_and_five_inquiry_guard_consent_tables_preserved": true,
+    "owned_user_and_sessions_removed": true,
+    "owned_mu_removed": true,
+    "context_and_password_ledger_removed": true,
+    "malformed_settings_persisted": false,
+    "all_six_delivery_flags_disabled": true,
+    "installed_version": "0.6.4.3"
+  },
+  "doctor_validation_and_consent_runtime_unchanged": true,
+  "client_deployment": false
+}

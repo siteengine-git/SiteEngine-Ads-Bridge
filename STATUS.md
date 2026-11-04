@@ -1,3 +1,36 @@
+## 2026-11-04 - Doctor reporting correction0.6.4.3 installed verified
+
+Canonical source/repository/maintenance branch unchanged; accepted0.6.4.2 ZIP and
+release evidence preserved. Current assignment's sole server target Alma.
+One initial inspection:Doctor33 PASS/9 WARN/0 FAIL/0 PENDING, current job complete,
+executor free, unresolved Ads none. Previously reported single failure UNKNOWN;
+no functional cause guessed or unrelated underlying repair performed.
+
+Demonstrated defect:module_status discarded Doctor rows and returned only a FAIL
+count. Corrected module message retains every FAIL name/original explanation;
+Ads dashboard/page notice supplies direct Diagnostics/recognized corrective links.
+Unknown checks never redirect generically to Business Data. Error severity/Doctor
+rules/validation/setup precedence unchanged. HTML escaped; manage_options retained.
+
+Focused local65 assertions (16 new+30 reporting+19 bootstrap) and3 package PHP
+lints PASS. Installed19 actual authenticated HTTP/native assertions PASS:one real
+Sheets-value FAIL, two real Currency/Sheets FAIL rows, actual Base dashboard card/
+notice and Ads Diagnostics/error/link checks, fresh normal Ready restored. Request-
+local malformed values only; no saved configuration. All protected Ads options/
+inquiry/guard/three Consent tables checksum-identical. Owned user/sessions/MU/context/
+password ledger removed; all six flags disabled. No new client or export activity.
+Completed0.6.4.2 setup/Consent acceptance reused, no broad campaign restarted.
+
+Implemented/packaged/installed/verified YES. Publication recorded after stable push.
+ZIP SHA256 89adbf7946bf9f2fe6558047590498b4dde8ee638f85461cfc9124a828222240
+Manifest SHA256 e63c3a3b421b42205eb10d69a5ba93ff66533881091ef7182b5ff728df635dd2
+30 installed members and fresh-process version/profile verified. Task-specific exact
+requested directory D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+contains exactly one latest ZIP with matching release instructions/checksum. The
+November4 specific destination supersedes prior general default for this correction;
+prior directory artifacts hash-archived under delivery-history. Underlying reported
+single failure remains UNKNOWN. Source release evidence:releases/0.6.4.3.
+
 ## Latest delivery-root clarification applied
 
 Filesystem destination: D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.4.3 - 2026-11-04
+
+- Replace count-only Doctor failure module messages with every failing check's readable name and original explanation.
+- Add direct Diagnostics and supported corrective destinations in Ads-owned dashboard/page notices; escape output and retain administrator capability checks.
+- Preserve Doctor algorithms/severity/validation, setup precedence, configuration authority, storage, Consent and disabled delivery/export behavior.
+- Alma initial inspection found zero failures; the previously reported single failure remains unidentified. No underlying functional cause is guessed or repaired.
+
+
 ## 0.6.4.2 - 2026-11-03 (accepted; Alma administrator verification passed)
 
 - Add explicit Storage controls using the existing inquiry and configuration-guard migrations.

@@ -1,3 +1,11 @@
+## Current November 4 Doctor-reporting assignment
+
+Fix reporting only on Alma; no customer/client or other plugin operations. Current
+specific delivery destination is `D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge`. This assignment-specific
+path supersedes the earlier general delivery default for this correction. Preserve
+prior accepted packages/evidence in archives. Underlying reported single failure
+is unknown unless demonstrated; initial Alma inspection found zero FAIL.
+
 ## Authoritative installable delivery root - latest user clarification
 
 Populate plugin repositories normally. Deliver only the last known installable

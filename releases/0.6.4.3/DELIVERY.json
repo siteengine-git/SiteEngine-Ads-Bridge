@@ -1,0 +1,20 @@
+{
+  "version": "0.6.4.3",
+  "package": "siteengine-ads-bridge-0.6.4.3.zip",
+  "sha256": "89adbf7946bf9f2fe6558047590498b4dde8ee638f85461cfc9124a828222240",
+  "embedded_manifest_sha256": "e63c3a3b421b42205eb10d69a5ba93ff66533881091ef7182b5ff728df635dd2",
+  "external_manifest_sha256": "e63c3a3b421b42205eb10d69a5ba93ff66533881091ef7182b5ff728df635dd2",
+  "verified_members": 30,
+  "implemented": true,
+  "packaged": true,
+  "installed": true,
+  "verified": true,
+  "released": false,
+  "underlying_reported_single_failure": "UNKNOWN; initial Alma inspection zero failures",
+  "candidate_scope": "Reporting only; no Doctor rules or functional repair",
+  "local_assertions": 65,
+  "installed_http_assertions": 19,
+  "php_lint": 3,
+  "destination": "D:\\SiteEngine\\Plugins..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
+  "source_commit": "Published checkpoint containing this file; release tag v0.6.4.3 pins verified source"
+}
