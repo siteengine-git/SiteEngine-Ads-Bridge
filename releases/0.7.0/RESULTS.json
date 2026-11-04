@@ -80,30 +80,18 @@
     "all_operational_rows": 0,
     "tokens_preview_editor_verified": true
   },
-  "main_site_upgrade": {
-    "status": "PASS",
-    "members": 49,
-    "fresh_version": "0.7.0",
-    "original_options_native_data_inquiry_Consent_journals_preserved": true,
-    "activation_or_migration": false,
-    "inquiry_schema": 2,
-    "guard_schema": 1,
-    "four_export_families_disabled": true,
-    "other_preexisting_flags_preserved": true,
-    "Doctor": {
-      "PASS": 36,
-      "WARN": 4,
-      "FAIL": 1
-    },
-    "remaining_failure": "Credentials parent inaccessible/unknown in CLI context; no Ready substitution."
-  },
   "producer_coexistence": {
-    "status": "BLOCKED_PENDING_CRM_INSTALLED_CHECK",
+    "status": "NOT_RUN_REQUIRED_OWNER_DEPENDENCY",
     "observed_failure": "CRM 0.3.15 read-only export inventory rejects new Ads bootstrap: ads_successor_pin_mismatch",
     "owner_update": "CRM 0.3.16 candidate reported 12 focused checks and 26 PHP lints; installed normal export still outstanding",
     "failed_read_only_job_safely_finished": true,
     "failure_evidence_preserved": true,
-    "Ads_or_CRM_native_replay": false
+    "Ads_or_CRM_native_replay": false,
+    "latest_owner_evidence": "CRM Helper current handback confirms0.3.16 locally tested/packaged,installation and native export outstanding;0.3.15 remains accepted historical baseline.",
+    "fresh_Alma_finding": "No installed SiteEngine CRM Configuration plugin found;AdminConfiguration class absent. No CRM files/activation changed by Ads.",
+    "required_executor": "CRM Codex:install/reconcile its0.3.16 producer under existing assignment,complete one normal configuration export/download against final Ads bytes,and supply exact handback.",
+    "Ads_protected_bootstrap_coordination_contract_inquiry_pins": "Unchanged from its reviewed0.7.0 binding.",
+    "new_export_run_by_Ads": false
   },
   "cleanup": {
     "status": "PASS",
@@ -136,8 +124,8 @@
     "No contacts, enrollment, real mail, Sheet writes or Ads delivery.",
     "Native content configuration acceptance is not sender/runtime acceptance.",
     "Existing Consent/inquiry/coordination acceptance carried forward; only affected Consent dispatch regression rerun.",
-    "Current corrected bytes are installed/verified only in isolated Alma fixture. Main Alma still has the earlier 49-member candidate because a real retained Ads operation blocks replacement.",
-    "Release remains held for completion of actual original Ads import, exact corrected-byte installation and CRM-owned0.3.16 normal export coexistence verification."
+    "Current corrected bytes are main-Alma installed and Ads verification passes;full release/delivery replacement remains held only for CRM-owned0.3.16 installed normal export coexistence evidence.",
+    "No repeat isolated campaign,client operation,live message,Sheet append or advertising export."
   ],
   "initial_candidate_sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
   "initial_manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
@@ -229,5 +217,61 @@
       "Local existing administrator fixture lacked the now-required original executor lock; fixture corrected to include its supported existing lock."
     ],
     "source_commit": "45c253d3cc35402301734d313a1717675917a849"
+  },
+  "saved_main_import_closeout": {
+    "status": "PASS",
+    "workflow": "Original administrator; authenticated existing Ads admin page/nonce and three normal continue requests. No upload,begin or storage initialization.",
+    "starting_cursor": 104,
+    "remaining_operations": 22,
+    "resume_cursors": [
+      112,
+      120,
+      126
+    ],
+    "final_receipts": 126,
+    "final_guard_checkpoints": 16,
+    "remaining_native_saves": 1,
+    "only_write": "Final originally planned Ads settings save; native objects reused.",
+    "original_source_plan_operation_IDs_receipts_checkpoints_preserved": true,
+    "guard_complete_pending_none_executor_free": true,
+    "temporary_own_session_revoked_only": true
+  },
+  "initial_main_site_upgrade": {
+    "status": "PASS",
+    "members": 49,
+    "fresh_version": "0.7.0",
+    "original_options_native_data_inquiry_Consent_journals_preserved": true,
+    "activation_or_migration": false,
+    "inquiry_schema": 2,
+    "guard_schema": 1,
+    "four_export_families_disabled": true,
+    "other_preexisting_flags_preserved": true,
+    "Doctor": {
+      "PASS": 36,
+      "WARN": 4,
+      "FAIL": 1
+    },
+    "remaining_failure": "Credentials parent inaccessible/unknown in CLI context; no Ready substitution."
+  },
+  "main_site_upgrade": {
+    "status": "PASS",
+    "members": 50,
+    "version": "0.7.0",
+    "package_sha256": "ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa",
+    "manifest_sha256": "a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f",
+    "original_options_native_content_inquiry_Consent_journals_preserved": true,
+    "targeted_backup_retained_privately": true,
+    "fresh_process_and_independent_member_readback": true,
+    "configuration_validation_errors": [],
+    "module_status": "Ready with7 Doctor warnings",
+    "Doctor": {
+      "PASS": 35,
+      "WARN": 7,
+      "FAIL": 0,
+      "PENDING": 0
+    },
+    "four_export_families_disabled": true,
+    "corrected_normal_administrator_page": "HTTP200, saved import complete and physical-storage/guard status verified",
+    "PHP_lints": "28 actual Alma8.3.36 package lints carried forward;exact same package bytes,not rerun."
   }
 }

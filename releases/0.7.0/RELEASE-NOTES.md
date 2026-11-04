@@ -1,20 +1,29 @@
-# Ads Bridge 0.7.0 — destination configuration import
+# Ads Bridge0.7.0 — destination CRM configuration import
 
-Adds an ordinary administrator workflow: upload the CRM producer ZIP, choose destination mappings, review, import automatically in bounded batches, then edit native FluentCRM objects. Destination sites no longer require the separate CRM Configuration plugin. Existing Consent, inquiry, lifecycle, timezone and coordination implementations are byte-identical to released 0.6.4.5.
+Adds the ordinary administrator upload→map→review→automatic-import workflow.
+Destination sites use Ads Bridge and native FluentCRM;the separate CRM builder is
+not required. Imported content remains editable/inactive. Lists,tags,fields,templates,
+campaigns,automations and Pro sequences retain their logical relationships with
+remapped destination identities. Incomplete disabled setup and Unused source mappings
+can save. Consent, inquiry, lifecycle, timezone and coordination behavior is preserved.
 
-Actual fresh browser/native verification imported 117 producer definitions plus eight standard Ads fields, checked 66 relationships, repeated with zero native saves and demonstrated deliberate Keep/Replace. All optional source mappings can be Unused; incomplete lifecycle setup can save while automation stays disabled. Import never enables sending, enrollment, Sheets or exports.
+Recovery reporting distinguishes physical-schema faults,live ownership,retained
+operations and unknown evidence. Matching saved Ads operations resume with original
+pins,IDs and readback. Predecessor CRM journals remain with their owner;initialization
+never replaces recovery,clears a journal or marks an unknown write complete.
 
-Requirements: PHP 8.3 with mysqli/ZIP, Base, Fluent Forms and supported FluentCRM 3.2.6/3.3.1. This producer's Pro sequences require FluentCRM Pro 3.3.1. Complete real Base, Consent/form, account and credentials prerequisites separately. See the administrator guide for exact setup/recovery boundaries.
+The original retained Alma import completed its remaining22 operations through3
+normal Resume requests. Original104 receipts and13 checkpoints were preserved;final
+126/16 completion verified. Only its final planned settings save wrote;no duplicate
+native content. The exact corrected ZIP is main-Alma installed:50 verified members;
+configuration,native content,inquiry/Consent and journals preserved. Doctor35PASS,
+7WARN,0FAIL;all4 export families false.28 packaged PHP8.3.36 lints are carried forward.
+55 affected local assertions and isolated native recovery passed;earlier browser
+import,Keep/Replace and zero-save repeat evidence retained without a repeat campaign.
 
-The exact package is installed on Alma and its 49 members verified; 27 PHP lints and 182 affected local assertions pass. Two owned isolated destinations were removed after evidence retention. Normal Alma still reports its real credentials-context failure. No client rollout or real delivery is authorized.
-
-Release is currently held for CRM's 0.3.16 installed producer/export compatibility check. The prior stable deliverable is preserved until that check completes.
-
-Unfinished-operation correction: Storage no longer mislabels retained configuration
-work as a schema problem. Matching Ads operations link to saved Resume; exact reviewed
-predecessor identities/receipts survive recovery. Original CRM journals remain held
-for their owner. Native fixture recovery and zero-save interrupted repeat passed;
-ordinary setup resumed afterward. The corrected package has50 members/28 PHP lints.
-Its main-Alma replacement stopped before any writes because an actual saved Ads
-import is running/reserved. Original saved recovery must reach its safe completion
-before replacement. No journals, unknown writes or withdrawal barriers were cleared.
+Release/delivery replacement is still held for the CRM owner's installed0.3.16
+normal configuration export/download coexistence result. Its latest handback says
+that check remains outstanding;its accepted installed export evidence is0.3.15.
+The current Alma inventory finds no installed CRM Configuration plugin. Ads did not
+change the producer or run an export. Prior stable0.6.4.5 delivery is preserved.
+No client rollout,real sending,enrollment,Sheet append or advertising delivery.

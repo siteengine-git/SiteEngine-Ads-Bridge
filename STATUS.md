@@ -1,3 +1,36 @@
+## 0.7.0 — original main import completed;corrected package installed — 2026-11-04
+
+Under direct continuation,original administrator resumed only the remaining22
+operations through3 authenticated normal continue requests:104→112→120→126.
+Original operation/source/plan/IDs/104 receipts/13 checkpoints preserved;final126
+receipts/16 checkpoints complete,inner pendingnull,destination pendingnone. Only
+final planned Ads settings save wrote;native definitions reused. Original snapshot
+and full completion journal retained privately. No new import or Storage migration.
+
+Exact corrected package ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa
+installed on main Alma;50 members and manifest a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f
+independently verified. Targeted backups retained;configuration/native tables,
+inquiry/Consent and journals unchanged across replacement. Fresh validationerrors[];
+Doctor35PASS/7WARN/0FAIL,moduleReady with7warnings;all4 exportsfalse. Corrected
+normal admin page renders completed original import and healthy physical guard.
+Executor free. Only this task's temporary administrator session revoked;others kept.
+28 actual package PHP8.3.36 lints and prior local/native/browser evidence carried
+forward;no repeat isolated campaign. No client or live sending/advertising export.
+
+Implemented/packaged/main-installed/Ads-verified YES. Released/full coexistence NO:
+CRM Helper's current handback explicitly says0.3.16 is locally tested/packaged but
+installation and normal export/download still outstanding;accepted evidence is0.3.15.
+Fresh Alma filesystem/plugin inventory has no CRM Configuration plugin and its
+AdminConfiguration class is absent. Ads has not changed producer files/activation.
+Required owner:CRM Codex installs/reconciles its exact0.3.16 and returns one normal
+configuration export/download result against final Ads bytes. Ads bootstrap,
+coordination,contract and inquiry hashes still match its reviewed binding.
+
+Stable0.6.4.5 remains sole ZIP in canonical Plugins\..Deliverables folder until
+that concrete gate passes. Current0.7.0 ready-to-publish assets are prepared locally;
+no tag/release promotion claimed. No additional general approval is needed.
+Details in releases/0.7.0;site-specific records/backups remain private,Ads Codex owner.
+
 ## 0.7.0 recovery correction — isolated native verified; main replacement blocked — 2026-11-04
 
 Correction source commit45c253d3cc35402301734d313a1717675917a849; scoped push verified

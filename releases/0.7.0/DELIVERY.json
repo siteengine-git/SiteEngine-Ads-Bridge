@@ -7,16 +7,18 @@
   "source_commit": "45c253d3cc35402301734d313a1717675917a849",
   "implemented": true,
   "packaged": true,
-  "installed": false,
+  "installed": true,
   "verified": false,
   "native_destination_workflow_verified": true,
   "released": false,
-  "release_gate": "Actual original main-Alma Ads import is running/reserved; finish its supported saved recovery before replacement. CRM0.3.16 installed normal export coexistence check also remains outstanding.",
+  "release_gate": "Only CRM-owned0.3.16 installed normal configuration export/download coexistence verification remains. Current owner handback says outstanding;fresh Alma plugin inventory is absent. No new general approval required.",
   "CRM_binding_candidate_commit": "40a0312ce97b9d489c5aff4956f5579abed76f7e",
   "previous_stable_delivery": "0.6.4.5 retained",
-  "verification": "55 fresh focused local assertions;148 unchanged carried forward;50 exact isolated Alma package members/28 lints;actual native interrupted-ID and receipt recovery, zero-save repeat, setup save/readback and ownership refusal;fixture cleanup PASS",
+  "verification": "Original saved main import completed104\u2192126 via3 normal Resume requests,original identities/checkpoints preserved;50 exact main-installed members;configuration/native/inquiry/Consent/journal checksums preserved;Doctor35PASS7WARN0FAIL;28 packaged PHP lints carried forward.",
   "limits": "No client rollout or delivery. No sender/queue acceptance. No CRM source edits.",
   "supersedes_source_commit": "c1e8e6dfee732b0b310dd91b1a0aba884e0b1250",
   "isolated_Alma_installed": true,
-  "isolated_recovery_verified": true
+  "isolated_recovery_verified": true,
+  "main_installed": true,
+  "Ads_verified": true
 }
