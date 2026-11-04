@@ -3,6 +3,8 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class SiteEngine_Ads_Bridge_Setup {
+    private static bool $executor_owned=false;
+    public static function executor_owned():bool { return self::$executor_owned; }
     const AUTHORITY_OPTION = 'seab_settings_authority_v1';
 
     /** A deliberate migration applies only to the reviewed external file bytes. */
@@ -15,31 +17,54 @@ final class SiteEngine_Ads_Bridge_Setup {
             && hash_equals( (string) $choice['sha256'], hash_file( 'sha256', SEAB_CONFIG_FILE ) );
     }
 
+    /** Existing route, or the predecessor's deterministic private directory if retained. No mkdir/discovery. */
+    public static function executor_directory() {
+        if (function_exists('se_crm_deployment_directory')) return se_crm_deployment_directory();
+        if (defined('DB_NAME')) {
+            global $wpdb;
+            $parent=realpath(dirname(rtrim(ABSPATH,'/')));
+            if ($parent) { $path=$parent.'/siteengine-crm-private-'.substr(hash('sha256',DB_NAME.'|'.$wpdb->prefix),0,16); if (file_exists($path)||is_link($path)) return $path; }
+        }
+        return null;
+    }
+
+    public static function blocker_message($reason) {
+        if (class_exists('SiteEngine\\AdsBridge\\Import\\Recovery')) return \SiteEngine\AdsBridge\Import\Recovery::message($reason);
+        if ($reason==='shared_configuration_recovery_required') return 'An unfinished shared configuration job owns these settings. Use its original saved recovery; no takeover or initialization.';
+        if ($reason==='coordination_configuration_recovery_required') return 'Unfinished configuration operation requires its saved import/recovery workflow. Initialization does not repair or reset it. Reason: '.$reason;
+        if ($reason==='coordination_schema_unsupported') return 'Existing storage is incomplete or unsupported. Review the physical inquiry/guard schemas with the supported inquiry-admin migration preview before any repair. Reason: '.$reason;
+        if ($reason==='coordination_busy') return 'Another configuration writer currently holds the destination lock. No initialization was attempted. Reason: '.$reason;
+        return 'Ads setup blocked: '.$reason.'. Preserve existing state; no rows or journals were reset.';
+    }
+
     /** Consult the existing shared executor and durable job; never take over a job. */
     public static function with_executor( callable $callback ) {
         $lock = null;
         try {
-            $directory = null;
-            if ( function_exists( 'se_crm_deployment_directory' ) ) {
-                $directory = se_crm_deployment_directory();
-            } elseif ( class_exists( '\SiteEngine\CRM\AdminConfiguration' ) ) {
-                $directory = \SiteEngine\CRM\AdminConfiguration::directory();
-            }
+            $directory = self::executor_directory();
             if ( null !== $directory ) {
                 if ( ! is_dir( $directory ) || is_link( $directory ) ) { throw new RuntimeException( 'Shared executor directory is unavailable.' ); }
+                $lock_path=$directory.'/executor.lock';
+                if (is_link($lock_path)||(!is_file($lock_path)&&(file_exists($directory.'/deployment-job.json')||file_exists($directory.'/admin-state.json')))) { throw new RuntimeException('Original executor lock is missing or linked. Preserve the retained job and establish writer cessation through its owner before recovery.'); }
                 $lock = fopen( $directory . '/executor.lock', 'c' );
-                if ( ! $lock || ! flock( $lock, LOCK_EX | LOCK_NB ) ) { throw new RuntimeException( 'Another configuration executor is running. Finish that job before changing Ads setup.' ); }
+                if ( ! $lock || ! flock( $lock, LOCK_EX | LOCK_NB ) ) { throw new RuntimeException( 'Another configuration executor is running. '.self::blocker_message('shared_executor_busy') ); }
+                self::$executor_owned=true;
                 $path = $directory . '/deployment-job.json';
                 if ( is_link( $path ) ) { throw new RuntimeException( 'Shared job record requires review.' ); }
                 if ( is_file( $path ) ) {
                     $job = json_decode( file_get_contents( $path ), true );
                     if ( ! is_array( $job ) || ( $job['format'] ?? '' ) !== 'siteengine.crm.deployment-job/1' || ( $job['state'] ?? '' ) !== 'complete' ) {
-                        throw new RuntimeException( 'An unfinished shared configuration job owns these settings. Complete or explicitly hand off that job first.' );
+                        throw new RuntimeException( self::blocker_message('shared_configuration_recovery_required') );
                     }
                 }
             }
+            if (class_exists('SiteEngine\\AdsBridge\\Import\\Recovery')) {
+                $shared=\SiteEngine\AdsBridge\Import\Recovery::shared();
+                if (!in_array($shared['kind'],['none','idle'],true)) throw new RuntimeException($shared['message'].' Job '.($shared['job_id']??'unknown').'; state '.($shared['state']??'unknown').'. No replacement or initialization.');
+            }
             return $callback();
         } finally {
+            self::$executor_owned=false;
             if ( is_resource( $lock ) ) { flock( $lock, LOCK_UN ); fclose( $lock ); }
         }
     }
@@ -49,11 +74,11 @@ final class SiteEngine_Ads_Bridge_Setup {
         return self::with_executor( static function() use ( $callback ) {
             if ( class_exists('SiteEngine\\AdsBridge\\Import\\Store') && !\SiteEngine\AdsBridge\Import\Engine::$executing ) {
                 $import=\SiteEngine\AdsBridge\Import\Store::job();
-                if ($import && in_array($import['status'],['running','uncertain'],true)) { throw new RuntimeException('An active CRM configuration import owns Ads setup. Resume its saved operation before changing settings.'); }
+                if ($import && in_array($import['status'],['running','uncertain'],true)) { throw new RuntimeException('Saved Ads import '.$import['id'].'; state '.$import['status'].'. Resume its saved operation before changing settings; initialization is not recovery.'); }
             }
             // Fresh setup can save first, while still checking any existing journal.
             $held = SiteEngine_Ads_Bridge_Coordination::enter_setup( true );
-            if ( ! $held['ok'] ) { throw new RuntimeException( $held['reason'] ); }
+            if ( ! $held['ok'] ) { throw new RuntimeException( self::blocker_message($held['reason']) ); }
             try { return $callback(); }
             finally { if ( ! SiteEngine_Ads_Bridge_Coordination::release() ) { throw new RuntimeException( 'Ads configuration lock release could not be confirmed. Inspect state before retrying.' ); } }
         } );
@@ -63,7 +88,7 @@ final class SiteEngine_Ads_Bridge_Setup {
     public static function initialize_storage() {
         return self::with_executor( static function() {
             $held = SiteEngine_Ads_Bridge_Coordination::enter_setup( true );
-            if ( ! $held['ok'] ) { throw new RuntimeException( 'Storage initialization blocked: ' . $held['reason'] . '. Existing incomplete schemas require the supported inquiry-admin migration review; no rows or journals were reset.' ); }
+            if ( ! $held['ok'] ) { throw new RuntimeException( self::blocker_message($held['reason']) ); }
             try {
                 if ( ! SiteEngine_Ads_Bridge_Inquiries::table_exists() || ! SiteEngine_Ads_Bridge_Inquiries::schema_ready() ) {
                     $inquiry = SiteEngine_Ads_Bridge_Inquiries::migrate( true );

@@ -35,11 +35,11 @@ final class Engine {
         if(!current_user_can('manage_options')||!current_user_can('unfiltered_html'))throw new RuntimeException('Administrator and unfiltered HTML permissions are required.');
         if($j['actor']!==get_current_user_id())throw new RuntimeException('This import belongs to another administrator. Its progress is preserved.');
         if($j['destination']!==seab_configuration_capability()['destination'])throw new RuntimeException('The import belongs to another destination.');
-        if(in_array($j['status'],['running','uncertain'],true)&&$j['source_pin']!==self::sourcePin())throw new RuntimeException('Importer code changed during this operation. Preserve the journal and recover with its original version.');
+        if(in_array($j['status'],['running','uncertain'],true)&&!Recovery::compatible($j))throw new RuntimeException('Saved importer source/plan is not a reviewed recovery predecessor. Preserve the original journal and recover with its pinned importer; no operation was rebound.');
     }
     public static function readOnly(callable $f) {
         return \SiteEngine_Ads_Bridge_Setup::with_executor(static function()use($f){
-            $held=\SiteEngine_Ads_Bridge_Coordination::enter_setup(true);if(!$held['ok'])throw new RuntimeException($held['reason']);
+            $held=\SiteEngine_Ads_Bridge_Coordination::enter_setup(true);if(!$held['ok'])throw new RuntimeException(\SiteEngine_Ads_Bridge_Setup::blocker_message($held['reason']));
             try{return $f();}finally{if(!\SiteEngine_Ads_Bridge_Coordination::release())throw new RuntimeException('Import lock release is unconfirmed.');}
         });
     }
@@ -208,7 +208,9 @@ final class Engine {
             if($failure){$j['status']='uncertain';$j['message']=$failure->getMessage();Store::save($j);throw $failure;}
             if($result['status']==='complete'){
                 $j['registry']['service_label']=$j['mappings']['service_label'];$j['registry']['views']=$j['package']['views'];$j['registry']['execution_enabled']=false;Store::write(Store::REGISTRY,$j['registry']);$j['status']='complete';$j['message']='Configuration imported. Native objects remain editable and inactive. Automation, Sheets and exports remain disabled.';Store::save($j);
-            }elseif($result['reason_code']!=='coordination_batch_incomplete'){
+            }elseif($result['reason_code']==='coordination_batch_incomplete'){
+                if($j['status']==='uncertain'){$j['status']='running';$j['message']='Saved operation read back; continuing the original import in bounded batches.';Store::save($j);}
+            }else{
                 $j['status']='uncertain';$j['message']=$result['reason_code'];Store::save($j);throw new RuntimeException($result['reason_code']);
             }
             return self::view($j);

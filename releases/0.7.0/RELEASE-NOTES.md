@@ -9,3 +9,12 @@ Requirements: PHP 8.3 with mysqli/ZIP, Base, Fluent Forms and supported FluentCR
 The exact package is installed on Alma and its 49 members verified; 27 PHP lints and 182 affected local assertions pass. Two owned isolated destinations were removed after evidence retention. Normal Alma still reports its real credentials-context failure. No client rollout or real delivery is authorized.
 
 Release is currently held for CRM's 0.3.16 installed producer/export compatibility check. The prior stable deliverable is preserved until that check completes.
+
+Unfinished-operation correction: Storage no longer mislabels retained configuration
+work as a schema problem. Matching Ads operations link to saved Resume; exact reviewed
+predecessor identities/receipts survive recovery. Original CRM journals remain held
+for their owner. Native fixture recovery and zero-save interrupted repeat passed;
+ordinary setup resumed afterward. The corrected package has50 members/28 PHP lints.
+Its main-Alma replacement stopped before any writes because an actual saved Ads
+import is running/reserved. Original saved recovery must reach its safe completion
+before replacement. No journals, unknown writes or withdrawal barriers were cleared.

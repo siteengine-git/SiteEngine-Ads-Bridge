@@ -1,7 +1,7 @@
 <?php
 /** Actual administrator handlers/resolver; filesystem real, WP/vendor/SQL doubled. */
 define('ABSPATH',__DIR__.'/');
-$fixture=sys_get_temp_dir().'/seab-setup-'.bin2hex(random_bytes(6));mkdir($fixture);
+$fixture=sys_get_temp_dir().'/seab-setup-'.bin2hex(random_bytes(6));mkdir($fixture);touch($fixture.'/executor.lock');
 define('SEAB_CONFIG_IS_EXTERNAL',true);define('SEAB_CONFIG_FILE',$fixture.'/external.php');
 $options=[];$allowed=true;$nonce=true;$calls=[];$directory=null;
 function get_option($k,$d=false){return $GLOBALS['options'][$k]??$d;}

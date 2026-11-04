@@ -781,12 +781,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 	public static function render_storage() {
 		echo '<h2>Required Ads Storage</h2><p>Inquiry history (schema 2) and the configuration guard (schema 1) are required. Initialization reuses the explicit plugin migrations. It creates absent storage, preserves existing records and journals, and never adopts inquiries, enables delivery or exports, or changes Consent.</p>';
-		$ready = SiteEngine_Ads_Bridge_Inquiries::table_exists() && SiteEngine_Ads_Bridge_Inquiries::schema_ready();
-		echo '<p><strong>storage.inquiries:</strong> ' . esc_html( $ready ? 'Schema 2 ready' : 'Initialization or migration review required' ) . '</p>';
-		if ( $ready ) {
-			$guard = SiteEngine_Ads_Bridge_Coordination::migrate( false );
-			echo '<p><strong>storage.configuration_guard:</strong> ' . esc_html( $guard['reason_code'] ) . '</p>';
-		}
+		$storage = \SiteEngine\AdsBridge\Import\Recovery::inspect();
+		\SiteEngine\AdsBridge\Import\Recovery::render($storage);
+		if (!$storage['can_initialize']) { echo '<p>Initialization is unavailable for this state. Use the reported owner/recovery workflow; it never clears pending operations.</p>'; return; }
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="seab_initialize_storage">';
 		wp_nonce_field( 'seab_initialize_storage' );
 		echo '<p><label><input required type="checkbox" name="confirm_storage" value="1"> Initialize required Ads storage on this site. Preserve all existing history and pending work.</label></p>';

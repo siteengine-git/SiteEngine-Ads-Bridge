@@ -1,3 +1,47 @@
+## 0.7.0 recovery correction — isolated native verified; main replacement blocked — 2026-11-04
+
+Current corrected ZIP ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa;
+manifest a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f.
+50 members/28 actual Alma PHP8.3.36 lints PASS. Previous49-member candidate and all
+archives preserved. Stable0.6.4.5 remains the sole current delivery ZIP.
+
+Confirmed defect: initialize_storage unconditionally appended schema-repair guidance
+when enter_setup reported an unfinished configuration guard. Reproduced exact message
+with physical inquiry schema ready in an isolated native fixture. Reporting now
+separates absent/unsupported schemas, live locks, retained reservations and unknown
+reads; displays verified operation/state; disables initialization for unfinished work.
+Matching Ads journals route to Resume. Exact reviewed c1e8e6d source/plan can recover
+without repinning; unknown sources/plans refuse. Predecessor CRM metadata is inspected
+without its activation, and original recovery remains with its owner. No journal reset,
+unknown-create replay, missing-lock recreation or completed-step overwrite.
+
+Native fixture: interruption after durable returned ID left pending intent/inflight
+and one prior group receipt. Successor completed126 operations with original job,
+plan, source, IDs and receipts unchanged;21 unique fields/no duplicates. Interrupted
+repeat after receipt9 resumed running/cursor16 and completed in15 bounded requests,
+zero native saves. Completed original journal unchanged. Normal setup save had fresh
+readback and was restored. Actual Linux busy lock vs retained predecessor reservation
+both refused replacement with CRM absent.93 bodies/24 dependencies/66 refs match;
+zero contacts/enrollment/inquiry rows or delivery.55 fresh local assertions PASS;
+148 unchanged carried forward (203 coverage), JS syntax/changed PHP lint PASS.
+
+Cleanup PASS:49 exact owned tables/WordPress copy removed;zero foreign refs;no HTTP
+worker/listener. Private journals/fault receipts retained, Ads Codex ownership.
+
+Actual main-Alma replacement STOPPED BEFORE WRITES: an original saved Ads import owns
+a reserved guard with13/16 groups and104/126 receipts; current/running journal and
+installed source pin match, no inner pending intent. Shared CRM job is complete.
+No backup/file replacement occurred; failure evidence preserved. Original administrator
+must use Import CRM Configuration > Resume saved import, preserving its exact identity;
+Storage initialization/new import is not recovery. The actual retained operation was
+not executed as part of the isolated fixture assignment. No installer guard bypass.
+
+Implemented/packaged/isolated-installed/isolated-verified YES; corrected main-installed,
+fully-verified/released NO. Finish that original supported operation, then install
+exact corrected bytes under ownership and carry CRM0.3.16 installed export result.
+No clients, real exports/sends or additional general campaign. Public results sanitized;
+site-specific IDs/private paths and detailed evidence stay outside Git.
+
 ## 0.7.0 — native browser import verified; producer compatibility closeout pending — 2026-11-04
 
 Canonical source/repository/branch unchanged. Previous released 0.6.4.5 and all prior

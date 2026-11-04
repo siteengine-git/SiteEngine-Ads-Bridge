@@ -23,6 +23,7 @@
   }
   mappings.elements.form.addEventListener('change', () => selectors());
   function render() {
+    const recovery=document.querySelector('#seab-import-recovery p');if(recovery&&state.recovery)recovery.textContent=state.recovery.message;
     message.textContent = `${state.message || 'Upload a configuration ZIP to begin.'}${state.total ? ` Progress: ${state.cursor}/${state.total}.` : ''}`;
     document.getElementById('seab-import-details').textContent = JSON.stringify({status:state.status, revision:state.revision, upload_sha256:state.upload_sha256, package_revision:state.package_revision, vendor_saves:state.writes},null,2);
     upload.hidden = ['running','uncertain'].includes(state.status);

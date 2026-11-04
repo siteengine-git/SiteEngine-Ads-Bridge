@@ -1,7 +1,5 @@
 {
   "version": "0.7.0",
-  "package_sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
-  "manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
   "local": {
     "results": [
       {
@@ -138,6 +136,97 @@
     "No contacts, enrollment, real mail, Sheet writes or Ads delivery.",
     "Native content configuration acceptance is not sender/runtime acceptance.",
     "Existing Consent/inquiry/coordination acceptance carried forward; only affected Consent dispatch regression rerun.",
-    "Final release remains held for CRM-owned installed normal export compatibility verification."
-  ]
+    "Current corrected bytes are installed/verified only in isolated Alma fixture. Main Alma still has the earlier 49-member candidate because a real retained Ads operation blocks replacement.",
+    "Release remains held for completion of actual original Ads import, exact corrected-byte installation and CRM-owned0.3.16 normal export coexistence verification."
+  ],
+  "initial_candidate_sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
+  "initial_manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
+  "package_sha256": "ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa",
+  "manifest_sha256": "a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f",
+  "unfinished_operation_correction": {
+    "source_defect": "Setup::initialize_storage appended a physical-schema repair explanation to every enter_setup failure, including a valid guard with retained work.",
+    "implemented": [
+      "Read-only status distinguishes absent/unsupported physical storage, busy named/shared locks, retained/reserved operations and unknown evidence.",
+      "Display original operation/state and route matching saved Ads import to Resume; no initialization remedy for unfinished work.",
+      "Exact reviewed c1e8e6d source pin can recover original actions/plan/operation; unknown sources or altered predecessor plans refuse.",
+      "Resume restores running status after proven partial recovery so existing automatic UI batches continue.",
+      "Retained predecessor CRM jobs remain owned by original saved-session recovery; plugin absence does not erase deterministic private records.",
+      "Missing/linked executor lock is not recreated over retained ownership records."
+    ],
+    "local": {
+      "fresh_checks": [
+        {
+          "suite": "crm-import-blockers.php",
+          "assertions": 21,
+          "status": "PASS"
+        },
+        {
+          "suite": "crm-import-recovery.php",
+          "assertions": 15,
+          "status": "PASS"
+        },
+        {
+          "suite": "administrator-setup-acceptance.php",
+          "assertions": 19,
+          "status": "PASS"
+        }
+      ],
+      "fresh_assertions": 55,
+      "previous_182_evidence": "148 unchanged assertions carried forward;34 affected assertions rerun above",
+      "current_focused_coverage": 203,
+      "new_runtime_PHP_lints": 6,
+      "JS_syntax": "PASS",
+      "native_package_lints": 28,
+      "unchanged_protected_runtime": {
+        "consent": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0",
+        "coordination": "90c8ef86bd06b2b05dc57bc7b887fa86e2a55782f348a26455e5ba35503dc18a",
+        "inquiries": "d1cc0b1285b237f0866f79f7ea45968ac853f59a071c5503a077de56a6bf0454",
+        "lifecycle": "27a560d638bf8949f844e8d321e42a4615239b58c0435cafd2252961b2461915",
+        "time": "4ce7fc336271a51eaad62de9518534da2e6f9dd9489810ef0892a1bbe00a471d"
+      },
+      "SQL_claim": "Local doubles distinct from actual isolated native recovery receipts"
+    },
+    "native": {
+      "original_error_reproduced_with_ready_inquiry_schema": true,
+      "interruption": "Test-only exception after real native returned-ID persistence; actual native WordPress/MariaDB state, not an OS crash claim.",
+      "cursor_at_interruption": 8,
+      "pending_native_ID_durable": true,
+      "guard_state": "inflight",
+      "completed_group_receipt_retained": true,
+      "original_operation_plan_source_IDs_preserved": true,
+      "prior_receipts_unchanged": true,
+      "full_import_operations": 126,
+      "native_saves_including_settings": 126,
+      "duplicate_field_slugs": 0,
+      "custom_fields": 21,
+      "automatic_resume_repeat": "Interrupted after receipt9; next request running/cursor16;15 bounded requests completed126 with zero native saves.",
+      "original_completed_journal_unchanged": true,
+      "ordinary_setup_save_fresh_readback_and_restore": true,
+      "predecessor_CRM_fixture": "Actual Linux file lock busy vs free retained reservation distinguished with CRM plugin absent; native writes refused; fictional records preserved, prior absence restored.",
+      "native_content_readback": "93 bodies/24 dependencies/66 references match; eight standard Ads fields present; zero operational rows.",
+      "final_package_members": 50,
+      "final_PHP83_lints": 28
+    },
+    "cleanup": {
+      "tables_removed": 49,
+      "foreign_references": 0,
+      "owned_WordPress_copy_removed": true,
+      "HTTP_worker_started": false,
+      "remaining_listeners": 0,
+      "retained_owner": "Ads Codex; private fault/journal receipts and original allocation metadata preserved."
+    },
+    "main_Alma_installation": {
+      "status": "BLOCKED_BEFORE_WRITES",
+      "reason": "coordination_configuration_recovery_required",
+      "actual_saved_Ads_import": "running;104/126 individual receipts,13/16 groups;reserved guard;no inner pending intent;source pin matches installed predecessor.",
+      "file_changes": 0,
+      "backups_started": false,
+      "recovery_action": "Original administrator uses Import CRM Configuration > Resume saved import, preserving exact original operation/plan. Do not initialize, reset or start a new import. No automatic execution of this actual retained import in the fixture assignment."
+    },
+    "test_preparation_failures_retained": [
+      "Initial fixture request omitted global wpdb; stopped before writes.",
+      "Next fixture baseline expected zero forms but native FluentForms activation creates two demos; read-only IDs/titles verified before proceeding.",
+      "Local existing administrator fixture lacked the now-required original executor lock; fixture corrected to include its supported existing lock."
+    ]
+  }
 }

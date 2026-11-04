@@ -90,8 +90,23 @@ not saved again. An interrupted update may resume only from its exact unchanged
 before state or verified intended result. A create whose returned ID was not durably
 recorded is uncertain and cannot be automatically recreated or adopted by a latest/
 title search. Preserve that journal for exact operation-specific investigation.
-Source changes during active work require the original importer for exact recovery;
-do not edit pins, delete journals, steal locks or manufacture completion.
+Storage and Import show separate physical-schema, live-lock and retained-operation
+states. A free lock with an unfinished durable job is a retained reservation, not
+permission to replace it. Initialization is unavailable for unfinished operations.
+Matching Ads journals link to Resume saved import; completed steps are read back
+under the original guard operation/plan. This revision explicitly supports the exact
+reviewed c1e8e6d importer source pin without rebinding its original journal. Unknown
+source/plan changes still require the pinned original importer and exact recovery.
+A create without a durable returned ID is never automatically replayed.
+
+Predecessor CRM jobs remain owned by their original recovery workflow. Ads reads
+bounded metadata from the existing canonical private directory, including when the
+CRM plugin is absent, and does not copy, delete or complete its journals. With the
+original plugin available, use the linked saved CRM session; otherwise obtain its
+pinned recovery tooling, original job/request/profile, checkpoints and returned IDs
+through the CRM owner. The link is inspection, not permission to start a new import.
+Missing/ambiguous records stay held. No manual database clearing is supported.
+Do not edit pins, delete journals, steal locks or manufacture completion.
 
 Rollback restores only backed-up Ads files when no active import needs the successor.
 It does not undo native edits or drop Ads storage. Preserve imported native content,

@@ -20,8 +20,8 @@
   "payload": [
     {
       "path": "CHANGELOG.md",
-      "bytes": 21493,
-      "sha256": "b023cdbc6333657b5c6ce7d68275bec0d6a1d4004cb7807ca90c09533ab24a6e"
+      "bytes": 21746,
+      "sha256": "5b140ab928a6be3288f1efe8b244b43b1b1f2b565d11e853eea326976c586465"
     },
     {
       "path": "README.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "docs/CRM-CONFIGURATION-IMPORT.md",
-      "bytes": 7806,
-      "sha256": "37b27fed3bf4be8cef6ea2f0d45956f1655ba8f7ebc6b08b35239722bf187535"
+      "bytes": 8954,
+      "sha256": "7718f17c37f3975ca9e9b4761be66e0eb1a3646bc903d82e4f3c094a81c1b258"
     },
     {
       "path": "docs/CRM-OPS-INQUIRY-CONTRACT.md",
@@ -110,8 +110,8 @@
     },
     {
       "path": "includes/class-siteengine-ads-bridge-admin.php",
-      "bytes": 61530,
-      "sha256": "0d871a3d7fb8d2b7cbf6d16a77a7ec62eddf9e5bd90fa9fe100a84bc8c151815"
+      "bytes": 61386,
+      "sha256": "9cc08995810d9637af93bc65e8b87833007915b955fd2058259f04c574bfca32"
     },
     {
       "path": "includes/class-siteengine-ads-bridge-cli.php",
@@ -135,8 +135,8 @@
     },
     {
       "path": "includes/class-siteengine-ads-bridge-crm-import.php",
-      "bytes": 333,
-      "sha256": "8058b622a787586bbfc5d0459072ccdc83f6d774aa6cafff0abe021e993efbf0"
+      "bytes": 344,
+      "sha256": "6e642df521df8f33d344fabf55141295bc238901f0908e1d4ddee02a947ff1dc"
     },
     {
       "path": "includes/class-siteengine-ads-bridge-doctor.php",
@@ -170,8 +170,8 @@
     },
     {
       "path": "includes/class-siteengine-ads-bridge-setup.php",
-      "bytes": 11562,
-      "sha256": "4634f6ff7b929f1a0954725d48e9de1bd2052c321efa0cbb21b153e0d2e804a7"
+      "bytes": 13905,
+      "sha256": "e603ebc67a75803a2e56bdf8d535dc1fa074dd4c443969899d8d460bfd901f86"
     },
     {
       "path": "includes/class-siteengine-ads-bridge-time.php",
@@ -185,8 +185,8 @@
     },
     {
       "path": "includes/crm-import/admin.php",
-      "bytes": 7413,
-      "sha256": "928da75b70146629edb4cb8f8e05877a10344e5d529f3c1e341ece434b0484bf"
+      "bytes": 7602,
+      "sha256": "d45bbbab79190bfd793e63fd8fa3be31fbe294aedc8bf3683a1fdc323c6fb257"
     },
     {
       "path": "includes/crm-import/common.php",
@@ -210,8 +210,8 @@
     },
     {
       "path": "includes/crm-import/engine.php",
-      "bytes": 22797,
-      "sha256": "b422a735f898c72536482ce4ecf187fb7fa817f06aed4bec3b776718b6b4af54"
+      "bytes": 23090,
+      "sha256": "55cdca3ee505c1038a5b3251ad7d99db092647e8af765b0baed52a280f2eaea7"
     },
     {
       "path": "includes/crm-import/format.php",
@@ -220,8 +220,8 @@
     },
     {
       "path": "includes/crm-import/import.js",
-      "bytes": 7050,
-      "sha256": "64eb5a518b747a9b56aae3ab9e00582f3b8914328cc259f81ac839f41866d59f"
+      "bytes": 7192,
+      "sha256": "9fe5428c9e0fa5f2237440f6ad15253e7ffd134af6119ca183fc42f96e4615c5"
     },
     {
       "path": "includes/crm-import/native.php",
@@ -232,6 +232,11 @@
       "path": "includes/crm-import/preview.php",
       "bytes": 1364,
       "sha256": "390cce1e9dad0461b7fdc0ab47d6107931d3e26ad683ae3c971283128da542d5"
+    },
+    {
+      "path": "includes/crm-import/recovery.php",
+      "bytes": 12248,
+      "sha256": "73c54b9dfa803e2ae3b64b5a8fb9c171fece8b60e433d4de9e41e59bb9bbb3ec"
     },
     {
       "path": "includes/crm-import/sequences.php",

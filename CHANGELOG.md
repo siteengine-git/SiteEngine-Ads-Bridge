@@ -1,5 +1,7 @@
 ## 0.7.0 — destination CRM configuration import
 
+- Separate physical storage faults from unfinished configuration recovery; route exact saved Ads operations to Resume, retain predecessor CRM reservations, and preserve original operation/plan/returned-ID evidence during reviewed predecessor recovery.
+
 - Package configuration-only validators/native adapters inside Ads; no destination dependency on the CRM builder.
 - Add upload, destination mapping, review, automatic batching, exact operation recovery and native editor links.
 - Reuse compatible objects, retain client edits, and require explicit Keep/Replace for conflicts.

@@ -41,7 +41,7 @@ final class Admin {
             }elseif($action==='begin')$result=Engine::begin((string)($_POST['plan_hash']??''));
             elseif($action==='continue')$result=Engine::run();
             else throw new RuntimeException('Unknown import action.');
-            wp_send_json_success($result);
+            $result['recovery']=Recovery::inspect();wp_send_json_success($result);
         }catch(Throwable $e){
             $view=null;try{$view=Engine::view();}catch(Throwable $ignored){}
             wp_send_json_error(['message'=>$e->getMessage(),'state'=>$view],409);
@@ -58,7 +58,8 @@ final class Admin {
     public static function render():void {
         if(!current_user_can('manage_options'))return;
         echo '<h2>Import CRM Configuration</h2><p>Upload the portable ZIP from the CRM builder. Review destination mappings and changes, then import editable, inactive FluentCRM configuration. No contacts, history, credentials, messages or enrollment are imported.</p>';
-        try{$state=Engine::view();$choices=self::choices();}
+        $recovery=Recovery::inspect();echo '<div id="seab-import-recovery">';Recovery::render($recovery);echo '</div>';
+        try{$state=Engine::view();$state['recovery']=$recovery;$choices=self::choices();}
         catch(Throwable $e){echo '<div class="notice notice-error inline"><p>'.esc_html($e->getMessage()).'</p></div>';return;}
         echo '<style>#seab-crm-import [hidden]{display:none!important}</style><div id="seab-crm-import" data-nonce="'.esc_attr(wp_create_nonce('seab_crm_import')).'"><p id="seab-import-message" role="status"></p>';
         echo '<form id="seab-import-upload"><label>Configuration ZIP <input type="file" name="configuration" accept=".zip" required></label> <button class="button">Upload ZIP</button></form>';
