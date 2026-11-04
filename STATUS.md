@@ -1,5 +1,7 @@
 ## 0.7.0 recovery correction — isolated native verified; main replacement blocked — 2026-11-04
 
+Correction source commit45c253d3cc35402301734d313a1717675917a849; scoped push verified
+at closeout.
 Current corrected ZIP ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa;
 manifest a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f.
 50 members/28 actual Alma PHP8.3.36 lints PASS. Previous49-member candidate and all

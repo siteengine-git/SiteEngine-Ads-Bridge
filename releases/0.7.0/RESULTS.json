@@ -227,6 +227,7 @@
       "Initial fixture request omitted global wpdb; stopped before writes.",
       "Next fixture baseline expected zero forms but native FluentForms activation creates two demos; read-only IDs/titles verified before proceeding.",
       "Local existing administrator fixture lacked the now-required original executor lock; fixture corrected to include its supported existing lock."
-    ]
+    ],
+    "source_commit": "45c253d3cc35402301734d313a1717675917a849"
   }
 }

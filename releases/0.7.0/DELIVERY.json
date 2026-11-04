@@ -4,7 +4,7 @@
   "sha256": "ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa",
   "manifest_sha256": "a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f",
   "members": 50,
-  "source_commit": null,
+  "source_commit": "45c253d3cc35402301734d313a1717675917a849",
   "implemented": true,
   "packaged": true,
   "installed": false,
