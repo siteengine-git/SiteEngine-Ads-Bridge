@@ -13,18 +13,18 @@
   "candidate": "0.6.4.4",
   "designation": "Product correction; installed/release results recorded separately",
   "runtime_base_commit": "bbe82704b0ad6c559241309ebbb3107804bdd7c8",
-  "source_pin": "Published checkpoint containing releases/0.6.4.3; stable tag after installed verification",
+  "source_pin": "Published checkpoint containing releases/0.6.4.4; runtime implementation ecfc94de5794e633cb8d371dd5cc7bb30a16ee2c",
   "scope": "Portable timezone semantics and deliberate setup/verification; no Base or client mutation",
   "payload": [
     {
       "path": "CHANGELOG.md",
-      "bytes": 19348,
-      "sha256": "f74ca59c41e1d7b0ee70b650610321f375e9eb3b4c6f276890f36e69e8dbca0c"
+      "bytes": 20369,
+      "sha256": "68870a8e3ed8df3bc7b634f93461e435f7b9e8f46f8151fe1b2e60d933d13057"
     },
     {
       "path": "README.md",
-      "bytes": 15922,
-      "sha256": "abd7f7276f892accb198bcda227fac5e9145f4ca09ec30e88f9013b9fff7877a"
+      "bytes": 15974,
+      "sha256": "1868ab47b5a7fd3e49d25f9bab57a8d5ab834da1bd470b7c251abe9de5722235"
     },
     {
       "path": "config/client.example.php",

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.4.4 - 2026-11-04
+
+- Fix site-local versus conversion-zone datetime reinterpretation; preserve explicit offsets and reject invalid/ambiguous DST wall times without historical rewrites.
+- Add administrator manual account/feed confirmations bound to current inputs, optional source selectors and shared missing-only custom-field provisioning.
+- Distinguish credential path/file/access states and disabled/never-run/stale/failed export telemetry; supply accurate quoted scheduler paths.
+- Use the same Doctor rows for module counts/reasons/destinations, including external configuration. Identify missing Converted action at its actual setting.
+- 390 local assertions,65 actual Alma setup/native assertions and17 installed PHP lints PASS. Owned fixtures cleaned; ordinary configuration/Base/fields/inquiry/Consent unchanged. No real delivery or client rollout.
+- Schema2 naive inquiry DST-fold timestamps remain blocked for review because their original offset is unavailable; no guessed history or schema expansion.
+
 ## 0.6.4.3 - 2026-11-04
 
 - Replace count-only Doctor failure module messages with every failing check's readable name and original explanation.

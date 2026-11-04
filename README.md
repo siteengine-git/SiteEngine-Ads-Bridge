@@ -1,7 +1,7 @@
-> Current source: **0.6.4.3, Doctor failure reporting**, PHP 8.3 minimum.
-> Module status retains each failing check and explanation. Dashboard/Ads notices link directly to Diagnostics and supported corrective settings.
-> Doctor severity/validation, Consent and disabled export behavior are unchanged.
-> Read [Doctor reporting instructions](docs/DOCTOR-REPORTING-0.6.4.3.md).
+> Current source: **0.6.4.4, portable timezone and administrator setup correction**, PHP 8.3 minimum.
+> Preserve instants across independent site/conversion zones; deliberate manual verification and missing-only setup controls.
+> Real Alma portability checks pass; site-specific credentials, account/feed verification and disabled delivery remain explicit.
+> Read [0.6.4.4 operator instructions](docs/PRODUCT-SETUP-0.6.4.4.md).
 
 # SiteEngine Ads Bridge
 

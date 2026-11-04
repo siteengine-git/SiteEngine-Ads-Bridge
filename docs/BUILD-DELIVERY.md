@@ -26,3 +26,6 @@ The prior accepted 0.6.4.2 ZIP remains hash-preserved in project archives and it
 GitHub release. The 0.6.4.3 correction's exact package hash and installed reporting
 evidence are in `releases/0.6.4.3/`. Packaging never regenerates an accepted ZIP
 just to change its delivery location.
+
+Current product correction: releases/0.6.4.4; see PRODUCT-SETUP-0.6.4.4.md.
+The current user explicitly selects the literal Plugins..Deliverables destination.

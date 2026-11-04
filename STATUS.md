@@ -1,3 +1,55 @@
+## 2026-11-04 — final 0.6.4.4 package verified
+
+Final ZIP SHA25606769fcb773a0ac19ff0e98d204c8daf59d6b5353e13ce81e3ab426155b02b91;
+manifestd643e79ec688b0d0a19bc87d3da505b7a818203ad2af72f543202741154e7622.
+Final delta from the installed-tested a60a19 package is README/CHANGELOG/manifest
+only; every PHP byte is identical. Final33 members and fresh Alma readback PASS,
+protected database/configuration preserved. Runtime implementationecfc94d retained.
+390 local and65 installed assertions,17 installed lints; fixture cleanup PASS.
+Implemented/packaged/installed/verified YES. Stable source/publication pin is v0.6.4.4;
+PUBLICATION.json records actual remote state after publishing. No customer rollout.
+Normal Alma remains Needs Attention with its two real site-specific failures;
+remaining account/feed/credentials/field requirements are in RELEASE-NOTES.md.
+Prior accepted packages and all initial fixture/failure receipts preserved.
+
+## 2026-11-04 — 0.6.4.4 portable product correction installed/verified
+
+Implementation/package source ecfc94de5794e633cb8d371dd5cc7bb30a16ee2c; exact ZIP
+SHA256 a60a19f61390fca435d94694283fc9c381817606a9351c6bc85f2caacb392656.
+Manifest71a3ede5730e74e93d15bcbb618392d15a8e3e42c4e604f8c4f239be3aa162b9.
+33 installed members verified;17 package PHP lints on actual PHP8.3.36 PASS.
+65 actual Alma HTTP/native assertions PASS: fresh setup, missing-only/repeat
+upgrade field provisioning, existing/unused optional source mappings, manual
+confirmation handlers/readback and refusals, same-row module count, credential
+context, instant/DST/CLI parsing. Operator account input was fictional and
+isolated; no real Google Ads/feed verification is claimed.390 local assertions
+PASS, including actual pinned Consent implementation with synthetic storage/sink.
+
+Actual product correction, not site alignment: lifecycle stamps preserve explicit
+offsets; site-local naive timestamps convert to configured-zone presentation;
+invalid dates, DST gaps/folds fail closed. Schema2 inquiry DATETIME loses offsets;
+ambiguous historical fold values remain blocked, never reconstructed or rewritten.
+Configuration precedence and Consent/inquiry/coordination contracts preserved.
+
+Normal Alma honestly remains Doctor35 PASS/4 WARN/2 FAIL: unqualified_at missing
+and credential parent inaccessible/unknown. Source Referral Lead remains an optional
+missing mapping. Real account timezone/feed confirmations remain unrecorded. Their
+portable administrator controls are tested in isolated fresh/upgrade fixtures.
+All four export flags remain false. Preexisting lifecycle automation and Sheets
+sink flags were true on admission and preserved; do not repeat older six-false claim.
+No ordinary Ads/Base/timezone/CRM field/history/journal/Consent changes were used to
+satisfy acceptance. Protected checksums match; two users, four options, one marked
+shadow meta table, MU/context/secret ledger removed. Private backup/evidence retained
+under the existing Ads directory; Ads Codex owns retention. No unresolved test worker.
+
+Exact delivery for this superseding assignment: D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge.
+Exactly one latest ZIP plus matching neutral documents; historical artifacts archived
+outside delivery. Implementation/packaging/Alma installation/verification YES;
+source publication/release recorded at closeout. No client access/rollout, live
+export, browser lead replay, Base/shared field correction or historical repair.
+Detailed local evidence: ../product-correction-20261104. See releases/0.6.4.4/RESULTS.json
+and docs/PRODUCT-SETUP-0.6.4.4.md for precise limits and normal operator actions.
+
 ## 2026-11-04 — portable setup/timezone product correction in verification
 
 0.6.4.4 corrects demonstrated site-wall-time versus conversion-zone parsing;
