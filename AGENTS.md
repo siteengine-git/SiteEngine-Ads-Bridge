@@ -1,3 +1,26 @@
+## Isolated FieldEdge foundation assignment — November 5, 2026
+
+This worktree is exclusively the FieldEdge implementation workspace authorized by
+the latest direct user handoff. Primary Ads source remains ../source; never modify
+that checkout or interrupt its writer. One repository, separate implementation
+branch codex/fieldedge-foundation-20261105, accepted base v0.8.0 at
+b9b6574529c9ce9a89dea7f1b7641d110d08d834. Newer primary 0.8.1 work is not this base.
+This explicit isolation instruction supersedes historical single-checkout wording
+for this assignment; it does not create a second canonical product/repository.
+
+Only connector-specific files, synthetic fixtures/tests and integration documents
+may change. Shared runtime loader/contracts/settings/storage/export/CRM changes
+require primary AB ownership coordination. No deployment, client operation,
+production authentication, webhook registration, record writes or live exports.
+Do not replace current installable delivery. Foundation remains dormant; no version
+bump. Review docs/integrations/fieldedge before continuation. Local CoreDouble is
+not durable storage, authoritative Consent or installed end-to-end acceptance.
+Keep this worktree's STATUS.md current; primary checkout status belongs to its writer.
+Prepared inter-project handoffs are not sent/acknowledged unless evidence proves it.
+
+Historical primary instructions below remain preserved; unrelated open primary
+assignments are context, not work to resume from this isolated FieldEdge workspace.
+
 ## Current ordered correction and setup UI assignment
 
 Complete producer-record compatibility first in its own commit, then four-area setup

@@ -1,3 +1,43 @@
+## FieldEdge foundation milestone 1 — isolated synthetic verification, 2026-11-05
+
+Workspace: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\fieldedge.
+Canonical repository: https://github.com/siteengine-git/SiteEngine-Ads-Bridge.
+Branch: codex/fieldedge-foundation-20261105. Starting accepted v0.8.0 tag:
+b9b6574529c9ce9a89dea7f1b7641d110d08d834; runtime implementation
+2a1ebc641a4789e0c4c434861acb0d574842da01; publication closeout82639b8.
+Tag verified against origin. Archived accepted ZIP freshly hashed:
+47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58.
+Primary checkout remains ../source on its maintenance branch; initial HEAD6ffbe45
+contains newer0.8.1 work, with three unrelated untracked paths preserved. Remote
+maincfdbba3 is not selected as the development base. No primary files edited.
+
+Implemented dormant pure PHP notification verification, ID/timestamp/approved-value
+normalization, explicit inquiry/job associations, revision holds and GET retry
+classification. No runtime loader change, settings, tables, migration, endpoint,
+OAuth client, cron, export or CRM modification. Full API matrix, identity/architecture
+and precise core contract request: docs/integrations/fieldedge.
+
+Actual local PHP8.3.36 -n suite:62 PASS/0 FAIL;3 changed PHP files lint clean.
+Synthetic records only. In-memory CoreDouble models consent/ledger/replay behavior;
+durability, concurrency, provider access and installed/end-to-end acceptance are NOT
+verified. No site or provider commands/authentication were needed. All initial ten
+synthetic scenarios covered, with shared behavior explicitly attributed to the double.
+
+Proposed: shared Ads-owned outcome API/storage, verified provider relationship and
+revision contracts. Implemented: independent foundation. Packaged/installable,
+installed and released: NO. Verified: local synthetic only. Branch checkpoint is
+unaccepted development, not a stable Ads release. Existing installable delivery intact.
+
+Blockers to live integration: no established provider entitlement/sandbox/scopes;
+no accepted core outcome submission/storage interface; no client-approved monetary/
+aggregation policy; provider lead/job discovery, invoice revisions/payment/refund
+and field-level access remain unresolved. See API-CAPABILITIES and CORE-HANDOFF.
+Next: primary AB owner reviews the proposed interface/value policy. Handoff prepared,
+not delivered/acknowledged. Do not implement shared runtime changes under this scope.
+
+Historical baseline status below is preserved verbatim; its publication-in-progress
+statement is superseded by the verified later publication82639b8, not an open task.
+
 ## Stable 0.8.0 accepted — publication in progress,2026-11-05
 
 Final Helper acceptance resolves the historical CRM0.3.16 rejection:CRM0.3.17 source/
