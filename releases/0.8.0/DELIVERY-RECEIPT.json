@@ -3,7 +3,7 @@
   "source_commit": "2a1ebc641a4789e0c4c434861acb0d574842da01",
   "package": "siteengine-ads-bridge-0.8.0.zip",
   "ZIP_count": 1,
-  "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
+  "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
   "sha256": "47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58",
   "manifest_sha256": "9a661852d731ae1b84afec6e825b03b0c8407b74b11a38550b229e27d1e59fe2",
   "previous_0_7_2_delivery_archived_byte_identical": true,
@@ -12,5 +12,7 @@
   "installed": true,
   "verified_with_documented_limits": true,
   "stable_released": false,
-  "remaining_integration": "CRM0.3.16 exact-bootstrap binding owner review"
+  "remaining_integration": "CRM0.3.16 exact-bootstrap binding owner review",
+  "scheduler_assessment": "satisfactory;no changes justified;historical cron payload unavailable",
+  "producer_gate": "FAIL:ads_successor_pin_mismatch:siteengine-ads-bridge.php (CRM0.3.16 read-only pins)"
 }

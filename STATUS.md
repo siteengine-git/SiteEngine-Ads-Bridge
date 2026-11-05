@@ -1,3 +1,21 @@
+## 0.8.0 scheduler assessment complete; exact CRM gate still fails — 2026-11-05
+
+Four-area UI/functional evidence accepted by Helper;completed campaigns carried forward.
+Current 27 WordPress cron hooks/counts match retained end-of-acceptance inventory;all
+recurring schedules registered,argument keys valid,no Ads events. Site owner has no
+OS crontab. All delivery/lifecycle/export flags remain false. No scheduler repair,
+job execution,option reset or whole-cron restore. Original serialized cron was NOT
+captured;exact pre-installation job/timestamp delta remains unknown. This coverage
+limit is not a scheduler recovery gate. See releases/0.8.0/SCHEDULER-ASSESSMENT.md.
+
+Fresh installed CRM0.3.16 read-only AdministratorSetup::pins() FAILS with
+ads_successor_pin_mismatch:siteengine-ads-bridge.php. Published CRMmain still7da32a6
+records0.7.0 acceptance,not0.8.0. Specific remaining owner:CRM Helper/Codex reviewed
+0.8.0 binding/disposition. Request for final result sent to Aubrey in this chat;
+no inter-chat transmission claimed. Do not silently edit CRM or publish stable
+over this observed failure. Implemented/packaged/installed/Ads-verified YES;
+stable released NO. Tested ZIP/source unchanged;one physical delivery ZIP verified.
+
 ## 0.8.0 — ordered correction/UI successor verified on Alma,2026-11-05
 
 Implementation2a1ebc641a4789e0c4c434861acb0d574842da01 pushed;remote branch verified.

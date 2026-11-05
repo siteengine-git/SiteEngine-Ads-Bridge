@@ -32,3 +32,11 @@ Preserve same-session protection,original operation journals and disabled delive
 Ads did not edit CRM source or repeat configuration-export acceptance. Prior0.7.0
 coexistence remains accepted;it is not relabeled as0.8.0 evidence. Prepared handback
 only;no inter-chat transmission or acknowledgment is claimed.
+
+Closeout update,2026-11-05T19:58:02Z:installed CRM0.3.16's existing read-only
+AdministratorSetup::pins() actually fails with
+`ads_successor_pin_mismatch:siteengine-ads-bridge.php`.
+Gate source SHA2560ec876577445b13c5f918ab5ddfbd8fde7d3acb1f06f67d59a313fbf8943d6dd.
+No producer export was run. Ads scheduler assessment is satisfactory and is not a
+remaining recovery gate. Please supply the reviewed final0.8.0 compatibility
+disposition/checkpoint and reconcile this still-installed gate before stable release.

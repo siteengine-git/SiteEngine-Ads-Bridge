@@ -1,0 +1,28 @@
+{
+  "assessed_UTC": "2026-11-05T19:56:52+00:00",
+  "scheduler_result": "SATISFACTORY_NO_REPAIR_JUSTIFIED",
+  "event_count": 27,
+  "same_hook_counts_as_retained_end_of_acceptance": true,
+  "Ads_cron_events": 0,
+  "all_recurring_schedules_registered": true,
+  "all_argument_keys_match": true,
+  "delivery_flags_disabled": true,
+  "site_owner_crontab": "absent;native exit 1/no crontab diagnostic",
+  "root_shared_crontab": "not inspected or changed",
+  "old_serialized_cron_payload_captured": false,
+  "exact_historical_jobs_or_timestamp_delta": "UNKNOWN",
+  "scheduler_changes_performed": false,
+  "jobs_or_exports_executed": false,
+  "producer": {
+    "version": "0.3.16",
+    "operation": "read-only AdministratorSetup::pins()",
+    "result": "FAIL",
+    "reason": "ads_successor_pin_mismatch:siteengine-ads-bridge.php",
+    "source_sha256": "0ec876577445b13c5f918ab5ddfbd8fde7d3acb1f06f67d59a313fbf8943d6dd",
+    "previous_0_7_0_evidence_carried_forward_without_relabeling": true,
+    "owner": "CRM Helper/Codex",
+    "normal_export_repeated": false
+  },
+  "package_changed": false,
+  "stable_released": false
+}
