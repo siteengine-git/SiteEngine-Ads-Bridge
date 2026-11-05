@@ -1,5 +1,12 @@
 ## FieldEdge foundation milestone 1 — isolated synthetic verification, 2026-11-05
 
+Implementation checkpoint80345cf60788ccff0fb55d5bd2e24f810ab64431 pushed to the
+isolated origin branch; exact remote ref independently read back. Worktree clean.
+Noninstallable source-review ZIP retained outside installable delivery at
+../fieldedge-evidence-20261105/fieldedge-foundation-review-80345cf.zip,10 files,
+SHA25684cdbc13f52acbcca8cda931e03ee95d14bd2d879128653a337c620b0b998929.
+It is an unaccepted review artifact, not an installable plugin or release.
+
 Workspace: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\fieldedge.
 Canonical repository: https://github.com/siteengine-git/SiteEngine-Ads-Bridge.
 Branch: codex/fieldedge-foundation-20261105. Starting accepted v0.8.0 tag:
