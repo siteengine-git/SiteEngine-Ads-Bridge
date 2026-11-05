@@ -18,14 +18,21 @@ try {
     ok(save()==='saved','Completed authoritative deployment permits ordinary save with >1MiB historical payload');
     $s=Recovery::shared();ok($s['kind']==='idle'&&!$s['historical_admin_payload_read'],'Historical administrator payload is not read for proven completion');
     ok(hash_file('sha256',$fixture.'/admin-state.json')===$hash,'Historical payload remains byte-identical');
+    $large=job();$large['history']=[['result'=>str_repeat('x',1798466-strlen(json_encode($large))-28)]];
+    $body=json_encode($large);$large['history'][0]['result'].=str_repeat(' ',1798466-strlen($body));$body=json_encode($large);ok(strlen($body)===1798466,'Exact reported deployment size1798466');
+    foreach([false,true]as$bigAdmin){if(!$bigAdmin)file_put_contents($fixture.'/admin-state.json','{}');else file_put_contents($fixture.'/admin-state.json',$payload);file_put_contents($fixture.'/deployment-job.json',$body);$h=hash_file('sha256',$fixture.'/deployment-job.json');ok(save()==='saved','Large completed deployment permits save with historical payload '.($bigAdmin?'large':'small'));ok(hash_file('sha256',$fixture.'/deployment-job.json')===$h,'Original deployment bytes preserved');}
+    $large['state']='active';file_put_contents($fixture.'/deployment-job.json',json_encode($large));blocked('deployment-job.json','retained_operation');
+    $large['state']='complete';$large['inflight']=['request'=>'pending'];file_put_contents($fixture.'/deployment-job.json',json_encode($large));blocked('deployment-job.json','retained_operation');
+    file_put_contents($fixture.'/deployment-job.json',substr($body,0,-1));blocked('deployment-job.json','malformed_content');
+    file_put_contents($fixture.'/deployment-job.json',substr($body,0,-1).',"state":"complete"}');blocked('deployment-job.json','malformed_content');
     $x=job('active');putjob($x);$s=Recovery::shared();ok($s['kind']==='retained'&&!$s['historical_admin_payload_read'],'Active job remains retained without historical read');blocked('deployment-job.json','retained_operation');
     putjob(job('complete',['request'=>'uncertain']));blocked('deployment-job.json','retained_operation');
     $x=job();unset($x['inflight']);putjob($x);blocked('deployment-job.json','malformed_content');
     $x=job();unset($x['safe_checkpoint']);putjob($x);blocked('deployment-job.json','missing_completion_evidence');
     file_put_contents($fixture.'/deployment-job.json','not JSON private-content-must-not-appear');blocked('deployment-job.json','malformed_content');
     $s=Recovery::shared();ok(!str_contains($s['message'],'private-content-must-not-appear'),'No record body appears in diagnostics');
-    file_put_contents($fixture.'/deployment-job.json',str_repeat('x',1048577));blocked('deployment-job.json','oversized_file');
-    unlink($fixture.'/deployment-job.json');blocked('admin-state.json','oversized_file');
+    file_put_contents($fixture.'/deployment-job.json',str_repeat('x',Recovery::MAX_RECORD_BYTES+1));blocked('deployment-job.json','inspection_budget_exceeded');
+    unlink($fixture.'/deployment-job.json');blocked('deployment-job.json','missing_completion_evidence');
     file_put_contents($fixture.'/admin-state.json','malformed');blocked('admin-state.json','malformed_content');
     unlink($fixture.'/admin-state.json');blocked('deployment-job.json','missing_completion_evidence');
     putjob(job());unlink($fixture.'/executor.lock');blocked('executor.lock','missing_lock');ok(!file_exists($fixture.'/executor.lock'),'Original missing lock is never recreated over retained records');touch($fixture.'/executor.lock');

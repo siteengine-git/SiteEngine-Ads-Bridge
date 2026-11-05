@@ -1,3 +1,10 @@
+## Current ordered correction and setup UI assignment
+
+Complete producer-record compatibility first in its own commit, then four-area setup
+cleanup. Bounded Alma-only native/admin/browser checks, protected additive storage
+preparation and delivery are authorized. Preserve current settings, archives, Consent
+barriers and disabled transports. No clients or unrelated plugin edits.
+
 ## Priority0.7.1 settings ownership correction — November5,2026
 
 Direct Helper instruction authorizes the focused runtime/settings correction,local

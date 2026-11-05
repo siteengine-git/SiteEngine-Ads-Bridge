@@ -21,7 +21,39 @@ final class Recovery {
             && hash_equals($j['plan_hash'],JSON::hash([$j['upload_sha256'],$j['mappings'],$j['actions'],$j['source_pin']]));
     }
     private static function id($v):?string {return is_string($v)&&preg_match('/^[A-Za-z0-9_.:-]{1,80}$/D',$v)?$v:null;}
-    const MAX_RECORD_BYTES=1048576;
+    // Producer history grows with phases and has no 1 MiB writer restriction.
+    // Bound raw input to16 MiB; validate at producer depth512, then project only
+    // ownership fields (4 KiB scalar ceiling). Never decode historical arrays.
+    const MAX_RECORD_BYTES=16777216;
+    const RECORD_DEPTH=512;
+    const INSPECTION_SECONDS=3;
+    private static function ownershipProjection(string $raw,string $name):array {
+        $until=hrtime(true)+self::INSPECTION_SECONDS*1000000000;
+        if(!json_validate($raw,self::RECORD_DEPTH))self::recordFailure($name,'malformed_content','file is not valid JSON at the supported producer depth; contents are not displayed');
+        $length=strlen($raw);$i=strspn($raw," \t\r\n");
+        if(($raw[$i]??'')!=='{')self::recordFailure($name,'malformed_content','JSON must contain an ownership object');
+        $out=[];$wanted=['format','job_id','state','inflight','safe_checkpoint','status','operation'];$i++;
+        while($i<$length){
+            $i+=strspn($raw," \t\r\n,",$i);if(($raw[$i]??'')==='}')break;
+            $start=$i++;while($i<$length){if($raw[$i]==='\\'){$i+=2;continue;}if($raw[$i++]==='"')break;}
+            $key=$i-$start<=128?json_decode(substr($raw,$start,$i-$start),true,8,JSON_THROW_ON_ERROR):null;
+            $i+=strspn($raw," \t\r\n",$i);$i++;$i+=strspn($raw," \t\r\n",$i);$start=$i;$depth=0;$quoted=false;
+            for(;$i<$length;$i++){
+                if(($i&65535)===0&&hrtime(true)>$until)self::recordFailure($name,'inspection_budget_exceeded','ownership scan exceeded3 seconds; completion remains unknown; retain original records');
+                $c=$raw[$i];if($quoted){if($c==='\\'){$i++;continue;}if($c==='"')$quoted=false;continue;}
+                if($c==='"'){$quoted=true;continue;}if($c==='{'||$c==='['){$depth++;continue;}
+                if($depth===0&&($c===','||$c==='}'))break;if($c==='}'||$c===']')$depth--;
+            }
+            if(in_array($key,$wanted,true)){
+                if(array_key_exists($key,$out))self::recordFailure($name,'malformed_content','duplicate ownership field '.$key.' is ambiguous');
+                $size=$i-$start;while($size>0&&str_contains(" \t\r\n",$raw[$start+$size-1]))$size--;
+                if(in_array($key,['inflight','operation'],true))$out[$key]=($size===4&&substr_compare($raw,'null',$start,4)===0)?null:true;
+                else{if($size>4096)self::recordFailure($name,'malformed_content','ownership scalar '.$key.' exceeds4 KiB');$out[$key]=json_decode(substr($raw,$start,$size),true,8,JSON_THROW_ON_ERROR);}
+            }
+        }
+        if(hrtime(true)>$until)self::recordFailure($name,'inspection_budget_exceeded','ownership inspection exceeded3 seconds; completion remains unknown');
+        return $out;
+    }
     private static function recordFailure(string $record,string $condition,string $detail):void {
         throw new OwnershipRecordFailure($record,$condition,$detail);
     }
@@ -38,13 +70,11 @@ final class Recovery {
         $stat=@lstat($path);if($stat===false)return null;
         if(!is_file($path))self::recordFailure($name,'not_regular_file','entry is not a regular file');
         if(!is_readable($path))self::recordFailure($name,'unreadable_file','file cannot be read by this PHP execution identity');
-        $size=$stat['size'];if($size>self::MAX_RECORD_BYTES)self::recordFailure($name,'oversized_file','file has '.$size.' bytes; bounded ownership read permits at most '.self::MAX_RECORD_BYTES.' bytes');
+        $size=$stat['size'];if($size>self::MAX_RECORD_BYTES)self::recordFailure($name,'inspection_budget_exceeded','file has '.$size.' bytes; no completion conclusion; bounded ownership read permits at most '.self::MAX_RECORD_BYTES.' bytes');
         $f=@fopen($path,'rb');if(!$f)self::recordFailure($name,'unreadable_file','file could not be opened for reading');
-        try{$opened=fstat($f);$raw=stream_get_contents($f,self::MAX_RECORD_BYTES+1);if($raw===false)self::recordFailure($name,'unreadable_file','bounded read failed');if(strlen($raw)>self::MAX_RECORD_BYTES)self::recordFailure($name,'oversized_file','file grew beyond the bounded ownership read');if($opened['dev']!==$stat['dev']||$opened['ino']!==$stat['ino']||strlen($raw)!==$size)self::recordFailure($name,'changed_during_read','file identity or length changed during inspection');}
+        try{$opened=fstat($f);$raw=stream_get_contents($f,self::MAX_RECORD_BYTES+1);if($raw===false)self::recordFailure($name,'unreadable_file','bounded read failed');if(strlen($raw)>self::MAX_RECORD_BYTES)self::recordFailure($name,'inspection_budget_exceeded','file grew beyond the16 MiB bounded ownership read; no completion conclusion');if($opened['dev']!==$stat['dev']||$opened['ino']!==$stat['ino']||strlen($raw)!==$size)self::recordFailure($name,'changed_during_read','file identity or length changed during inspection');}
         finally{fclose($f);}
-        try{$v=json_decode($raw,true,128,JSON_THROW_ON_ERROR);}catch(\JsonException $e){self::recordFailure($name,'malformed_content','file is not valid bounded JSON; contents are not displayed');}
-        if(!is_array($v))self::recordFailure($name,'malformed_content','JSON does not contain an ownership object');
-        return $v;
+        return self::ownershipProjection($raw,$name);
     }
     /** The only optional creation is an explicitly empty first-use directory. */
     public static function acquireExecutor(string $dir,bool $allowEmptyCreate=false) {

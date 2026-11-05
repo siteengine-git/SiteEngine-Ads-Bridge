@@ -1,0 +1,122 @@
+{
+  "version": "0.7.2",
+  "Windows_assertions": 43,
+  "native_Linux_assertions": 58,
+  "native_Linux_skips": 0,
+  "ordinary_authenticated_HTTP_cases": [
+    {
+      "case": "deployment-only",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": true,
+      "expected_blocked": false,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "admin-only",
+      "PASS": true,
+      "deployment_bytes": 174,
+      "normal_HTTP_save": true,
+      "expected_blocked": false,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "both",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": true,
+      "expected_blocked": false,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "active",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "inflight",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "malformed",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "unknown-format",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    }
+  ],
+  "main": {
+    "status": "PASS",
+    "version": "0.7.2",
+    "package_sha256": "550688b27b5e85e22044e04d65c3024cbb562f67a7fe1e6e7be797c96fc6d4db",
+    "members": 50,
+    "changed": [
+      "includes/crm-import/recovery.php",
+      "tools/successor-readiness.php",
+      "siteengine-ads-bridge.php",
+      "SUCCESSOR-MANIFEST.json"
+    ],
+    "original_configuration_native_data_history_preserved": true,
+    "fresh": {
+      "version": "0.7.2",
+      "source": "settings",
+      "errors": [],
+      "doctor": {
+        "PASS": 35,
+        "WARN": 7,
+        "FAIL": 0,
+        "PENDING": 0
+      },
+      "pending": {
+        "contract_version": "1",
+        "destination": "d0725d771d6b6eb8b855a9d9b2e3b47909181fe167adcb49bf66b1fa3d67e3fc",
+        "scope": "destination_shared_configuration",
+        "inquiry_schema": "2",
+        "coordination_schema": "1",
+        "session_model": "single_php_process_single_wpdb_session",
+        "max_steps": 64,
+        "state": "none",
+        "complete": true,
+        "reason_code": "complete_empty",
+        "write_permission": false
+      },
+      "four_export_flags": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "main_normal_Sheets_save": {
+    "HTTP": 200,
+    "normal_authenticated_settings_POST": true,
+    "preserved_existing_path": true,
+    "saved": true,
+    "credential_path_sha256": "425b892a9b5865d8dae2951c2f53153d278610dadb1481ddd3410c0a9d5b4994"
+  },
+  "limits": "Credentials persistence does not establish service-account file access. No client operations or transport. Native readbacks,not new visual browser acceptance."
+}
