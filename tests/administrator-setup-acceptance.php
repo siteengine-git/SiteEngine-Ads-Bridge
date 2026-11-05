@@ -28,8 +28,9 @@ class SiteEngine_Ads_Bridge_Coordination {
 }
 $wpdb=new class {public $prefix='fixture_',$last_error='';function prepare($sql,$title){return $title;}function get_col($title){return $title==='Ambiguous'?[5,6]:($title==='Missing'?[]:[1]);}};
 foreach(['settings','setup','config','admin']as$name)require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-'.$name.'.php';
-$directory=$fixture;
-$job=['format'=>'siteengine.crm.deployment-job/1','state'=>'complete'];file_put_contents($fixture.'/deployment-job.json',json_encode($job));
+require dirname(__DIR__).'/includes/crm-import/recovery.php';
+$directory=realpath($fixture);
+$job=['format'=>'siteengine.crm.deployment-job/1','job_id'=>str_repeat('a',32),'state'=>'complete','inflight'=>null,'safe_checkpoint'=>'completed; native readback verified; owned maintenance restored'];file_put_contents($fixture.'/deployment-job.json',json_encode($job));
 $data=SiteEngine_Ads_Bridge_Settings::defaults();$data['client']['timezone']='America/Chicago';$data['fluent_forms']['fields']['extra_preserved']='keep';$data['fluentcrm']['tags']['lifecycle']['new']='';
 file_put_contents(SEAB_CONFIG_FILE,'<?php return '.var_export($data,true).';');
 $n=0;function ok($v,$s){global$n;if(!$v)throw new LogicException($s);$n++;echo "PASS $s\n";}
@@ -57,8 +58,8 @@ try {
  foreach(['Missing','Ambiguous','Qualified']as$bad){$_POST['tag_new']=$bad;invoke('handle_save',$bad==='Qualified'?'distinct':'exactly one');ok($options['seab_settings_v2']===$expected,'invalid lifecycle identity blocked: '.$bad);}
  unset($_POST['lifecycle_automation_enabled']);
  $_POST['tag_new']='New';SiteEngine_Ads_Bridge_Coordination::$blocked=true;invoke('handle_save','pending');ok($options['seab_settings_v2']===$expected,'pending destination prevents settings write');SiteEngine_Ads_Bridge_Coordination::$blocked=false;
- $job['state']='active';file_put_contents($fixture.'/deployment-job.json',json_encode($job));invoke('handle_save','unfinished shared');ok($options['seab_settings_v2']===$expected,'durable active job blocks between invocations');
- $job['state']='complete';file_put_contents($fixture.'/deployment-job.json',json_encode($job));$foreign=fopen($fixture.'/executor.lock','c');flock($foreign,LOCK_EX);invoke('handle_save','Another configuration executor');flock($foreign,LOCK_UN);fclose($foreign);
+ $job['state']='active';file_put_contents($fixture.'/deployment-job.json',json_encode($job));invoke('handle_save','Retained/reserved deployment');ok($options['seab_settings_v2']===$expected,'durable active job blocks between invocations');
+ $job['state']='complete';file_put_contents($fixture.'/deployment-job.json',json_encode($job));$foreign=fopen($fixture.'/executor.lock','c');flock($foreign,LOCK_EX);invoke('handle_save','executor.lock [busy]');flock($foreign,LOCK_UN);fclose($foreign);
  ok($options['seab_settings_v2']===$expected,'live executor blocks overlapping save');
  $_POST=['confirm_storage'=>'1'];$calls=[];SiteEngine_Ads_Bridge_Inquiries::$ready=SiteEngine_Ads_Bridge_Inquiries::$exists=false;invoke('handle_storage');
  ok($calls===['destination lock','inquiry migration','release','guard migration'],'fresh storage uses existing migrations in order');

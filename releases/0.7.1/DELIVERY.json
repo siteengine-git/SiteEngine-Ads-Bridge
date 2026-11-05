@@ -1,0 +1,16 @@
+{
+  "version": "0.7.1",
+  "package": "siteengine-ads-bridge-0.7.1.zip",
+  "sha256": "8baa93c3d3e2236ce8bb60cecac81b7baf202eccc5b05d814a02510fae3bc630",
+  "manifest_sha256": "c495e1f4290209559d086274ad56f57ed1a5dc583c2308667033181cc341defb",
+  "members": 50,
+  "source_commit": "commit containing this release record",
+  "implemented": true,
+  "packaged": true,
+  "installed": true,
+  "verified": true,
+  "released": false,
+  "designation": "Ads correction verified;stable publication withheld pending CRM producer binding disposition",
+  "CRM_binding": "CRM0.3.16 exact bootstrap gate requires owner review;no CRM source edited",
+  "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge"
+}

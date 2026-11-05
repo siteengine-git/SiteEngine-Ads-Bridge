@@ -3,6 +3,12 @@ namespace SiteEngine\AdsBridge\Import;
 use RuntimeException;
 use Throwable;
 
+final class OwnershipRecordFailure extends RuntimeException {
+    public function __construct(public string $record,public string $condition,string $detail) {
+        parent::__construct('Ownership record '.$record.' ['.$condition.']: '.$detail.'.');
+    }
+}
+
 /** Read-only routing. A status snapshot never grants write/recovery permission. */
 final class Recovery {
     // c1e8e6d: reviewed predecessor. Native actions, group identities and readback
@@ -15,32 +21,72 @@ final class Recovery {
             && hash_equals($j['plan_hash'],JSON::hash([$j['upload_sha256'],$j['mappings'],$j['actions'],$j['source_pin']]));
     }
     private static function id($v):?string {return is_string($v)&&preg_match('/^[A-Za-z0-9_.:-]{1,80}$/D',$v)?$v:null;}
+    const MAX_RECORD_BYTES=1048576;
+    private static function recordFailure(string $record,string $condition,string $detail):void {
+        throw new OwnershipRecordFailure($record,$condition,$detail);
+    }
+    public static function directoryEvidence(string $dir):void {
+        if(is_link($dir))self::recordFailure('executor directory','linked_parent','directory is linked; its original identity is unverified');
+        if(!is_dir($dir))self::recordFailure('executor directory','unavailable_parent','directory is absent or cannot be traversed from its parent');
+        if(!is_readable($dir))self::recordFailure('executor directory','unreadable_parent','directory cannot be listed by this PHP execution identity');
+        if(DIRECTORY_SEPARATOR!=='\\'&&!is_executable($dir))self::recordFailure('executor directory','untraversable_parent','directory cannot be traversed by this PHP execution identity');
+        if(realpath($dir)!==$dir)self::recordFailure('executor directory','parent_identity','resolved directory differs from its recorded identity');
+    }
     private static function record(string $path):?array {
-        if (!file_exists($path)&&!is_link($path)) return null;
-        if (is_link($path)||!is_file($path)||!is_readable($path)||filesize($path)>1048576) throw new RuntimeException('Saved ownership record is unreadable, linked or exceeds 1 MiB.');
-        $v=json_decode(file_get_contents($path),true,128,JSON_THROW_ON_ERROR);
-        if (!is_array($v)) throw new RuntimeException('Saved ownership record is malformed.');
+        $name=basename($path);self::directoryEvidence(dirname($path));clearstatcache(true,$path);
+        if(is_link($path))self::recordFailure($name,'linked_file','file is linked; its original ownership identity is unverified');
+        $stat=@lstat($path);if($stat===false)return null;
+        if(!is_file($path))self::recordFailure($name,'not_regular_file','entry is not a regular file');
+        if(!is_readable($path))self::recordFailure($name,'unreadable_file','file cannot be read by this PHP execution identity');
+        $size=$stat['size'];if($size>self::MAX_RECORD_BYTES)self::recordFailure($name,'oversized_file','file has '.$size.' bytes; bounded ownership read permits at most '.self::MAX_RECORD_BYTES.' bytes');
+        $f=@fopen($path,'rb');if(!$f)self::recordFailure($name,'unreadable_file','file could not be opened for reading');
+        try{$opened=fstat($f);$raw=stream_get_contents($f,self::MAX_RECORD_BYTES+1);if($raw===false)self::recordFailure($name,'unreadable_file','bounded read failed');if(strlen($raw)>self::MAX_RECORD_BYTES)self::recordFailure($name,'oversized_file','file grew beyond the bounded ownership read');if($opened['dev']!==$stat['dev']||$opened['ino']!==$stat['ino']||strlen($raw)!==$size)self::recordFailure($name,'changed_during_read','file identity or length changed during inspection');}
+        finally{fclose($f);}
+        try{$v=json_decode($raw,true,128,JSON_THROW_ON_ERROR);}catch(\JsonException $e){self::recordFailure($name,'malformed_content','file is not valid bounded JSON; contents are not displayed');}
+        if(!is_array($v))self::recordFailure($name,'malformed_content','JSON does not contain an ownership object');
         return $v;
+    }
+    /** The only optional creation is an explicitly empty first-use directory. */
+    public static function acquireExecutor(string $dir,bool $allowEmptyCreate=false) {
+        self::directoryEvidence($dir);$path=$dir.'/executor.lock';clearstatcache(true,$path);
+        if(is_link($path))self::recordFailure('executor.lock','linked_file','original executor lock is linked');
+        if(!file_exists($path)){
+            $it=new \FilesystemIterator($dir,\FilesystemIterator::SKIP_DOTS);
+            if(!$allowEmptyCreate||$it->valid())self::recordFailure('executor.lock','missing_lock','original executor lock is missing; establish writer cessation with its owner; it will not be recreated over retained records');
+            $f=@fopen($path,'x+b');
+        }else{
+            if(!is_file($path)||!is_readable($path))self::recordFailure('executor.lock','unreadable_file','original lock is not a readable regular file');
+            $f=@fopen($path,'rb');
+        }
+        if(!$f)self::recordFailure('executor.lock','unreadable_file','original lock could not be opened');
+        if(!flock($f,LOCK_EX|LOCK_NB,$busy)){fclose($f);if($busy)throw new OwnershipRecordFailure('executor.lock','busy','a live executor holds the lock; no settings callback was run');self::recordFailure('executor.lock','lock_failed','exclusive ownership could not be established');}
+        return $f;
     }
     public static function shared():array {
         $out=['kind'=>'none','message'=>'No predecessor executor directory is present.'];$f=null;
         try {
             $dir=\SiteEngine_Ads_Bridge_Setup::executor_directory();if($dir===null)return $out;
-            if(!is_dir($dir)||is_link($dir)||realpath($dir)!==$dir)throw new RuntimeException('Original private executor directory is unavailable or ambiguous.');
-            $job=self::record($dir.'/deployment-job.json');$state=self::record($dir.'/admin-state.json');
-            $out=['kind'=>'idle','job_id'=>self::id($job['job_id']??null),'state'=>self::id($job['state']??null),'import_state'=>self::id($state['status']??null),'inflight'=>!empty($job['inflight'])||!empty($state['operation']),'message'=>'No unfinished predecessor job observed.'];
-            $path=$dir.'/executor.lock';
-            if(is_link($path))throw new RuntimeException('Executor lock is linked.');
-            if(is_file($path)&&!\SiteEngine_Ads_Bridge_Setup::executor_owned()){
-                $f=fopen($path,'rb');if(!$f)throw new RuntimeException('Executor lock cannot be inspected.');
-                if(!flock($f,LOCK_EX|LOCK_NB)){$out['kind']='busy';$out['message']='A live executor holds the shared lock. Do not resume or replace its work.';return $out;}
-            }elseif(!is_file($path)&&($job||$state))throw new RuntimeException('Original executor lock is missing; writer cessation is unverified.');
-            if($job&&(($job['format']??null)!=='siteengine.crm.deployment-job/1'||!in_array($job['state']??null,['active','complete'],true)))throw new RuntimeException('Deployment job format/state is not recognized.');
-            if(($job&&(($job['state']??null)!=='complete'||$out['inflight']))||($state&&($state['mode']??null)==='import'&&($state['status']??null)!=='complete')){
-                $out['kind']='retained';$out['message']='Retained/reserved predecessor operation; no executor holds the lock at this observation. This is not proof the job is complete or safe to replace. Use its original CRM saved-session recovery.';
+            self::directoryEvidence($dir);
+            if(!\SiteEngine_Ads_Bridge_Setup::executor_owned())$f=self::acquireExecutor($dir);
+            // Read authoritative deployment state only AFTER exclusive ownership.
+            $job=self::record($dir.'/deployment-job.json');
+            $out=['kind'=>'unknown','job_id'=>self::id($job['job_id']??null),'state'=>self::id($job['state']??null),'historical_admin_payload_read'=>false];
+            if($job!==null){
+                if(($job['format']??null)!=='siteengine.crm.deployment-job/1'||$out['job_id']===null||!in_array($job['state']??null,['active','complete'],true)||!array_key_exists('inflight',$job))self::recordFailure('deployment-job.json','malformed_content','recognized format,job identity,state and explicit inflight evidence are required');
+                $out['inflight']=$job['inflight']!==null;
+                if($job['state']==='complete'&&$job['inflight']===null){
+                    if(!is_string($job['safe_checkpoint']??null)||trim($job['safe_checkpoint'])==='')self::recordFailure('deployment-job.json','missing_completion_evidence','completed deployment is missing its durable safe_checkpoint');
+                    $out['kind']='idle';$out['message']='Deployment '.$out['job_id'].' is complete, with explicit inflight:null and a durable checkpoint, under exclusive executor ownership. Historical admin-state.json is not needed or read for ordinary Ads settings.';return $out;
+                }
+                $out['kind']='retained';$out['record']='deployment-job.json';$out['condition']='retained_operation';$out['message']='Ownership record deployment-job.json [retained_operation]: Retained/reserved deployment '.$out['job_id'].'; state '.$out['state'].'; inflight '.($out['inflight']?'present':'none').'. A free executor lock does not complete it. Resume its original saved recovery before changing settings.';return $out;
             }
-            return $out;
-        }catch(Throwable $e){return ['kind'=>'unknown','message'=>$e->getMessage().' Original job, request, profile, checkpoints and native returned IDs are required before recovery.'];}
+            // With no authoritative deployment record, never infer completion from
+            // an administrator payload, age, missing plugin or an available lock.
+            $state=self::record($dir.'/admin-state.json');$out['historical_admin_payload_read']=$state!==null;
+            if($state!==null){$out['import_state']=self::id($state['status']??null);$out['inflight']=!empty($state['operation']);}
+            self::recordFailure('deployment-job.json','missing_completion_evidence','authoritative deployment record is missing; original job/checkpoint and executor ownership evidence are required. Historical administrator state cannot authorize replacement');
+        }catch(OwnershipRecordFailure $e){$out['kind']=$e->condition==='busy'?'busy':'unknown';$out['record']=$e->record;$out['condition']=$e->condition;$out['message']=$e->getMessage().' Preserve records; no settings callback or journal reset is authorized by this inspection.';return $out;}
+        catch(Throwable $e){$out['kind']='unknown';$out['message']='Ownership inspection unavailable; original executor location and valid bounded deployment-job.json are required. No record contents are displayed.';return $out;}
         finally{if(is_resource($f)){flock($f,LOCK_UN);fclose($f);}}
     }
     /** Actual supported inspection validates physical storage and the guard journal. */

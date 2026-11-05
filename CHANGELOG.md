@@ -1,3 +1,10 @@
+##0.7.1 — completed predecessor settings saves
+
+- Read bounded authoritative deployment state under exclusive executor ownership before considering historical administrator state.
+- Permit ordinary settings saves after proven completion without reading unrelated oversized/unreadable administrator payloads.
+- Name the exact ownership record and condition; preserve active,interrupted,uncertain and unknown-state holds and missing locks.
+- Keep credentials-path persistence and file diagnostics separate from ownership;no permission changes or credential fabrication.
+
 ## 0.7.0 — destination CRM configuration import
 
 - Separate physical storage faults from unfinished configuration recovery; route exact saved Ads operations to Resume, retain predecessor CRM reservations, and preserve original operation/plan/returned-ID evidence during reviewed predecessor recovery.

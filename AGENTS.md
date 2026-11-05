@@ -1,3 +1,13 @@
+## Priority0.7.1 settings ownership correction — November5,2026
+
+Direct Helper instruction authorizes the focused runtime/settings correction,local
+checks,bounded Alma Linux fixtures,ordinary administrator save verification,packaging
+and successor delivery. This supersedes the prior release-only scope below. Preserve
+stable0.7.0 and all importer/Consent/recovery evidence. No client sites,CRM source
+edits,journal clearing,unknown-state bypass,live delivery or broader UI cleanup.
+Use the existing canonical source and access. Preserve current delivery until the
+verified successor is ready;canonical physical delivery remains Plugins\..Deliverables.
+
 ## Stable0.7.0 released — November5,2026
 
 Tagv0.7.0 pins3ed9ee2044b9d15f9af82e987a23dd757eb82bef;stable publication/delivery verified.

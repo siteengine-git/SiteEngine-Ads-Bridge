@@ -51,11 +51,11 @@ $directory=sys_get_temp_dir().'/seab-retained-'.bin2hex(random_bytes(6));mkdir($
 try{
     file_put_contents($directory.'/deployment-job.json',json_encode(['format'=>'siteengine.crm.deployment-job/1','job_id'=>'crm.fixture','state'=>'active','inflight'=>null]));
     file_put_contents($directory.'/admin-state.json',json_encode(['mode'=>'import','status'=>'running','job_id'=>'crm.fixture','operation'=>['request'=>'retained']]));
-    $before=hash_file('sha256',$directory.'/admin-state.json');$s=Recovery::shared();ok($s['kind']==='retained'&&$s['inflight']&&$s['job_id']==='crm.fixture','Free lock plus active durable job means retained reservation, not completion');
-    refusal(fn()=>SiteEngine_Ads_Bridge_Setup::with_configuration(fn()=>throw new LogicException('must not execute')),'Retained/reserved predecessor');
+    $before=hash_file('sha256',$directory.'/admin-state.json');$s=Recovery::shared();ok($s['kind']==='retained'&&!$s['inflight']&&$s['job_id']==='crm.fixture','Free lock plus active durable job means retained reservation, not completion');
+    refusal(fn()=>SiteEngine_Ads_Bridge_Setup::with_configuration(fn()=>throw new LogicException('must not execute')),'Retained/reserved deployment');
     $f=fopen($directory.'/executor.lock','rb');flock($f,LOCK_EX|LOCK_NB);$s=Recovery::shared();ok($s['kind']==='busy','Actual held file lock identifies live executor');flock($f,LOCK_UN);fclose($f);
     ok(hash_file('sha256',$directory.'/admin-state.json')===$before,'Inspection and refusal preserve original predecessor journal');
-    unlink($directory.'/executor.lock');refusal(fn()=>SiteEngine_Ads_Bridge_Setup::with_configuration(fn()=>null),'Original executor lock is missing');ok(!file_exists($directory.'/executor.lock'),'Missing predecessor lock is not silently recreated');touch($directory.'/executor.lock');
-    file_put_contents($directory.'/deployment-job.json','malformed');$s=Recovery::shared();ok($s['kind']==='unknown'&&str_contains($s['message'],'Original job'),'Malformed ownership requires exact missing evidence, never automatic takeover');
+    unlink($directory.'/executor.lock');refusal(fn()=>SiteEngine_Ads_Bridge_Setup::with_configuration(fn()=>null),'executor.lock [missing_lock]');ok(!file_exists($directory.'/executor.lock'),'Missing predecessor lock is not silently recreated');touch($directory.'/executor.lock');
+    file_put_contents($directory.'/deployment-job.json','malformed');$s=Recovery::shared();ok($s['kind']==='unknown'&&str_contains($s['message'],'deployment-job.json [malformed_content]'),'Malformed ownership requires exact missing evidence, never automatic takeover');
 }finally{foreach(glob($directory.'/*')as$p)unlink($p);rmdir($directory);$directory=null;}
 echo json_encode(['assertions'=>$n,'status'=>'PASS','SQL_evidence'=>'simulated; actual PHP/file-lock/reporting code'])."\n";

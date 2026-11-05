@@ -1,4 +1,4 @@
-# Import CRM Configuration — Ads Bridge 0.7.0
+# Import CRM Configuration — Ads Bridge 0.7.1
 
 The CRM builder remains on the authoring site. Destination sites need Ads Bridge,
 SiteEngine Base, FluentCRM and Fluent Forms. This package's native Pro sequences
@@ -98,6 +98,15 @@ under the original guard operation/plan. This revision explicitly supports the e
 reviewed c1e8e6d importer source pin without rebinding its original journal. Unknown
 source/plan changes still require the pinned original importer and exact recovery.
 A create without a durable returned ID is never automatically replayed.
+
+Ordinary settings ownership inspection first holds the original executor lock and
+reads bounded deployment-job.json. Recognized complete state, explicit inflight:null
+and a durable checkpoint establish completed deployment authority; unrelated historical
+admin-state.json is not read. Active/inconsistent/unknown deployment evidence remains
+held. Read failures identify the exact record and condition without its contents:
+parent access, unreadable/linked/oversized file, malformed JSON or missing completion
+proof. Limits are unchanged and a missing original lock is never recreated over
+retained records. Credentials-path diagnostics remain a separate file-access check.
 
 Predecessor CRM jobs remain owned by their original recovery workflow. Ads reads
 bounded metadata from the existing canonical private directory, including when the

@@ -23,6 +23,8 @@ final class SiteEngine_Ads_Bridge_Setup {
         if (defined('DB_NAME')) {
             global $wpdb;
             $parent=realpath(dirname(rtrim(ABSPATH,'/')));
+            if (!$parent) { throw new \SiteEngine\AdsBridge\Import\OwnershipRecordFailure('executor directory','unavailable_parent','predecessor location parent cannot be resolved; absence cannot be established'); }
+            \SiteEngine\AdsBridge\Import\Recovery::directoryEvidence($parent);
             if ($parent) { $path=$parent.'/siteengine-crm-private-'.substr(hash('sha256',DB_NAME.'|'.$wpdb->prefix),0,16); if (file_exists($path)||is_link($path)) return $path; }
         }
         return null;
@@ -42,25 +44,12 @@ final class SiteEngine_Ads_Bridge_Setup {
         $lock = null;
         try {
             $directory = self::executor_directory();
+            if (!class_exists('SiteEngine\\AdsBridge\\Import\\Recovery')) { throw new RuntimeException('Ads ownership inspector is unavailable; restore the matching plugin package before changing settings.'); }
             if ( null !== $directory ) {
-                if ( ! is_dir( $directory ) || is_link( $directory ) ) { throw new RuntimeException( 'Shared executor directory is unavailable.' ); }
-                $lock_path=$directory.'/executor.lock';
-                if (is_link($lock_path)||(!is_file($lock_path)&&(file_exists($directory.'/deployment-job.json')||file_exists($directory.'/admin-state.json')))) { throw new RuntimeException('Original executor lock is missing or linked. Preserve the retained job and establish writer cessation through its owner before recovery.'); }
-                $lock = fopen( $directory . '/executor.lock', 'c' );
-                if ( ! $lock || ! flock( $lock, LOCK_EX | LOCK_NB ) ) { throw new RuntimeException( 'Another configuration executor is running. '.self::blocker_message('shared_executor_busy') ); }
+                $lock=\SiteEngine\AdsBridge\Import\Recovery::acquireExecutor($directory,true);
                 self::$executor_owned=true;
-                $path = $directory . '/deployment-job.json';
-                if ( is_link( $path ) ) { throw new RuntimeException( 'Shared job record requires review.' ); }
-                if ( is_file( $path ) ) {
-                    $job = json_decode( file_get_contents( $path ), true );
-                    if ( ! is_array( $job ) || ( $job['format'] ?? '' ) !== 'siteengine.crm.deployment-job/1' || ( $job['state'] ?? '' ) !== 'complete' ) {
-                        throw new RuntimeException( self::blocker_message('shared_configuration_recovery_required') );
-                    }
-                }
-            }
-            if (class_exists('SiteEngine\\AdsBridge\\Import\\Recovery')) {
                 $shared=\SiteEngine\AdsBridge\Import\Recovery::shared();
-                if (!in_array($shared['kind'],['none','idle'],true)) throw new RuntimeException($shared['message'].' Job '.($shared['job_id']??'unknown').'; state '.($shared['state']??'unknown').'. No replacement or initialization.');
+                if (!in_array($shared['kind'],['none','idle'],true)) throw new RuntimeException($shared['message'].' Job '.($shared['job_id']??'unknown').'; state '.($shared['state']??'unknown').'.');
             }
             return $callback();
         } finally {

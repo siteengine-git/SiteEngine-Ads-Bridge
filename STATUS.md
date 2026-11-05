@@ -1,3 +1,37 @@
+## 0.7.1 ordinary-settings correction — Alma verified, 2026-11-05
+
+Implemented/packaged/main-Alma installed/Ads verified YES;stable publication NO pending
+CRM-owner exact-bootstrap binding disposition. Canonical source/repository unchanged.
+ZIP8baa93c3d3e2236ce8bb60cecac81b7baf202eccc5b05d814a02510fae3bc630;
+manifestc495e1f4290209559d086274ad56f57ed1a5dc583c2308667033181cc341defb.
+
+Released0.7.0 reproduced the exact generic save refusal in a disposable Alma destination
+with CRM absent and a1,048,644-byte historical admin-state.json. Initial main Alma records
+were readable/below1MiB and did not reproduce the report; no client cause is inferred.
+The original executor now owns bounded authoritative deployment inspection first.
+Explicit complete/inflight:null/checkpoint bypasses only unrelated historical payload;
+active,inconsistent,unknown,missing-lock and malformed evidence stay blocked with precise
+record/condition. No raised limit,journal reset or ownership bypass.
+
+Fresh local89 assertions PASS;actual owner/Linux45 filesystem assertions PASS,including
+native unreadable file/parent and symlink cases. Normal isolated authenticated HTTP saves
+persisted two different noncredential paths;fresh reads/Doctor used each exact value.
+Historical bytes unchanged;active,inflight and chmod-denied authoritative records refused
+normal HTTP saves. Main exact50 members and28 PHP8.3.36 lints PASS;ordinary administrator
+Sheets save and fresh path readback PASS with existing path preserved. Doctor35PASS/7WARN/
+0FAIL,validationerrors[],four exportsfalse. Targeted backup/config/native/inquiry/Consent/
+journal preservation verified;no full volatile fc_meta byte identity claim.
+
+Cleanup:47 exact owned tables and disposable WordPress copy removed;zero foreign refs;
+HTTP worker/listener/SSH forward stopped,own administrator sessions revoked. Private
+history/failure receipts/backups retained under Ads Codex ownership. No real credentials,
+client access,sends,exports,migration or repeated importer/Consent acceptance. Protected
+Consent/coordination/inquiry/lifecycle/time/Doctor/Admin bytes match0.7.0.
+
+CRM0.3.16 exact bootstrap allowlist still requires its owner's scoped0.7.1 review (version
+metadata only);request relayed through Aubrey. Previous0.7.0 coexistence remains accepted,
+not relabeled0.7.1. See releases/0.7.1 for sanitized results. Preserve0.7.0 archives.
+
 ## RELEASED stable0.7.0 — 2026-11-05
 
 Implemented / packaged / main-Alma installed / verified / released: YES. No client
