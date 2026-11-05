@@ -1,5 +1,10 @@
 ## 0.7.1 ordinary-settings correction — Alma verified, 2026-11-05
 
+Source checkpoint196be4aa3062d8484daab3b87a5f6ac51fd5a804 pushed and remote branch verified.
+Physical canonical Plugins\..Deliverables folder now has exactly ONE installable0.7.1
+ZIP with matching docs/hashes;0.7.0 delivery archived byte-identical outside it after
+verified successor staging. Stable release/tag not published;CRM binding limit below.
+
 Implemented/packaged/main-Alma installed/Ads verified YES;stable publication NO pending
 CRM-owner exact-bootstrap binding disposition. Canonical source/repository unchanged.
 ZIP8baa93c3d3e2236ce8bb60cecac81b7baf202eccc5b05d814a02510fae3bc630;
