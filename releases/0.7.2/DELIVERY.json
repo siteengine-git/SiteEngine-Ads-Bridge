@@ -9,5 +9,6 @@
   "installed": true,
   "verified": true,
   "released": false,
-  "designation": "Focused correction verified; broader UI successor follows separately"
+  "designation": "Focused correction verified; broader UI successor follows separately",
+  "source_commit": "b90b27ec24af66c47038118d674c4d9f2956af8d"
 }
