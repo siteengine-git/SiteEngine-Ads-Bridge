@@ -1,5 +1,11 @@
 ## 0.8.0 — ordered correction/UI successor verified on Alma,2026-11-05
 
+Implementation2a1ebc641a4789e0c4c434861acb0d574842da01 pushed;remote branch verified.
+ZIP47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58;
+manifest9a661852d731ae1b84afec6e825b03b0c8407b74b11a38550b229e27d1e59fe2.
+Filesystem-derived canonical delivery verified:exactly ONE0.8.0 ZIP with matching
+documents;0.7.2 archived byte-identical after successor staging. No stable tag/release.
+
 Priority0.7.2 completed FIRST:implementationb90b27e,delivery6838879. Exact1798466-byte
 completed producer deployment saves through ordinary administrator HTTP;oversized
 admin alone/together and active/inflight/malformed/unknown cases verified. Records
