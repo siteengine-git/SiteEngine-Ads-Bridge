@@ -11,9 +11,12 @@
   "packaged": true,
   "installed": true,
   "verified_with_documented_limits": true,
-  "stable_released": false,
+  "stable_released": true,
   "remaining_integration": "none within accepted release scope",
   "scheduler_assessment": "satisfactory;no changes justified;historical cron payload unavailable",
   "producer_gate": "PASS:CRM0.3.17 accepted at 72705d456d72c9221ab672962de08d5ad59a3587",
-  "designation": "Stable0.8.0 accepted;publication pending receipt"
+  "designation": "Stable0.8.0 published;accepted Alma evidence carried forward",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.0",
+  "tag": "v0.8.0",
+  "tag_commit": "b9b6574529c9ce9a89dea7f1b7641d110d08d834"
 }

@@ -10,11 +10,14 @@
   "packaged": true,
   "installed": true,
   "verified": true,
-  "released": false,
-  "designation": "Stable0.8.0 accepted;publication pending receipt",
+  "released": true,
+  "designation": "Stable0.8.0 published;accepted Alma evidence carried forward",
   "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
   "delivery_zip_count": 1,
   "CRM_binding_bootstrap_sha256": "c50a5fe0e25de312311696df70be2d940a97a9dd9709305f8fa96a06263f518a",
   "scheduler_assessment": "satisfactory;no changes justified;historical cron payload unavailable",
-  "producer_gate": "PASS:CRM0.3.17 accepted at 72705d456d72c9221ab672962de08d5ad59a3587"
+  "producer_gate": "PASS:CRM0.3.17 accepted at 72705d456d72c9221ab672962de08d5ad59a3587",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.0",
+  "tag": "v0.8.0",
+  "tag_commit": "b9b6574529c9ce9a89dea7f1b7641d110d08d834"
 }

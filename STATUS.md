@@ -1,3 +1,24 @@
+## RELEASED stable 0.8.0 — 2026-11-05
+
+Implemented / packaged / main-Alma installed / verified / released:YES.
+Stable release:https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.0
+Tagv0.8.0 pins accepted source/evidenceb9b6574529c9ce9a89dea7f1b7641d110d08d834;
+runtime source remains2a1ebc641a4789e0c4c434861acb0d574842da01. No tested package change.
+ZIP47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58;
+manifest9a661852d731ae1b84afec6e825b03b0c8407b74b11a38550b229e27d1e59fe2.
+All nine remote asset digests/sizes and fresh public downloads verified byte-for-byte.
+Physical D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge contains
+exactly ONE0.8.0 ZIP plus matching release documents;historical archives preserved.
+
+CRM0.3.17 accepted at72705d456d72c9221ab672962de08d5ad59a3587:normal authenticated
+administrator export/download and Ads contract validation PASS,all50 installed Ads
+payloads verified;jobfb2c6cdfbfaccb5e6693adc329b7b270 complete/inflightnull/executor
+released. Schedulerd1080f9 satisfactory,no repair;uncaptured historical serialized
+cron remains a documented limit,not a restoration task. Completed Ads tests carried
+forward without rerun. No website/settings/runtime/UI/queue/export changes in publication.
+Service-account access/live delivery remain unverified;exports disabled;no client rollout.
+See releases/0.8.0/PUBLICATION.json,CRM-ACCEPTANCE.json and delivery receipt.
+
 ## Stable 0.8.0 accepted — publication in progress,2026-11-05
 
 Final Helper acceptance resolves the historical CRM0.3.16 rejection:CRM0.3.17 source/
