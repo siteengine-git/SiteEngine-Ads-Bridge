@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "designation": "Ads successor verified on Alma;stable publication not performed",
+  "designation": "Stable 0.8.0 accepted;Alma Ads and final CRM producer gates passed;publication receipt separate",
   "priority_correction": {
     "version": "0.7.2",
     "implementation_commit": "b90b27ec24af66c47038118d674c4d9f2956af8d",
@@ -223,8 +223,9 @@
   "limits": [
     "No client operations,live advertising/Sheet delivery or browser lead submissions.",
     "Fresh fixtures intentionally retain missing Base/Consent/connection prerequisites rather than fabricate Ready. No service-account access or Google Ads account verification is established.",
-    "CRM0.3.16 exact-bootstrap producer binding has not been updated/reaccepted for0.8.0 by this assignment. Prior0.7.0 producer evidence is retained,not relabeled.",
-    "Bounded form detector supports the flat selectors consumed by the existing Ads reader;compound/unsupported forms require explicit review."
+    "Bounded form detector supports the flat selectors consumed by the existing Ads reader;compound/unsupported forms require explicit review.",
+    "CRM0.3.17 final acceptance is carried forward from its pinned evidence;no additional export or destination-import campaign repeated.",
+    "Historical serialized cron payload was not captured;exact pre-installation job/timestamp delta remains unknown;current assessment satisfactory,no restoration task."
   ],
   "scheduler_and_producer_closeout": {
     "assessed_UTC": "2026-11-05T19:56:52+00:00",
@@ -242,6 +243,36 @@
     "scheduler_changes_performed": false,
     "jobs_or_exports_executed": false,
     "producer": {
+      "result": "PASS;final handback accepted by Ads Helper",
+      "CRM_source_commit": "72705d456d72c9221ab672962de08d5ad59a3587",
+      "CRM_tag": "v0.3.17",
+      "evidence_url": "https://github.com/siteengine-git/siteengine-crm-configuration/blob/72705d456d72c9221ab672962de08d5ad59a3587/docs/MASTER-EMAIL-0317-RESULTS.json",
+      "evidence_sha256": "2134e2a28c78e228b61870620c3cb4571171d789eee1d5d22b3401cfa614a402",
+      "Ads_source_commit": "2a1ebc641a4789e0c4c434861acb0d574842da01",
+      "Ads_ZIP_sha256": "47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58",
+      "CRM_plugin_ZIP_sha256": "9d016a911533b4e2e4a20bf653842ae6ff93abe262b2a1540bd5d463e8344ba9",
+      "export_ZIP_sha256": "ec3beece625693abe25fa90267b249059e579848a7c83f139a3946e8e81cc6e5",
+      "export_json_sha256": "b4a1715f757ba8dc40b23d32d2170141c0a10430e622a2d549f6a903938ebc4b",
+      "installed_Ads_payloads_verified": 50,
+      "both_producer_gates": "accept exact reviewed bootstrap;Helper accepted disposition",
+      "normal_authenticated_administrator_export_download": true,
+      "actual_Ads_contract_validation": true,
+      "native_objects": 93,
+      "dependencies": 24,
+      "relationships": 66,
+      "previous_export_preserved": true,
+      "job": {
+        "job_id": "fb2c6cdfbfaccb5e6693adc329b7b270",
+        "state": "complete",
+        "inflight": null
+      },
+      "executor_released": true,
+      "destination_import_campaign_repeated": false,
+      "Ads_closeout_scheduler_commit": "d1080f9167880a3a757f372dcdd942e2ce96befb",
+      "publication_only": "Existing accepted evidence carried forward;no new website/bootstrap/export operation"
+    },
+    "package_changed": false,
+    "historical_producer_blocker": {
       "version": "0.3.16",
       "operation": "read-only AdministratorSetup::pins()",
       "result": "FAIL",
@@ -251,7 +282,7 @@
       "owner": "CRM Helper/Codex",
       "normal_export_repeated": false
     },
-    "package_changed": false,
-    "stable_released": false
+    "release_gate_passed": true,
+    "publication_receipt": "PUBLICATION.json"
   }
 }

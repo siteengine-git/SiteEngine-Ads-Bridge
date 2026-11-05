@@ -12,4 +12,9 @@ from the priority phase. Fresh activation/storage,one126-operation browser impor
 incomplete/Unused saves,ambiguity/custom mapping,protected recovery and390px keyboard
 layout checks passed. No lead submissions or real delivery. Detailed local evidence
 and four-area screenshots retained outside public Git. See RESULTS.json for limits,
-including unrelated scheduler/cron bookkeeping and outstanding CRM producer binding.
+including unrelated scheduler/cron bookkeeping. Final CRM0.3.17 producer compatibility,
+normal authenticated administrator export/download and Ads contract validation PASS;
+original job complete/inflightnull/executor released. See CRM-ACCEPTANCE.json.
+No service-account access,live delivery or client rollout is established. Exports
+remain disabled. Historical cron payload was not captured;current scheduler
+assessment is satisfactory and requires no restoration.

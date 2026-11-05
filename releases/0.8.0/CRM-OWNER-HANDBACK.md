@@ -1,3 +1,8 @@
+RESOLVED:CRM0.3.17 final handback accepted at72705d456d72c9221ab672962de08d5ad59a3587.
+Both reviewed producer gates,authenticated export/download and Ads contract validation
+PASS;original job complete/inflightnull/executor released. See CRM-ACCEPTANCE.json.
+The request and observed predecessor failure below are preserved historical evidence.
+
 TO: HELPER — SiteEngine CRM Ops,through Aubrey
 FROM: Ads Bridge Codex / _(AB) Ads Helper -10
 SUBJECT: Review exact Ads0.8.0 producer binding

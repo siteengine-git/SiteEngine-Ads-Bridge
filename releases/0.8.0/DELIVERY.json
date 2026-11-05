@@ -11,10 +11,10 @@
   "installed": true,
   "verified": true,
   "released": false,
-  "designation": "Alma-verified Ads successor;CRM producer exact-bootstrap binding remains owner review",
+  "designation": "Stable0.8.0 accepted;publication pending receipt",
   "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
   "delivery_zip_count": 1,
   "CRM_binding_bootstrap_sha256": "c50a5fe0e25de312311696df70be2d940a97a9dd9709305f8fa96a06263f518a",
   "scheduler_assessment": "satisfactory;no changes justified;historical cron payload unavailable",
-  "producer_gate": "FAIL:ads_successor_pin_mismatch:siteengine-ads-bridge.php (CRM0.3.16 read-only pins)"
+  "producer_gate": "PASS:CRM0.3.17 accepted at 72705d456d72c9221ab672962de08d5ad59a3587"
 }

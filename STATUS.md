@@ -1,3 +1,20 @@
+## Stable 0.8.0 accepted — publication in progress,2026-11-05
+
+Final Helper acceptance resolves the historical CRM0.3.16 rejection:CRM0.3.17 source/
+tag72705d456d72c9221ab672962de08d5ad59a3587/v0.3.17 verifies all50 Ads payload files,
+both exact producer gates,normal authenticated administrator export/download and
+Ads contract validation. Jobfb2c6cdfbfaccb5e6693adc329b7b270 complete/inflightnull;
+executor released. Exportec3beece625693abe25fa90267b249059e579848a7c83f139a3946e8e81cc6e5.
+Published evidence independently read at exact CRM pin;see releases/0.8.0/CRM-ACCEPTANCE.json.
+
+Scheduler assessmentd1080f9 satisfactory;historical serialized cron unavailable is
+a coverage limit,not an open restoration gate. No runtime/UI/site/settings/queue/
+export operation or repeated acceptance suite for publication. Accepted package
+47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58 remains unchanged,
+51 ZIP members/50 payloads equal source2a1ebc641a4789e0c4c434861acb0d574842da01.
+Service-account access/live delivery unverified;all exports remain disabled.
+Remote tag/assets and physical one-ZIP delivery verified in final publication receipt.
+
 ## 0.8.0 scheduler assessment complete; exact CRM gate still fails — 2026-11-05
 
 Four-area UI/functional evidence accepted by Helper;completed campaigns carried forward.

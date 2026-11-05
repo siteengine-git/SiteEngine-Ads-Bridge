@@ -42,6 +42,10 @@ Preserve created storage/data/journals and Consent barriers;never drop/truncate 
 clear pending ownership or restore a whole database/global cron. Installed acceptance
 noted unrelated scheduler bookkeeping/cron hash changes;those were not rolled back.
 
-CRM's separate Alma producer plugin owns its exact0.8.0 bootstrap binding and any normal
-producer-export reacceptance. Ads packaging is not that integration result. No stable
-GitHub release or client rollout is claimed by this delivery.
+The separate Alma CRM producer0.3.17 at72705d456d72c9221ab672962de08d5ad59a3587
+accepts these exact Ads bytes. Its normal authenticated export/download and Ads
+contract validation passed;its completed job released ownership. CRM is not a
+destination installation dependency. See CRM-ACCEPTANCE.json and PUBLICATION.json.
+Service-account access and live delivery remain unverified;exports remain disabled.
+The missing historical serialized cron is a coverage limit,not a restoration task.
+Stable publication does not authorize client rollout or delivery activation.

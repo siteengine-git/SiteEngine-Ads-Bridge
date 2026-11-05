@@ -73,7 +73,7 @@ Conclusion: current Ads scheduling is consistent with disabled exports. There is
 no demonstrated assignment-caused job change to correct. The missing historical
 payload is a recorded coverage limit, not an ongoing scheduler recovery gate.
 
-## Producer gate — concrete remaining release blocker
+## Historical producer blocker — resolved by accepted CRM 0.3.17
 
 Fresh read-only invocation of installed CRM 0.3.16's existing
 `SiteEngine\CRM\AdministratorSetup::pins()` at 2026-11-05T19:58:02Z fails:
@@ -87,7 +87,7 @@ still resolves to 7da32a653cc0453ace4f623aadeb1ed21e632918, whose coexistence re
 is for Ads 0.7.0. No final 0.8.0 disposition was available in those records.
 The prepared CRM-owner handback remains applicable. CRM owns the corrected
 candidate-specific binding/disposition; Ads does not silently patch it or relabel
-old coexistence evidence. Stable publication awaits this specific producer gate.
+old coexistence evidence. This historical blocker is superseded by CRM0.3.17 at72705d456d72c9221ab672962de08d5ad59a3587. Both reviewed producer gates and normal authenticated export/download passed;the original job completed and released ownership. See CRM-ACCEPTANCE.json. No acceptance campaign was repeated by Ads.
 
 ## Preservation and delivery
 
