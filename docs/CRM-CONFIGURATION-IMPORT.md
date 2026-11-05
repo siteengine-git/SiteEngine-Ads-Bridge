@@ -1,3 +1,18 @@
+# Configuration authority in0.8.1
+
+Setup > Configuration authority explicitly selects WordPress settings without
+requiring CRM configuration import, credentials or readiness. Existing saved Ads
+values are retained exactly; otherwise safe disabled defaults are created. External
+and plugin-local files are preserved. Missing/unreadable/invalid files are diagnosed
+and are never imported by this action. Intentional external authority remains active
+until an administrator chooses otherwise. This explicit choice (including existing
+reviewed import choices) survives later file changes, removal or path changes.
+Optional Import legacy settings requires the readable, loaded file to match its
+reviewed hash. Shared facts continue to come from Base. All operations retain the
+existing executor/configuration protections;unfinished work still blocks saves.
+CRM configuration not imported is distinct from missing FluentCRM dependencies or
+invalid mappings. It does not prevent saving incomplete Ads setup.
+
 # Administrator workflow in0.8.0
 
 Overview summarizes the next action, disabled/enabled exports and actual last successful

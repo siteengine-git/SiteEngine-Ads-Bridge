@@ -11,6 +11,7 @@ function update_option($k,$v,$autoload=false){$GLOBALS['options'][$k]=$v;return 
 function sanitize_key($s){return preg_replace('/[^a-z0-9_\-]/','',strtolower($s));}
 function sanitize_text_field($s){return trim((string)$s);}function absint($v){return abs((int)$v);}
 function current_user_can($c){return $GLOBALS['allowed'];}function wp_unslash($v){return $v;}
+function get_current_user_id(){return 7;}
 function check_admin_referer($a){if(!$GLOBALS['nonce'])throw new RuntimeException('invalid nonce');}
 function wp_die($s){throw new RuntimeException($s);}function esc_html($s){return htmlspecialchars((string)$s,ENT_QUOTES);}
 function admin_url($s){return 'https://example.test/wp-admin/'.$s;}
@@ -66,7 +67,30 @@ try {
  $_POST=['confirm_storage'=>'1'];$calls=[];SiteEngine_Ads_Bridge_Inquiries::$ready=SiteEngine_Ads_Bridge_Inquiries::$exists=false;invoke('handle_storage');
  ok($calls===['destination lock','inquiry migration','release','guard migration','destination lock','ledger migration','release'],'fresh storage uses existing migrations in order');
  $calls=[];invoke('handle_storage');ok($calls===['destination lock','release','guard migration','destination lock','ledger migration','release'],'ready inquiry storage never replays migration');
- file_put_contents(SEAB_CONFIG_FILE,$old."\n// changed by external authority\n");ok(reset_config()->configuration_source()==='external','external file drift visibly resumes external authority');
- invoke('handle_save','External SEAB_CONFIG_FILE');
+ file_put_contents(SEAB_CONFIG_FILE,$old."\n// changed by external authority\n");ok(reset_config()->configuration_source()==='settings','explicit authority remains durable after external file drift');
+ $before=$options['seab_settings_v2'];unlink(SEAB_CONFIG_FILE);ok(reset_config()->configuration_source()==='settings','explicit authority survives preserved file removal');
+ ok($options['seab_settings_v2']===$before,'file changes never rewrite saved values');
+ // A missing file is not a valid configuration, nor permission to silently
+ // supersede an intentional override. The ordinary administrator makes the choice.
+ unset($options[SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION],$options['seab_settings_v2']);
+ ok(reset_config()->configuration_source()==='external'&&SiteEngine_Ads_Bridge_Setup::config_file_status()['state']==='missing','external intent and missing file distinguished');
+ $_POST=['confirm_settings_authority'=>'1'];$allowed=false;invoke('handle_authority','Permission denied');$allowed=true;$nonce=false;invoke('handle_authority','invalid nonce');$nonce=true;
+ ok(!isset($options['seab_settings_v2']),'authority capability and nonce precede writes');
+ SiteEngine_Ads_Bridge_Coordination::$blocked=true;invoke('handle_authority','pending');SiteEngine_Ads_Bridge_Coordination::$blocked=false;
+ ok(!isset($options['seab_settings_v2']),'unfinished operation blocks authority choice');
+ invoke('handle_authority');ok(reset_config()->configuration_source()==='settings','explicit missing-file switch enables WordPress without import');
+ ok($options['seab_settings_v2']===SiteEngine_Ads_Bridge_Settings::sanitize_config(SiteEngine_Ads_Bridge_Settings::defaults()),'fresh choice stores disabled incomplete defaults without CRM import');
+ file_put_contents(SEAB_CONFIG_FILE,'<?php throw new RuntimeException("must not execute after settings choice");');
+ ok(reset_config()->configuration_source()==='settings','subsequent throwing file is not evaluated');
+ $options[SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION]=['path'=>SEAB_CONFIG_FILE,'sha256'=>hash('sha256',$old)];
+ ok(reset_config()->configuration_source()==='settings','prior explicit import choice remains durable without hash agreement');
+ unset($options[SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION]);
+ ok(reset_config()->get_load_errors()!==[],'throwing external configuration is diagnosed without fatal page');
+ file_put_contents(SEAB_CONFIG_FILE,'<?php return [;');
+ ok(reset_config()->get_load_errors()!==[],'malformed legacy PHP is diagnosed without importing it');
+ $_POST=['switch_authority'=>'1','external_sha256'=>hash_file('sha256',SEAB_CONFIG_FILE)];$before=$options['seab_settings_v2'];invoke('handle_import','Confirm');
+ ok($options['seab_settings_v2']===$before,'even a matching file hash cannot authorize malformed content import');
+ $_POST=['confirm_settings_authority'=>'1'];$before=$options['seab_settings_v2'];invoke('handle_authority');
+ ok(reset_config()->configuration_source()==='settings'&&$options['seab_settings_v2']===$before,'malformed-file switch preserves existing saved values exactly');
  echo "SUMMARY: $n PASS; actual handlers/resolver; WP/vendor/SQL doubles\n";
 } finally {foreach(glob($fixture.'/*')as$f)unlink($f);rmdir($fixture);}

@@ -8,14 +8,41 @@ final class SiteEngine_Ads_Bridge_Setup {
     public static function executor_owned():bool { return self::$executor_owned; }
     const AUTHORITY_OPTION = 'seab_settings_authority_v1';
 
-    /** A deliberate migration applies only to the reviewed external file bytes. */
+    /** Administrator authority is durable; a preserved file cannot revoke it. */
     public static function settings_authority() {
         $choice = get_option( self::AUTHORITY_OPTION, array() );
-        return SiteEngine_Ads_Bridge_Settings::exists()
-            && is_array( $choice ) && isset( $choice['path'], $choice['sha256'] )
-            && defined( 'SEAB_CONFIG_FILE' ) && $choice['path'] === SEAB_CONFIG_FILE
-            && is_file( SEAB_CONFIG_FILE )
-            && hash_equals( (string) $choice['sha256'], hash_file( 'sha256', SEAB_CONFIG_FILE ) );
+        if (!is_array($choice)) return false;
+        if (($choice['version']??null)===2 && ($choice['authority']??null)==='settings') return true;
+        // Earlier explicit imports already recorded administrator intent. Retain
+        // that choice even if the original path/hash is no longer available.
+        return isset($choice['path'],$choice['sha256']) && is_string($choice['path'])
+            && $choice['path']!=='' && is_string($choice['sha256'])
+            && preg_match('/^[a-f0-9]{64}$/D',$choice['sha256'])===1;
+    }
+
+    /** Metadata only; never include/evaluate a file to decide its availability. */
+    public static function config_file_status():array {
+        $path=defined('SEAB_CONFIG_FILE')&&is_string(SEAB_CONFIG_FILE)?SEAB_CONFIG_FILE:'';
+        $out=['external_flag'=>defined('SEAB_CONFIG_IS_EXTERNAL')&&(bool)SEAB_CONFIG_IS_EXTERNAL,'path'=>$path,'state'=>'path_missing','readable'=>false];
+        if($path==='')return $out;
+        clearstatcache(true,$path);
+        if(!is_dir(dirname($path))||!is_readable(dirname($path))){$out['state']='parent_unavailable_or_inaccessible';return $out;}
+        if(!file_exists($path)){$out['state']='missing';return $out;}
+        if(!is_file($path)){$out['state']='not_regular_file';return $out;}
+        if(!is_readable($path)){$out['state']='unreadable';return $out;}
+        $out['state']='readable_file';$out['readable']=true;return $out;
+    }
+
+    /** Caller holds the existing executor/configuration protection. No file import. */
+    public static function choose_wordpress_settings():void {
+        if(!SiteEngine_Ads_Bridge_Settings::exists()){
+            $defaults=SiteEngine_Ads_Bridge_Settings::sanitize_config(SiteEngine_Ads_Bridge_Settings::defaults());
+            SiteEngine_Ads_Bridge_Settings::save($defaults);
+            if(SiteEngine_Ads_Bridge_Settings::get()!==$defaults)throw new RuntimeException('WordPress settings readback failed;authority was not changed.');
+        }
+        $choice=['version'=>2,'authority'=>'settings','selected_at'=>gmdate('c'),'user_id'=>get_current_user_id(),'previous_file'=>self::config_file_status()];
+        update_option(self::AUTHORITY_OPTION,$choice,false);
+        if(get_option(self::AUTHORITY_OPTION)!==$choice)throw new RuntimeException('Authority choice readback failed;reload Configuration authority before retrying.');
     }
 
     /** Existing route, or the predecessor's deterministic private directory if retained. No mkdir/discovery. */

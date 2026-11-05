@@ -8,10 +8,11 @@
  * and every consumer-facing read resolves against one canonical v2 tree.
  *
  * Configuration authority precedence:
- *   1. Explicit external SEAB_CONFIG_FILE (legacy/operator override)
- *   2. WordPress Ads Bridge settings, with shared client facts from SiteEngine Base
- *   3. Existing plugin-local config/client.php (migration fallback)
- *   4. Safe setup defaults with exports disabled
+ *   1. Explicit administrator choice of WordPress settings (durable)
+ *   2. Explicit external SEAB_CONFIG_FILE if no settings choice was recorded
+ *   3. Saved WordPress Ads Bridge settings, with shared facts from SiteEngine Base
+ *   4. Existing plugin-local config/client.php (only without an explicit choice)
+ *   5. Safe setup defaults with exports disabled
  *
  * Runtime call sites that still read legacy dot-keys (e.g. `timezone` and
  * `sheets.google_ads_import.tab`) resolve
@@ -231,7 +232,7 @@ class SiteEngine_Ads_Bridge_Config {
 	private function load() {
 		// An explicitly defined SEAB_CONFIG_FILE remains the highest-precedence
 		// authority for backward compatibility unless an administrator deliberately
-		// migrates this exact reviewed file to WordPress settings.
+		// chooses WordPress settings. File changes cannot undo that choice.
 		if ( defined( 'SEAB_CONFIG_IS_EXTERNAL' ) && SEAB_CONFIG_IS_EXTERNAL && ! ( class_exists( 'SiteEngine_Ads_Bridge_Setup' ) && SiteEngine_Ads_Bridge_Setup::settings_authority() ) ) {
 			$this->source = 'external';
 			$this->load_php_config( SEAB_CONFIG_FILE );
@@ -247,8 +248,8 @@ class SiteEngine_Ads_Bridge_Config {
 		}
 
 		// Existing plugin-local configs continue running unchanged until the
-		// operator imports them through SiteEngine -> Ads Bridge -> Migration.
-		if ( defined( 'SEAB_CONFIG_FILE' ) && file_exists( SEAB_CONFIG_FILE ) ) {
+		// operator uses Ads Bridge -> Advanced -> Configuration authority.
+		if ( ! (class_exists('SiteEngine_Ads_Bridge_Setup') && SiteEngine_Ads_Bridge_Setup::settings_authority()) && defined( 'SEAB_CONFIG_FILE' ) && file_exists( SEAB_CONFIG_FILE ) ) {
 			$this->source = 'local_file';
 			$this->load_php_config( SEAB_CONFIG_FILE );
 			return;
@@ -274,11 +275,20 @@ class SiteEngine_Ads_Bridge_Config {
 	 */
 	private function load_php_config( $path ) {
 		if ( ! is_string( $path ) || '' === $path || ! file_exists( $path ) ) {
-			$this->load_errors[] = 'Config file is missing.';
+			$state=class_exists('SiteEngine_Ads_Bridge_Setup')?SiteEngine_Ads_Bridge_Setup::config_file_status()['state']:'missing_or_unavailable';
+			$this->load_errors[] = 'Legacy configuration is unavailable ('.$state.'). Open Ads Bridge > Setup > Configuration authority; no content was imported.';
+			return;
+		}
+		if (!is_file($path)||!is_readable($path)) {
+			$this->load_errors[]='Legacy configuration file is not a readable regular file. Open Ads Bridge > Setup > Configuration authority; retain the external configuration or explicitly use WordPress settings without importing it.';
 			return;
 		}
 
-		$raw = require $path;
+		try { $raw = require $path; }
+		catch (Throwable $e) {
+			$this->load_errors[]='Legacy configuration could not be loaded ('.get_class($e).'). No content was imported. Open Ads Bridge > Setup > Configuration authority.';
+			return;
+		}
 		if ( ! is_array( $raw ) ) {
 			$this->load_errors[] = 'Config file did not return an array.';
 			return;

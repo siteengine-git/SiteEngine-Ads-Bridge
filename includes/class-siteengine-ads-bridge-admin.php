@@ -32,6 +32,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		add_action('admin_init',static function(){if(($_GET['page']??'')===self::PAGE_SLUG)SiteEngine_Ads_Bridge_Setup::prepare_storage_for_admin();});
 		add_action( 'admin_post_seab_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_seab_import_config', array( __CLASS__, 'handle_import' ) );
+		add_action('admin_post_seab_use_settings',array(__CLASS__,'handle_authority'));
 		add_action( 'admin_post_seab_initialize_storage', array( __CLASS__, 'handle_storage' ) );
 		add_action('admin_post_seab_verify_setup',array(__CLASS__,'handle_verification'));
 		add_action('admin_post_seab_provision_fields',array(__CLASS__,'handle_fields'));
@@ -117,7 +118,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '</ol>';
 
 		echo '<h3>Configuration authority</h3>';
-		echo '<p>Normal installations use WordPress Ads Bridge settings plus shared SiteEngine Base data. Legacy external <code>SEAB_CONFIG_FILE</code> controls values until an administrator deliberately imports and switches authority in Migration. This choice is bound to the reviewed file path/hash; later file changes visibly restore external authority. Plugin-local <code>config/client.php</code> is supported as a migration fallback.</p>';
+		echo '<p>Normal installations use WordPress Ads Bridge settings plus shared SiteEngine Base data. Legacy external <code>SEAB_CONFIG_FILE</code> is retained until an administrator chooses WordPress settings in Setup > Configuration authority. Importing readable legacy values is optional. The explicit choice remains in effect when the preserved file changes or is removed. Plugin-local <code>config/client.php</code> is supported as a migration fallback.</p>';
 
 		echo '<h3>Export safety rules</h3><ul>';
 		echo '<li>Writes require explicit <code>--apply</code>; preview modes write nothing.</li>';
@@ -149,7 +150,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 				$messages[] = $issue['label'] . ': ' . $issue['message'] . ' Open ' . $issue['destination'] . '.';
 			}
 			if ( 'external' === $source ) {
-				$messages[] = 'External configuration is active; UI saves do not replace SEAB_CONFIG_FILE. Review the override in Ads Bridge Migration.';
+				$messages[] = 'External configuration is active; UI saves do not replace SEAB_CONFIG_FILE. Open Ads Bridge > Setup > Configuration authority.';
 			}
 			return array(
 				'status'  => 'setup_required',
@@ -355,7 +356,7 @@ final class SiteEngine_Ads_Bridge_Admin {
         echo '<nav class="seab-primary" aria-label="Ads Bridge">';foreach($tabs as$key=>$label)echo '<a '.($key===$tab?'aria-current="page" ':'').'href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab='.$key)).'">'.esc_html($label).'</a>';echo '</nav>';
         if(isset($_GET['seab_saved']))echo '<div class="notice notice-success" role="status"><p>Ads Bridge settings saved. Incomplete setup remains editable.</p></div>';
         if(isset($_GET['seab_imported']))echo '<div class="notice notice-success" role="status"><p>Legacy settings imported. Original configuration preserved.</p></div>';
-        if($config->external_override_active()&&$tab!=='advanced')echo '<div class="notice notice-warning"><p>An external configuration controls these values. <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=advanced&section=legacy')).'">Review Import legacy settings</a> before changing settings.</p></div>';
+        if($config->external_override_active()&&$tab!=='advanced')echo '<div class="notice notice-warning"><p>An external configuration controls these values. <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=setup&section=authority')).'">Choose configuration authority</a> before changing settings.</p></div>';
         echo '<div class="seab-scroll">';
         if($tab==='overview')self::render_overview($config);
         elseif($tab==='setup')self::render_setup_workflow($config,$section);
@@ -396,9 +397,10 @@ final class SiteEngine_Ads_Bridge_Admin {
         $job=\SiteEngine\AdsBridge\Import\Store::job();$imported=$job&&($job['status']??'')==='complete';
         $form=SiteEngine_Ads_Bridge_Setup::form_connection((int)$config->get('fluent_forms.form_id',0),(array)$config->get('fluent_forms.fields',[]));
         if($section==='')$section=!$base?'business':(!$imported?'crm':(!$form['ready']?'form':(($config->get('google_sheets.spreadsheet_id','')===''||$config->get('google_sheets.credentials_path','')==='')?'connections':'review')));
+        self::render_authority($config);
         echo '<h2>Complete setup in order</h2><p>Save each step as you go. Completed steps stay collapsed and editable. Saving incomplete setup does not enable delivery.</p>';
         self::step('business','1. Read shared Business Data',$base,$section,static fn()=>self::render_shared_business($config));
-        self::step('crm','2. Import CRM configuration',$imported,$section,static function()use($config,$imported){if($imported)echo '<p>Imported configuration and CRM mappings are retained; no need to enter them again.</p>';\SiteEngine\AdsBridge\Import\Admin::render();echo '<details><summary>Edit CRM mappings and optional sources</summary>';self::render_lifecycle($config);echo '</details><details><summary>Standard CRM field definitions</summary>';self::render_field_provisioning();echo '</details>';});
+        self::step('crm','2. Import CRM configuration',$imported,$section,static function()use($config,$imported){if($imported)echo '<p>Imported configuration and CRM mappings are retained; no need to enter them again.</p>';else echo '<p>CRM configuration has not been imported. This does not block saving Ads settings and does not mean FluentCRM is missing. Existing mappings may be configured below; missing dependencies and invalid mappings are reported separately.</p>';\SiteEngine\AdsBridge\Import\Admin::render();echo '<details><summary>Edit CRM mappings and optional sources</summary>';self::render_lifecycle($config);echo '</details><details><summary>Standard CRM field definitions</summary>';self::render_field_provisioning();echo '</details>';});
         self::step('form','3. Select and verify the lead form',$form['ready']&&$form['mapping']===(array)$config->get('fluent_forms.fields',[])&&SiteEngine_Ads_Bridge_Setup::verification('submission',$config)['valid'],$section,static fn()=>self::render_setup($config));
         $connection=$config->get('google_sheets.spreadsheet_id','')!==''&&$config->get('google_sheets.credentials_path','')!=='';
         self::step('connections','4. Google Sheets and conversion settings',$connection,$section,static function()use($config){self::render_sheets($config);self::render_exports($config);self::verification_form('timezone',$config);});
@@ -420,13 +422,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		);
 		$label = isset( $labels[ $source ] ) ? $labels[ $source ] : $source;
 		echo '<p><strong>Configuration authority:</strong> ' . esc_html( $label ) . '.</p>';
-		if ( 'external' === $source ) {
-			if ( get_option( SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION, array() ) ) { echo '<div class="notice notice-error inline"><p>The external file no longer matches the reviewed migration binding. External authority has resumed. Review Migration before any further settings save.</p></div>'; }
-
-			echo '<div class="notice notice-warning inline"><p><strong>External override active.</strong> Settings saves are blocked while this file controls values. In Migration, deliberately import and switch authority to WordPress settings, or retain the external authority. <a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration' ) ) . '">Review configuration authority in Migration</a>.</p></div>';
-		} elseif ( 'local_file' === $source ) {
-			echo '<div class="notice notice-info inline"><p>An existing plugin-local PHP config is active. Use the Migration tab to import it into Base-managed settings.</p></div>';
-		}
+		self::render_authority($config);
 	}
 
 	/** @return void */
@@ -618,34 +614,44 @@ final class SiteEngine_Ads_Bridge_Admin {
 	}
 
 	/** @return void */
-	private static function render_migration( $config ) {
-		$source = $config->configuration_source();
-		echo '<h2>Import legacy settings</h2>';
-		echo '<p>Current authority: <strong>' . esc_html( $source ) . '</strong></p>';
-		if ( 'local_file' === $source || 'external' === $source ) {
-			echo '<p>Ads Bridge can copy the currently resolved schema-v2 configuration into WordPress settings. Shared client values will then be supplied by SiteEngine Base.</p>';
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="seab_import_config">';
-			wp_nonce_field( 'seab_import_config' );
-			if ( 'external' === $source ) {
+    private static function render_migration($config) { self::render_authority($config); }
 
-				echo '<p><label><input required type="checkbox" name="switch_authority" value="1"> Import the current effective values and make WordPress settings authoritative for this external file.</label></p>';
-				echo '<input type="hidden" name="external_sha256" value="' . esc_attr( is_file( SEAB_CONFIG_FILE ) ? hash_file( 'sha256', SEAB_CONFIG_FILE ) : '' ) . '">';
-			}
-			submit_button( 'Import legacy settings', 'primary', 'submit', false );
-			echo '</form>';
-			if ( 'external' === $source ) {
+    /** Always reachable from normal Setup, even with missing/unreadable legacy files. */
+    private static function render_authority($config) {
+        $source=$config->configuration_source();$file=SiteEngine_Ads_Bridge_Setup::config_file_status();
+        echo '<section id="seab-configuration-authority"><h3>Configuration authority</h3>';
+        if(SiteEngine_Ads_Bridge_Setup::settings_authority()){
+            echo '<p><strong>WordPress settings explicitly selected.</strong> The preserved legacy file is inactive. Changing or removing it will not reverse this choice. Shared facts come from Business Data.</p>';
+        }elseif(!in_array($source,['external','local_file'],true)){
+            echo '<p>WordPress settings are available. Save incomplete setup now; CRM import, credentials access and export readiness are not required to save.</p>';
+        }else{
+            echo '<p><strong>Legacy file authority is selected.</strong> The external flag alone does not establish that a valid configuration was loaded. Keep intentional file authority by leaving it selected, or explicitly choose WordPress settings below.</p>';
+            echo '<p>File status: <strong>'.esc_html($file['state']).'</strong>. Path: <code>'.esc_html($file['path']).'</code>.</p>';
+            foreach($config->get_load_errors()as$error)echo '<p>'.esc_html($error).'</p>';
+            echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_use_settings">';
+            wp_nonce_field('seab_use_settings');
+            echo '<p><label><input required type="checkbox" name="confirm_settings_authority" value="1"> Use WordPress settings. Keep existing saved Ads values, or start with disabled setup defaults if none are saved. Do not import the legacy file.</label></p>';
+            submit_button('Use WordPress settings','primary','submit',false);echo '</form><p>The original file and wp-config.php are preserved. This choice remains effective after later file changes or removal. Saving incomplete settings is allowed.</p>';
+            if($file['readable']&&!$config->get_load_errors()){
+                echo '<details><summary>Import legacy settings instead</summary><p>Optional: copy the currently loaded values after reviewing this exact file. Shared facts then come from Base. Existing WordPress values are replaced only by this explicit import; review delivery flags before confirming.</p><form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_import_config">';
+                wp_nonce_field('seab_import_config');echo '<input type="hidden" name="external_sha256" value="'.esc_attr(hash_file('sha256',SEAB_CONFIG_FILE)).'"><p><label><input required type="checkbox" name="switch_authority" value="1"> Import these reviewed values and durably use WordPress settings.</label></p>';
+                submit_button('Import legacy settings','secondary','submit',false);echo '</form></details>';
+            }else echo '<p>No legacy content can be imported from this state. Choosing WordPress settings does not read or import that content.</p>';
+        }
+        echo '</section>';
+    }
 
-				echo '<div class="notice notice-warning inline"><p>This deliberate switch preserves the external file and wp-config.php. It binds your choice to the current file path and SHA-256. If that file changes later, external authority resumes visibly and must be reviewed again. Shared business facts then come from Business Data. Export and automation flags are copied as configured; review them before switching.</p></div>';
-			} else {
-				echo '<p>For plugin-local config installations, imported settings become authoritative on the next request. The old file may remain as an inert fallback until cleanup.</p>';
-			}
-		} elseif ( 'settings' === $source ) {
-			echo '<p>Ads Bridge is already using Base-managed WordPress settings. No config migration is required.</p>';
-			if ( SiteEngine_Ads_Bridge_Setup::settings_authority() ) { echo '<p>The administrator deliberately migrated the external configuration to settings. The preserved external file is inactive while its reviewed hash matches. Business Data controls shared facts; Ads Bridge tabs control Ads values.</p>'; }
-		} else {
-			echo '<p>No legacy PHP configuration is active. Complete setup using the other tabs.</p>';
-		}
-	}
+    public static function handle_authority() {
+        if(!current_user_can('manage_options'))wp_die('Permission denied.');
+        check_admin_referer('seab_use_settings');
+        if(self::post_text('confirm_settings_authority')!=='1')wp_die('Confirm Use WordPress settings in Ads Bridge > Setup > Configuration authority.');
+        $before=SiteEngine_Ads_Bridge_Settings::get();$choice=get_option(SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION,null);
+        try{SiteEngine_Ads_Bridge_Setup::with_configuration(static function()use($before,$choice){
+            if(SiteEngine_Ads_Bridge_Settings::get()!==$before||get_option(SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION,null)!==$choice)throw new RuntimeException('Configuration changed during this request;reload before choosing authority.');
+            SiteEngine_Ads_Bridge_Setup::choose_wordpress_settings();
+        });}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
+        wp_safe_redirect(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=setup&section=authority&seab_authority_saved=1'));exit;
+    }
 
 	/**
 	 * Save one UI tab while preserving unexposed fields and mappings.
@@ -657,7 +663,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 			wp_die( 'Permission denied.' );
 		}
 		check_admin_referer( 'seab_save_settings' );
-		if ( SiteEngine_Ads_Bridge_Config::instance()->external_override_active() ) { wp_die( 'External SEAB_CONFIG_FILE controls these values. Use Ads Bridge > Migration to import and deliberately switch authority before saving settings.' ); }
+		if ( SiteEngine_Ads_Bridge_Config::instance()->external_override_active() ) { wp_die( 'External SEAB_CONFIG_FILE controls these values. Open Ads Bridge > Setup > Configuration authority to keep intentional file authority or choose WordPress settings without importing the file. File status: ' . SiteEngine_Ads_Bridge_Setup::config_file_status()['state'] ); }
 		$tab = isset( $_POST['seab_tab'] ) ? sanitize_key( wp_unslash( $_POST['seab_tab'] ) ) : 'setup';
 		$saved_before = SiteEngine_Ads_Bridge_Settings::get();
 
@@ -739,15 +745,16 @@ final class SiteEngine_Ads_Bridge_Admin {
 		check_admin_referer( 'seab_import_config' );
 		$config = SiteEngine_Ads_Bridge_Config::instance();
 		if ( ! in_array( $config->configuration_source(), array( 'local_file', 'external' ), true ) ) {
-			wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=setup&section=authority' ) );
 			exit;
 		}
 		try { SiteEngine_Ads_Bridge_Setup::with_configuration( static function() use ( $config ) {
-			$choice = null;
-			if ( $config->external_override_active() ) {
+			$choice = true;
+			// Both local and external imports require the exact readable review.
+			{
 				$hash = self::post_text( 'external_sha256' );
-				if ( self::post_text( 'switch_authority' ) !== '1' || ! is_file( SEAB_CONFIG_FILE ) || ! hash_equals( hash_file( 'sha256', SEAB_CONFIG_FILE ), $hash ) ) { throw new RuntimeException( 'Confirm the deliberate authority switch in Migration. The external file must still match the displayed review.' ); }
-				$choice = array( 'path' => SEAB_CONFIG_FILE, 'sha256' => $hash );
+				if ( self::post_text( 'switch_authority' ) !== '1' || !SiteEngine_Ads_Bridge_Setup::config_file_status()['readable'] || $config->get_load_errors() || ! hash_equals( hash_file( 'sha256', SEAB_CONFIG_FILE ), $hash ) ) { throw new RuntimeException( 'Confirm the reviewed import in Ads Bridge > Setup > Configuration authority. The readable file must still match; no missing, unreadable or invalid content is imported.' ); }
+				$choice = true;
 			}
 			$data = $config->all();
 			foreach ( SiteEngine_Ads_Bridge_Config::lifecycle_roles() as $role ) { $data['fluentcrm']['tags']['lifecycle'][ $role ] = $config->get( 'fluentcrm.tags.lifecycle.' . $role, '' ); }
@@ -755,11 +762,10 @@ final class SiteEngine_Ads_Bridge_Admin {
 			SiteEngine_Ads_Bridge_Settings::save( $data );
 			if ( SiteEngine_Ads_Bridge_Settings::get() !== $data ) { throw new RuntimeException( 'Imported settings readback failed; external authority has not been changed.' ); }
 			if ( null !== $choice ) {
-				update_option( SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION, $choice, false );
-				if ( get_option( SiteEngine_Ads_Bridge_Setup::AUTHORITY_OPTION ) !== $choice ) { throw new RuntimeException( 'Authority switch readback failed. Review Migration before retrying.' ); }
+				SiteEngine_Ads_Bridge_Setup::choose_wordpress_settings();
 			}
 		} ); } catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
-		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=migration&seab_imported=1' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=setup&section=authority&seab_imported=1' ) );
 		exit;
 	}
 

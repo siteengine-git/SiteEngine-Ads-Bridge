@@ -1,3 +1,13 @@
+## 0.8.1
+
+- Add Setup > Configuration authority: explicitly select WordPress settings without
+  importing an unavailable legacy file; preserve saved values and original files.
+- Keep administrator authority durable after legacy file changes/removal, including
+  previously recorded explicit imports. Preserve intentional external overrides.
+- Diagnose missing/unreadable/invalid files without a fatal page; keep protected
+  ownership and settings saves independent of CRM import/credential readiness.
+- Replace obsolete Migration directions and distinguish import status from dependencies.
+
 ## 0.8.0
 
 - Four primary areas: Overview, ordered Setup, existing Leads queue, Advanced.
