@@ -20,6 +20,8 @@ WordPress/vendor/SQL doubles are identified in local results.
 
 Main Alma has one genuine credentials-access failure with its original sink flag
 preserved: Doctor35 PASS/5 WARN/1 FAIL; all four export families disabled. No claimed
-service-account access, live delivery, client fix or new producer export acceptance.
+service-account access, live delivery or client fix. Final CRM0.3.18 compatibility,
+normal authenticated administrator HTTP export/download and exact Ads binding pass.
+This is carried-forward HTTP/native evidence, not a new browser-click test.
 The reported installation itself was not inspected; its correction is not asserted.
 See RESULTS.json for exact coverage and retained test-tool failure/restoration receipts.

@@ -1,0 +1,33 @@
+{
+  "result": "PASS;final handback accepted by Ads Helper",
+  "CRM_source_commit": "9076e3d62237bc1fceb79a0064355d8815fe81e6",
+  "CRM_tag": "v0.3.18",
+  "CRM_plugin_ZIP_sha256": "33dd4dd21ef3ac0adbda3b1a088d9506999aaae63c069eb7e1596db7f71a6b26",
+  "evidence_url": "https://github.com/siteengine-git/siteengine-crm-configuration/blob/9076e3d62237bc1fceb79a0064355d8815fe81e6/docs/ADS-081-COEXISTENCE-0318-RESULTS.json",
+  "evidence_git_blob_sha1": "2bc1ec981f162624eef001a053ba56c180a31125",
+  "evidence_sha256": "0c1c872ee7a4d9dc413175de1a340d49934e007bd8162015d73a7df5689b6a44",
+  "Ads_source_commit": "1376f31df2e51b0af276537ad0650493b7952bd0",
+  "Ads_ZIP_sha256": "8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d",
+  "Ads_bootstrap_sha256": "f8983f5e6ba18262bb8c31f859447cb35825b7667d8348a1e815e0c6d4085bee",
+  "compatibility": "compatible;bootstrap version-only;administrator authority/save changes reviewed;coordination,inquiry,contract and importer implementations unchanged",
+  "installed_Ads_payloads_verified": 50,
+  "normal_authenticated_administrator_export_download": true,
+  "browser_click_acceptance": false,
+  "export_sha256": "ec3beece625693abe25fa90267b249059e579848a7c83f139a3946e8e81cc6e5",
+  "native_objects": 93,
+  "dependencies": 24,
+  "relationships": 66,
+  "native_configuration_and_ids_unchanged": true,
+  "mapping_settings_checkpoint_and_protected_rows_unchanged": true,
+  "previous_export_preserved": true,
+  "job": {
+    "job_id": "04e296206e93bb9359af011d86cf266c",
+    "state": "complete",
+    "inflight": null
+  },
+  "executor_released": true,
+  "owned_staging_removed": true,
+  "new_consumer_requirement": false,
+  "destination_import_tests_repeated": false,
+  "publication_only": "Pinned completed evidence carried forward;no server request,test rerun,live export or client operation by Ads release task"
+}

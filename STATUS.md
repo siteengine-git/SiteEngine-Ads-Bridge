@@ -1,3 +1,21 @@
+## Stable0.8.1 accepted — publication in progress,2026-11-05
+
+Final Helper acceptance resolves the producer gate:CRM0.3.18 source/tag
+9076e3d62237bc1fceb79a0064355d8815fe81e6/v0.3.18. Exact final Ads binding reviewed;
+50 installed payloads match. Normal authenticated administrator HTTP export/download
+PASS,previous export/native IDs/configuration/protected rows preserved. Job
+04e296206e93bb9359af011d86cf266c complete/inflightnull/executor released.
+Exportec3beece625693abe25fa90267b249059e579848a7c83f139a3946e8e81cc6e5.
+Pinned remote evidence independently read;see releases/0.8.1/CRM-ACCEPTANCE.json.
+No new browser-click,destination-import or Ads acceptance campaign.
+
+Unchanged ZIP8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d;
+manifestc118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3.
+All51 members/50 payloads freshly match accepted source1376f31df2e51b0af276537ad0650493b7952bd0.
+No runtime/website/settings changes for release. Credentials accessibility unresolved,
+separately reported installation not verified,all four export familiesdisabled.
+Stable tag/assets/one-ZIP delivery verification recorded in final publication receipt.
+
 ## 0.8.1 — authority/save correction Alma-verified,2026-11-05
 
 Source1376f31df2e51b0af276537ad0650493b7952bd0 pushed. Released0.8.0 exact missing-file

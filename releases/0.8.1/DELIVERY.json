@@ -11,7 +11,8 @@
   "installed": "Alma only",
   "verified": "documented focused scope",
   "released": false,
-  "designation": "Alma-verified maintenance successor;stable GitHub release not published;reported installation not verified",
+  "designation": "Stable0.8.1 accepted;publication pending receipt",
   "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
-  "delivery_zip_count": 1
+  "delivery_zip_count": 1,
+  "CRM_compatibility": "PASS:CRM0.3.18@9076e3d62237bc1fceb79a0064355d8815fe81e6"
 }

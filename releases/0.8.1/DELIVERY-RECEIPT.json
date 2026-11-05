@@ -12,5 +12,7 @@
   "packaged": true,
   "installed": "Alma",
   "verified": "documented authority/settings scope",
-  "stable_GitHub_release_published": false
+  "stable_GitHub_release_published": false,
+  "CRM_compatibility": "PASS:CRM0.3.18@9076e3d62237bc1fceb79a0064355d8815fe81e6",
+  "designation": "Stable0.8.1 accepted;publication pending receipt"
 }

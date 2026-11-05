@@ -41,3 +41,11 @@ without file drift. Its older version-1 choice is also file-bound. Review effect
 authority before any downgrade; it is not a way to restore ordinary settings saves.
 Preserve the new choice/settings and original file; never reset authority implicitly.
 No client deployment is included in Alma verification.
+
+
+Final producer compatibility: CRM0.3.18 at9076e3d62237bc1fceb79a0064355d8815fe81e6
+accepts these exact Ads bytes. Normal authenticated administrator export/download
+passed;previous export/content/journals preserved;completed job released ownership.
+The separate CRM producer plugin is not a destination-installation prerequisite.
+See CRM-ACCEPTANCE.json and PUBLICATION.json. Credentials accessibility remains
+unresolved;the separately reported installation has not been inspected or verified.
