@@ -1,3 +1,23 @@
+## RELEASED stable0.8.1 — 2026-11-05
+
+Implemented / packaged / main-Alma installed / focused verified / released:YES.
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.1
+Remote tagv0.8.1 pins accepted source/evidencecd9d5bca7bed9a2fd984d516dc9ae65a703b7d80;
+runtime source1376f31df2e51b0af276537ad0650493b7952bd0. Tested ZIP unchanged:
+8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d;
+manifestc118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3.
+All seven remote asset digests/sizes and fresh public downloads byte-verified.
+Physical D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+contains exactly ONE0.8.1 ZIP with matching release documents;archives preserved.
+
+Accepted CRM0.3.18 at9076e3d62237bc1fceb79a0064355d8815fe81e6:exact bindings,
+50 installed Ads payloads,normal authenticated HTTP export/download PASS;original
+jobcomplete/inflightnull/executor released. No new browser-click claim. Completed
+Ads acceptance carried forward;no runtime,site,client or export operation for release.
+Credentials accessibility remains unresolved (Doctor35PASS/5WARN/1FAIL);all four
+export familiesdisabled. The separately reported installation remains NOT verified.
+See releases/0.8.1/PUBLICATION.json,CRM-ACCEPTANCE.json and delivery receipt.
+
 ## Stable0.8.1 accepted — publication in progress,2026-11-05
 
 Final Helper acceptance resolves the producer gate:CRM0.3.18 source/tag

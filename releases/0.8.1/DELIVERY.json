@@ -10,9 +10,12 @@
   "packaged": true,
   "installed": "Alma only",
   "verified": "documented focused scope",
-  "released": false,
-  "designation": "Stable0.8.1 accepted;publication pending receipt",
+  "released": true,
+  "designation": "Stable0.8.1 published;accepted Alma scope and reported-installation limitation retained",
   "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
   "delivery_zip_count": 1,
-  "CRM_compatibility": "PASS:CRM0.3.18@9076e3d62237bc1fceb79a0064355d8815fe81e6"
+  "CRM_compatibility": "PASS:CRM0.3.18@9076e3d62237bc1fceb79a0064355d8815fe81e6",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.1",
+  "tag": "v0.8.1",
+  "tag_commit": "cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80"
 }

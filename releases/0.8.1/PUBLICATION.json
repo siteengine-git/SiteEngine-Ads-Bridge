@@ -1,0 +1,69 @@
+{
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.1",
+  "published_at": "2026-11-05T23:10:56Z",
+  "tag": "v0.8.1",
+  "accepted_commit": "cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80",
+  "runtime_source_commit": "1376f31df2e51b0af276537ad0650493b7952bd0",
+  "draft": false,
+  "prerelease": false,
+  "published_state_verified": true,
+  "assets": [
+    {
+      "name": "siteengine-ads-bridge-0.8.1.zip",
+      "sha256": "8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d",
+      "size": 277773,
+      "github_digest": "sha256:8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/siteengine-ads-bridge-0.8.1.zip",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "MANIFEST.json",
+      "sha256": "c118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3",
+      "size": 9797,
+      "github_digest": "sha256:c118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/MANIFEST.json",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "sha256": "ea4734d917a354edbb5161c6d90066864df4b1ba5020e4afff839310b403a3ad",
+      "size": 515,
+      "github_digest": "sha256:ea4734d917a354edbb5161c6d90066864df4b1ba5020e4afff839310b403a3ad",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/SHA256SUMS.txt",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "INSTALL-AND-UPGRADE.md",
+      "sha256": "aa036eecf78407743dafa916afbe0b8a0318b60b74e6d8ef41ce1b97ed9afdfc",
+      "size": 3337,
+      "github_digest": "sha256:aa036eecf78407743dafa916afbe0b8a0318b60b74e6d8ef41ce1b97ed9afdfc",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/INSTALL-AND-UPGRADE.md",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "RELEASE-NOTES.md",
+      "sha256": "9a39338a225dcaecb18a2a46e3b7997144535930500b3a245367bb2c8267882d",
+      "size": 1812,
+      "github_digest": "sha256:9a39338a225dcaecb18a2a46e3b7997144535930500b3a245367bb2c8267882d",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/RELEASE-NOTES.md",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "RESULTS.json",
+      "sha256": "ade1f7f3e86d3448c77e30dac1d8201fd1e33e272c8d8aac8d5b54a93acfa0c1",
+      "size": 10404,
+      "github_digest": "sha256:ade1f7f3e86d3448c77e30dac1d8201fd1e33e272c8d8aac8d5b54a93acfa0c1",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/RESULTS.json",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "CRM-ACCEPTANCE.json",
+      "sha256": "56ab330cacfe4ef240939a58efc88603244bafc7151f38147870da1039459f7f",
+      "size": 1857,
+      "github_digest": "sha256:56ab330cacfe4ef240939a58efc88603244bafc7151f38147870da1039459f7f",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.8.1/CRM-ACCEPTANCE.json",
+      "download_bytes_verified": true
+    }
+  ],
+  "all_seven_public_downloads_byte_verified": true
+}
