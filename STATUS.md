@@ -1,3 +1,35 @@
+## 0.8.1 — authority/save correction Alma-verified,2026-11-05
+
+Source1376f31df2e51b0af276537ad0650493b7952bd0 pushed. Released0.8.0 exact missing-file
+external rejection reproduced through ordinary authenticated Alma POST. Reported
+installation itself not accessed;main Alma initially externalflagfalse/source settings.
+Setup > Configuration authority now offers explicit durable WordPress choice with
+no legacy import required. Existing settings/custom mappings/files preserved;missing/
+unreadable/malformed files diagnosed;intentional overrides stay selected until choice.
+Prior explicit imports stay durable after drift/removal. Obsolete Migration text fixed;
+CRM import absence distinguished from missing dependencies/invalid mappings.
+
+140 focused local assertions PASS;seven native authenticated HTTP scenarios plus
+three final-byte delta cases PASS,including actual Linux unreadability. No CRM import,
+credential access or readiness required for incomplete saves. Main51 exact members/
+29 PHP8.3.36 lints PASS;ordinary authenticated save and fresh exact-path readback PASS.
+Main original settings hash exactly restored after caught helper-checkbox omission;
+corrected helper preserves checked controls. Doctor35PASS/5WARN/1FAIL:actual credentials
+parent access failure retained;all four export familiesfalse,original sink flag retained.
+Initial post-install diagnostic omitted an argument;failure retained,installation not
+replayed,independent readback proves exact files/14 managed tables/60 critical options.
+No fabricated Ready or client fix. Detailed incidents/evidence in local authority work.
+
+ZIP8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d;
+manifestc118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3.
+Implemented/packaged/main-Alma installed/focused verified YES;stable release/tag NOT
+published. No new CRM0.8.1 producer gate accepted. Prior0.8.0 release/archives preserved.
+Physical Plugins/..Deliverables promotion verified:exactly ONE0.8.1 ZIP with matching
+documents;0.8.0 archived byte-identical outside delivery. See DELIVERY-RECEIPT.json.
+Cleanup50 owned tables/WordPress copy removed,zero foreign refs;own workers/listeners/
+forward/sessions stopped/revoked;private backups/journals/failure evidence retained.
+No clients,real deliveries,exports,Consent/history rewrite or broad acceptance rerun.
+
 ## RELEASED stable 0.8.0 — 2026-11-05
 
 Implemented / packaged / main-Alma installed / verified / released:YES.

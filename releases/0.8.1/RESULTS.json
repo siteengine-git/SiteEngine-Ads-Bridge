@@ -1,0 +1,212 @@
+{
+  "version": "0.8.1",
+  "code_commit": "1376f31df2e51b0af276537ad0650493b7952bd0",
+  "baseline": "stable0.8.0",
+  "target": "Alma development only",
+  "demonstrated_causes": [
+    "0.8.0 uses the external flag to select external authority even when the file is missing;normal settings POST rejects before its callback.",
+    "Prior authority selection requires a matching current file path/hash;later file change/removal silently resumes external authority.",
+    "The former switch UI requires a readable file/import and points to obsolete Migration directions;it cannot rescue missing/unreadable files.",
+    "Uncaught PHP file-load errors can interrupt setup;now diagnosed without importing content."
+  ],
+  "reported_installation_limit": "Not accessed or identified as Alma;no client access or site-specific fix claimed. Main Alma inspection found external flagfalse,local fileabsent,no saved choice,source settings.",
+  "reproduction": {
+    "released_version": "0.8.0",
+    "external_flag": true,
+    "file": "missing",
+    "ordinary_authenticated_POST": true,
+    "exact_rejection_reproduced": true
+  },
+  "local": {
+    "assertions": 140,
+    "suites": {
+      "administrator-setup": 32,
+      "setup-reporting": 30,
+      "successor-bootstrap": 19,
+      "setup-workflow": 16,
+      "completed-predecessor-settings": 43
+    },
+    "boundaries": "Actual PHP algorithms/handlers and local filesystem;WordPress/vendor/SQL boundaries doubled. Windows permission skips identified;new unreadable authority file exercised natively on Alma. Unchanged producer-reader native58 evidence carried forward,not rerun."
+  },
+  "native_administrator_cases": [
+    {
+      "case": "clean",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "missing",
+      "preserved_file_changes_cannot_reverse_choice": false
+    },
+    {
+      "case": "valid-existing",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "readable_file",
+      "preserved_file_changes_cannot_reverse_choice": true
+    },
+    {
+      "case": "missing",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "missing",
+      "preserved_file_changes_cannot_reverse_choice": true
+    },
+    {
+      "case": "unreadable",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "unreadable",
+      "preserved_file_changes_cannot_reverse_choice": true
+    },
+    {
+      "case": "malformed",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "readable_file",
+      "preserved_file_changes_cannot_reverse_choice": true
+    },
+    {
+      "case": "legacy-reviewed-choice",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "readable_file",
+      "preserved_file_changes_cannot_reverse_choice": true
+    },
+    {
+      "case": "reviewed-import",
+      "PASS": true,
+      "ordinary_authenticated_save": true,
+      "fresh_request_exact_path": true,
+      "imports_required": false,
+      "credentials_access_claimed": false,
+      "disabled_exports": true,
+      "original_state": "readable_file",
+      "preserved_file_changes_cannot_reverse_choice": true
+    }
+  ],
+  "initial_case_package_sha256": "d2f2558350c6f125e8044d29f3b5b0277407fe3e8abce9003976789680bef147",
+  "final_delta": "Only missing-file diagnostic and validation of local-file imports changed after seven-case run;final exact bytes verified with valid/malformed local imports and missing-file choice,plus main ordinary save.",
+  "final_package_native": {
+    "version": "0.8.1",
+    "members": 51,
+    "PHP_lints": 29,
+    "PHP": "8.3.36",
+    "manifest_sha256": "c118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3",
+    "cases": [
+      {
+        "case": "final-local-valid",
+        "PASS": true,
+        "ordinary_HTTP_save": true,
+        "fresh_exact_readback": true,
+        "unverified_content_imported": false
+      },
+      {
+        "case": "final-local-malformed",
+        "PASS": true,
+        "ordinary_HTTP_save": true,
+        "fresh_exact_readback": true,
+        "unverified_content_imported": false
+      },
+      {
+        "case": "final missing-file diagnostic/explicit choice",
+        "PASS": true,
+        "ordinary_HTTP_action": true
+      }
+    ]
+  },
+  "main_Alma": {
+    "version": "0.8.1",
+    "members": 51,
+    "PHP_lints": 29,
+    "PHP": "8.3.36",
+    "source": "settings",
+    "errors": [],
+    "ordinary_authenticated_Sheets_save": true,
+    "fresh_request_exact_path_readback": true,
+    "exact_original_settings_hash_restored_and_verified": true,
+    "original_custom_mappings_preserved": true,
+    "managed_table_checksums_match": [
+      "se_ads_export_ledger",
+      "se_ads_inquiries",
+      "se_ads_configuration_guard",
+      "se_consent_receipts",
+      "se_consent_chains",
+      "se_consent_events",
+      "fc_lists",
+      "fc_tags",
+      "fc_subscribers",
+      "fc_campaigns",
+      "fc_funnels",
+      "fc_funnel_sequences",
+      "posts",
+      "postmeta"
+    ],
+    "critical_options_checked": 60,
+    "Doctor": {
+      "PASS": 35,
+      "WARN": 5,
+      "FAIL": 1,
+      "PENDING": 0
+    },
+    "actual_failure": "Google Sheets credentials:parent unavailable/inaccessible in CLI UID5004;no contents read",
+    "four_export_families_disabled": true,
+    "prior_sink_flag_retained": true,
+    "pending_none": true
+  },
+  "test_tool_incidents": [
+    {
+      "incident": "Post-replacement diagnostic omitted required capability argument",
+      "disposition": "Retained failure receipt;independent corrected readback proved exact files/preserved state;installation was not replayed;not a website outage."
+    },
+    {
+      "incident": "HTTP helper omitted checked sink checkbox",
+      "disposition": "Original HTML and pre-installation serialized settings hash proved exact single-flag delta;restored only that flag through ordinary authenticated form;corrected second save preserved checked controls;fresh settings hash exactly matches pre-installation. Real Doctor failure retained."
+    },
+    {
+      "incident": "Corrected helper GET initially rejected403",
+      "disposition": "No POST ran;using same User-Agent as successful existing operator path returned normal page;no access/security changes."
+    }
+  ],
+  "cleanup": {
+    "owned_tables_removed": 50,
+    "remaining_owned_tables": 0,
+    "foreign_references": 0,
+    "fixture_WordPress_removed": true,
+    "own_HTTP_worker_listener_forward_stopped": true,
+    "own_temporary_sessions_revoked": true,
+    "other_main_sessions_preserved": true,
+    "private_backups_journals_and_failure_receipts_retained": true,
+    "owner": "Ads Codex"
+  },
+  "preservation": "Consent,coordination,inquiries,lifecycle,time,CLI export and importer engine/transport code unchanged from0.8.0. No original table fixtures,client access,exports or sends.",
+  "remaining_limits": [
+    "Reported installation needs its own authority-state evidence;Alma reproduction does not identify its actual file.",
+    "Service-account access and live delivery unverified;four exports disabled.",
+    "CRM0.3.17 acceptance is for0.8.0;no new producer export or candidate binding acceptance for0.8.1 is claimed.",
+    "Historical serialized cron payload remains uncaptured;no scheduler restoration task.",
+    "Prior0.8.0 does not understand new authority record;downgrade requires effective-authority review."
+  ]
+}

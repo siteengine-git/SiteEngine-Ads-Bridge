@@ -1,0 +1,16 @@
+{
+  "version": "0.8.1",
+  "source_commit": "1376f31df2e51b0af276537ad0650493b7952bd0",
+  "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
+  "package": "siteengine-ads-bridge-0.8.1.zip",
+  "ZIP_count": 1,
+  "sha256": "8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d",
+  "manifest_sha256": "c118b9d242504599b56b7fe3887f703609233f33f496b479b7c5bc2576be14e3",
+  "prior_0_8_0_delivery_archived_byte_identical": true,
+  "old_package_stable_release_preserved": true,
+  "implemented": true,
+  "packaged": true,
+  "installed": "Alma",
+  "verified": "documented authority/settings scope",
+  "stable_GitHub_release_published": false
+}
