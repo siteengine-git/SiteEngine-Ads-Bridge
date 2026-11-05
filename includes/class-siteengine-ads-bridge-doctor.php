@@ -1153,6 +1153,8 @@ class SiteEngine_Ads_Bridge_Doctor {
 		$missing_fields = array();
 
 		foreach ( $required_fields as $required_field ) {
+            $key=$required_field==='country-list'?'country':$required_field;
+            $required_field=(string)$this->config->get('fluent_forms.fields.'.$key,$required_field);
 			if ( ! in_array( $required_field, $field_names, true ) ) {
 				$missing_fields[] = $required_field;
 			}

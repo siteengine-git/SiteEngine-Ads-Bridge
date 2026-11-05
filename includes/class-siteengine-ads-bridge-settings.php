@@ -91,10 +91,10 @@ final class SiteEngine_Ads_Bridge_Settings {
 						'won'         => 'Won',
 					),
 					'sources'   => array(
-						'call'     => 'Call Lead',
-						'form'     => 'Form Lead',
-						'referral' => 'Referral Lead',
-						'walk_in'  => 'Walk In Lead',
+						'call'     => '',
+						'form'     => '',
+						'referral' => '',
+						'walk_in'  => '',
 					),
 				),
 				'lifecycle_automation' => array(

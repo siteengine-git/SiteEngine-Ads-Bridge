@@ -9,7 +9,8 @@ namespace FluentCrm\App\Models {
 }
 namespace {
 define('ABSPATH',__DIR__.'/');define('ARRAY_A','ARRAY_A');
-$opts=[];$registry=[['slug'=>'unrelated','type'=>'text','label'=>'Preserve','extra'=>['a'=>1]]];$field_saves=0;$zone='UTC';$n=0;
+$opts=[];$registry=[['slug'=>'unrelated','type'=>'text','label'=>'Preserve','extra'=>['a'=>1]]];$field_saves=0;$zone='UTC';require_once dirname(__DIR__).'/includes/crm-import/recovery.php';
+$n=0;
 function get_option($k,$d=false){return $GLOBALS['opts'][$k]??$d;}function update_option($k,$v,$a=false){$GLOBALS['opts'][$k]=$v;return true;}
 function get_current_user_id(){return 7;}function wp_timezone_string(){return $GLOBALS['zone'];}
 class SiteEngine_Ads_Bridge_Config {

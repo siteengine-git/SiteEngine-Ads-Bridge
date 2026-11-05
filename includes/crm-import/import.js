@@ -9,7 +9,7 @@
   let state = initial.state, busy = false;
   const option = (select, value, label) => { const o = document.createElement('option'); o.value = value; o.textContent = label; select.append(o); };
   option(mappings.elements.form, '', 'Choose a destination form');
-  initial.choices.forms.forEach(f => option(mappings.elements.form, f.id, `${f.title} (#${f.id})`));
+  initial.choices.forms.forEach(f => option(mappings.elements.form, f.id, f.title));
   for (const [name, slug, label, types] of [['service_field','service_type','Service',['text','select-one']],['outcome_field','customer_rating','Outcome reason',['select-one']]]) {
     const select = mappings.elements[name]; const fields = initial.choices.fields.filter(f => types.includes(f.type));
     if (!fields.some(f => f.slug === slug)) option(select, slug, `Create missing ${label} field (${slug})`);
@@ -39,7 +39,7 @@
     }
     const summary=document.getElementById('seab-import-summary');summary.replaceChildren();
     if(state.status==='complete'){const p=document.createElement('p');p.textContent=`Import complete: ${state.total-1} native definitions; ${state.writes} saves including Ads setup. Automation, enrollment, Sheets and exports remain disabled.`;summary.append(p);
-      const ul=document.createElement('ul');for(const a of state.actions){if(a.kind==='settings')continue;const li=document.createElement('li'),link=document.createElement('a');link.textContent=`${a.title} (#${a.id})`;link.href=nativeURL(a);li.append(link);ul.append(li);}summary.append(ul);
+      const ul=document.createElement('ul');for(const a of state.actions){if(a.kind==='settings')continue;const li=document.createElement('li'),link=document.createElement('a');link.textContent=a.title;link.href=nativeURL(a);li.append(link);ul.append(li);}const content=document.createElement('details'), title=document.createElement('summary');title.textContent='View imported CRM content';content.append(title,ul);const next=document.createElement('a');next.className='button button-primary';next.href='admin.php?page=siteengine-ads-bridge&tab=setup&section=form';next.textContent='Continue setup';summary.append(next,content);
     }
     root.querySelectorAll('button').forEach(b=>b.disabled=busy);
   }

@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class SiteEngine_Ads_Bridge_Setup {
     private static bool $executor_owned=false;
+    public static ?string $storage_error=null;
     public static function executor_owned():bool { return self::$executor_owned; }
     const AUTHORITY_OPTION = 'seab_settings_authority_v1';
 
@@ -76,6 +77,10 @@ final class SiteEngine_Ads_Bridge_Setup {
     /** Reuse existing explicit migrations; existing partial schemas fail closed. */
     public static function initialize_storage() {
         return self::with_executor( static function() {
+            if(class_exists('SiteEngine\\AdsBridge\\Import\\Store')){
+                $import=\SiteEngine\AdsBridge\Import\Store::job();
+                if($import&&in_array($import['status'],['running','uncertain'],true))throw new RuntimeException('Saved Ads import '.$import['id'].'; state '.$import['status'].'. Resume its saved operation before preparing storage; initialization is not recovery.');
+            }
             $held = SiteEngine_Ads_Bridge_Coordination::enter_setup( true );
             if ( ! $held['ok'] ) { throw new RuntimeException( self::blocker_message($held['reason']) ); }
             try {
@@ -88,8 +93,47 @@ final class SiteEngine_Ads_Bridge_Setup {
             }
             $guard = SiteEngine_Ads_Bridge_Coordination::migrate( true );
             if ( $guard['status'] !== 'complete' ) { throw new RuntimeException( 'Configuration guard initialization blocked: ' . $guard['reason_code'] ); }
+            $held=SiteEngine_Ads_Bridge_Coordination::enter_setup();if(!$held['ok'])throw new RuntimeException(self::blocker_message($held['reason']));
+            try{SiteEngine_Ads_Bridge_Storage::prepare_ledger();if(defined('SEAB_VERSION'))update_option('seab_version',SEAB_VERSION,false);}
+            finally{if(!SiteEngine_Ads_Bridge_Coordination::release())throw new RuntimeException('Storage lock release unconfirmed; inspect before retrying.');}
             return true;
         } );
+    }
+
+    /** Only normal activation/Ads administrator entry; never front-end or workers. */
+    public static function prepare_storage_for_admin() {
+        if(!current_user_can('manage_options'))return;
+        try{self::initialize_storage();self::$storage_error=null;}
+        catch(Throwable $e){self::$storage_error=$e->getMessage();}
+    }
+    public static function required_form_keys():array {
+        return ['first_name','last_name','address_1','address_2','city','state','zip_code','country','phone','email','service_type','estimated_value','gclid','gbraid','wbraid','fbclid','msclkid','utm_source','utm_medium','utm_campaign','utm_content','utm_term','referrer_url','page_title','ip_address','user_agent','cookie_value','transaction_id'];
+    }
+    /** Flat selectors supported by the actual reader; no feed/Consent claim. */
+    public static function form_connection(int $id,array $mapping):array {
+        global $wpdb;$out=['ready'=>false,'fields'=>[],'mapping'=>$mapping,'needs'=>[],'error'=>'Select a lead form.'];
+        if($id<1)return $out;
+        $raw=$wpdb->get_var($wpdb->prepare("SELECT form_fields FROM `{$wpdb->prefix}fluentform_forms` WHERE id=%d",$id));
+        if($wpdb->last_error||!is_string($raw)||strlen($raw)>1048576){$out['error']='Form definition is unavailable or exceeds1 MiB; no mappings changed.';return $out;}
+        try{$tree=json_decode($raw,true,128,JSON_THROW_ON_ERROR);}catch(Throwable $e){$out['error']='Form definition is malformed; no mappings changed.';return $out;}
+        $walk=static function($v)use(&$walk,&$out){if(!is_array($v))return;
+            if(isset($v['attributes']['name'])&&is_string($v['attributes']['name'])){$n=$v['attributes']['name'];if(!str_starts_with($n,'se_consent_')){$old=$out['fields'][$n]??['count'=>0,'label'=>(string)($v['settings']['label']??$n),'type'=>(string)($v['element']??'')];$old['count']++;$out['fields'][$n]=$old;}}
+            foreach($v as$x)if(is_array($x))$walk($x);
+        };$walk($tree);if(count($out['fields'])>500){$out['fields']=[];$out['error']='Form exceeds500 selectors; inspect Advanced.';return $out;}
+        $defaults=SiteEngine_Ads_Bridge_Settings::default_field_map();
+        foreach(self::required_form_keys()as$key){$current=$mapping[$key]??$defaults[$key];$candidates=[];
+            foreach($out['fields']as$name=>$f){if($f['count']!==1)continue;if($name===$defaults[$key]||($key==='email'&&$f['type']==='input_email')||($key==='phone'&&in_array($f['type'],['phone','input_tel'],true)))$candidates[]=$name;}
+            if(isset($out['fields'][$current])&&$out['fields'][$current]['count']===1)continue;
+            // Preserve an explicitly customized but now missing selector; require choice.
+            if($current===$defaults[$key]&&count($candidates)===1){$out['mapping'][$key]=$candidates[0];continue;}
+            $out['needs'][$key]=$candidates;
+        }
+        $out['ready']=!$out['needs'];$out['error']=$out['ready']?'':'Missing or ambiguous inputs need a field choice. Saving incomplete setup is allowed.';return $out;
+    }
+    public static function resolve_form_mapping(int $id,array $mapping,array $choices):array {
+        $view=self::form_connection($id,$mapping);if(!$view['fields'])return $mapping;
+        foreach($choices as$key=>$selector){if(!in_array($key,self::required_form_keys(),true)||$selector==='')continue;if(!isset($view['fields'][$selector])||$view['fields'][$selector]['count']!==1)throw new RuntimeException('Selected '.str_replace('_',' ',$key).' field is absent or ambiguous on this form. Reload and choose again.');$mapping[$key]=$selector;}
+        return self::form_connection($id,$mapping)['mapping'];
     }
 
     /** Exact existing tag titles only; ambiguous titles cannot establish identity. */

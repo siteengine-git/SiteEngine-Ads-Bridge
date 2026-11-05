@@ -1,0 +1,229 @@
+{
+  "version": "0.8.0",
+  "designation": "Ads successor verified on Alma;stable publication not performed",
+  "priority_correction": {
+    "version": "0.7.2",
+    "implementation_commit": "b90b27ec24af66c47038118d674c4d9f2956af8d",
+    "delivered_before_UI_work": true,
+    "deployment_size_bytes": 1798466,
+    "cases": [
+      {
+        "case": "deployment-only",
+        "PASS": true,
+        "deployment_bytes": 1798466,
+        "normal_HTTP_save": true,
+        "expected_blocked": false,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      },
+      {
+        "case": "admin-only",
+        "PASS": true,
+        "deployment_bytes": 174,
+        "normal_HTTP_save": true,
+        "expected_blocked": false,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      },
+      {
+        "case": "both",
+        "PASS": true,
+        "deployment_bytes": 1798466,
+        "normal_HTTP_save": true,
+        "expected_blocked": false,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      },
+      {
+        "case": "active",
+        "PASS": true,
+        "deployment_bytes": 1798466,
+        "normal_HTTP_save": false,
+        "expected_blocked": true,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      },
+      {
+        "case": "inflight",
+        "PASS": true,
+        "deployment_bytes": 1798466,
+        "normal_HTTP_save": false,
+        "expected_blocked": true,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      },
+      {
+        "case": "malformed",
+        "PASS": true,
+        "deployment_bytes": 1798466,
+        "normal_HTTP_save": false,
+        "expected_blocked": true,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      },
+      {
+        "case": "unknown-format",
+        "PASS": true,
+        "deployment_bytes": 1798466,
+        "normal_HTTP_save": false,
+        "expected_blocked": true,
+        "record_bytes_preserved": true,
+        "fresh_path_exact": true
+      }
+    ],
+    "native_Linux_permission_assertions": 58,
+    "native_Linux_skips": 0,
+    "carried_forward_to_UI": "Ownership projection/with_executor unchanged;no repeat permission campaign"
+  },
+  "local": {
+    "assertions": 180,
+    "suites": [
+      {
+        "suite": "completed-predecessor-settings.php",
+        "result": "{\"status\":\"PASS\",\"assertions\":43,\"platform\":\"Windows\",\"skipped\":[\"Linux file\\/parent permissions and symlinks: execute natively as unprivileged Alma owner\"],\"SQL_or_WordPress_claim\":false}"
+      },
+      {
+        "suite": "administrator-setup-acceptance.php",
+        "result": "SUMMARY: 19 PASS; actual handlers/resolver; WP/vendor/SQL doubles"
+      },
+      {
+        "suite": "successor-bootstrap-acceptance.php",
+        "result": "PASS 19 successor bootstrap/CLI checks; WordPress/native boundaries doubled"
+      },
+      {
+        "suite": "setup-reporting-acceptance.php",
+        "result": "SUMMARY: 30 PASS; actual resolver/reporting, synthetic WordPress/Base/Doctor"
+      },
+      {
+        "suite": "doctor-status-reporting-acceptance.php",
+        "result": "SUMMARY: 16 PASS; actual formatter/notice, doubled WordPress/Base/Doctor"
+      },
+      {
+        "suite": "product-setup-acceptance.php",
+        "result": "SUMMARY 34 PASS; synthetic storage/vendor boundaries; actual product algorithms"
+      },
+      {
+        "suite": "setup-workflow-acceptance.php",
+        "result": "SUMMARY 16 PASS;production detector;synthetic DB boundary"
+      },
+      {
+        "suite": "storage-preparation-safety.php",
+        "result": "SUMMARY 3 PASS;actual preparation admission;synthetic storage boundaries"
+      }
+    ],
+    "boundaries": "PHP product code;WordPress/vendor/SQL doubles except filesystem tests"
+  },
+  "native_workflow": {
+    "fresh_normal_activation": {
+      "three_InnoDB_tables": true,
+      "settings_still_absent": true,
+      "manual_storage_initialization": false
+    },
+    "one_browser_configuration_import": {
+      "complete": 126,
+      "total": 126,
+      "receipts": 126,
+      "separate_CRM_plugin_absent": true,
+      "contacts_created": 0,
+      "inquiries_created": 0,
+      "prior_importer_recovery_conflict_campaign": "carried forward,not repeated"
+    },
+    "normal_administrator_saves": {
+      "incomplete_setup": true,
+      "all_optional_sources_unused": true,
+      "standard_form_detection": true,
+      "ambiguity_requires_explicit_choice": true,
+      "custom_phone_mapping_preserved": true,
+      "existing_Referral_tag_selected": true,
+      "credentials_path_retained_by_import": true
+    },
+    "storage_cases": {
+      "additive_guard_automatic": true,
+      "existing_inquiry_schema_and_settings_preserved": true,
+      "incompatible_schema_untouched_until_owned_fault_restoration": true,
+      "actual_unfinished_intent_blocked_administrator_POST": true,
+      "settings_unchanged_on_refusal": true,
+      "same_operation_native_readback_recovered": true,
+      "journal_retained": true,
+      "healthy_storage_no_recovery_warning": true
+    },
+    "browser": {
+      "keyboardNavigation": true,
+      "keyboardDisclosure": true,
+      "typedFormSave": true,
+      "explicitAmbiguityChoice": true,
+      "narrow": {
+        "bodyWidth": 375,
+        "documentWidth": 375,
+        "viewport": 390
+      },
+      "fixtureOnly": true
+    },
+    "legacy_routes": "fields,lifecycle,sheets,storage and diagnostics retain supported actions/routing"
+  },
+  "main_Alma": {
+    "version": "0.8.0",
+    "stored_version": "0.8.0",
+    "members": 51,
+    "PHP_lints": 29,
+    "PHP": "8.3.36",
+    "ordinary_authenticated_Sheets_save": true,
+    "fresh_credentials_path_exact": true,
+    "validation_errors": [],
+    "Doctor": {
+      "PASS": 35,
+      "WARN": 7,
+      "FAIL": 0,
+      "PENDING": 0
+    },
+    "warning_checks": [
+      "Google Ads timezone",
+      "Lifecycle compliance automation",
+      "FluentCRM source tags (optional)",
+      "Google Sheets sink",
+      "Google Sheets credentials",
+      "Scheduled export runtime",
+      "submission_id pipeline"
+    ],
+    "three_physical_InnoDB_tables": true,
+    "absent_canonical_ledger_created_empty": true,
+    "existing_Ads_Base_configuration_and_custom_mappings_preserved": true,
+    "existing_managed_content_inquiry_Consent_journals_checksums_match": true,
+    "exports": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "unrelated_scheduler_bookkeeping_and_cron_options_changed_during_admin_acceptance": true,
+    "exact_cron_payload_delta_unavailable": "Baseline retained its hash,not serialized cron values;no full-cron preservation claim,no rollback",
+    "queues_or_export_commands_explicitly_invoked": false,
+    "full_volatile_fc_meta_identity_claim": false
+  },
+  "protected_runtime_identity_to_0_7_0": {
+    "includes/class-siteengine-ads-bridge-consent.php": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0",
+    "includes/class-siteengine-ads-bridge-coordination.php": "90c8ef86bd06b2b05dc57bc7b887fa86e2a55782f348a26455e5ba35503dc18a",
+    "includes/class-siteengine-ads-bridge-inquiries.php": "d1cc0b1285b237f0866f79f7ea45968ac853f59a071c5503a077de56a6bf0454",
+    "includes/class-siteengine-ads-bridge-lifecycle.php": "27a560d638bf8949f844e8d321e42a4615239b58c0435cafd2252961b2461915",
+    "includes/class-siteengine-ads-bridge-time.php": "4ce7fc336271a51eaad62de9518534da2e6f9dd9489810ef0892a1bbe00a471d",
+    "includes/class-siteengine-ads-bridge-runtime.php": "b396f71fc8cd703de51d6de1350b22855c1eb1b3e9b2f96c48696830f5e588cb",
+    "includes/class-siteengine-ads-bridge-config.php": "c6b1ec99e66d1e452f73290e4f8fbb6dc38de6fd280b68bffdf63bc0eda9ed4f"
+  },
+  "cleanup": {
+    "owned_tables_removed": 100,
+    "remaining_owned_tables": 0,
+    "foreign_references": 0,
+    "owned_HTTP_workers_listeners_forwards_removed": true,
+    "both_owned_WordPress_copies_removed": true,
+    "temporary_fixture_sessions_revoked": true,
+    "own_main_admin_session_revoked_other_sessions_preserved": true,
+    "private_journals_backups_and_failure_receipts_retained": true,
+    "owner": "Ads Codex"
+  },
+  "limits": [
+    "No client operations,live advertising/Sheet delivery or browser lead submissions.",
+    "Fresh fixtures intentionally retain missing Base/Consent/connection prerequisites rather than fabricate Ready. No service-account access or Google Ads account verification is established.",
+    "CRM0.3.16 exact-bootstrap producer binding has not been updated/reaccepted for0.8.0 by this assignment. Prior0.7.0 producer evidence is retained,not relabeled.",
+    "Bounded form detector supports the flat selectors consumed by the existing Ads reader;compound/unsupported forms require explicit review."
+  ]
+}

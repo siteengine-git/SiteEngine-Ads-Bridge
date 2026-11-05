@@ -15,6 +15,7 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 
 require_once __DIR__ . '/class-siteengine-ads-bridge-time.php';
 require_once __DIR__ . '/class-siteengine-ads-bridge-fields.php';
+require_once __DIR__ . '/class-siteengine-ads-bridge-storage.php';
 
 class SiteEngine_Ads_Bridge_CLI {
         private $aggregate_failed=false;
@@ -3238,32 +3239,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @return bool True if the table exists after the call.
          */
         private function ensure_ledger_table() {
-                global $wpdb;
-                if ( $this->ledger_table_exists() ) {
-                        return true;
-                }
-                $t               = $this->ledger_table();
-                $charset_collate = $wpdb->get_charset_collate();
-                $sql             = "CREATE TABLE IF NOT EXISTS `{$t}` (
-                        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                        sink_slug VARCHAR(64) NOT NULL DEFAULT '',
-                        contact_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
-                        transaction_id VARCHAR(191) NOT NULL DEFAULT '',
-                        row_hash CHAR(64) NOT NULL DEFAULT '',
-                        spreadsheet_id VARCHAR(191) NOT NULL DEFAULT '',
-                        tab VARCHAR(191) NOT NULL DEFAULT '',
-                        updated_range VARCHAR(191) NOT NULL DEFAULT '',
-                        status VARCHAR(16) NOT NULL DEFAULT '',
-                        error TEXT NULL,
-                        attempts INT UNSIGNED NOT NULL DEFAULT 0,
-                        created_at DATETIME NOT NULL,
-                        updated_at DATETIME NOT NULL,
-                        PRIMARY KEY (id),
-                        KEY sink_txn (sink_slug, transaction_id),
-                        KEY sink_status (sink_slug, status)
-                ) {$charset_collate};";
-                $wpdb->query( $sql );
-                return $this->ledger_table_exists();
+                return SiteEngine_Ads_Bridge_Storage::ensure_ledger_exists();
         }
 
         /**

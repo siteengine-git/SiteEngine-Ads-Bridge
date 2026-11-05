@@ -1,4 +1,19 @@
-##0.7.1 — completed predecessor settings saves
+## 0.8.0
+
+- Four primary areas: Overview, ordered Setup, existing Leads queue, Advanced.
+- Normal activation/Ads administrator setup prepares absent inquiry/guard/ledger storage
+  through protected routines; incompatible schemas and unfinished operations stay blocked.
+- Verify unique standard form selectors, retain custom mappings and request explicit
+  choices for missing/ambiguous fields; CRM feed verification remains separate.
+- Fresh optional source mappings default to Unused. Preserve existing/imported mappings.
+- Carry forward0.7.2 producer-compatible ownership projection and Consent protections.
+
+## 0.7.2
+
+- Accept growing completed producer deployment records using bounded JSON validation
+  and ownership-only projection; active and uncertain operations remain protected.
+
+## 0.7.1 — completed predecessor settings saves
 
 - Read bounded authoritative deployment state under exclusive executor ownership before considering historical administrator state.
 - Permit ordinary settings saves after proven completion without reading unrelated oversized/unreadable administrator payloads.

@@ -4,6 +4,8 @@ define('ABSPATH',__DIR__.'/');
 $fixture=sys_get_temp_dir().'/seab-setup-'.bin2hex(random_bytes(6));mkdir($fixture);touch($fixture.'/executor.lock');
 define('SEAB_CONFIG_IS_EXTERNAL',true);define('SEAB_CONFIG_FILE',$fixture.'/external.php');
 $options=[];$allowed=true;$nonce=true;$calls=[];$directory=null;
+function delete_option($k){unset($GLOBALS['options'][$k]);}
+class SiteEngine_Ads_Bridge_Storage{static function prepare_ledger(){$GLOBALS['calls'][]='ledger migration';}}
 function get_option($k,$d=false){return $GLOBALS['options'][$k]??$d;}
 function update_option($k,$v,$autoload=false){$GLOBALS['options'][$k]=$v;return true;}
 function sanitize_key($s){return preg_replace('/[^a-z0-9_\-]/','',strtolower($s));}
@@ -62,8 +64,8 @@ try {
  $job['state']='complete';file_put_contents($fixture.'/deployment-job.json',json_encode($job));$foreign=fopen($fixture.'/executor.lock','c');flock($foreign,LOCK_EX);invoke('handle_save','executor.lock [busy]');flock($foreign,LOCK_UN);fclose($foreign);
  ok($options['seab_settings_v2']===$expected,'live executor blocks overlapping save');
  $_POST=['confirm_storage'=>'1'];$calls=[];SiteEngine_Ads_Bridge_Inquiries::$ready=SiteEngine_Ads_Bridge_Inquiries::$exists=false;invoke('handle_storage');
- ok($calls===['destination lock','inquiry migration','release','guard migration'],'fresh storage uses existing migrations in order');
- $calls=[];invoke('handle_storage');ok($calls===['destination lock','release','guard migration'],'ready inquiry storage never replays migration');
+ ok($calls===['destination lock','inquiry migration','release','guard migration','destination lock','ledger migration','release'],'fresh storage uses existing migrations in order');
+ $calls=[];invoke('handle_storage');ok($calls===['destination lock','release','guard migration','destination lock','ledger migration','release'],'ready inquiry storage never replays migration');
  file_put_contents(SEAB_CONFIG_FILE,$old."\n// changed by external authority\n");ok(reset_config()->configuration_source()==='external','external file drift visibly resumes external authority');
  invoke('handle_save','External SEAB_CONFIG_FILE');
  echo "SUMMARY: $n PASS; actual handlers/resolver; WP/vendor/SQL doubles\n";

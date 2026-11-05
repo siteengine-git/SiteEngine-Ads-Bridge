@@ -1,0 +1,18 @@
+{
+  "version": "0.8.0",
+  "package": "siteengine-ads-bridge-0.8.0.zip",
+  "sha256": "47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58",
+  "manifest_sha256": "9a661852d731ae1b84afec6e825b03b0c8407b74b11a38550b229e27d1e59fe2",
+  "members": 51,
+  "PHP_files": 29,
+  "source_commit": "commit containing this record;implementation pin recorded after commit",
+  "implemented": true,
+  "packaged": true,
+  "installed": true,
+  "verified": true,
+  "released": false,
+  "designation": "Alma-verified Ads successor;CRM producer exact-bootstrap binding remains owner review",
+  "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
+  "delivery_zip_count": 1,
+  "CRM_binding_bootstrap_sha256": "c50a5fe0e25de312311696df70be2d940a97a9dd9709305f8fa96a06263f518a"
+}

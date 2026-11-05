@@ -1,4 +1,30 @@
-# Import CRM Configuration — Ads Bridge 0.7.1
+# Administrator workflow in0.8.0
+
+Overview summarizes the next action, disabled/enabled exports and actual last successful
+runtime. Setup follows Business Data → CRM import → lead form → Sheets/conversion settings
+→ readiness. Completed steps collapse and remain editable. Import supplies CRM mappings;
+edit them only when needed. Saving incomplete setup is supported; no feature is enabled
+implicitly. Lead compliance remains the existing work queue.
+
+Normal activation and the Ads administrator page prepare absent plugin-owned storage under
+original executor and coordination protection. Supported schema2 inquiry / absent guard1
+and absent canonical ledger additions are handled internally. Older incompatible/partial
+inquiry schemas still require their precise supported migration review; they are not
+silently repaired. Front-end traffic and queue workers do not initialize storage.
+
+Advanced holds full overrides, diagnostics, scheduler, storage recovery and legacy tools.
+Legacy URLs and administrator actions still route to their corresponding area. Legacy
+import is shown only for an active actual legacy configuration. No authority changes
+occur implicitly. A matching field name never proves a Fluent Forms→CRM feed; its existing
+manual verification and optional exact runtime linkage readback remain distinct.
+
+Current reader validates growing producer records up to16MiB at JSON depth512 and projects
+bounded ownership scalars; it never decodes history arrays. Three-second inspection limit;
+explicit recognized identity/completion/inflight:null/checkpoint under executor ownership.
+No completion inference from size, age or a free lock. Credentials-path persistence is
+separate from actual PHP filesystem access to the service-account file.
+
+# Import CRM Configuration — Ads Bridge 0.8.0
 
 The CRM builder remains on the authoring site. Destination sites need Ads Bridge,
 SiteEngine Base, FluentCRM and Fluent Forms. This package's native Pro sequences

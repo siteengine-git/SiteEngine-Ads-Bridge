@@ -1,3 +1,48 @@
+## 0.8.0 — ordered correction/UI successor verified on Alma,2026-11-05
+
+Priority0.7.2 completed FIRST:implementationb90b27e,delivery6838879. Exact1798466-byte
+completed producer deployment saves through ordinary administrator HTTP;oversized
+admin alone/together and active/inflight/malformed/unknown cases verified. Records
+unchanged across saves.16MiB/depth512/4KiB scalar/3second ownership-only projection,
+original executor lock,explicit completion;58 actual Linux filesystem assertions PASS.
+
+UI successor:Overview/ordered Setup/existing Leads/Advanced. Normal activation/admin
+entry prepares absent inquiry2/guard1/canonical ledger via protected routines;no front
+traffic initialization,partial-schema repair or unfinished-journal bypass. Unique flat
+standard form mappings detected;custom/missing/ambiguous mappings preserved/reviewed.
+Feed verification stays separate. Fresh optional sources defaultUnused;existing values
+remain. Legacy URLs/actions route correctly;legacy import only for actual active legacy.
+
+180 focused local assertions PASS. Actual Alma fresh activation3 InnoDB tables without
+manual initialization;normal incomplete/Unused saves;one browser import126/126 with
+CRM absent;unique/ambiguous form choices,custom phone mapping and existingReferral save.
+Additive guard preparation preserved existing inquiry/settings;incompatible schema stayed
+untouched until exact owned fault restoration;retained intent blocked normal HTTP save,
+then same-operation native readback recovered without duplicate objects. No contacts,
+submissions,inquiries or delivery created. Keyboard/native disclosures and390px layout
+(no document overflow) verified;four-area screenshots kept privately.
+
+Main0.8.0 installed:51 exact members,29 PHP8.3.36 lints,normal Sheets save and fresh
+exact-path readback;validationerrors[],Doctor35PASS/7WARN/0FAIL,four exportsfalse.
+Absent canonical ledger auto-created empty;all3 enginesInnoDB. Existing managed
+settings/Base data/custom mappings/content/inquiry/Consent/journal checksums match.
+Version metadata updated. Separate existing scheduler bookkeeping/cron options advanced
+during administrator acceptance;baseline had cron hash only,so exact cron payload delta
+is not claimed. No global cron restore,queue/export command or unrelated worker stop.
+Full volatilefc_meta byte identity is not claimed. Precise evidence retained locally.
+
+Cleanup:100 exact owned tables and both WordPress copies removed,zero foreign refs;
+own workers/listeners/forwards stopped,temporary fixture sessions and own main session
+revoked. Private original journals/failure receipts/backups retained by Ads Codex.
+Consent/coordination/inquiry/lifecycle/time/runtime/config bytes match0.7.0;no repeat
+withdrawal/producer/native-concurrency campaign. No client access or live delivery.
+
+Implemented/packaged/main-installed/Ads-verified YES. Stable released NO:CRM0.3.16
+exact-bootstrap binding needs its owner's0.8.0 review;prior0.7.0 coexistence stays
+accepted,not relabeled. Source/pins/results in releases/0.8.0. Canonical physical
+Plugins\..Deliverables destination retains one latest installable;prior packages
+are archived outside delivery after verified successor staging.
+
 ## 0.7.2 producer-record correction — verified before UI work
 
 Exact1,798,466-byte valid completed deployment now permits normal authenticated
