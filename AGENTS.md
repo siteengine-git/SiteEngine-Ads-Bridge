@@ -1,5 +1,6 @@
-## Stable0.7.0 release closeout — November5,2026
+## Stable0.7.0 released — November5,2026
 
+Tagv0.7.0 pins3ed9ee2044b9d15f9af82e987a23dd757eb82bef;stable publication/delivery verified.
 The controlling Helper accepts Ads closeout b5abb5a and CRM coexistence7da32a6.
 Publish/deliver the exact verified0.7.0 ZIP;do not repeat completed acceptance or
 resume the completed import. Preserve package bytes and historical archives. No UI

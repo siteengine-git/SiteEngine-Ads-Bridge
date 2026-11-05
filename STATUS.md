@@ -1,3 +1,30 @@
+## RELEASED stable0.7.0 — 2026-11-05
+
+Implemented / packaged / main-Alma installed / verified / released: YES. No client
+rollout. Tagv0.7.0 independently resolves remotely to3ed9ee2044b9d15f9af82e987a23dd757eb82bef;
+implementation45c253d3cc35402301734d313a1717675917a849. Stable GitHub release:
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.7.0
+
+ZIPac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa;
+manifest a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f. All six
+published asset digests/sizes independently verified,and all six public downloads
+freshly byte-hashed against local files. Publication receipt in releases/0.7.0.
+
+Physical delivery D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge:
+exactly ONE ZIP,siteengine-ads-bridge-0.7.0.zip,matching the published pin;instructions,
+manifest,checksum,notes,results and publication receipt accompany it. Successor was
+staged/fsynced/hash-verified before prior0.6.4.5 files were archived outside delivery.
+Archive/evidence retained locally under Ads Codex ownership. Older similarly named
+Plugins..Deliverables directory was not used;filesystem-derived path verified.
+
+Accepted main import126/126,50 installed members,28 actual packaged PHP lints,
+Doctor35PASS/7WARN/0FAIL and all four export families disabled carry forward. CRM
+0.3.16 gatePASS at7da32a653cc0453ace4f623aadeb1ed21e632918:authenticated HTTP/native
+export/current and previous downloads;93 objects/24 dependencies/3 sequences/6 emails/
+66 relationships. No new visual browser test;no full volatile fc_meta byte-identity
+claim. No import,recovery,producer suites or website/settings/schema work repeated
+for publication. UI simplification remains a subsequent patch. No live delivery.
+
 ## ACCEPTED stable 0.7.0 — all finite gates passed; publication underway — 2026-11-05
 
 Direct Helper authorization accepts Ads closeout b5abb5a and CRM coexistence evidence

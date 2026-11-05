@@ -25,5 +25,10 @@
   "CRM_producer_coexistence_verified": true,
   "release_tag": "v0.7.0",
   "designation": "Stable accepted 0.7.0; exact tested package bytes",
-  "publication_record": "PUBLICATION.json records actual publication/tag/asset digest verification"
+  "publication_record": "PUBLICATION.json:remote tag and six asset digests verified",
+  "released": true,
+  "release_commit": "3ed9ee2044b9d15f9af82e987a23dd757eb82bef",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.7.0",
+  "delivery_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
+  "delivery_zip_count": 1
 }
