@@ -1,3 +1,28 @@
+## ACCEPTED stable 0.7.0 — all finite gates passed; publication underway — 2026-11-05
+
+Direct Helper authorization accepts Ads closeout b5abb5a and CRM coexistence evidence
+7da32a653cc0453ace4f623aadeb1ed21e632918. CRM0.3.16 installed/active;normal authenticated
+administrator HTTP export/current and previous downloads plus native readback PASS:
+93 objects,24 dependencies,three sequences,six emails,66 relationships. Export hash
+822f2bd6411c3fe2657bdbb1b79423e48f880f9722ff80d716b031022ae9defc. Producer jobcomplete,
+inflightnull,executorfree. This is not a new visual browser test;full volatile fc_meta
+byte identity is not claimed. No acceptance suite or website operation repeated.
+
+Obsolete pending-producer blocker is removed. Ads original import126/126,main install
+50 members,28 package PHP lints,Doctor35PASS/7WARN/0FAIL and four exportsfalse carry
+forward. Implementation45c253d;exact ZIPac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa;
+manifest a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f. All50 package
+members freshly compared to source;tested bytes unchanged. Public evidence updates
+are outside ZIP. Tag/release publication and staged delivery promotion follow;
+actual remote publication/delivery receipt will be recorded at closeout.
+
+Filesystem confirms canonical D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+is a physical directory;Plugins..Deliverables is a distinct older sibling. Stage and
+verify successor before archiving0.6.4.5 outside the delivery area. No UI/navigation,
+field mapping,automatic storage,settings,migration,client or live-delivery changes.
+
+Historical status below is superseded by this accepted gate and final publication.
+
 ## 0.7.0 — original main import completed;corrected package installed — 2026-11-04
 
 Under direct continuation,original administrator resumed only the remaining22

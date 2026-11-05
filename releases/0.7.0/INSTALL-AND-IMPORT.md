@@ -1,7 +1,8 @@
 # Install and import — Ads Bridge0.7.0
 
-This build is main-Alma installed and Ads-verified. Final publication/delivery remains
-pending the CRM-owned producer coexistence result recorded in DELIVERY.json.
+This stable build is main-Alma installed and verified. The CRM0.3.16 authenticated
+HTTP/native producer coexistence gate passed;exact evidence is in RESULTS.json.
+No new visual browser test or client rollout is claimed.
 
 1. Back up the existing Ads files and configuration/history before replacing the
    plugin. Finish an active saved configuration import with its original administrator

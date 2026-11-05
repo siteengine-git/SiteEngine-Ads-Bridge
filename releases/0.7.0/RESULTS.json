@@ -81,17 +81,33 @@
     "tokens_preview_editor_verified": true
   },
   "producer_coexistence": {
-    "status": "NOT_RUN_REQUIRED_OWNER_DEPENDENCY",
-    "observed_failure": "CRM 0.3.15 read-only export inventory rejects new Ads bootstrap: ads_successor_pin_mismatch",
-    "owner_update": "CRM 0.3.16 candidate reported 12 focused checks and 26 PHP lints; installed normal export still outstanding",
-    "failed_read_only_job_safely_finished": true,
-    "failure_evidence_preserved": true,
-    "Ads_or_CRM_native_replay": false,
-    "latest_owner_evidence": "CRM Helper current handback confirms0.3.16 locally tested/packaged,installation and native export outstanding;0.3.15 remains accepted historical baseline.",
-    "fresh_Alma_finding": "No installed SiteEngine CRM Configuration plugin found;AdminConfiguration class absent. No CRM files/activation changed by Ads.",
-    "required_executor": "CRM Codex:install/reconcile its0.3.16 producer under existing assignment,complete one normal configuration export/download against final Ads bytes,and supply exact handback.",
-    "Ads_protected_bootstrap_coordination_contract_inquiry_pins": "Unchanged from its reviewed0.7.0 binding.",
-    "new_export_run_by_Ads": false
+    "status": "PASS",
+    "evidence_commit": "7da32a653cc0453ace4f623aadeb1ed21e632918",
+    "evidence_url": "https://github.com/siteengine-git/siteengine-crm-configuration/blob/7da32a653cc0453ace4f623aadeb1ed21e632918/docs/ADS-070-COEXISTENCE-0316-RESULTS.json",
+    "evidence_sha256": "77027abf64fb78b821cc459086c36cd3cc4d8cbdb1a266907a577f80d4fc0db8",
+    "runtime_source_commit": "40a0312ce97b9d489c5aff4956f5579abed76f7e",
+    "installed": {
+      "version": "0.3.16",
+      "active": true,
+      "members": 37
+    },
+    "acceptance": "Normal authenticated administrator HTTP export AJAX/current and previous downloads; actual native readback. No new visual browser test.",
+    "export_sha256": "822f2bd6411c3fe2657bdbb1b79423e48f880f9722ff80d716b031022ae9defc",
+    "native_objects": 93,
+    "dependencies": 24,
+    "Pro_sequences": 3,
+    "sequence_emails": 6,
+    "relationships": 66,
+    "native_body_differences": [],
+    "all_objects_draft": true,
+    "previous_download_preserved": true,
+    "producer_job_complete_inflight_null_executor_free": true,
+    "Ads_reviewed_payload_files": 49,
+    "Ads_members_including_manifest": 50,
+    "native_metadata_limit": "Managed field/funnel metadata compared with downloaded definitions. Full fc_meta byte identity is not claimed because the existing sending-last-called timestamp advances; no volatile timestamp was reset.",
+    "earlier_failed_readonly_inventory_history": "Archived unchanged by owning CRM executor; no historical failure concealed.",
+    "owner_reconciliation": "CRM owner restored its absent plugin/accepted guard and staging declaration within its assignment. Ads made no CRM or environment changes.",
+    "new_acceptance_run_by_Ads": false
   },
   "cleanup": {
     "status": "PASS",
@@ -124,8 +140,9 @@
     "No contacts, enrollment, real mail, Sheet writes or Ads delivery.",
     "Native content configuration acceptance is not sender/runtime acceptance.",
     "Existing Consent/inquiry/coordination acceptance carried forward; only affected Consent dispatch regression rerun.",
-    "Current corrected bytes are main-Alma installed and Ads verification passes;full release/delivery replacement remains held only for CRM-owned0.3.16 installed normal export coexistence evidence.",
-    "No repeat isolated campaign,client operation,live message,Sheet append or advertising export."
+    "No repeat isolated campaign,client operation,live message,Sheet append or advertising export.",
+    "CRM coexistence is authenticated HTTP/native acceptance, not a new visual browser test. Full volatile fc_meta byte identity is not claimed.",
+    "This stable publication carries finite completed evidence forward. No client installation, email/sender/enrollment acceptance, live Sheet append or advertising delivery. UI simplification and other subsequent changes are outside this release."
   ],
   "initial_candidate_sha256": "9380326a8146e15c002d02c82132a1c4c0fe4fcfce48a3e790703c783b6b1b3b",
   "initial_manifest_sha256": "0bd68a75ef6010beb1e7ef7d04cb65893b0d1234b1e8bdfaff9e8d8950875f46",
@@ -273,5 +290,15 @@
     "four_export_families_disabled": true,
     "corrected_normal_administrator_page": "HTTP200, saved import complete and physical-storage/guard status verified",
     "PHP_lints": "28 actual Alma8.3.36 package lints carried forward;exact same package bytes,not rerun."
+  },
+  "release_acceptance": {
+    "date": "2026-11-05",
+    "accepted_Ads_closeout": "b5abb5a35fb50c5061ec926dfcac086e705887df",
+    "implementation_commit": "45c253d3cc35402301734d313a1717675917a849",
+    "tag": "v0.7.0",
+    "all_finite_gates_passed": true,
+    "package_bytes_preserved": true,
+    "new_import_recovery_producer_suites_run": false,
+    "website_or_settings_mutation_this_release_step": false
   }
 }

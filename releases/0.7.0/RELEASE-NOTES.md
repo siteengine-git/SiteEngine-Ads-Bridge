@@ -1,29 +1,39 @@
-# Ads Bridge0.7.0 — destination CRM configuration import
+# SiteEngine Ads Bridge 0.7.0
 
-Adds the ordinary administrator upload→map→review→automatic-import workflow.
-Destination sites use Ads Bridge and native FluentCRM;the separate CRM builder is
-not required. Imported content remains editable/inactive. Lists,tags,fields,templates,
-campaigns,automations and Pro sequences retain their logical relationships with
-remapped destination identities. Incomplete disabled setup and Unused source mappings
-can save. Consent, inquiry, lifecycle, timezone and coordination behavior is preserved.
+Stable release of the destination CRM configuration importer. Upload the producer's
+portable ZIP in Ads Bridge, choose destination form/field/service mappings, review,
+then import automatically in bounded batches. Native FluentCRM content stays editable
+and inactive. Destination sites do not require the separate CRM Configuration plugin.
+Compatible definitions are reused; destination edits require Keep or Replace.
+Incomplete disabled setup and Unused optional source mappings can save.
 
-Recovery reporting distinguishes physical-schema faults,live ownership,retained
-operations and unknown evidence. Matching saved Ads operations resume with original
-pins,IDs and readback. Predecessor CRM journals remain with their owner;initialization
-never replaces recovery,clears a journal or marks an unknown write complete.
+Storage reporting separates schema faults, live ownership, retained operations and
+unknown evidence. Saved Ads imports resume with their original pins/IDs/receipts;
+predecessor CRM journals remain with their owner. No journal reset or unknown-create
+replay. Consent, inquiry, lifecycle, timezone and coordination behavior is preserved.
 
-The original retained Alma import completed its remaining22 operations through3
-normal Resume requests. Original104 receipts and13 checkpoints were preserved;final
-126/16 completion verified. Only its final planned settings save wrote;no duplicate
-native content. The exact corrected ZIP is main-Alma installed:50 verified members;
+Completed evidence: actual isolated browser/native import,66 relationships,zero-save
+repeats,Keep/Replace,interrupted-operation recovery and setup readback. The original
+main-Alma import completed126/126 with its identities/receipts/checkpoints preserved.
+The corrected package is main-installed with50 exact members and28 PHP8.3.36 lints;
 configuration,native content,inquiry/Consent and journals preserved. Doctor35PASS,
-7WARN,0FAIL;all4 export families false.28 packaged PHP8.3.36 lints are carried forward.
-55 affected local assertions and isolated native recovery passed;earlier browser
-import,Keep/Replace and zero-save repeat evidence retained without a repeat campaign.
+7WARN,0FAIL;all four export families disabled. Local affected coverage203 assertions:
+55 fresh recovery/setup assertions plus148 unchanged checks carried forward.
 
-Release/delivery replacement is still held for the CRM owner's installed0.3.16
-normal configuration export/download coexistence result. Its latest handback says
-that check remains outstanding;its accepted installed export evidence is0.3.15.
-The current Alma inventory finds no installed CRM Configuration plugin. Ads did not
-change the producer or run an export. Prior stable0.6.4.5 delivery is preserved.
-No client rollout,real sending,enrollment,Sheet append or advertising delivery.
+CRM0.3.16 coexistence PASS at evidence7da32a653cc0453ace4f623aadeb1ed21e632918:
+normal authenticated administrator HTTP export/current and previous downloads plus
+native readback of93 objects,24 dependencies,three sequences,six emails,66 relations.
+This was not a new visual browser test. Full volatile fc_meta byte identity is not
+claimed;managed definitions were compared directly and no timestamp was reset.
+Producer completed/released ownership. Prior accepted evidence/failures are retained.
+
+Requirements:PHP8.3+,mysqli/ZIP,Base,Fluent Forms,and supported FluentCRM3.2.6/3.3.1.
+The producer package's Pro sequences require Pro3.3.1. Complete site-specific Base,
+Consent/form/feed,account and credentials prerequisites separately. Import completion
+is not permission to send,enroll,append Sheets or deliver advertising. No client
+rollout or real delivery is part of this release. UI simplification is a later patch.
+
+ZIP SHA256:ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa
+Manifest SHA256:a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f
+Implementation:45c253d3cc35402301734d313a1717675917a849
+CRM evidence:https://github.com/siteengine-git/siteengine-crm-configuration/blob/7da32a653cc0453ace4f623aadeb1ed21e632918/docs/ADS-070-COEXISTENCE-0316-RESULTS.json

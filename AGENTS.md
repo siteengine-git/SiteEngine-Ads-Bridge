@@ -1,3 +1,14 @@
+## Stable0.7.0 release closeout — November5,2026
+
+The controlling Helper accepts Ads closeout b5abb5a and CRM coexistence7da32a6.
+Publish/deliver the exact verified0.7.0 ZIP;do not repeat completed acceptance or
+resume the completed import. Preserve package bytes and historical archives. No UI
+simplification,runtime edit,site/config/schema mutation,client operation or live
+sending/export is in this release-only scope. Delivery remains the filesystem-derived
+D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge literal child.
+The sibling Plugins..Deliverables remains historical. Actual publication and asset
+pins belong in releases/0.7.0/PUBLICATION.json and current STATUS.md.
+
 ## Current CRM configuration import assignment — November 4, 2026
 
 Controlling Helper: _(AB) Ads Helper - 10. Canonical source remains this checkout.
