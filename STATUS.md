@@ -1,5 +1,16 @@
 ## Climatrol integration — UNACCEPTED candidate, 2026-11-06
 
+Packaged checkpoint source e52007069c58645e861bab760d2571fb1e2206dc;
+ZIP22e5a3129a75c70196262f4a2ef3e6be76be0e52f3e69ec55cd16e198f48d60d,
+manifest a1e0e7e3fcd4a44cbfd3e09ff64418ed4eb42a826f0e08b1586cc44daca0e4cb.
+Exact ZIP isolated-installed:75/75 members/no stale extras,42 native PHP lints PASS,
+fresh recorded FE replay/eligible preview and21/94 contracts PASS. Settings hash,
+sinkfalse and all four familiesfalse preserved. Original stable delivery still one
+byte-identical0.8.1 ZIP. Package is outside stable delivery in the private execution
+directory's candidate folder;neutral pins in candidates/climatrol-20261106/.
+Implemented/packaged/isolated installed/native verified:YES. Real Google worksheet,
+accepted Monday demonstration freeze and stable publication:NO/pending exact inputs.
+
 Canonical source unchanged; branch codex/climatrol-outcome-20261106, rooted at
 stable publication941f749 / accepted v0.8.1cd9d5bc. Stable release/delivery retained.
 FE-only foundation and incremental70b7224 selected; both FE branches/worktree

@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "source_commit": "e52007069c58645e861bab760d2571fb1e2206dc",
+  "manifest_sha256": "a1e0e7e3fcd4a44cbfd3e09ff64418ed4eb42a826f0e08b1586cc44daca0e4cb",
+  "members": 75,
+  "php_lints": 42,
+  "exact_payloads": true,
+  "no_stale_extras": true,
+  "settings_source": "settings",
+  "settings_sha256": "48eb5607abf887deb91cedd76efd677a0faac22725a9134b4cdfa929e1464726",
+  "four_export_families": [
+    false,
+    false,
+    false,
+    false
+  ],
+  "sheet_sink": false,
+  "canonical_fe_replay": "recorded",
+  "fe_eligibility": "eligible",
+  "google_columns": 21,
+  "all_leads_columns": 94,
+  "real_google_append_verified": false,
+  "stable_delivery_preserved": {
+    "zip_count": 1,
+    "sha256": "8d6549663b437ceb8f037735587487423893d7c1db56929ce0ffd0fefd78543d"
+  },
+  "candidate_zip_sha256": "22e5a3129a75c70196262f4a2ef3e6be76be0e52f3e69ec55cd16e198f48d60d"
+}
