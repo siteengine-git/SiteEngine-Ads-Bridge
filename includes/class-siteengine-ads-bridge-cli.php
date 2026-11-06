@@ -4389,6 +4389,8 @@ class SiteEngine_Ads_Bridge_CLI {
                                 if (!$stored) throw new RuntimeException('outcome_canonical_receipt_unavailable');
                         }
                         $o=json_decode($stored['body'],true,16,JSON_THROW_ON_ERROR);
+                        $association=SiteEngine_Ads_Bridge_Outcomes::association_reason($o);
+                        if ($association!=='') return ['status'=>'held','reason_code'=>$association,'association_status'=>'attributed'];
                         $inq=SiteEngine_Ads_Bridge_Inquiries::get($o['inquiry_id']);
                         if (!$inq || !in_array($inq['state'],['active','archived'],true)) return ['status'=>'held','reason_code'=>'inquiry_unavailable'];
                         $config=SiteEngine_Ads_Bridge_Config::instance();
@@ -4446,6 +4448,7 @@ class SiteEngine_Ads_Bridge_CLI {
                         $check=$wpdb->get_row($wpdb->prepare("SELECT * FROM `$ledger` WHERE id=%d",$intent['insert_id']),ARRAY_A);
                         if ($wpdb->last_error!=='' || !$check || $check['row_hash']!==$hash || $check['status']!=='outcome_pending') throw new RuntimeException('outcome_append_intent_readback_unconfirmed');
                         SiteEngine_Ads_Bridge_Coordination::assert_owner();
+                        $context['outcome_intent_id']=$intent['insert_id'];
                         $result=$this->google_sheets_append_row($sheet['spreadsheet_id'],$target['tab'],$values,$sheet['token'],'RAW',$context);
                         if (!$result['ok'] || $result['updated_rows']!==1) return ['status'=>'held','reason_code'=>'outcome_append_uncertain_reconcile_required'];
                         $event['status']='appended'; $event['updated_range']=$result['updated_range'];
@@ -6858,6 +6861,17 @@ class SiteEngine_Ads_Bridge_CLI {
                     array( 'all_leads_sheet', 'all_leads_lifecycle_qualified', 'all_leads_lifecycle_unqualified', 'all_leads_lifecycle_won' ), true ) ) ) {
                         $error = $this->advertising_dispatch_error( $values, $context );
                         if ( '' !== $error ) { $out['error'] = $error; return $out; }
+                        // An uncertain external Converted append cannot be bypassed by
+                        // switching to the older form exporter for this same stage.
+                        $config=SiteEngine_Ads_Bridge_Config::instance();
+                        if (($values[20]??null)===$config->get('exports.won_jobs.conversion_action','SE | Converted Lead') && $this->ledger_table_exists()) {
+                                global $wpdb;
+                                $pending=$wpdb->get_results($wpdb->prepare('SELECT id,row_hash FROM `'.$this->ledger_table().'` WHERE sink_slug=%s AND transaction_id=%s AND status=%s','google_ads_import_converted_lead',$context['txn'],'outcome_pending'),ARRAY_A);
+                                if ($wpdb->last_error!=='' || !is_array($pending)) { $out['error']='external outcome pending state unavailable'; return $out; }
+                                foreach ($pending as $intent) {
+                                        if ((int)$intent['id']!==(int)($context['outcome_intent_id']??0) || $intent['row_hash']!==hash('sha256',implode("\x1f",array_map('strval',$values)))) { $out['error']='external outcome append requires exact reconciliation'; return $out; }
+                                }
+                        }
                 }
 
                 $response = wp_remote_post(

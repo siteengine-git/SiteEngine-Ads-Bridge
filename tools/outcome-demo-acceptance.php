@@ -215,4 +215,42 @@ if ($mode==='call-evidence') {
     $state['call_evidence']=$result;update_option('seab_climatrol_demo_owner',$state,false);
     echo wp_json_encode(['status'=>'PASS','producer'=>'CB native repository, explicitly synthetic; no real call','intake'=>$result]);return;
 }
+if ($mode==='protection-cases') {
+    $assert(!isset($state['protection_results']),'protection_cases_not_repeated');
+    $r=json_decode($state['body'],true);$r['operation_id']='test-caller-transaction';$r['event_id']='notice-caller-transaction';
+    $wpdb->query('START TRANSACTION');
+    try {$transaction=seab_external_outcome_submit(wp_json_encode($r));}finally{$wpdb->query('ROLLBACK');}
+    $assert($transaction['status']==='retry'&&$transaction['reason_code']==='coordination_caller_transaction','caller_transaction_refused');
+    $r=json_decode($state['body'],true);$r['operation_id']='test-event-reuse';$event=seab_external_outcome_submit(wp_json_encode($r));
+    $assert($event['status']==='conflict'&&$event['reason_code']==='source_event_identity_reused','source_event_reuse_refused');
+    $r['amount']=1250.0;$invalid=seab_external_outcome_submit(wp_json_encode($r));
+    $assert($invalid['status']==='conflict'&&$invalid['reason_code']==='invalid_request','noncanonical_amount_refused');
+    // Corrupt/lost evidence readback at the other newly introduced insert boundary.
+    $o=array_intersect_key(json_decode($state['body'],true),array_flip(['provider','tenant_id','customer_id','job_id','invoice_id','inquiry_id','completed_at','invoice_at','amount','currency','snapshot_sha256','value_policy_id']));
+    $o['job_id']='90000000-0000-4000-8000-000000000008';
+    $evidence=['evidence_id'=>'review-lost-readback','outcome'=>$o,'provenance'=>['reference'=>'synthetic-evidence-recovery','sha256'=>hash('sha256','synthetic-review-recovery')],'synthetic'=>true,'source'=>'form'];
+    $reads=0;$inject=static function($sql)use(&$reads){if(str_starts_with($sql,'SELECT ')&&str_contains($sql,'`'.SiteEngine_Ads_Bridge_Outcomes::table('evidence').'` WHERE evidence_id=')&&str_contains($sql,'review-lost-readback')){if(++$reads===2)throw new RuntimeException('outcome_evidence_readback_unconfirmed');}return $sql;};
+    add_filter('query',$inject,9999);$lost=false;
+    try{seab_external_outcome_review($evidence);}catch(RuntimeException $e){$lost=$e->getMessage()==='outcome_evidence_readback_unconfirmed';}finally{remove_filter('query',$inject,9999);}
+    $assert($lost,'evidence_post_insert_readback_loss');$state['uncertain_evidence']=$evidence;
+    $state['protection_results']=['caller_transaction'=>$transaction,'source_event_reuse'=>$event,'invalid_amount'=>$invalid,'evidence_readback_loss_observed'=>true];
+    update_option('seab_climatrol_demo_owner',$state,false);echo wp_json_encode(['status'=>'PASS','cases'=>$state['protection_results']]);return;
+}
+if ($mode==='evidence-recovery') {
+    $result=seab_external_outcome_review($state['uncertain_evidence']);
+    $assert($result['status']==='recorded'&&$result['reason_code']==='evidence_already_reviewed','fresh_evidence_recovery_without_duplicate');
+    $count=(int)$wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM `'.SiteEngine_Ads_Bridge_Outcomes::table('evidence').'` WHERE evidence_id=%s',$state['uncertain_evidence']['evidence_id']));
+    $assert($count===1,'one_review_after_readback_loss');echo wp_json_encode(['status'=>'PASS','review'=>$result,'evidence_rows'=>$count]);return;
+}
+if ($mode==='association-dispatch-delta') {
+    $assert(!isset($state['association_dispatch_delta']),'association_delta_not_repeated');
+    $r=json_decode($state['body'],true);$o=array_intersect_key($r,array_flip(['provider','tenant_id','customer_id','job_id','invoice_id','inquiry_id','completed_at','invoice_at','amount','currency','snapshot_sha256','value_policy_id']));
+    $o['inquiry_id']='inq_90000000-0000-4000-8000-000000000002';
+    seab_external_outcome_review(['evidence_id'=>'review-pilot-later-ambiguity','outcome'=>$o,'provenance'=>['reference'=>'synthetic-later-ambiguity','sha256'=>hash('sha256','synthetic-ambiguity')],'synthetic'=>true,'source'=>'form']);
+    $held=(new SiteEngine_Ads_Bridge_CLI())->external_outcome_export($state['receipt']);
+    $assert($held['status']==='held'&&$held['reason_code']==='association_ambiguous','new_ambiguity_blocks_future_dispatch');
+    $assert(seab_external_outcome_submit($state['body'])===$state['result'],'ambiguity_does_not_rewrite_historical_receipt');
+    $fe=(new SiteEngine_Ads_Bridge_CLI())->external_outcome_export($state['fe_receipt']);$assert($fe['status']==='eligible','independent_fe_review_remains_eligible');
+    $state['association_dispatch_delta']=$held;update_option('seab_climatrol_demo_owner',$state,false);echo wp_json_encode(['status'=>'PASS','pilot_dispatch'=>$held,'receipt_unchanged'=>true,'fe_eligibility'=>'eligible']);return;
+}
 echo wp_json_encode(['state'=>'inspect','owner'=>$state['owner'],'fixture_ids'=>$state['fixture_ids'],'receipt'=>$state['receipt']??null]);

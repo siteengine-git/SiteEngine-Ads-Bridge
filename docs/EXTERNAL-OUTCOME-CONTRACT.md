@@ -80,8 +80,20 @@ No Qualified action or 21/94-column contract is changed.
 CB intake: `seab_external_call_evidence(string $call_sid,string $inquiry_id): array`
 reads through CB 0.1.4 `CallLogRepository::findByCallSid($sid,true)`; never writes
 CB tables. The identity is `twilio:{CallSid}`, independently related to the explicit
-AB inquiry. Missing evidence/interface holds; call-origin Google delivery always
+AB inquiry. Administrator intake persists that separate relationship, source
+timestamp/status/qualification and snapshot digest in AB's evidence table.
+Missing evidence/interface holds; call-origin Google delivery always
 holds as `call_origin_google_contract_unsupported`. No form identity is fabricated.
+
+Explicit CLI advertising inspection/export uses `se-ads outcome --receipt=<id>`;
+`--apply` is limited to the pinned isolated synthetic target described in
+[the operator runbook](CLIMATROL-DEMO.md). It reuses the existing 21-column builder,
+fresh Consent/current DNC checks, HTTP transport and Converted stage ledger. No
+normal export family is enabled. `current_dnc` and `consent_evidence_missing` hold
+advertising while the recorded business receipt remains attributed. Newly ambiguous
+review evidence blocks future dispatch without rewriting the historical receipt.
+An uncertain append persists intent and requires exact worksheet `--reconcile`;
+ordinary/replayed exports cannot silently submit another row.
 
 Candidate, not stable release. Installed/native/export acceptance is recorded
 separately in the integration demonstration records; this document makes no pass claim.

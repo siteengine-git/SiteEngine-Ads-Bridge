@@ -147,6 +147,21 @@ final class SiteEngine_Ads_Bridge_Outcomes {
             !in_array($response['status']??null,['recorded','held'],true) || ($response['export_eligible']??null)!==false) throw new RuntimeException('outcome_receipt_corrupt');
         return $r;
     }
+    /** Fresh review read for dispatch; exact operation replay never calls this. */
+    public static function association_reason(array $request): string {
+        global $wpdb; $o=self::normalized($request); $t=self::table('evidence');
+        $e=self::rows($wpdb->prepare("SELECT * FROM `$t` WHERE evidence_id=%s",$request['evidence_id']));
+        if (!$e || hash('sha256',$e[0]['body'])!==$e[0]['digest']) return 'reviewed_evidence_unavailable';
+        $review=json_decode($e[0]['body'],true,16,JSON_THROW_ON_ERROR);
+        if ($review['outcome']!==$o || $review['source']!=='form' || !$review['synthetic']) return 'reviewed_evidence_mismatch';
+        $links=self::rows($wpdb->prepare("SELECT digest,body FROM `$t` WHERE relationship_key=%s",self::key([$o['provider'],$o['tenant_id'],$o['job_id']])));
+        $ids=[];
+        foreach ($links as $link) {
+            if (hash('sha256',$link['body'])!==$link['digest']) return 'reviewed_evidence_unavailable';
+            $ids[]=json_decode($link['body'],true,16,JSON_THROW_ON_ERROR)['outcome']['inquiry_id'];
+        }
+        return count(array_unique($ids))===1 && $ids[0]===$o['inquiry_id']?'':'association_ambiguous';
+    }
     /** Exact JSON bytes, not re-encoded PHP arrays, define an operation body. */
     public static function submit(string $body): array {
         $digest=hash('sha256',$body); $receipt='';

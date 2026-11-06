@@ -21,11 +21,22 @@ recovery after post-INSERT readback exception. Actual installed FE adapter submi
 normalized source and verifies receipt in a fresh process. CB synthetic producer
 record retains twilio identity and explicit AB relation; Google call delivery held.
 
+Additional native PASS: review-insert readback loss/fresh exact recovery, caller
+transaction/source-event reuse rejection, fresh ambiguity blocks future dispatch
+without receipt rewrite. Exporter-native SQL with synthetic HTTP worksheet proved
+one append, lost ACK, held repeat, exact reconciliation, stage dedup and legacy
+dispatch refusal. No real Google worksheet claim. Temporary signing fixture removed
+and isolated settings restored exactly; ordinary authenticated Setup HTTP200 confirms
+the same saved settings hash. Local62 foundation+51 FE+32 Consent dispatch+9 export
+runtime checks PASS; initial Consent child launch from wrong cwd corrected, no code
+failure. Installed37 PHP lints PASS; dependency manifests retained privately. Operator
+steps, actual coverage and limitations:docs/CLIMATROL-DEMO.md.
+
 Implemented/isolated installed/native verified: YES for the above. Final worksheet
 verification, acceptance freeze and stable publication: NOT COMPLETE. Existing
 service-account path is unavailable; dedicated Google credential path/spreadsheet
 requested. No real Sheet append, provider call/write, client/main-site settings or
-stable delivery replacement. Next: finish exporter-boundary checks, bind the actual
+stable delivery replacement. Next: bind the actual
 dedicated test worksheet, append exactly one eligible synthetic FE row and freeze
 the Monday November9 operator candidate with exact pins/limitations.
 
