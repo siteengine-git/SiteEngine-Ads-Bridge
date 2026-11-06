@@ -1,3 +1,31 @@
+## FieldEdge Climatrol implementation — November 6, 2026
+
+This is the isolated FieldEdge worktree at
+D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\fieldedge, now on
+codex/fieldedge-climatrol-081-20261106. Accepted baseline v0.8.1 is
+cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80. The prior foundation branch is
+preserved at70b72248b700f58eb74a915d515f40688b273834. Only FE paths were
+transplanted; older shared STATUS/AGENTS/runtime were not merged into this base.
+One canonical repository; primary AB remains the shared integration writer.
+
+Latest direct assignment authorizes the runnable Climatrol-specific synthetic
+normalization/submission path and local replay/conflict fixtures. Consume the exact
+AB supplied external-outcome contract1; never invent shared callable signatures.
+AB owns durable outcomes/reviews, shared loader/schema/export changes, isolated
+Alma installation, test worksheet and final integration. Only connector-specific
+code/tests/tools/docs and this worktree's concise status/scope may be edited here.
+Never edit ../source, CRM/CB source, or replace installable delivery. No production
+FieldEdge authentication, client operations or live Google delivery. No competing
+ledger, general inbox/revision framework or additional provider work.
+
+Read docs/integrations/fieldedge/CLIMATROL-RUNBOOK.md before continuation. Local
+SyntheticOutcomeApi is an in-memory test double, never installed/durable acceptance.
+Submit retains exact JSON bytes; AB receipt readback governs recorded/held and
+attribution. No automatic retry/review/migration/export is authorized by the adapter.
+Preserve all prior packages/history. No new release/version bump is implied.
+
+Historical primary assignments below are reference; do not resume them from FE.
+
 ## Current ordered correction and setup UI assignment
 
 Complete producer-record compatibility first in its own commit, then four-area setup

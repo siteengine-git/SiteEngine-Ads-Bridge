@@ -1,3 +1,50 @@
+## Climatrol runnable FieldEdge connector — November 6, 2026
+
+Workspace: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\fieldedge.
+Repository: https://github.com/siteengine-git/SiteEngine-Ads-Bridge.
+Active isolated branch: codex/fieldedge-climatrol-081-20261106, based directly on
+accepted v0.8.1 cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80. Publication closeout
+941f74973dabe18d581edd96d0f60a773fbe24ab verified in primary source history.
+Preserved foundation branch codex/fieldedge-foundation-20261105 now pins pushed
+70b72248b700f58eb74a915d515f40688b273834 (new runnable connector changes only).
+The transition retained the same worktree and selectively transplanted only FE
+directories/tests/tools/docs; no older shared STATUS/AGENTS/core runtime merged.
+Primary ../source belongs to AB and was not modified by this executor.
+
+Implemented: ClimatrolWorkflow + SubmissionAdapter, one form/customer/job/invoice
+synthetic USD1250.00 fixture, local demo and administrator WordPress eval-file entry.
+Uses supplied contract1 exact JSON string call/readback,18 string fields,work-order
+to job_id mapping and synthetic-usd-demo-1. No reviewed evidence creation, migrations,
+storage, scheduler, export or core loader changes. Durable AB review/receipt is the
+authority; local hints cannot decide association/advertising eligibility.
+
+Actual local PHP8.3.36 -n:62 original foundation assertions +51 new Climatrol
+assertions PASS (113 total),10 PHP lints PASS. Demo Attributed/recorded,
+Unattributed/held,Needs Review/held; replay same receipt/no extra fixture insert;
+changed body conflicts. All receipts/AB responses in these local tests are a
+non-durable API double. Installed WordPress/provider/worksheet tests by FE:ZERO.
+Actual installed persistence/Consent/DNC/concurrency/export verification remains AB.
+
+Coordination delivered through the Codex thread tool to Implement Climatrol outcome
+API:early contract request,implementation acknowledgement,and checkpoint70b7224
+with exact connector files/runbook. AB supplied its exact on-disk contract and
+private isolated installation identity. Do not publish that DB/prefix/profile.
+Contract SHA at binding:a1a9f03b68b0eccec08ae3ae57b5c01b047ba0b31247f91ba30b0beb9bee299e.
+AB runtime/contract frozen commit still awaited; no stable API acceptance claimed.
+
+Run instructions/expected output:docs/integrations/fieldedge/CLIMATROL-RUNBOOK.md.
+Verification:CLIMATROL-VERIFICATION.json. Target demonstration:Monday November9.
+Next:AB incorporates connector-only files,provides pinned candidate and executes
+the installed path with its actual reviewed inquiry/evidence and destination.
+Service-account/test-worksheet dependency is recorded by AB;FE neither retrieves
+client financial data nor invents a destination. Continue connector-specific fixes
+against demonstrated contract changes,without another architecture campaign.
+
+Implemented/local-verified:YES. Installable packaged/installed/released by FE:NO.
+This remains an unaccepted development candidate. Prior release ZIPs untouched.
+Historical accepted0.8.1 status below is retained; its publication-in-progress
+heading is superseded by publication941f749,not an open FE release task.
+
 ## Stable0.8.1 accepted — publication in progress,2026-11-05
 
 Final Helper acceptance resolves the producer gate:CRM0.3.18 source/tag
