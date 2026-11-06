@@ -30,12 +30,22 @@ API:early contract request,implementation acknowledgement,and checkpoint70b7224
 with exact connector files/runbook. AB supplied its exact on-disk contract and
 private isolated installation identity. Do not publish that DB/prefix/profile.
 Contract SHA at binding:a1a9f03b68b0eccec08ae3ae57b5c01b047ba0b31247f91ba30b0beb9bee299e.
-AB runtime/contract frozen commit still awaited; no stable API acceptance claimed.
+AB supplied candidate pin68cc49bd85945567afc92f7621e3d696d2cfab68. Exact callable
+contract inspected at that pin; no interface change (review-field count corrected).
+Actual private alma-native-fe-outcome.txt and alma-native-fe-readback.txt independently
+read:installed ClimatrolWorkflow/SubmissionAdapter returned recorded/Attributed with
+receipt_verified true;fresh-process replay returned the same stored receipt. Packet
+ccbd1a3f90beb2d006c2ee539e80893d32291484d9422696ff13aeaa57194641. This is AB-executed
+WordPress/durable receipt evidence,distinct from FE's113 local fixture assertions.
+Receipt export_eligible remains false;separate fresh authority preview was eligible
+with21 columns,original form identity,synthetic USD1250.00 and personalization Denied.
+No actual worksheet append or stable API acceptance claimed.
 
 Run instructions/expected output:docs/integrations/fieldedge/CLIMATROL-RUNBOOK.md.
 Verification:CLIMATROL-VERIFICATION.json. Target demonstration:Monday November9.
-Next:AB incorporates connector-only files,provides pinned candidate and executes
-the installed path with its actual reviewed inquiry/evidence and destination.
+Next:AB completes the dedicated real test-worksheet demonstration once its operator
+supplies the existing service-account path and authorized spreadsheet. Connector
+incorporation,pinned candidate and installed FE receipt/replay are now verified.
 Service-account/test-worksheet dependency is recorded by AB;FE neither retrieves
 client financial data nor invents a destination. Continue connector-specific fixes
 against demonstrated contract changes,without another architecture campaign.

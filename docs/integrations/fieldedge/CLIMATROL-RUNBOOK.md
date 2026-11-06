@@ -46,10 +46,12 @@ identity reuse, uncertain response readback, and strict candidate contract bindi
 
 The exact candidate handoff was received from **Implement Climatrol outcome API**.
 Its source contract is `source/docs/EXTERNAL-OUTCOME-CONTRACT.md` in the canonical
-repository, contract version `1`, on `codex/climatrol-outcome-20261106`. This replaces
+repository, contract version `1`, pinned at
+`68cc49bd85945567afc92f7621e3d696d2cfab68` on
+`codex/climatrol-outcome-20261106`. This replaces
 the earlier proposed method names in CORE-HANDOFF; that historical proposal is
-retained for provenance, not an interface to invoke. Obtain the owner's frozen
-contract/runtime pin before calling the installed candidate.
+retained for provenance, not an interface to invoke. The pin remains an unaccepted
+integration candidate pending the dedicated real test worksheet.
 
 The connector calls only these supplied surfaces:
 
@@ -110,11 +112,23 @@ provenance. The tool submits through AB and reads its receipt. It never creates 
 review or enables/executes any export. Repeat with the same arguments and frozen
 component pins only; for an uncertain retry use the retained original body directly.
 
-AB reported a fresh isolated installation and private identity/profile under the
+AB established a fresh isolated installation and private identity/profile under the
 parent project's `climatrol-demo-20261106` directory. Its operational DB/prefix and
 server paths are intentionally not copied into public source. FE has not executed
-an installed test there. Service-account/test-worksheet setup and final durable/
-fresh-request/concurrency/worksheet verification remain AB's concrete dependencies.
+an installed test there. AB executed the actual installed FE normalization/submission
+path and fresh-process replay; FE independently inspected its private native output
+files. Both returned recorded/Attributed with matching durable receipt readback.
+This is separate from the local API double. Installed packet SHA256:
+`ccbd1a3f90beb2d006c2ee539e80893d32291484d9422696ff13aeaa57194641`.
+
+The pinned AB driver `tools/outcome-demo-acceptance.php` has modes `fixture-fe`,
+`fe-outcome` and `fe-readback`. These are AB-owned installation operations: retain
+the original fixture and body, and use readback instead of resaving setup. AB also
+reported native contention/uncertain-write tests; they are not counted as FE local
+assertions. No real Sheet append has occurred. A separate authority preview built
+21 columns with original form identity, synthetic USD1250.00 and personalization
+Denied; receipt export_eligible remained false. Service-account/test-worksheet
+setup and final real worksheet verification remain AB's concrete dependencies.
 
 ## Source integration ownership
 

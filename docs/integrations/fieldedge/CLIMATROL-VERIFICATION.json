@@ -23,13 +23,28 @@
     "version": "1",
     "submit": "seab_external_outcome_submit(string $body): array",
     "read": "seab_external_outcome_read(string $receipt_id): ?array",
-    "runtime_pin": "awaiting AB owner's frozen integration candidate"
+    "runtime_pin": "68cc49bd85945567afc92f7621e3d696d2cfab68"
   },
   "verification_scope": "local fixtures and in-memory supplied-API test double",
   "installed_wordpress_tests_executed_by_fieldedge": 0,
+  "installed_verification_reviewed_from_ab": {
+    "executor": "primary AB Codex",
+    "source_commit": "68cc49bd85945567afc92f7621e3d696d2cfab68",
+    "evidence": "private alma-native-fe-outcome.txt and alma-native-fe-readback.txt independently inspected",
+    "driver": "tools/outcome-demo-acceptance.php modes fixture-fe / fe-outcome / fe-readback",
+    "packet_sha256": "ccbd1a3f90beb2d006c2ee539e80893d32291484d9422696ff13aeaa57194641",
+    "status": "recorded",
+    "attribution_status": "Attributed",
+    "receipt_verified": true,
+    "receipt_export_eligible": false,
+    "fresh_process_replay": "PASS, identical stored receipt",
+    "separate_eligibility_preview": "eligible; 21 columns; original form identity; synthetic USD 1250.00; personalization Denied",
+    "actual_worksheet_append": false,
+    "acceptance": "unaccepted integration candidate; dedicated real test worksheet pending"
+  },
   "provider_authentication": false,
   "connector_durable_storage": false,
   "exports_executed": false,
   "installed_and_worksheet_verification_owner": "primary AB Codex",
-  "release_state": "unaccepted development checkpoint, not installed or released"
+  "release_state": "unaccepted development checkpoint; installed FE path verified by AB; no stable release"
 }
