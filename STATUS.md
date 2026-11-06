@@ -1,3 +1,34 @@
+## Climatrol integration — UNACCEPTED candidate, 2026-11-06
+
+Canonical source unchanged; branch codex/climatrol-outcome-20261106, rooted at
+stable publication941f749 / accepted v0.8.1cd9d5bc. Stable release/delivery retained.
+FE-only foundation and incremental70b7224 selected; both FE branches/worktree
+preserved, no older root status/runtime/release history merged.
+
+Implemented trusted outcome contract1, separately stored operator review, immutable
+receipts/exact JSON replay, unique job/stage and inquiry/action reservations, and
+held CB intake through its native repository. Explicit two-table additive migration.
+Recorded attribution is independent of fresh advertising eligibility; no CRM head
+or lifecycle projection. Existing21/94 contracts and disabled Google Ads upload remain.
+See docs/EXTERNAL-OUTCOME-CONTRACT.md and tools/outcome-demo-acceptance.php.
+
+Fresh private Alma loopback installation; actual URL/DB/prefix/component inventory
+and synthetic ownership journal retained outside Git in ../climatrol-demo-20261106/.
+Installed native PASS: form inquiry, exact fresh replay/conflict, different notice
+dedup, unmatched/ambiguous, extra job/invoice/value revision holds, current DNC,
+missing consent with owned response restored, two-process contention and exact
+recovery after post-INSERT readback exception. Actual installed FE adapter submits
+normalized source and verifies receipt in a fresh process. CB synthetic producer
+record retains twilio identity and explicit AB relation; Google call delivery held.
+
+Implemented/isolated installed/native verified: YES for the above. Final worksheet
+verification, acceptance freeze and stable publication: NOT COMPLETE. Existing
+service-account path is unavailable; dedicated Google credential path/spreadsheet
+requested. No real Sheet append, provider call/write, client/main-site settings or
+stable delivery replacement. Next: finish exporter-boundary checks, bind the actual
+dedicated test worksheet, append exactly one eligible synthetic FE row and freeze
+the Monday November9 operator candidate with exact pins/limitations.
+
 ## RELEASED stable0.8.1 — 2026-11-05
 
 Implemented / packaged / main-Alma installed / focused verified / released:YES.

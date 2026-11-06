@@ -1,0 +1,16 @@
+{
+  "synthetic": true,
+  "description": "Climatrol internal demonstration only; no actual client revenue policy or records",
+  "inquiry": {
+    "inquiry_id": "inq-climatrol-synthetic-1",
+    "source": {"type": "fluent_form", "form_id": 7, "entry_id": 101}
+  },
+  "association_evidence_id": "climatrol-synthetic-association-1",
+  "value_approval": {
+    "approved": true,
+    "amount": "1250.00",
+    "currency": "USD",
+    "approval_id": "climatrol-synthetic-value-1",
+    "policy_id": "synthetic-usd-demo-1"
+  }
+}

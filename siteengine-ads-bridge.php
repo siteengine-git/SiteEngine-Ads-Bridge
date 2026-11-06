@@ -37,6 +37,9 @@ require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-runtime.php
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-lifecycle.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-coordination.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-inquiries.php';
+require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/Foundation.php';
+require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/Retry.php';
+require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-outcomes.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-doctor.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-admin.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-crm-import.php';
@@ -149,3 +152,10 @@ function seab_configuration_schema_sql() {
 function seab_configuration_migrate( $apply = false ) {
     return SiteEngine_Ads_Bridge_Coordination::migrate( $apply );
 }
+
+/** Trusted same-site outcome contract 1; exact JSON bytes own replay identity. */
+function seab_external_outcome_capability(): array { return SiteEngine_Ads_Bridge_Outcomes::capability(); }
+function seab_external_outcome_submit(string $body): array { return SiteEngine_Ads_Bridge_Outcomes::submit($body); }
+function seab_external_outcome_review(array $evidence): array { return SiteEngine_Ads_Bridge_Outcomes::review($evidence); }
+function seab_external_outcome_read(string $receipt_id): ?array { return SiteEngine_Ads_Bridge_Outcomes::read($receipt_id); }
+function seab_external_call_evidence(string $call_sid,string $inquiry_id): array { return SiteEngine_Ads_Bridge_Outcomes::call_evidence($call_sid,$inquiry_id); }

@@ -4358,6 +4358,112 @@ class SiteEngine_Ads_Bridge_CLI {
          * @param string $time_of_day  Validated HH:MM:SS.
          * @return array
          */
+        /**
+         * Inspect/export one explicitly reviewed synthetic external outcome.
+         *
+         * ## OPTIONS
+         *
+         * --receipt=<sha256>
+         * [--apply]
+         * [--reconcile]
+         *
+         * @subcommand outcome
+         */
+        public function outcome($args,$assoc_args) {
+                $result=$this->external_outcome_export((string)($assoc_args['receipt']??''),isset($assoc_args['apply']),isset($assoc_args['reconcile']));
+                WP_CLI::line(wp_json_encode($result));
+        }
+
+        /** Same builder, authority checks, transport and stage ledger as form exports. */
+        public function external_outcome_export(string $receipt,bool $apply=false,bool $reconcile=false): array {
+                if (!current_user_can('manage_options')) return ['status'=>'held','reason_code'=>'administrator_required'];
+                try {
+                return SiteEngine_Ads_Bridge_Outcomes::protected_call(function() use($receipt,$apply,$reconcile) {
+                        global $wpdb;
+                        $stored=SiteEngine_Ads_Bridge_Outcomes::read($receipt);
+                        if (!$stored) return ['status'=>'held','reason_code'=>'outcome_not_found'];
+                        $response=json_decode($stored['response'],true,16,JSON_THROW_ON_ERROR);
+                        if ($response['status']!=='recorded') return ['status'=>'held','reason_code'=>'outcome_not_recorded'];
+                        if ($response['canonical_receipt_id']!==$receipt) {
+                                $stored=SiteEngine_Ads_Bridge_Outcomes::read($response['canonical_receipt_id']);
+                                if (!$stored) throw new RuntimeException('outcome_canonical_receipt_unavailable');
+                        }
+                        $o=json_decode($stored['body'],true,16,JSON_THROW_ON_ERROR);
+                        $inq=SiteEngine_Ads_Bridge_Inquiries::get($o['inquiry_id']);
+                        if (!$inq || !in_array($inq['state'],['active','archived'],true)) return ['status'=>'held','reason_code'=>'inquiry_unavailable'];
+                        $config=SiteEngine_Ads_Bridge_Config::instance();
+                        if ($config->get('exports.won_jobs.value_field','invoiced_amount')!=='invoiced_amount' || $config->get('exports.won_jobs.date_field','closed_date')!=='closed_date') return ['status'=>'held','reason_code'=>'external_outcome_field_mapping_unsupported'];
+                        $subscriber=\FluentCrm\App\Models\Subscriber::find((int)$inq['contact_id']);
+                        if (!$subscriber) return ['status'=>'held','reason_code'=>'contact_unavailable'];
+                        // This in-memory export view has no CRM/inquiry writes. The receipt
+                        // supplies economic evidence; the frozen inquiry supplies attribution.
+                        $view=$inq; $view['lifecycle']='won'; $view['closed_date']=substr($o['completed_at'],0,10);
+                        $view['invoiced_amount']=$o['amount']; $view['ads_conversion_value_frozen']=$o['amount'];
+                        $built=$this->build_google_ads_import($subscriber,$config,'12:00:00',$view);
+                        $values=$built['values'];
+                        $when=new DateTimeImmutable(preg_replace('/(\.\d{6})\d/','$1',$o['completed_at']));
+                        $values[0]=$when->format('Y-m-d H:i:sP'); $values[14]=$o['amount']; $values[15]=$o['currency'];
+                        $context=['cid'=>(int)$inq['contact_id'],'txn'=>$inq['transaction_id']];
+                        $dispatch=$this->advertising_dispatch_error($values,$context);
+                        $reason=$dispatch!==''?$dispatch:implode('; ',$built['reasons']);
+                        $reason_code=$dispatch==='current DNC blocks advertising dispatch'?'current_dnc':(str_contains($reason,'unsigned legacy consent')?'consent_evidence_missing':'advertising_ineligible');
+                        if (!$built['exportable'] || $dispatch!=='') return ['status'=>'held','reason_code'=>$reason_code,'association_status'=>'attributed','detail'=>$reason];
+                        if (!$apply && !$reconcile) return ['status'=>'eligible','reason_code'=>'fresh_authority_verified','association_status'=>'attributed','values'=>$values,'headers'=>$built['headers'],'inquiry_id'=>$o['inquiry_id']];
+                        $target=get_option('seab_outcome_demo_target_v1',[]);
+                        if (wp_get_environment_type()!=='staging' || ($target['destination']??null)!==seab_external_outcome_capability()['destination'] || ($target['tab']??null)!=='SYNTHETIC_Climatrol_20261109' || ($target['spreadsheet_id']??null)!==$config->get('google_sheets.spreadsheet_id','') || $o['value_policy_id']!=='synthetic-usd-demo-1') return ['status'=>'held','reason_code'=>'isolated_demo_target_required'];
+                        $sink='google_ads_import_converted_lead'; $txn=$inq['transaction_id']; $ledger=$this->ledger_table();
+                        if (!SiteEngine_Ads_Bridge_Storage::inspect_ledger()['ready']) throw new RuntimeException('outcome_ledger_unavailable');
+                        $rows=$wpdb->get_results($wpdb->prepare("SELECT * FROM `$ledger` WHERE sink_slug IN (%s,%s) AND transaction_id=%s ORDER BY id",$sink,'google_ads_import_sheet',$txn),ARRAY_A);
+                        if ($wpdb->last_error!=='' || !is_array($rows)) throw new RuntimeException('outcome_ledger_read_unavailable');
+                        foreach ($rows as $row) if ($row['status']==='appended') return ['status'=>'already_exported','reason_code'=>'converted_stage_already_appended'];
+                        $hash=hash('sha256',implode("\x1f",array_map('strval',$values)));
+                        if ($rows && !$reconcile) return ['status'=>'held','reason_code'=>'outcome_append_uncertain_reconcile_required'];
+                        // Obtain credentials only after all permission and destination gates.
+                        $sheet=$this->prepare_family_sheet_context($config,$target['tab']);
+                        $headers=$this->google_sheets_read_header($sheet['spreadsheet_id'],$target['tab'],$sheet['token']);
+                        if (!$headers['ok'] || $this->trim_trailing_empty_cells($headers['values'])!==$this->trim_trailing_empty_cells($built['headers'])) return ['status'=>'held','reason_code'=>'test_worksheet_headers_mismatch'];
+                        $event=['sink_slug'=>$sink,'contact_id'=>$inq['contact_id'],'transaction_id'=>$txn,'row_hash'=>$hash,'spreadsheet_id'=>$sheet['spreadsheet_id'],'tab'=>$target['tab'],'updated_range'=>'','status'=>'outcome_pending','error'=>'','attempts'=>1];
+                        if ($rows) {
+                                $first=$rows[0];
+                                if ($first['row_hash']!==$hash || $first['spreadsheet_id']!==$sheet['spreadsheet_id'] || $first['tab']!==$target['tab']) return ['status'=>'held','reason_code'=>'outcome_retry_body_or_destination_changed'];
+                                $url='https://sheets.googleapis.com/v4/spreadsheets/'.rawurlencode($sheet['spreadsheet_id']).'/values/'.rawurlencode($this->quote_sheet_title($target['tab']).'!A2:U');
+                                $read=$this->google_sheets_json_request('GET',$url,$sheet['token']);
+                                if (!$read['ok']) return ['status'=>'held','reason_code'=>'outcome_sheet_readback_unavailable'];
+                                $matches=[]; $all=$read['json']['values']??[];
+                                foreach ($all as $i=>$row) {
+                                        if (($row[1]??null)!==$txn || ($row[20]??null)!==$values[20]) continue;
+                                        if (array_pad($row,21,'')!==$values) return ['status'=>'held','reason_code'=>'outcome_sheet_body_conflict'];
+                                        $matches[]=$i+2;
+                                }
+                                if (count($matches)!==1) return ['status'=>'held','reason_code'=>count($matches)?'outcome_sheet_duplicate_requires_review':'outcome_append_unresolved_no_automatic_retry'];
+                                $event['status']='appended'; $event['updated_range']=$target['tab'].'!A'.$matches[0].':U'.$matches[0];
+                                if (!$this->external_outcome_ledger_insert($event)['ok']) throw new RuntimeException('outcome_reconciliation_write_unconfirmed');
+                                return ['status'=>'exported','reason_code'=>'outcome_append_reconciled','updated_range'=>$event['updated_range']];
+                        }
+                        // Persist intention and exact body hash before a physical request.
+                        $intent=$this->external_outcome_ledger_insert($event);
+                        if (!$intent['ok']) throw new RuntimeException('outcome_append_intent_unconfirmed');
+                        $check=$wpdb->get_row($wpdb->prepare("SELECT * FROM `$ledger` WHERE id=%d",$intent['insert_id']),ARRAY_A);
+                        if ($wpdb->last_error!=='' || !$check || $check['row_hash']!==$hash || $check['status']!=='outcome_pending') throw new RuntimeException('outcome_append_intent_readback_unconfirmed');
+                        SiteEngine_Ads_Bridge_Coordination::assert_owner();
+                        $result=$this->google_sheets_append_row($sheet['spreadsheet_id'],$target['tab'],$values,$sheet['token'],'RAW',$context);
+                        if (!$result['ok'] || $result['updated_rows']!==1) return ['status'=>'held','reason_code'=>'outcome_append_uncertain_reconcile_required'];
+                        $event['status']='appended'; $event['updated_range']=$result['updated_range'];
+                        if (!$this->external_outcome_ledger_insert($event)['ok']) throw new RuntimeException('outcome_append_ack_unconfirmed');
+                        return ['status'=>'exported','reason_code'=>'synthetic_outcome_appended','updated_range'=>$result['updated_range']];
+                });
+                } catch (Throwable $error) { return ['status'=>'retry','reason_code'=>'outcome_export_unconfirmed']; }
+        }
+
+        private function external_outcome_ledger_insert(array $event): array {
+                global $wpdb; $insert=$this->ledger_insert($event);
+                if (!$insert['ok']) return $insert;
+                $row=$wpdb->get_row($wpdb->prepare('SELECT * FROM `'.$this->ledger_table().'` WHERE id=%d',$insert['insert_id']),ARRAY_A);
+                if ($wpdb->last_error!=='' || !is_array($row)) return ['ok'=>false,'insert_id'=>$insert['insert_id']];
+                foreach ($event as $key=>$value) if ((string)($row[$key]??'')!==(string)$value) return ['ok'=>false,'insert_id'=>$insert['insert_id']];
+                return $insert;
+        }
+
         private function build_google_ads_import( $subscriber, $config, $time_of_day, $inquiry = null ) {
                 $email   = (string) $subscriber->email;
                 $phone   = (string) $subscriber->phone;
