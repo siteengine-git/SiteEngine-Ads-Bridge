@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-10",
+  "assignment": "Climatrol OAuth provisioning and first bounded read",
+  "controlling_helper": "FE Helper",
+  "executor": "FE Codex",
+  "storage_inspection": {
+    "installed_base_version": "2.4.0",
+    "credential_api": true,
+    "sodium": true,
+    "key_context": "key_unavailable",
+    "registered_definition_count": 0,
+    "credential_table": "absent",
+    "audit_table": "absent",
+    "changes_made": false
+  },
+  "storage_choice": "one local Windows user/machine DPAPI CLIXML bundle outside repository; no source switch or server deployment",
+  "oauth_endpoint": "https://fieldedge.withgobo.com/oauth/token",
+  "read_endpoint": "https://api.fieldedge.com/open-api/v1/work-orders?offset=0&limit=1",
+  "redirect_uri_required_by_documented_flow": false,
+  "company_identity_dependency": "company:read not among supplied scopes; endpoint not called",
+  "local_synthetic_php_assertions": 43,
+  "windows_dpapi_assertions": 6,
+  "public_docs_tls_check": {"http_status": 200, "curl_errno": 0},
+  "real_credentials_provisioned_at_initial_inspection": false,
+  "production_authentication": "not executed; secure provisioning pending",
+  "production_read": "not executed; secure provisioning pending",
+  "provider_writes": 0,
+  "scope_claim": "No permissions independently verified until real read succeeds",
+  "shared_ab_runtime_changes": false,
+  "client_deployment": false
+}

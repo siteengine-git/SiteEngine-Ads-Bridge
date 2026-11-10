@@ -1,3 +1,17 @@
+## Authorized OAuth/read-only milestone — November 10, 2026
+
+FE Helper controls FE Codex. Latest direct user assignment authorizes secure local
+Climatrol production credential provisioning, one OAuth token and one bounded
+read-only API test when provisioned. This supersedes earlier no-auth wording only
+for that bounded milestone. No leads:write,webhooks,bulk retrieval,sync,CRM updates,
+Google delivery,client deployment or canonical AB runtime edits. AB Helper/AB Codex
+retain core ownership; coordination was sent before independent implementation.
+Read docs/integrations/fieldedge/OAUTH-PROVISIONING.md. Credentials never enter chat,
+Git,fixtures,arguments or logs. Installed Base key/tables are unprovisioned; use the
+explicit local DPAPI bundle for this local test,not an automatic Base fallback.
+Do not initialize Base/shared infrastructure or change site credential authority.
+Preserve existing synthetic normalization/submission and all prior evidence.
+
 ## FieldEdge Climatrol implementation — November 6, 2026
 
 This is the isolated FieldEdge worktree at

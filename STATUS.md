@@ -1,3 +1,33 @@
+## OAuth provisioning / bounded production read — November 10, 2026
+
+FE Helper controls FE Codex. Worktree/branch unchanged;starting40a91d4 on
+codex/fieldedge-climatrol-081-20261106. Existing foundation/Climatrol code retained.
+AB Helper/AB Codex coordination sent before FE-only independent implementation;
+no canonical source,loader,schema,settings,client deployment or export changes.
+
+Installed main Alma Base2.4.0 read-only inspection:credential API/sodium present;
+key_context key_unavailable;credential/audit tables absent;registered definitions0.
+No Base keys/tables/settings/permissions changed. Existing Credentials UI is not
+provisioned for FE. Small bounded alternative implemented:Windows DPAPI encrypted
+CLIXML under current-user LOCALAPPDATA\SiteEngine\FieldEdge-Climatrol-OAuth,
+outside Git,with masked local entry and restricted new directory;no site authority
+switch. Three values go through private stdin to a local PHP child,never arguments.
+
+OAuthClient permits only documented client_credentials token POST and fixed
+work-orders GET offset0/limit1. TLS/hostname verified,no redirects,5s connect/15s
+request,64KiB cap,one token+one read,no retries/caching. Sanitized status/schema only.
+Company identity endpoint needs missing company:read and is not called;other granted
+scopes are not claimed verified. No leads:write,webhook,financialhistory or CRM work.
+
+Actual new checks:43 synthetic HTTP/OAuth +6 native Windows DPAPI/parser/status PASS.
+Native cURL public-docs TLS HEAD200/errno0 is separate from production authentication.
+Real credential bundle absent at inspection;production OAuth/read NOT EXECUTED.
+Exact provisioning command and procedure:docs/integrations/fieldedge/OAUTH-PROVISIONING.md.
+Next:administrator runs local FieldEdge-Connection.ps1 -Action Provision using masked
+inputs;FE Codex then runs the already-authorized bounded Test when bundle exists.
+No credential values should be sent through chat. OAUTH-VERIFICATION.json records
+scope/results. Provisioning and one production read do not authorize synchronization.
+
 ## Climatrol runnable FieldEdge connector — November 6, 2026
 
 Workspace: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\fieldedge.
