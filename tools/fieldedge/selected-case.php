@@ -5,17 +5,22 @@ require_once __DIR__ . '/../../includes/connectors/fieldedge/SelectedCaseDiscove
 use SiteEngine\AdsBridge\Connectors\FieldEdge\OAuthClient;
 use SiteEngine\AdsBridge\Connectors\FieldEdge\SelectedCaseJournal;
 use SiteEngine\AdsBridge\Connectors\FieldEdge\SelectedCaseDiscovery;
+$stage = 'selected_input_unconfirmed';
 try {
 	$input = stream_get_contents( STDIN, 32769 );
 	if ( PHP_SAPI !== 'cli' || strlen( $input ) > 32768 ) { throw new RuntimeException(); }
 	$config = json_decode( $input, true, 4, JSON_THROW_ON_ERROR ); unset( $input );
+	$stage = 'selected_config_unconfirmed';
 	if ( ( $config['environment'] ?? null ) !== 'Production_ClimatrolAirLLC' || ! preg_match( '/\A[a-f0-9]{64}\z/D', $config['evidence_sha256'] ?? '' ) ) { throw new RuntimeException(); }
+	$stage = 'selected_evidence_unconfirmed';
 	$bytes = file_get_contents( $config['evidence_file'], false, null, 0, 131073 );
 	if ( ! is_string( $bytes ) || strlen( $bytes ) > 131072 || hash( 'sha256', $bytes ) !== $config['evidence_sha256'] ||
 		file_exists( $config['findings_file'] ) || is_link( $config['findings_file'] ) ) { throw new RuntimeException(); }
 	$entries = json_decode( $bytes, true, 32, JSON_THROW_ON_ERROR ); unset( $bytes );
 	if ( ! is_array( $entries ) || count( $entries ) !== 2 ) { throw new RuntimeException(); }
+	$stage = 'selected_journal_unconfirmed';
 	$journal = new SelectedCaseJournal( $config['journal_file'], $config['evidence_sha256'] );
+	$stage = 'selected_execution_unconfirmed';
 	$report = ( new OAuthClient() )->selectedCase( $config, $journal, static fn( $get, $j ) => SelectedCaseDiscovery::run( $get, $j, $entries ) );
 	unset( $entries );
 	$file = fopen( $config['findings_file'], 'xb' );
@@ -31,5 +36,5 @@ try {
 	echo json_encode( $safe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES ) . "\n";
 	exit( $report['reason_code'] === 'selected_case_completed' ? 0 : 2 );
 } catch ( Throwable $error ) {
-	echo '{"reason_code":"selected_private_execution_unconfirmed"}' . "\n"; exit( 2 );
+	echo json_encode( array( 'reason_code' => $stage ), JSON_THROW_ON_ERROR ) . "\n"; exit( 2 );
 }

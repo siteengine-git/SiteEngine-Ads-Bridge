@@ -24,6 +24,21 @@ try {
     finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer) }
     $status = & $connectionScript -Action Status | ConvertFrom-Json
     Assert-Test ($null -ne $status.provisioned) 'actual provisioning status returns only safe metadata without network access'
+    $php = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'local-test-runtime\php-8.3.36\php.exe'
+    $psi = New-Object Diagnostics.ProcessStartInfo
+    $psi.FileName = $php
+    $psi.Arguments = '-n -r "echo bin2hex(stream_get_contents(STDIN));"'
+    $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
+    $psi.RedirectStandardInput = $true; $psi.RedirectStandardOutput = $true
+    $child = [Diagnostics.Process]::Start($psi)
+    try {
+        $unicodeBytes = [Text.Encoding]::UTF8.GetBytes([string][char]0x2014)
+        $child.StandardInput.BaseStream.Write($unicodeBytes,0,$unicodeBytes.Length)
+        $child.StandardInput.BaseStream.Flush()
+        $child.StandardInput.Close()
+        $hex = $child.StandardOutput.ReadToEnd(); $child.WaitForExit()
+        Assert-Test ($hex -eq 'e28094' -and [IO.File]::ReadAllText($connectionScript).Contains('$process.StandardInput.BaseStream.Write($inputBytes,0,$inputBytes.Length)')) 'PHP stdin preserves Unicode through explicit UTF-8 without BOM'
+    } finally { $child.Dispose() }
     Write-Output "RESULT: $passed PASS, 0 FAIL; Windows DPAPI synthetic roundtrip only; no real credentials or provider requests."
 } finally {
     # One exact, self-created temporary file; never touch the real bundle.

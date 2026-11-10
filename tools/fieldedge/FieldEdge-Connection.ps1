@@ -129,9 +129,14 @@ try {
                 Assert-NoLink $inputObject.findings_file
             }
             $inputJson = ConvertTo-Json -InputObject $inputObject -Compress
-            $process.StandardInput.Write($inputJson)
+            # Write UTF-8 bytes directly: Windows PowerShell's default writer
+            # uses the console code page, which can alter Unicode input.
+            $inputBytes = [Text.Encoding]::UTF8.GetBytes($inputJson)
+            $process.StandardInput.BaseStream.Write($inputBytes,0,$inputBytes.Length)
+            $process.StandardInput.BaseStream.Flush()
             $process.StandardInput.Close()
-            Remove-Variable inputJson,inputObject,bundle
+            [Array]::Clear($inputBytes,0,$inputBytes.Length)
+            Remove-Variable inputBytes,inputJson,inputObject,bundle
             $ceilingMilliseconds = if ($Action -eq 'Discover') { 130000 } else { 40000 }
             if (-not $process.WaitForExit($ceilingMilliseconds)) { $process.Kill(); $process.WaitForExit(); throw 'bounded_probe_timeout' }
             # Never echo raw stderr; provider/cURL diagnostics are not a log source.
