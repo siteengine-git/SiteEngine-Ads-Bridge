@@ -1,5 +1,9 @@
 [CmdletBinding()]
-param([ValidateSet('Provision','Status','Test')][string]$Action = 'Status')
+param(
+    [ValidateSet('Provision','Status','Test','Discover')][string]$Action = 'Status',
+    [string]$EvidenceFile,
+    [string]$EvidenceSha256
+)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
@@ -85,12 +89,18 @@ try {
             '{"provisioned":true,"storage":"Windows DPAPI, current user and machine","network_requests":0}'
         }
     } else {
+        if ($Action -eq 'Discover') {
+            if ($EvidenceSha256 -notmatch '^[a-f0-9]{64}$' -or -not (Test-Path -LiteralPath $EvidenceFile -PathType Leaf)) { throw 'selected_evidence_unavailable' }
+            Assert-NoLink $EvidenceFile
+            if ((Get-FileHash -LiteralPath $EvidenceFile -Algorithm SHA256).Hash.ToLowerInvariant() -ne $EvidenceSha256) { throw 'selected_evidence_hash_mismatch' }
+        }
         $bundle = Read-Bundle
         $projectDirectory = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
         $phpDirectory = Join-Path $projectDirectory 'local-test-runtime\php-8.3.36'
         $php = Join-Path $phpDirectory 'php.exe'
         if (-not (Test-Path -LiteralPath $php) -or -not (Test-Path -LiteralPath (Join-Path $phpDirectory 'ext\php_curl.dll'))) { throw 'approved_php_runtime_unavailable' }
         $probe = Join-Path $PSScriptRoot 'oauth-probe.php'
+        if ($Action -eq 'Discover') { $probe = Join-Path $PSScriptRoot 'selected-case.php' }
         $psi = New-Object Diagnostics.ProcessStartInfo
         $psi.FileName = $php
         # Runtime arguments contain paths and flags only; credential JSON goes to
@@ -110,11 +120,20 @@ try {
                 client_secret = Convert-ForProcess $bundle.client_secret
                 target_id = Convert-ForProcess $bundle.target_id
             }
+            if ($Action -eq 'Discover') {
+                $inputObject.evidence_file = (Resolve-Path -LiteralPath $EvidenceFile).Path
+                $inputObject.evidence_sha256 = $EvidenceSha256
+                $inputObject.journal_file = Join-Path $privateDirectory 'selected-case-pass.journal.json'
+                $inputObject.findings_file = Join-Path $privateDirectory 'selected-case-pass.findings.json'
+                Assert-NoLink $inputObject.journal_file
+                Assert-NoLink $inputObject.findings_file
+            }
             $inputJson = ConvertTo-Json -InputObject $inputObject -Compress
             $process.StandardInput.Write($inputJson)
             $process.StandardInput.Close()
             Remove-Variable inputJson,inputObject,bundle
-            if (-not $process.WaitForExit(40000)) { $process.Kill(); $process.WaitForExit(); throw 'bounded_probe_timeout' }
+            $ceilingMilliseconds = if ($Action -eq 'Discover') { 130000 } else { 40000 }
+            if (-not $process.WaitForExit($ceilingMilliseconds)) { $process.Kill(); $process.WaitForExit(); throw 'bounded_probe_timeout' }
             # Never echo raw stderr; provider/cURL diagnostics are not a log source.
             [void]$errTask.Result
             $result = $outTask.Result | ConvertFrom-Json
@@ -130,7 +149,8 @@ try {
     # Fixed error: no exception, submitted input, secret, token or HTTP body.
     $codes = @('unsafe_private_path','private_directory_acl_unconfirmed','credential_file_unavailable','credential_context_mismatch',
         'credential_bundle_incomplete','credential_bundle_decryption_unconfirmed','windows_dpapi_required','existing_bundle_preserved',
-        'credential_input_incomplete','approved_php_runtime_unavailable','bounded_probe_timeout','probe_output_unconfirmed')
+        'credential_input_incomplete','approved_php_runtime_unavailable','bounded_probe_timeout','probe_output_unconfirmed',
+        'selected_evidence_unavailable','selected_evidence_hash_mismatch')
     $reason = if ($_.Exception.Message -in $codes) { $_.Exception.Message } else { 'secure_local_operation_unconfirmed' }
     [pscustomobject]@{provisioned_or_test_confirmed=$false;reason_code=$reason} | ConvertTo-Json -Compress
     if ($Action -eq 'Provision') { Write-Host 'No provider call was made. Existing credential files are preserved. Use -Action Status before retrying.' }

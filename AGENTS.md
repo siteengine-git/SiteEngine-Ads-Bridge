@@ -1,3 +1,18 @@
+## Authorized selected-entry targeted extension — November 10, 2026
+
+AB Helper's direct instruction through AB Codex now authorizes narrowly allowlisted
+FE client/launcher changes and bounded discovery for two privately selected original
+entries. This supersedes prior no-source/no-executor restrictions only for FE-owned
+targeted reads. AB Codex is execution lead and sole consolidated technical handback
+owner;FE Helper controls FE scope. Use the supplied exact private evidence/hash.
+Maximum SIX cumulative business-record GET attempts,conservatively counted before
+dispatch in one private journal;no automatic retries,pagination sweeps or arbitrary
+list probes. Stop after one defensible pair. Keep customer selectors/provider IDs
+private,out of Git/chat. No financial history/amount reads,real-record synthetic
+labeling,backfill,outcome submission,webhooks,deployment,core edits or exports.
+Return factual results/blockers to pinned AB Codex;no separate prompts to Aubrey.
+See docs/integrations/fieldedge/TARGETED-LOOKUP.md for implementation/test scope.
+
 ## Authorized OAuth/read-only milestone — November 10, 2026
 
 FE Helper controls FE Codex. Latest direct user assignment authorizes secure local

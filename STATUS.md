@@ -1,3 +1,26 @@
+## Selected-entry targeted discovery extension — November 10, 2026
+
+FE-only changes authorized by AB Helper through pinned AB Codex execution lead.
+Existing worktree/branch retained;prior1228120 preserved. TargetedRead allowlists
+documented contact/customer/address/exact-ID GETs only;fixed page0/limit3,no invented
+filters or invoice/financial endpoint. OAuth authentication factored once without
+changing its protections;prior43 OAuth assertions still PASS. Launcher Discover reads
+two hash-bound original entries privately via existing DPAPI credentials and stdin.
+
+SelectedCaseJournal reserves/fsyncs/readbacks BEFORE dispatch,maximum6 GET attempts
+across both entries,including uncertain attempts. One token attempt,no auto retries;
+reinvocation cannot reset counts. Minimal findings/private request journal remain
+outside Git in the existing protected local directory. Source contains synthetic
+test entries only;no production identifiers/selector values committed.
+
+Actual focused local checks:44 targeted +43 prior OAuth +6 Windows PASS;5 affected
+PHP files lint. Partial request/structure failure preserves findings and reports
+failed stop,not completed. No production case API call made before source pin.
+Next:run the authorized finite Discover using AB Codex's private evidence/hash;
+return actual counts/statuses/evidence references and limits directly to AB Codex.
+Do not infer origin from customer/contact/address match or grant Google eligibility.
+No AB core edits,production business writes,backfill,outcome submission or deployment.
+
 ## OAuth provisioning / bounded production read — November 10, 2026
 
 FE Helper controls FE Codex. Worktree/branch unchanged;starting40a91d4 on
