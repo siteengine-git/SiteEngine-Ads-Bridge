@@ -120,10 +120,23 @@ DPAPI roundtrip used temporary synthetic values, not real provider credentials.
 Local cURL also performed a TLS-verified public documentation HEAD:HTTP200,errno0.
 This is not OAuth/provider authentication evidence.
 
-At implementation closeout the real bundle was absent: authentication and production
-read are **not executed** until provisioned. No live permission or account identity
-claim follows from synthetic passes. The script/client will produce the bounded
-sanitized connection report when real inputs are available.
+At implementation closeout the bundle was absent; the administrator subsequently
+provisioned it directly using the masked local prompts. FE Codex then executed the
+authorized production test. The first token attempt ended in an HTTPS transport
+timeout, without an HTTP status or work-order GET. Credential-free diagnostics
+confirmed DNS resolution and eventually a TLS-verified HEAD405 at the token endpoint;
+the method is intentionally unsupported. Other diagnostic attempts timed out. No
+credential rejection was inferred from those transport failures.
+
+One controlled manual reattempt succeeded: token HTTP200, Bearer, expires_in28800;
+work-order GET HTTP200 with one record and the documented total/limit/offset/data
+envelope. Known field types were strings for workOrderId/customerId/invoiceId/
+billingCustomerId/resolution, bool for completed, array for serviceAddress, and null
+for scheduledStart/scheduledEnd. No values, raw bodies, token or financial data were
+retained. This confirms workorders:read for the supplied tenant token; other scopes
+were not exercised. Company-name identity remains independently unverified because
+company:read is not granted. There were two credential-bearing token attempts and
+one work-order GET, with zero automatic retries. See OAUTH-VERIFICATION.json.
 
 Next after successful connection: define and verify one explicit inquiry/lead/job
 relationship under FE Helper/AB Helper ownership. No bulk retrieval, full CRM sync,

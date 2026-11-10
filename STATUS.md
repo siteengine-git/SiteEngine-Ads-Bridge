@@ -21,12 +21,21 @@ scopes are not claimed verified. No leads:write,webhook,financialhistory or CRM 
 
 Actual new checks:43 synthetic HTTP/OAuth +6 native Windows DPAPI/parser/status PASS.
 Native cURL public-docs TLS HEAD200/errno0 is separate from production authentication.
-Real credential bundle absent at inspection;production OAuth/read NOT EXECUTED.
+Real credential bundle was absent at inspection,then administrator provisioned it
+through masked local prompts. Actual token/read verification now PASS:OAuth200,
+Bearer lifetime28800 seconds,and work-order GET200 returning one record. Only field
+types/status retained;no customer/financial values,raw responses or access token.
+workorders:read confirmed;other granted scopes untested;company name unverified
+because company:read absent. First attempt had HTTPS transport timeout/noHTTP/noGET;
+credential-free DNS/TLS diagnostics reached HEAD405,and one controlled manual
+reattempt succeeded. Two token attempts,one work-order GET,zero automatic retries.
 Exact provisioning command and procedure:docs/integrations/fieldedge/OAUTH-PROVISIONING.md.
-Next:administrator runs local FieldEdge-Connection.ps1 -Action Provision using masked
-inputs;FE Codex then runs the already-authorized bounded Test when bundle exists.
+Next:FE Helper/AB Helper define one explicit inquiry/lead/job relationship for a
+separately bounded read-only identity-link investigation. No bulk sync,lead writes,
+webhooks,CRM updates,Google export or client deployment is authorized by this pass.
 No credential values should be sent through chat. OAUTH-VERIFICATION.json records
-scope/results. Provisioning and one production read do not authorize synchronization.
+scope/results. Local provisioning/client source checkpointe1f2d38 remains unchanged;
+this successful live read requires no runtime correction or shared source edit.
 
 ## Climatrol runnable FieldEdge connector — November 6, 2026
 
