@@ -75,11 +75,23 @@ record. AB Codex receives the factual execution result and owns consolidation.
 
 ## Focused local verification
 
-44 synthetic targeted assertions,43 original OAuth assertions and6 Windows DPAPI/
-parser/status assertions PASS. Five affected PHP files lint clean. Tests use fake
+44 synthetic targeted assertions,43 original OAuth assertions and7 Windows DPAPI/
+parser/status/Unicode assertions PASS. Five affected PHP files lint clean. Tests use fake
 transports and native temporary files only, with distinct synthetic form entries.
 They cover route/method/filter refusal, canonical queries, pre-dispatch reservation,
 seventh-request refusal, fresh journal read, no rerun reset, uncertainty/no retry,
 contact-only non-attribution, explicit-reference stop and partial-failure reporting.
-Actual selected-case request counts and findings are retained privately by the
-execution lead; this document contains no production pass claim or customer values.
+The Windows launcher sends explicit UTF-8 bytes through redirected stdin so the
+Windows PowerShell console code page cannot alter Unicode paths or credentials.
+Fixed stage codes identify local failures without exposing inputs or exceptions.
+
+## Bounded production execution
+
+Execution pin2551d2470705b1efd9b7555703b67bbe71458e06:one token HTTP200 and five
+business GET attempts,all HTTP200/JSON received;no retries,pagination or writes.
+Both cases remain Needs Review;candidate provider/contact/location relationships
+did not establish the exact original inquiry-to-job association. The private pass
+is closed. Actual identifiers,source timestamps,relationship references and evidence
+hashes were returned privately to AB Codex for the consolidated handback. No customer
+values are included here. This does not establish Google eligibility,installed
+WordPress acceptance,production conversion submission or synchronization readiness.
