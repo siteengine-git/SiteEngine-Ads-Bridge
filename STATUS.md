@@ -1,3 +1,26 @@
+## Windows/Alma route preparation — November 11, 2026
+
+Startedclean def319f on existingFEbranch;runtime e3534eb/dev.3 proof retained. Exact
+AB request/reply/route protocol received and actual fixed adapter/native source read.
+PilotDouble launcher branch precedes Read-Bundle;Windows PHP worker uses accepted
+PilotReview/LeadSubmission and local lead double,private exclusive request files to
+AB's pinned PowerShell7 adapter. Host/SID/profile/runner/source/tenant/card/body/operation
+pins checked;everyreply requires native site/owner/connection/lock/transaction proof.
+No credential load,provider network,new ledger/REST/auth/shared-runner edits.
+
+New actual Windows/PHP process DOUBLE checks9PASS:happy9callbacks/oneleaddouble,
+per-action receipts,badreply,lock,nonzero,oversize,permit,hosthold. These are NOT actual
+Alma persistence. AB owns sole admitted fresh-context native execution next,≤4new
+evidence rows;whole240s/12callbacks/128KiB/0retry. Requests/observations preserved on
+uncertainty;no reset or consumed-context reuse. No old suites/campaign rerun.
+
+ONE private provider clarification prepared from retained4officialschemas and existing
+Climatrol partnership contact;not sent. Source facts/casing/status/UTC contradictions,
+customer/address/SMS/email/dispatch/job effects and explicit lead/workorder identity
+questions consolidated for AB Helper/Aubrey. No provider probe or new owner request.
+Next:AB binds exact route/card/adapter pins and executes Windows→Alma double proof;
+native production transport remains disabled pending separate real-card authority.
+
 ## One-shot review preparation — November 11, 2026
 
 Started from clean ba2b2a3;accepted foundation1c2fe68 preserved. Exact AB pilot

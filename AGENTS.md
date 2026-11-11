@@ -1,3 +1,15 @@
+## Authorized Windows/Alma form-first route — November 11, 2026
+
+AB Helper accepted dev.3 and authorizes existing Windows launcher + canonical
+Invoke-Site-Wp owner/CLI orchestration. FE owns PilotDouble broker/worker,AB owns
+fixed allowlisted bridge/route admission/native isolated execution. Exact protocol
+pins private host/site/runtime/tenant/source/card,exclusive request files and durable
+claim/observation. No shared runner edit,new REST/auth/credential transfer/ledger,
+provider network or secret load for doubles. ExistingPowerShell7 only. At most12
+callbacks/240seconds/128KiB,0retries. Nativeproduction disabled. One provider question
+draft from retained official/partnership material only;no external contact. No old
+acceptance rerun or real customer/value selection. See WINDOWS-ALMA-ROUTE.md.
+
 ## Authorized one-shot review preparation — November 11, 2026
 
 AB Helper accepted dev.2 and authorized next FE-only source preparation. Preserve

@@ -1,8 +1,11 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('Provision','Status','Test','Discover')][string]$Action = 'Status',
+    [ValidateSet('Provision','Status','Test','Discover','PilotDouble')][string]$Action = 'Status',
     [string]$EvidenceFile,
-    [string]$EvidenceSha256
+    [string]$EvidenceSha256,
+    [string]$RouteFile,[string]$RouteSha256,[string]$CardFile,[string]$CardSha256,
+    [string]$BridgeAdapterPath,[string]$BridgeAdapterSha256,
+    [ValidateSet('review','simulate','disabled-execute')][string]$PilotMode='simulate'
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -80,6 +83,13 @@ try {
         Remove-Variable bundle,verified
         Write-Host "Provisioned DPAPI-encrypted bundle: $credentialFile"
         Write-Host 'Provisioning made no provider/network request. Next run this script with -Action Test.'
+    } elseif ($Action -eq 'PilotDouble') {
+        # This branch precedes Read-Bundle: no DPAPI content is loaded for doubles.
+        Assert-PrivateDirectory
+        $pilotOutput = & (Join-Path $PSScriptRoot 'Invoke-FieldEdgePilotDouble.ps1') -RouteFile $RouteFile -RouteSha256 $RouteSha256 -CardFile $CardFile -CardSha256 $CardSha256 -BridgeAdapterPath $BridgeAdapterPath -BridgeAdapterSha256 $BridgeAdapterSha256 -PilotMode $PilotMode
+        $pilotSucceeded = $?
+        $pilotOutput
+        if (-not $pilotSucceeded) { exit 2 }
     } elseif ($Action -eq 'Status') {
         if (-not (Test-Path -LiteralPath $credentialFile)) {
             '{"provisioned":false,"reason_code":"credential_bundle_not_provisioned"}'
