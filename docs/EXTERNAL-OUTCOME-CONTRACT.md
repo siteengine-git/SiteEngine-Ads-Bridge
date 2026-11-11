@@ -78,12 +78,21 @@ aggregation, correction, refund or historical export rewriting is implemented.
 No Qualified action or 21/94-column contract is changed.
 
 CB intake: `seab_external_call_evidence(string $call_sid,string $inquiry_id): array`
-reads through CB 0.1.4 `CallLogRepository::findByCallSid($sid,true)`; never writes
-CB tables. The identity is `twilio:{CallSid}`, independently related to the explicit
+reads through CB's supported `SiteEngine\CallBridge\Integration\CallEvidence::read('twilio:'.$sid)`
+(`siteengine.call-evidence.v1`, verified with CB 0.1.6); never writes CB tables or
+falls back to an internal repository. The identity is `twilio:{CallSid}`, independently related to the explicit
 AB inquiry. Administrator intake persists that separate relationship, source
 timestamp/status/qualification and snapshot digest in AB's evidence table.
 Missing evidence/interface holds; call-origin Google delivery always
 holds as `call_origin_google_contract_unsupported`. No form identity is fabricated.
+The supported snapshot and its explicit `unavailable` reasons are retained. Technical
+duration qualification is separate from business qualification, authoritative Consent
+and advertising permission. Timestamp timezone, original lease details and durable
+child mapping cannot be reconstructed from current configuration. Missing/malformed/
+unknown/failed evidence holds. Contract-versioned `cb-v1-` audit receipts preserve
+the immutable legacy receipt; replay retains one current receipt and one distinct
+call/inquiry relationship across both audit versions. See
+[the integration milestone evidence](INTEGRATION-MILESTONES-20261111.md).
 
 Explicit CLI advertising inspection/export uses `se-ads outcome --receipt=<id>`;
 `--apply` is limited to the pinned isolated synthetic target described in

@@ -223,23 +223,47 @@ final class SiteEngine_Ads_Bridge_Outcomes {
             return self::response('retry',$reason,$receipt,$digest);
         }
     }
+    /** Read only the supported CB boundary; never fall back to its repository. */
+    private static function read_call_snapshot(string $identity): array {
+        $api='SiteEngine\\CallBridge\\Integration\\CallEvidence';
+        if (!class_exists($api) || !is_callable([$api,'read'])) return ['ok'=>false,'reason_code'=>'call_bridge_interface_unavailable'];
+        try { $evidence=$api::read($identity); }
+        catch (Throwable $e) { return ['ok'=>false,'reason_code'=>'call_evidence_read_unavailable']; }
+        if (!is_array($evidence) || ($evidence['contract']??null)!=='siteengine.call-evidence.v1' ||
+            !is_array($evidence['unavailable']??null) || !in_array($evidence['status']??null,['found','invalid_identity','not_found','storage_error','identity_conflict'],true))
+            return ['ok'=>false,'reason_code'=>'call_bridge_contract_invalid'];
+        if ($evidence['status']!=='found') return ['ok'=>false,'reason_code'=>'call_evidence_'.$evidence['status']];
+        $call=$evidence['call']??null;
+        if (!is_array($call) || ($call['identity']??null)!==$identity || ($call['provider']??null)!=='twilio' ||
+            ($call['provider_call_sid']??null)!==substr($identity,7) || !is_int($call['record_id']??null) || $call['record_id']<1)
+            return ['ok'=>false,'reason_code'=>'call_identity_mismatch'];
+        foreach (['acquisition','number_assignment','outcome'] as $part) if (!is_array($call[$part]??null))
+            return ['ok'=>false,'reason_code'=>'call_bridge_contract_invalid'];
+        foreach (['timestamp_timezone','authoritative_consent_linkage','inquiry_identity','business_qualification','advertising_eligibility','durable_child_leg_mapping'] as $field) {
+            if (!array_key_exists($field,$call) || $call[$field]!==null || !is_string($evidence['unavailable'][$field]??null))
+                return ['ok'=>false,'reason_code'=>'call_bridge_contract_invalid'];
+        }
+        return ['ok'=>true,'evidence'=>$evidence];
+    }
     /** CB identity stays independent of the AB relationship. No CB table writes. */
     public static function call_evidence(string $sid,string $inquiry_id): array {
         if (!current_user_can('manage_options')) throw new RuntimeException('administrator_required');
         if (!preg_match('/^CA[a-f0-9]{32}$/Di',$sid)) throw new InvalidArgumentException('invalid_call_sid');
         self::id($inquiry_id);
-        if (!class_exists('SiteEngine\\CallBridge\\DB\\CallLogRepository')) return ['status'=>'held','reason_code'=>'call_bridge_interface_unavailable'];
-        $call=(new \SiteEngine\CallBridge\DB\CallLogRepository())->findByCallSid($sid,true);
-        if (!$call) return ['status'=>'held','reason_code'=>'call_evidence_unavailable'];
-        if (($call['twilio_call_sid']??null)!==$sid || ($call['transaction_id']??null)!=='twilio:'.$sid) return ['status'=>'held','reason_code'=>'call_identity_mismatch'];
+        $read=self::read_call_snapshot('twilio:'.$sid);
+        if (!$read['ok']) return ['status'=>'held','reason_code'=>$read['reason_code']];
+        $evidence=$read['evidence']; $call=$evidence['call'];
         $result=['status'=>'held','reason_code'=>'call_origin_google_contract_unsupported','call_identity'=>'twilio:'.$sid,
-            'inquiry_id'=>$inquiry_id,'call_status'=>$call['call_status']??null,'duration_seconds'=>$call['call_duration_sec']??null,
-            'qualification_status'=>$call['qualification_status']??null,'created_at'=>$call['created_at']??null,
-            'snapshot_sha256'=>self::key($call)];
+            'inquiry_id'=>$inquiry_id,'call_status'=>$call['outcome']['status']??null,'duration_seconds'=>$call['outcome']['duration_sec']??null,
+            'qualification_status'=>$call['outcome']['technical_qualification']??null,'created_at'=>$call['created_at']??null,
+            'evidence_contract'=>$evidence['contract'],'call_snapshot'=>$call,'unavailable'=>$evidence['unavailable'],
+            'snapshot_sha256'=>self::key($evidence)];
         return self::protected_call(static function() use($result) {
             if (!SiteEngine_Ads_Bridge_Inquiries::get($result['inquiry_id'])) return ['status'=>'held','reason_code'=>'inquiry_unavailable'];
             global $wpdb; $t=self::table('evidence');
-            $id='cb-'.self::key([$result['call_identity'],$result['inquiry_id']]);
+            // Version the evidence receipt, preserving the immutable legacy audit row.
+            // Both versions refer to the same explicit call/inquiry relationship.
+            $id='cb-v1-'.self::key([$result['call_identity'],$result['inquiry_id']]);
             $body=self::json($result+['reviewer_id'=>get_current_user_id()]);
             $old=self::rows($wpdb->prepare("SELECT body FROM `$t` WHERE evidence_id=%s",$id));
             if ($old && $old[0]['body']!==$body) return $result+['evidence_id'=>$id,'review_reason'=>'call_evidence_changed_requires_review'];

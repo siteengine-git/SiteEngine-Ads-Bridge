@@ -1,3 +1,20 @@
+## Parallel integration milestones — November 11, 2026
+
+CB supported-interface and FE synthetic projection are implemented/isolated-installed/
+focused-verified; real Google worksheet demonstration remains BLOCKED. One consolidated
+service-account reference/dedicated test-sheet request sent through AB Helper; no append,
+fixture recreation, production sync/lead POST or client export. Stable0.8.1 unchanged.
+CB0.1.6 sourceccf9c050:52 exact members,48 native lints;two fresh native v1 API reads,
+unchanged CB tables/options/settings/cron,legacy audit retained,one current v1 receipt/
+distinct relationship.25 local boundary checks PASS;no missing acquisition claim.
+FE4f273be:31 owner local checks,6 lints;seven exact selected files integrated/native
+linted. One synthetic contact/job,create/update/replay/conflict/ambiguous/readback PASS;
+positive DNC/tag/status/unrelated preservation,queues/settings/cron unchanged,zero
+delivery attempts. Sentinel-verified replay8queries/0writes;AB observer failures and
+exact recovery retained. Lead creation is dry-run only. Existing controlled-call
+evidence reused separately;call-origin Google remains held. Pins/limits/retention:
+docs/INTEGRATION-MILESTONES-20261111.md. No accepted overall demo freeze or stable release.
+
 ## Climatrol integration — UNACCEPTED candidate, 2026-11-06
 
 Packaged checkpoint source e52007069c58645e861bab760d2571fb1e2206dc;

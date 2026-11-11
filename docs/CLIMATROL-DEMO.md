@@ -16,11 +16,16 @@ ambiguous/unmatched association, revision/additional-job/invoice holds, Consent/
 refusal, two-executor contention and uncertain insert/readback recovery. Business
 attribution remains separate from advertising eligibility.
 
-CB 0.1.4 supplies evidence through `CallLogRepository::findByCallSid($sid,true)`.
+CB 0.1.6 now supplies evidence through supported `Integration\CallEvidence::read()`.
 AB stores `twilio:{CallSid}` and an independent explicit inquiry relation. The
 demonstration producer row is synthetic; there was no Twilio call or callback
 replay. Call-origin Google delivery holds explicitly. See the single authoritative
 [outcome contract](EXTERNAL-OUTCOME-CONTRACT.md) for callables, fields and responses.
+The November 11 isolated successor check reuses that original synthetic row, with
+two fresh native supported-interface reads and no CB record changes. Separate CB-owned
+controlled-call/callback evidence is retained privately; it is not a synthetic fixture,
+genuine advertising click or authoritative Consent proof. Details and current pins:
+[parallel integration milestones](INTEGRATION-MILESTONES-20261111.md).
 
 ## Current installation and pins
 
