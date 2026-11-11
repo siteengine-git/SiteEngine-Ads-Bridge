@@ -1,3 +1,36 @@
+## Stable0.8.2 released and delivered — November11,2026
+
+Implemented / packaged / main-installed / focused-verified / stable-released:
+complete within the documented scope. Public non-draft/non-prerelease release:
+https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.8.2
+Tagv0.8.2 points tod59daff1f90a1dac5af17e654a9ff2710bc9371d; package source
+cffd3a9d6d40d71c785ef6c81f332f7e0f197ace. All10 published assets/API digests
+and independent unauthenticated downloads matched local bytes. ZIP324132bytes,
+SHA25676333e62c2e610637bc6a8fefa946e9272b53d19daf13d1dc3752c8ce2e3b1d2;
+manifest3cb8766e102811c0c03f85067c28487ea73dc4512f71af440f56a4d682cddd8f.
+
+Physical D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge
+contains exactlyone current installable ZIP with matching documents/publication.
+Previous stable0.8.1 delivery10files archived byte-exact outside delivery; all
+dev/frozen worksheet archives/evidence remain unchanged. Runtime/package bytes
+were not modified to add publication evidence. See releases/0.8.2/PUBLICATION.json.
+
+| Owner | Actual state | Executable next action | Remaining boundary |
+| --- | --- | --- | --- |
+| AB Codex | Stable release/main verification/delivery completed; no active server job/control/worker | Preserve release and private install/failed-attempt evidence | No further server action needed for this release |
+| Site administrator | All4exports remain disabled; Sheets connection previouslytrue preserved | Resolve exact credentials-parent access before considering separately authorized delivery | Doctor35PASS5WARN1FAIL remains honest; no secret/permission change |
+| CRM owner | Exact Ads source compatible; installedCRM0.3.18 pin gate rejects0.8.2 | Own candidate-specific producer binding update separately | No CRM mutation/export in AB release job |
+| FE/Consent/CB owners | Existing work/CBmain0.1.7 retained | No further work required for supported core release | ProductionFE/calladvertising held; provider clarification unsent |
+
+Local/native lints46each;69 exact main members;74tables/schema/rows,579retained
+options,27crondefinitions/raw cron and138dependencyfiles preserved under fence.
+Installed admin render/help/readback PASS; no repeated browser/import/worksheet/
+provider campaign. Main originHTTP200, original configuration restored and executor
+independentlyfree. No migration/fixture/client/AWS action, external write or
+destructive cleanup. Historical raw pre0.8.0 cron remains an explicit coverage
+limit, not an open restoration task. No positive call Consent or FE continuity
+claim. Prior sections below are retained historical evidence/superseded scopes.
+
 ## Stable0.8.2 main installation verified — November11,2026
 
 Single AB writer completed existing main executor job; original controls restored,

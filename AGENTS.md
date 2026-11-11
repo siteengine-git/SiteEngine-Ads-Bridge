@@ -1,3 +1,17 @@
+## Current accepted release — November11,2026
+
+Stable Ads Bridge0.8.2 is published and main-Alma focused-verified. Package source
+cffd3a9d6d40d71c785ef6c81f332f7e0f197ace; tagv0.8.2 points to release/evidence
+d59daff1f90a1dac5af17e654a9ff2710bc9371d. ExactZIP76333e62c2e610637bc6a8fefa946e9272b53d19daf13d1dc3752c8ce2e3b1d2.
+Canonical source remains this existing project's source checkout. Authoritative
+delivery remains the literal Plugins\..Deliverables child, exactlyone currentZIP.
+Source STATUS.md and releases/0.8.2 hold current results/limits; historical release
+and planning sections remain preserved, not active blockers. All4 ordinary exports
+remain disabled; existing credentials-parent failure is unresolved. ProductionFE
+transport/calladvertising remain held. CRM0.3.18 requires its owner’s exact binding
+update; reviewed source compatibility is recorded, not new producer acceptance.
+No client rollout, external send or new source ownership is implied.
+
 ## Standing Alma development installation authority — November 11, 2026
 
 Aubrey's direct instruction supersedes conflicting older installation approval,
