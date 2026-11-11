@@ -1,3 +1,27 @@
+## One-shot review preparation — November 11, 2026
+
+Started from clean ba2b2a3;accepted foundation1c2fe68 preserved. Exact AB pilot
+review/read/claim signatures and actual source reviewed. FE PilotReview wraps the
+accepted adapter;raw card SHA/bytes,target/request/source/new operation,budget and
+productionfalse checked at boundaries. Unresolved/owner-designation/consumed-intent
+and mismatched card/read/claim hold. Default no transport,native production disabled.
+Bounded native review/simulate wrapper and caller-context-only synthetic card fixture
+supplied to AB;no new forms/calls/credentials/ledger/server operation from FE.
+
+Official public markdown OpenAPI resolves top-level requiredness,source string and
+numeric status0..19. Preferred method casing and response enum/example disagreements
+remain explicit. LeadReference extracts bounded documented lead/customer/account/
+tracking identity only;unknown workOrderId ignored,no crosswalk. Side-effect and
+lead/job continuity guarantees remain unestablished. PilotPayload validates exact
+bytes without inventing business/appointment values or changing old accepted payloads.
+
+Focused new28card/payload/gate+17reference assertions PASS;8affectedPHP lints PASS;
+diff check clean. No old campaign rerun. Native persistence pending AB-only execution
+at≤1fresh review+intent+claim+result (4rows),0actualHTTP/mail. Private real card remains
+held for owner inputs and WindowsDPAPI/Alma same-process boundary;no live command,
+secret transfer or unsupported authorization is manufactured. Existing dev.2/frozen
+archives/stable0.8.1 and closed production evidence unchanged.
+
 ## Prospective native verification closeout — November 11, 2026
 
 FE execution pin1c2fe6827069748c8c5b6ce3565600ce004efc9f retained unchanged.

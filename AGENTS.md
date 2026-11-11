@@ -1,3 +1,17 @@
+## Authorized one-shot review preparation — November 11, 2026
+
+AB Helper accepted dev.2 and authorized next FE-only source preparation. Preserve
+foundation1c2fe68 and consumed intents. Exact3 AB pilot review/read/claim callables
+govern raw-card/request/target/source/new-operation binding. Review-only synthetic
+transport;production POST disabled until separately authorized completed real card
+AND supported execution host. DPAPI/Windows and same-site Alma PHP are distinct;
+no credential transfer/REST/auth workaround is authorized. No provider reads/writes,
+real customer selection,appointment fabrication,old-suite campaign rerun or source
+changes outside FE files. AB sole native executor,≤1fresh synthetic graph/4evidence
+rows. Official markdown schema findings supplement prior rendered-page evidence;
+extract documented lead identities only,never infer lead/job from contacts. Queue:
+FE code/local focused tests/private pending card;AB actual gate/native verification.
+
 ## Authorized prospective submission foundation — November 11, 2026
 
 AB Helper's next direct assignment verified in pinned AB Codex chat authorizes
