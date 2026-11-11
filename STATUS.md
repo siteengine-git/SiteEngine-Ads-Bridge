@@ -1,21 +1,49 @@
-## Controlled pilot preparation — November 11, 2026 (in progress)
+## Controlled pilot preparation — November 11, 2026, completed isolated milestone
 
-Accepted dev.2/runtime402597d/package9c7310b8...e2727 is preserved. Current task
-adds exact one-shot review/claim binding and focused call-import diagnostics only;
-no live POST, new call, worksheet append, main/client install or stable promotion.
+AB Helper accepts dev.2 as foundation; preserved byte-identical. Actual source delta
+d6d81394270a74df20df3910812b6ed57bcd4d30 is packaged/isolated-installed/focused-
+verified as0.8.2-dev.3. No stable promotion. See candidates/pilot-preparation-20261111/.
 
 | Owner | Actual state | Executable next action | Concrete boundary | Next milestone |
 | --- | --- | --- | --- | --- |
-| AB Codex | Exact-card gate implemented;18 validator/15 call-shape/8 hold-double checks PASS | Integrate pinned FE wrapper, install real source delta in existing isolation, verify one fresh review/claim context | Native production POST disabled; pending actual pilot inputs and execution route | Exact successor/pilot card and focused native proof |
-| FE Codex / FE Helper | Existing session active; official full OpenAPI examined; wrapper/extraction tests running | Finish exact source pin/private card/native fixture wrapper | Provider side effects and company identity still unverified; no provider requests | Callable reviewed card path and concrete pending owner decisions |
-| CB Codex / CB Helper | Capture .1.7 closed; no new source required | Preserve supported evidence; contribute exact Consent/caller/start gaps | No published call Consent issuer/association or caller/start fields | Owner-confirmed contract boundary, no speculative capture work |
-| Consent Codex / Consent Helper | Read-only consultation answered at34ccc2c | No source work assigned | No supported call-bound authority; no legitimate positive-call Consent fixture | Subject-typed original association/current-withdrawal owner decision |
+| AB Codex | Exact one-shot card gate and structural call preview implemented,112 members installed; native one-context review/claim/replay/refusals PASS | Deliver private completed preparation card to AB Helper; preserve audit and safe checkpoint | Real subject/values/effects and exact live authorization absent; native POST disabled | Owner-designated single controlled pilot after precise card completion |
+| FE Codex / FE Helper | e3534eb runtime integrated;45 focused checks and actual native gate closeout def319f | Resolve only named provider effects/continuity questions when a permitted provider route exists | No documented lead/job pair or guaranteed trackingId idempotency; no native provider request | Exact bounded one-create request, never blind timeout retry |
+| CB Codex / CB Helper | Capture .1.7/480b4ca closed; no new adapter/source warranted | Supply trusted association facts only after Consent call contract defined | No caller/provider-start evidence in supported API; no call authority | Future call-mode owner contract, no speculative capture work |
+| Consent Codex / Consent Helper | Confirmed form-only authority at34ccc2c, read-only | Own subject-typed call association/current-withdrawal definition if separately assigned | No supported positive call-authority fixture can exist today | Exact prospective browser-intent/provider-call binding review |
 
-Official linked Google CSV downloaded:8 columns, SHA b9054427...461056e. Pure
-preview cannot export; Consent columns blank and existing21/94 contracts unchanged.
-Exact current fields/references and limits:docs/GOOGLE-CALL-IMPORT-CONTRACT.md.
-Existing Windows DPAPI and Alma same-site PHP are separate contexts; no secret
-transfer, REST/approval service or missing-privilege workaround is introduced.
+ZIP216f22986aa77be8817ceaa95ecca9e6f98bd70f01fb781b6492d02416cbb090;
+manifest ac99201e387d5323f15ba256d5c76b5f84b20a4febf58291bd1f3d8fec462430.
+112 exact installed members,15 changed native/localPHP lints;unchanged files carry
+prior exact-byte lint evidence.86 new focused local assertions,not a broad rerun.
+
+One existing original synthetic form inquiry/new target context:review writes2 rows,
+one201 lead DOUBLE completes4;exact replay0double;no token/HTTP/mail. Prior12 rows
+and their completed journal unchanged;new total16. Completed claim/new card/target
+mismatch/unresolved/missing review refusal PASS. No new contact/form/call. All selected
+original tables/evidence/settings/cron/Google journal preserved. Task processes finished,
+lock free/transaction absent; shared isolated slot released. AB retains staging/backups/
+referenced audit graph. All4ordinary exports and sink disabled;no cleanup requested.
+
+Private pilot preparation card SHA643f650184bf350616780c2b52964ce0ab0585be3808a1a0f4f8fd904d8f2c81.
+Exact tenant resolved privately via existing DPAPI target_id only;no clientsecret/clientID
+conversion or network/company query. Original subject/request and real business values
+remain deliberately unselected. Exact private review/refusal commands executed:held
+before credentials/transport/core writes. No native production command is falsely
+claimed under review_only/synthetic_transport_only. A later exact completed-card
+authorization must bind its execution mode/host; no new credential/account is needed.
+
+Google linked CSV independently downloaded:8 columns,not6 or existing21. Pure mapping
+checks true call-start/caller/later business instant/value and explicit offsets;Consent
+columns blank,always held. Positive structural fixtures are not positive call authority.
+Consent owner confirms no published call-bound API;CB has no caller/start-with-offset.
+Missing/negative/unavailable/DNC tests hold;existing call fresh read held. No invented
+form0/grant/source history;no schema guessed from another import mode. Exact owner
+gaps and primary sources:docs/GOOGLE-CALL-IMPORT-CONTRACT.md.
+
+Stable0.8.1 physical delivery remains exactlyone original ZIP;accepted worksheet archive,
+journal and dev.2ZIP/manifest unchanged. Public records contain hashes/sanitized findings
+only;target/customer/credential/payload/evidence remain private. Historical sections
+below are retained and superseded by this current state.
 
 ## Active execution queue — November 11, 2026, isolated pilot milestone complete
 

@@ -1,0 +1,197 @@
+{
+  "format": "siteengine.ads.controlled-pilot-preparation/1",
+  "date": "2026-11-11",
+  "implemented": true,
+  "packaged": true,
+  "isolated_installed": true,
+  "focused_verified": true,
+  "stable_released": false,
+  "native_production_post_enabled": false,
+  "runtime": {
+    "version": "0.8.2-dev.3",
+    "source": "d6d81394270a74df20df3910812b6ed57bcd4d30",
+    "sha256": "216f22986aa77be8817ceaa95ecca9e6f98bd70f01fb781b6492d02416cbb090",
+    "manifest_sha256": "ac99201e387d5323f15ba256d5c76b5f84b20a4febf58291bd1f3d8fec462430",
+    "members": 112,
+    "fe_source": "e3534eb30c749499a84c3325f2519838fdf0a7b4",
+    "zip_name": "siteengine-ads-bridge-0.8.2-dev.3-ac99201e387d.zip",
+    "designation": "Focused isolated development successor; no stable release"
+  },
+  "preserved": {
+    "dev2_source": "402597db0f8e2f0e52b85a747ee874df0db05989",
+    "dev2_zip_sha256": "9c7310b80828cef66b7b31d4fc757756b23e2c825e91af3c7c43914df72e2727",
+    "dev2_manifest_sha256": "e8610ed33bf9cbd04e0b32d6008628639b9f25b9088a71d6775479a247e40cd7",
+    "worksheet_archive_and_completed_journal": true,
+    "stable_081_one_zip_unchanged": true
+  },
+  "components": {
+    "siteengine-base": {
+      "files": 42,
+      "manifest_sha256": "259ee7ece21cef6708e50d1af282563802671e9b0bef9a22e771d4d3f349b947"
+    },
+    "siteengine-consent": {
+      "files": 6,
+      "manifest_sha256": "14a8bf53e5a53e9b8f7972717931c6692d1ed65e3634a97d2f9eaf2a4db2b7ca"
+    },
+    "siteengine-call-bridge": {
+      "files": 53,
+      "manifest_sha256": "af15239397cfedde9514378a241ff9f1916e24e444dbcedf9d6c0ad936f64746"
+    },
+    "siteengine-ads-bridge": {
+      "files": 112,
+      "manifest_sha256": "00c3f1b440b4b4851f1286d2f84a0080518cd3d5d8ac8f0fbf05abd71986fde3"
+    },
+    "fluentform": {
+      "files": 1241,
+      "manifest_sha256": "50be8a3ee0b6ee968835aeb0793fc429a86710d61c4512b351e1c6cf0c454aa5"
+    },
+    "fluent-crm": {
+      "files": 1186,
+      "manifest_sha256": "702325915ab6f4b10caa46c836749b78cbe1318fc1185ea686d6c6d9dc911232"
+    },
+    "fluentcampaign-pro": {
+      "files": 407,
+      "manifest_sha256": "f0389301f8bd6a075f8e3a2744062b2c72b272ca6b028d9921e67579ff226d3e"
+    }
+  },
+  "owners": {
+    "AB": "Core review/intent/claim/readback, Google structural contract, package and isolated executor",
+    "FE": "Runtime e3534eb30c749499a84c3325f2519838fdf0a7b4; native closeout def319fd27c0621e01c163cc5df7e24b5390e57f",
+    "CB": "Capture480b4ca2def17687a4db80e36891d03bf05ed003 closed; no new source required",
+    "Consent": "Read-only owner confirmation34ccc2c101163ab46f4a2189ddaa3d34f1b4f206; no source edit"
+  },
+  "focused_local": {
+    "card_validation": 18,
+    "google_call_structure": 15,
+    "call_hold_doubles": 8,
+    "FE_reference_normalization": 17,
+    "FE_gate_payload": 28,
+    "total_assertions": 86,
+    "changed_php_lints": 15,
+    "limits": "Doubles/pure validators; no native provider/positive call Consent claim"
+  },
+  "installed": {
+    "exact_AB_members": 112,
+    "native_changed_php_lints": 15,
+    "no_schema_change": true,
+    "selected_install_before_after_snapshots_unchanged": true,
+    "five_unrelated_component_manifests_unchanged": true,
+    "CB_dependency_manifest_unchanged": true
+  },
+  "native_gate": {
+    "phases": [
+      "admit",
+      "disabled",
+      "review",
+      "simulate",
+      "replay",
+      "refusals",
+      "closure"
+    ],
+    "all_processes_exit_0_and_explicit_PASS": true,
+    "existing_original_inquiry_used": true,
+    "new_contacts_forms_calls": 0,
+    "fresh_contexts": 1,
+    "new_review_intent_claim_result_rows": 4,
+    "prior_12_rows_unchanged": true,
+    "total_prospective_rows": 16,
+    "lead_doubles_first": 1,
+    "lead_doubles_replay": 0,
+    "token_doubles": 0,
+    "actual_provider_HTTP": 0,
+    "mail_attempts": 0,
+    "provider_status_code_0_persisted": "code:0",
+    "completed_claim_refused": true,
+    "changed_card_refused": true,
+    "target_mismatch_refused": true,
+    "unresolved_inputs_refused": true,
+    "missing_review_refused": true,
+    "original_selected_tables_evidence_settings_cron_and_Google_journal_preserved": true,
+    "coordination_lock_free_at_close": true,
+    "transaction_absent_at_close": true,
+    "transaction_boundary_limit": "Prior dev.2 observed transport outside transaction/lock carried; new claim returns from same protected guard before transport. No new in-closure SQL observer was added."
+  },
+  "pilot_card": {
+    "private_artifact_sha256": "643f650184bf350616780c2b52964ce0ab0585be3808a1a0f4f8fd904d8f2c81",
+    "private_concise_card_sha256": "6ff24ae665700a8915d944f323c42f47ef23d05ee95ddc236aecda344d20ed1d",
+    "status": "Prepared; actual subject/request pending owner designation, not executable live",
+    "exact_tenant_bound_privately": true,
+    "target_source": "Existing DPAPI target_id only, using approved launcher helpers; no clientsecret/clientID plaintext conversion",
+    "company_identity_independently_verified": false,
+    "provider_requests_for_resolution": 0,
+    "existing_credentials_requested_again": false,
+    "pending_card_review": "held/pilot_card_incomplete_or_unsupported; no core writes",
+    "disabled_execution": "held/native_production_post_disabled; no credentials/token/send",
+    "future_live_command": "Unavailable under review_only/synthetic_transport_only; exact completed-card authorization and reviewed execution-mode/host binding required. Available private commands prove review/refusal only.",
+    "remaining_owner_inputs": [
+      "one prospective original inquiry/subject",
+      "approved customer/contact/address/service/appointment values",
+      "permitted downstream provider effects"
+    ],
+    "provider_questions": [
+      "Does lead creation create/change customer/address or trigger communication/dispatch/jobs, and how are those effects bounded?",
+      "Which documented endpoint/event contains both lead and work-order IDs; does trackingId survive? No supported continuity or idempotency assumption."
+    ],
+    "request_budget": {
+      "oauth_token_posts": 1,
+      "lead_posts": 1,
+      "automatic_retries": 0
+    },
+    "uncertainty": "Retain original exact claim/observation and reconcile; never blind POST or reset consumed synthetic intent"
+  },
+  "call_contract": {
+    "selected": "Official eight-column calls-upload CSV, structural preview only; not existing21-column sheet",
+    "official_csv_sha256": "b9054427d5e012b8a154a4349fdd583121b2a14c44ee5f17d4bcfd065461056e",
+    "positive_structure": "PASS; delivery false, Consent columns blank, no upload-ready row",
+    "positive_call_Consent_fixture": "Not legitimate under current form-only owner contract; not fabricated or claimed",
+    "fresh_native_existing_call": "Held with precise missing authority/Google identity requirements, no row",
+    "exact_gaps": [
+      "Consent-owned prospective subject-typed original browser-intent/canonical-call association and current withdrawal API",
+      "CB provider-verified caller E.164 and true call-start with offset; receipt/capture time cannot substitute",
+      "AB Google forwarding/tracking and calls-upload action/account verification"
+    ],
+    "no_new_call_capture_or_schema": true,
+    "existing_21_and_94_column_contracts_preserved": true
+  },
+  "retention": {
+    "owner": "AB Codex existing isolated allocation; CB provenance unchanged",
+    "new_resources": "One exact synthetic card and four referenced review/intent/claim/result rows; private pending owner card/command/evidence and package backup",
+    "all_task_processes_finished": true,
+    "shared_isolated_slot": "safe checkpoint released",
+    "ordinary_export_families": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "sheet_sink": false,
+    "no_destructive_cleanup": true
+  },
+  "limits": [
+    "No native production lead POST, provider read/write, new call, Google request, client/main deployment or stable promotion",
+    "Real subject/service values and provider side effects not fabricated",
+    "Windows DPAPI and Alma trusted PHP remain distinct; no REST, credential-transfer or new authentication system",
+    "Retained local final-check script decoded an em dash using Windows locale and checked a nonexistent lookalike path. Remote payload/component checks passed; filesystem-derived local delivery check corrected the observation without remote rerun or archive change."
+  ],
+  "private_evidence_sha256": {
+    "REVIEW-SUCCESSOR-RESULTS.json": "d9d8762f4d5fecc2bf09c775a15cba465167bcda0e0ef602b828143e3a1aa1ed",
+    "native-admit.json": "a1ca0acb8e149bb5c78040c370533b9197cd16a83e6d35f0f94556ad5c5ea57f",
+    "native-disabled.json": "dda0c67dfeccbc340d8b1f84761f4e2c7abda610c053afc25dee15ec3b57cc4a",
+    "native-review.json": "a2a90fa581ae5535b26705f890e492444c82f4cc745cd78758a32d75fe3b5ba9",
+    "native-simulate.json": "507d6652b93df42903eab337ed5e239e33c6043f88353377feda42be219b21ed",
+    "native-replay.json": "bc7af42080f33228e6d5960dc3eb48fd38793aa53b3f0b4ad54e33584ce06dff",
+    "native-refusals.json": "87363fbea6d443406ccc12eaed0b1a2d5ca5a48711cc79666c9f7f3375da5548",
+    "native-closure.json": "d3c84a4beda0c4198abdb652133050f108c5e0c4bf5b07381380010434b75ccf",
+    "pending-card-review.json": "87297b2c1c5357e83ffcf3956db8a1db4aa82c5a1f53b173825edbc81d9de652",
+    "pending-card-disabled-execute.json": "ac80155acffeb9ad6db2f6a34a9a8431b4c8408e79f3b099bdbca6b6c9080652",
+    "PENDING-CARD-FINAL-READBACK.json": "3870a18be07641f52162b4b95a2cf50a165ca6cca474bde9d18baedc1d2e7c45",
+    "final-component-pins.json": "2884611167ea1bca6479a9df758b0f1bf78d49533d818a1e00537bc4474b1028",
+    "LOCAL-DELIVERY-CHECK.json": "d44529a60463680e674b286b1acd4e914be8213a55ec08f873e3b1a0ba270cbe",
+    "pilot-card-acceptance.php.txt": "85bbede1009ce21ec38c3b2cb70625d548766642aa0f26159f150a7d22cd3ed3",
+    "call-import-acceptance.php.txt": "d153698ed388e8dfef047f1980506712b44ad7fa8755d591184890e63f502ff9",
+    "call-eligibility-holds.php.txt": "fb40739af7c00cee99423e0a8ed16c67aa62a98d77aa867a85c27a18c3a95f7d",
+    "fieldedge-lead-reference-acceptance.php.txt": "4c5736c9590859318d5b120b85344b709024c38f4fe7f1046c2c036ec032bc3f",
+    "fieldedge-pilot-review-acceptance.php.txt": "88b2db154c03f805091d7d2cdc375c9e3bbe382573a56610056779cc0849491a",
+    "local-lints.txt": "8ffbe1307e4901f2eddfeead570b59c2b48962e9a25de0504550ff32c7d138ba"
+  }
+}
