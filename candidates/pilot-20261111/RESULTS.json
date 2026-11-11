@@ -211,5 +211,19 @@
     "call-pilot-eligibility.json": "eaee19f081ac4d7a57018501aa0f76263b3a577b867524cb6baee93a4d4f81a7",
     "call-pilot-closure.json": "c41e2836b4eded5e71f081f6e50c660a982aff1d5a2b9595fadb3fc42d58a900",
     "final-component-pins.json": "c50bfbed5f0d0a1577a4f9b7061c28d17d232708f65e7d9cf230ee075ac99979"
+  },
+  "later_live_review": {
+    "status": "NOT_EXECUTABLE_LIVE",
+    "private_artifact_sha256": "8bea6be62f5bf18707c30da4379678d83c3b6db896ed3b2ef1be8b8ecd7b9d99",
+    "maximum_effect": "1 lead POST,1 OAuth token POST,0 automatic retry; provider customer/address/notification effects not yet bounded",
+    "remaining_inputs": [
+      "approved customer/service/address/appointment values",
+      "provider requiredness and accepted enums",
+      "downstream provider-native effects",
+      "separate exact live authorization and owner-specific gated transport implementation"
+    ],
+    "consumed_synthetic_intent_may_be_reused": false,
+    "new_provider_requests": 0,
+    "new_secret_loads": 0
   }
 }
