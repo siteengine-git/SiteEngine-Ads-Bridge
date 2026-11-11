@@ -1,0 +1,73 @@
+{
+  "format": "siteengine.ads.form-first-route-tooling/1",
+  "source_commit": "68fc5bab1886bb731b03e8cb347647ebdcf0475f",
+  "designation": "Actual Windows-to-isolated-Alma durable route; provider transport double only",
+  "accepted_runtime_commit": "d6d81394270a74df20df3910812b6ed57bcd4d30",
+  "accepted_runtime_zip_sha256": "216f22986aa77be8817ceaa95ecca9e6f98bd70f01fb781b6492d02416cbb090",
+  "accepted_runtime_manifest_sha256": "ac99201e387d5323f15ba256d5c76b5f84b20a4febf58291bd1f3d8fec462430",
+  "FE_runtime": "3f0036182c07662e499f4661ff32d365006e5408",
+  "FE_uncertainty_tests": "2bda745c78a2f871218d9cff9b1e88417848cdb8",
+  "FE_native_closeout_docs": "71af81e69c7edef6b3715e8e093a559fed47337f",
+  "payload": [
+    {
+      "path": "tools/acceptance/Invoke-ProspectiveBridge.ps1",
+      "bytes": 6378,
+      "sha256": "24dfebab797f33a5acf649ae1d725ef86d648d1f92f3675cf69092495835edb0",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tools/acceptance/prospective-bridge.php",
+      "bytes": 6954,
+      "sha256": "1b19067446a55b83c9a71837fc058b874603802e122ddb9ae7580a4b798b2be2",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tools/fieldedge/FieldEdge-Connection.ps1",
+      "bytes": 10783,
+      "sha256": "1fb10e0b9c508e7a6a4b426285e17cb8edd7dbad5720cf92f01faeb0e91d1c0b",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tools/fieldedge/Invoke-FieldEdgePilotDouble.ps1",
+      "bytes": 13055,
+      "sha256": "3c31b270b3510a5bb3e5d9d156c729557b2c92f362078f4c475b63a1cf398278",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tools/fieldedge/pilot-windows-client.php",
+      "bytes": 3538,
+      "sha256": "f38622e74c6eb03d5c12e8a8903e8eb08f0c5144f87876854bf7a43f5f662b97",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tests/prospective-bridge-local.ps1",
+      "bytes": 3054,
+      "sha256": "2d41f29df9fdda1bb9e7e9307b0d8a6bc1d25bda6d7478b8975a9f5292bab359",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tests/fieldedge-windows-pilot-acceptance.ps1",
+      "bytes": 7987,
+      "sha256": "d43b6e8abd82e09ce9f703a5a89958b9aff21642f98b3ce7e4dddbfb3f0745e2",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "tests/support/fieldedge/Fake-ProspectiveBridge.ps1",
+      "bytes": 2850,
+      "sha256": "4a2a997e469c51f329f8f9105ca149e25a705d0ced995adb622fb83d763d8f82",
+      "role": "test_double_only"
+    },
+    {
+      "path": "docs/FORM-FIRST-WINDOWS-ALMA-ROUTE.md",
+      "bytes": 5061,
+      "sha256": "11b1026f231ce8c069530ebb0b71d7a0713e9fba1bff3ba07e77100dca5c07d8",
+      "role": "tooling_or_documentation"
+    },
+    {
+      "path": "docs/integrations/fieldedge/WINDOWS-ALMA-ROUTE.md",
+      "bytes": 5959,
+      "sha256": "af7fe2cc45e043e32c2339646b8d27ccb61c09718ed14d30959c3266ea96cce2",
+      "role": "tooling_or_documentation"
+    }
+  ]
+}

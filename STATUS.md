@@ -42,8 +42,12 @@ shared-number dialing/replay. CB confirms a new interaction is required,not an a
 to current leases/tel-clicks/provider facts. Consent/CB source unchanged;form-first route
 continues independently. No new call/provider/Google/main/client action or stable release.
 
+Tooling source68fc5bab1886bb731b03e8cb347647ebdcf0475f; ten-file manifestSHA
+550c445f08d33edc9ab1d0bed94279375b98a15650a6fc492ad099c57a0a3632.
+Private route addendumSHA7f827852bcdc69522b162edebead26299a388fb553b21de8c3050db8924498d7;
+provider answers still pending,so real pilot request remains incomplete,not fabricated.
 Current protocol/limits/actual checks:docs/FORM-FIRST-WINDOWS-ALMA-ROUTE.md. Exact private
-route/commands/receipts stay outside Git; sanitized tooling results follow in this source.
+route/commands/receipts stay outside Git;sanitized results:candidates/form-route-20261111/.
 Historical accepted milestones below remain preserved.
 
 ## Controlled pilot preparation — November 11, 2026, completed isolated milestone
