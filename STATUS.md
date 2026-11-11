@@ -1,5 +1,14 @@
 ## Windows/Alma route preparation — November 11, 2026
 
+Focused uncertainty follow-up:ONLY2new process-double cases run via
+fieldedge-windows-pilot-acceptance.ps1 -Group uncertainty;13assertionsPASS.
+Callback7post-double-read and8observe failures hold,preserve original request/permit/
+result evidence and stop with no subsequentcallback/write retry. No falsezero-count
+or successfulcompletion claim;worker/broker/runtime unchanged. Private testreceipts
+retained outsideGit. Actual AB first Windows→Alma run independently read from
+FIRST-RUN.json:completed/succeeded/verified,9callbacks/1locallead-double,0provider/
+credentialload. Exact native replay/closure still pending AB report;not inferred here.
+
 Startedclean def319f on existingFEbranch;runtime e3534eb/dev.3 proof retained. Exact
 AB request/reply/route protocol received and actual fixed adapter/native source read.
 PilotDouble launcher branch precedes Read-Bundle;Windows PHP worker uses accepted

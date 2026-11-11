@@ -62,6 +62,15 @@ size/permit/host cases. It makes no SSH/AB/provider call and is not installed ev
 Actual Windows→canonical runner→Alma durable proof is separately AB-owned/pending.
 No old acceptance campaign was repeated.
 
+Focused post-double uncertainty supplement:run the same test script with
+-Group uncertainty to execute ONLY two new process-double cases. Adapter failure
+at callback7(pre-observation read after local double) and callback8(observe) yields
+13PASS. Exclusive requests/held receipts,original permit/digest and callback sequence
+are preserved;there is no later callback/write retry or false success receipt.
+Missing final local-double count remains unknown,not zero. The callback8 observation
+retains its locally classified result without claiming durable remote acceptance.
+No worker/broker/runtime correction or old-suite rerun was needed.
+
 One provider clarification draft was prepared privately for AB Helper/Aubrey using
 the already-retained Integrations Team route. It consolidates the schema/casing/status
 contradictions,customer/address/notification/dispatch effects,and exact lead/workorder

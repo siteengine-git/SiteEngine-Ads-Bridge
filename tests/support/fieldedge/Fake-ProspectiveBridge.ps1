@@ -20,6 +20,8 @@ switch($q.operation){
 }
 $reply=[ordered]@{contract_version='1';request_sha256=$RequestSha256;route_sha256=$q.route_sha256;card_sha256=$q.card_sha256;operation=$q.operation;ok=$true;result=$result;execution=[ordered]@{connection_id=1000+$n;transaction_absent=$true;coordination_lock_free=$true;owner_uid=1001;site_verified=$true;production_post_enabled=$false}}
 switch($i.operation_id){
+ 'fail-after-double-read'{if($n -eq 7){exit 2}}
+ 'fail-after-double-observe'{if($n -eq 8){exit 2}}
  'bad-reply'{$reply.request_sha256='f'*64}
  'locked'{$reply.execution.coordination_lock_free=$false}
  'nonzero'{exit 2}
