@@ -1,3 +1,25 @@
+## Working-model worksheet demonstration VERIFIED and frozen — November 11, 2026
+
+Retained Google journal resumed after confirmed account sharing;actual authentication
+and dedicated target access PASS. Created only the absent synthetic tab/21headers;
+ONE physical retained-outcome append atA2:U2. Independent fresh Google read matched
+all21cells/exactlyone row. Same-receipt replay returnedalready_exported with0HTTP;
+another independent read verified identical sheet/no additional row. Original isolated
+settings/target restored;all four ordinary exports and isolatedsink disabled;credentials,
+production config,receipt/Consent data preserved. Journal complete;intent+ACK retained.
+
+Working-model baseline runtime/package:
+daca8d6acfd28eb0375dd027a69cc8540c4b9897.
+ZIPa6779cbf61928e589e4ee3bffd0f0c133e09f595e9c7606442608cdf08d86391;
+manifest86c8fce8ba4a947eb197af1aa965b053975bac975a9cd6cb329267f4dc8e26cb.
+All84members and7component pins reverified;prior49native lints carried forward.
+WORKING-MODEL-FREEZE.json supersedes earlier worksheet blockers/designation at
+archive creation. Immutable ZIP retains its originalUNACCEPTEDreview label;this
+verifies a synthetic working model,not stable release/production eligibility.
+CB0.1.6 held call delivery;packaged FE4f273be. Fbad499 supplement below remains
+separately staged/source-integrated and is NOT in this baseline ZIP. Stable0.8.1
+delivery still one byte-identical ZIP;no stable publication/promotion.
+
 ## FE supplement source and scoped native execution — November 11, 2026
 
 FE derivativefbad4999338c8673ffe55946e7f4c7e5fd7f7d6e integrated into this source.

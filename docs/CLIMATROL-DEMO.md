@@ -1,5 +1,16 @@
 # Climatrol integration operator candidate — November 9, 2026
 
+**November 11 working-model freeze:** the retained receipt completed one real
+dedicated-test worksheet append, independent exact 21-cell/single-row readback,
+same-receipt replay without another request and a second identical worksheet read.
+Original isolated settings/target were restored and ordinary exports remain disabled.
+Exact tested runtime/package/component pins and limits are in
+[`WORKING-MODEL-FREEZE.json`](../candidates/climatrol-20261111/WORKING-MODEL-FREEZE.json).
+This supersedes the historical worksheet blocker below. The immutable review ZIP
+keeps its original UNACCEPTED label; the verified synthetic working model is not a
+stable release or production conversion acceptance. Supplemental FE source/native
+tests are separate and are not silently folded into that tested package.
+
 UNACCEPTED. Stable Ads Bridge 0.8.1 and its delivery remain unchanged. The
 integration branch starts at publication `941f74973dabe18d581edd96d0f60a773fbe24ab`,
 accepted tag `cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80`. Exact candidate source and
