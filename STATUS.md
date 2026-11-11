@@ -19,13 +19,14 @@ was declared complete. No change to FE/CB/Consent source or unrelated services.
 
 | Owner | Actual state | Executable next action | Boundary | Milestone |
 | --- | --- | --- | --- | --- |
-| AB Codex | Main exact0.8.2/focused checks complete; metadata/helper/help updated | Publish exact verified ZIP/tag/assets and promote physical single-ZIP delivery | No runtime changes or repeated campaign needed | Stable release/delivery verification |
+| AB Codex | Main exact0.8.2/focused checks complete; metadata/helper/help updated | Publish exact verified ZIP/tag/assets; physical single-ZIP delivery verified | No runtime changes or repeated campaign needed | Stable release/delivery verification |
 | CRM Helper | Exact source compatible; currentCRM0.3.18 gates still rejectnewpins | CRM owner updates optional producer binding within its own assignment | No CRMsource/server/export changes in ABjob | Separate producer update, not Ads core blocker |
 | FE/Consent/CB | Prior owned work andCBmain0.1.7 preserved | No work required for this supported core release | FEproduction/calladvertising remain held | Explicit limits, no fabricated authority |
 
 Private installation attempts/backups/hash receipts are retained by AB. No active
-task worker/fence/executor remains. Stable0.8.1 physical delivery stays intact until
-verified promotion; exact manifest/limits/results in releases/0.8.2. Historical
+task worker/fence/executor remains. Previous stable0.8.1 delivery10files archived byte-exact outside delivery.
+The authoritative directory now holds exactlyone verified0.8.2ZIP; matching
+manifest/limits/results/receipt are in releases/0.8.2. Historical
 sections below are carried evidence and superseded task scopes.
 
 ## Current stable-release execution queue — November 11, 2026

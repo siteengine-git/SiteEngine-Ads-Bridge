@@ -6,7 +6,7 @@
   "manifest_sha256": "3cb8766e102811c0c03f85067c28487ea73dc4512f71af440f56a4d682cddd8f",
   "members": 69,
   "PHP_files": 46,
-  "designation": "Main-Alma focused verification complete; stable publication in progress",
+  "designation": "Stable0.8.2 main-Alma verified; publication identity recorded independently in PUBLICATION.json",
   "accepted_dev3_runtime": "d6d81394270a74df20df3910812b6ed57bcd4d30",
   "production_FE_transport": false,
   "call_advertising": false,
@@ -16,7 +16,6 @@
   "packaged": true,
   "installed": "main Alma0.8.2",
   "verified": "focused exact package/native lint/admin renderer/readback/preservation; carried prior accepted scope",
-  "released": false,
   "CRM_compatibility": "owner reviewed compatible; installedCRM0.3.18 producer exact-pin update pending",
-  "delivery_zip_count": "promotion pending"
+  "delivery_zip_count": 1
 }

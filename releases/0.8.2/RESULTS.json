@@ -7,7 +7,6 @@
   "packaged": true,
   "main_installed": true,
   "focused_verified": true,
-  "released": false,
   "local": {
     "ZIP_CRC_and_exact_members": "PASS",
     "members": 69,
@@ -100,5 +99,6 @@
     "AB": "restricted installation attempts, plugin backup and hash-only preservation receipts retained by AB; no active worker/fence/executor",
     "preexisting_isolation": "prior fixture/audit graphs and worksheet journal retain recorded ownership; no cleanup/recreation",
     "CB": "main0.1.7 preserved; stable publication remains CB-owned"
-  }
+  },
+  "publication": "See independent PUBLICATION.json; installation results precede publication"
 }
