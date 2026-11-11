@@ -475,12 +475,12 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 				'active_contact_id'            => $contact_id,
 				'previous_inquiry_id'          => null,
 				'state'                        => 'active',
-				'lifecycle'                    => self::subscriber_lifecycle_role( $subscriber ),
+				'lifecycle'                    => ($source['type'] ?? '') === 'call' ? 'new' : self::subscriber_lifecycle_role( $subscriber ),
 				'form_id'                      => isset( $binding['form_id'] ) ? $binding['form_id'] : null,
 				'submission_id'                => isset( $binding['entry_id'] ) ? $binding['entry_id'] : null,
 				'transaction_id'               => isset( $binding['transaction_id'] ) ? $binding['transaction_id'] : null,
 				'source_type'                  => isset( $source['type'] ) ? trim( (string) $source['type'] ) : 'adopted_current',
-				'source_reference'             => isset( $source['reference'] ) ? self::nullable_string( $source['reference'] ) : null,
+				'source_reference'             => ($source['type'] ?? '') === 'call' ? $source['identity'] : (isset( $source['reference'] ) ? self::nullable_string( $source['reference'] ) : null),
 				'reconciliation_id'            => null,
 				'request_event_id'             => $event_id,
 				'request_payload_hash'         => $payload_hash,
@@ -492,12 +492,12 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 				'projection_plan_hash'        => null,
 				'projection_verified_at_utc'  => null,
 				'contract_version'             => self::CONTRACT_VERSION,
-				'qualified_at'                 => self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
-				'unqualified_at'               => self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
-				'closed_date'                  => self::mysql_date_or_null( isset( $custom[ $cf ] ) ? $custom[ $cf ] : null ),
-				'invoiced_amount'              => self::positive_decimal_or_null( isset( $custom[ $vf ] ) ? $custom[ $vf ] : null ),
-				'customer_rating'              => self::nullable_string( isset( $custom[ $rf ] ) ? $custom[ $rf ] : null ),
-				'ads_conversion_value_frozen'  => self::positive_decimal_or_null( isset( $custom['ads_conversion_value_frozen'] ) ? $custom['ads_conversion_value_frozen'] : null ),
+				'qualified_at'                 => ($source['type'] ?? '') === 'call' ? null : self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
+				'unqualified_at'               => ($source['type'] ?? '') === 'call' ? null : self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
+				'closed_date'                  => ($source['type'] ?? '') === 'call' ? null : self::mysql_date_or_null( isset( $custom[ $cf ] ) ? $custom[ $cf ] : null ),
+				'invoiced_amount'              => ($source['type'] ?? '') === 'call' ? null : self::positive_decimal_or_null( isset( $custom[ $vf ] ) ? $custom[ $vf ] : null ),
+				'customer_rating'              => ($source['type'] ?? '') === 'call' ? null : self::nullable_string( isset( $custom[ $rf ] ) ? $custom[ $rf ] : null ),
+				'ads_conversion_value_frozen'  => ($source['type'] ?? '') === 'call' ? null : self::positive_decimal_or_null( isset( $custom['ads_conversion_value_frozen'] ) ? $custom['ads_conversion_value_frozen'] : null ),
 				'prepared_at_utc'              => $now,
 				'activated_at_utc'             => $now,
 				'archived_at_utc'              => null,
@@ -1229,6 +1229,15 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			return array( 'ok' => false, 'reason' => 'invalid_source' );
 		}
 		$type = isset( $source['type'] ) ? trim( (string) $source['type'] ) : '';
+		if ( 'call' === $type ) {
+			$identity = $source['identity'] ?? null;
+			if (!is_string($identity) || !preg_match('/^twilio:CA[a-f0-9]{32}$/Di',$identity) || (isset($source['reference']) && $source['reference']!==$identity)) return array('ok'=>false,'reason'=>'call_source_identity_invalid');
+			$api='SiteEngine\\CallBridge\\Integration\\CallEvidence';
+			if (!class_exists($api) || !is_callable([$api,'read'])) return array('ok'=>false,'reason'=>'call_source_interface_unavailable');
+			try { $e=$api::read($identity); } catch (\Throwable $e) { return array('ok'=>false,'reason'=>'call_source_read_unavailable'); }
+			if (($e['contract']??null)!=='siteengine.call-evidence.v1' || ($e['status']??null)!=='found' || ($e['call']['identity']??null)!==$identity || ($e['call']['provider_call_sid']??null)!==substr($identity,7)) return array('ok'=>false,'reason'=>'call_source_evidence_unavailable');
+			return array('ok'=>true,'reason'=>'','form_id'=>null,'entry_id'=>null,'transaction_id'=>$identity);
+		}
 		if ( 'fluent_form' !== $type ) {
 			return array( 'ok' => true, 'reason' => '', 'form_id' => null, 'entry_id' => null, 'transaction_id' => null );
 		}

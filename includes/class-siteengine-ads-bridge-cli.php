@@ -4393,6 +4393,9 @@ class SiteEngine_Ads_Bridge_CLI {
                         if ($association!=='') return ['status'=>'held','reason_code'=>$association,'association_status'=>'attributed'];
                         $inq=SiteEngine_Ads_Bridge_Inquiries::get($o['inquiry_id']);
                         if (!$inq || !in_array($inq['state'],['active','archived'],true)) return ['status'=>'held','reason_code'=>'inquiry_unavailable'];
+                        // Call identity is never rewritten as a Fluent Forms transaction.
+                        // No row/transport is released without a supported call Consent contract.
+                        if (($inq['source_type']??null)==='call') return SiteEngine_Ads_Bridge_Outcomes::call_eligibility($inq);
                         $config=SiteEngine_Ads_Bridge_Config::instance();
                         if ($config->get('exports.won_jobs.value_field','invoiced_amount')!=='invoiced_amount' || $config->get('exports.won_jobs.date_field','closed_date')!=='closed_date') return ['status'=>'held','reason_code'=>'external_outcome_field_mapping_unsupported'];
                         $subscriber=\FluentCrm\App\Models\Subscriber::find((int)$inq['contact_id']);

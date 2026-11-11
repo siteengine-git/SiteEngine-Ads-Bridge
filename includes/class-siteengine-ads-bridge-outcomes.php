@@ -8,7 +8,7 @@ final class SiteEngine_Ads_Bridge_Outcomes {
 
     public static function capability(): array {
         return ['contract_version'=>self::VERSION,'destination'=>SiteEngine_Ads_Bridge_Coordination::capability()['destination'],
-            'callable'=>'seab_external_outcome_submit','source'=>'form','stage'=>'converted',
+            'callable'=>'seab_external_outcome_submit','source'=>'form','sources'=>['form','call'],'stage'=>'converted',
             'value_policy'=>'synthetic-usd-demo-1','google_call_delivery'=>false];
     }
     public static function table(string $kind): string {
@@ -66,6 +66,28 @@ final class SiteEngine_Ads_Bridge_Outcomes {
     private static function json(array $v): string { return json_encode($v,JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES); }
     private static function key(array $v): string { return hash('sha256',self::json($v)); }
     private static function id($v): string { return \SiteEngine\AdsBridge\Connectors\FieldEdge\Foundation::id($v); }
+    /** Call review binds an immutable AB copy of supported CB evidence, never a contact match. */
+    private static function call_review_reason(array $review,array $o): string {
+        $inq=SiteEngine_Ads_Bridge_Inquiries::get($o['inquiry_id']);
+        if(!$inq||$inq['source_type']!=='call'||$inq['form_id']!==null||$inq['submission_id']!==null||!preg_match('/^twilio:CA[a-f0-9]{32}$/Di',$inq['transaction_id']??''))return 'call_inquiry_identity_unavailable';
+        global $wpdb;$t=self::table('evidence');$p=$review['provenance'];$rows=self::rows($wpdb->prepare("SELECT digest,body FROM `$t` WHERE evidence_id=%s",$p['reference']));
+        if(count($rows)!==1||hash('sha256',$rows[0]['body'])!==$rows[0]['digest']||$rows[0]['digest']!==$p['sha256'])return 'call_review_snapshot_unavailable';
+        $e=json_decode($rows[0]['body'],true,24,JSON_THROW_ON_ERROR);
+        if(($e['inquiry_id']??null)!==$o['inquiry_id']||($e['call_identity']??null)!==$inq['transaction_id']||($e['evidence_contract']??null)!=='siteengine.call-evidence.v1')return 'call_review_identity_mismatch';
+        $links=self::rows($wpdb->prepare("SELECT digest,body FROM `$t` WHERE relationship_key=%s",self::key(['cb',$inq['transaction_id']])));$ids=[];
+        foreach($links as$link){if(hash('sha256',$link['body'])!==$link['digest'])return 'call_review_snapshot_unavailable';$v=json_decode($link['body'],true,24,JSON_THROW_ON_ERROR);$ids[]=$v['inquiry_id']??null;}
+        return count(array_unique($ids))===1&&$ids[0]===$o['inquiry_id']?'':'call_inquiry_association_ambiguous';
+    }
+    /** Call advertising stays held until a reviewed original call Consent contract exists. */
+    public static function call_eligibility(array $inq): array {
+        $missing=['authoritative_call_consent','google_call_identity_contract'];$dnc=false;
+        try{
+            $contact=\FluentCrm\App\Models\Subscriber::find((int)$inq['contact_id']);$name=SiteEngine_Ads_Bridge_Config::instance()->get('fluentcrm.lists.do_not_contact','DNC');
+            if(!$contact||!is_iterable($contact->lists)||!is_scalar($name)||(string)$name==='')return ['status'=>'held','reason_code'=>'current_dnc_unavailable','missing_evidence'=>$missing];
+            foreach($contact->lists as$list){if(!isset($list->id,$list->title))return ['status'=>'held','reason_code'=>'current_dnc_unavailable','missing_evidence'=>$missing];if((ctype_digit((string)$name)&&(int)$name===(int)$list->id)||$list->title===(string)$name)$dnc=true;}
+        }catch(Throwable $e){return ['status'=>'held','reason_code'=>'current_dnc_unavailable','missing_evidence'=>$missing];}
+        return ['status'=>'held','reason_code'=>$dnc?'current_dnc':'call_consent_authority_contract_unavailable','association_status'=>'attributed','current_dnc'=>$dnc,'missing_evidence'=>$missing,'google_call_delivery'=>false];
+    }
     private static function digest($v): string {
         if (!is_string($v) || !preg_match('/^[a-f0-9]{64}$/D',$v)) throw new InvalidArgumentException('invalid_digest');
         return $v;
@@ -119,6 +141,8 @@ final class SiteEngine_Ads_Bridge_Outcomes {
             'synthetic'=>$synthetic,'reviewer_id'=>get_current_user_id(),'source'=>$evidence['source']??'form']);
         return self::protected_call(static function() use($id,$outcome,$body) {
             global $wpdb; $t=self::table('evidence');
+            $review=json_decode($body,true,16,JSON_THROW_ON_ERROR);
+            if(($review['source']??null)==='call'){$reason=self::call_review_reason($review,$outcome);if($reason!=='')return ['status'=>'held','reason_code'=>$reason,'evidence_id'=>$id];}
             $prior=self::rows($wpdb->prepare("SELECT * FROM `$t` WHERE evidence_id=%s",$id));
             if ($prior) {
                 $p=json_decode($prior[0]['body'],true,16,JSON_THROW_ON_ERROR); unset($p['reviewed_at']);
@@ -153,7 +177,8 @@ final class SiteEngine_Ads_Bridge_Outcomes {
         $e=self::rows($wpdb->prepare("SELECT * FROM `$t` WHERE evidence_id=%s",$request['evidence_id']));
         if (!$e || hash('sha256',$e[0]['body'])!==$e[0]['digest']) return 'reviewed_evidence_unavailable';
         $review=json_decode($e[0]['body'],true,16,JSON_THROW_ON_ERROR);
-        if ($review['outcome']!==$o || $review['source']!=='form' || !$review['synthetic']) return 'reviewed_evidence_mismatch';
+        if ($review['outcome']!==$o || !in_array($review['source'],['form','call'],true) || !$review['synthetic']) return 'reviewed_evidence_mismatch';
+        if($review['source']==='call'){$reason=self::call_review_reason($review,$o);if($reason!=='')return $reason;}
         $links=self::rows($wpdb->prepare("SELECT digest,body FROM `$t` WHERE relationship_key=%s",self::key([$o['provider'],$o['tenant_id'],$o['job_id']])));
         $ids=[];
         foreach ($links as $link) {
@@ -192,9 +217,9 @@ final class SiteEngine_Ads_Bridge_Outcomes {
                         if (!$inq || !in_array($inq['state'],['active','archived'],true)) $reason='inquiry_unavailable';
                         else {
                             $associated=true; $reason='outcome_persisted';
-                            if ($e['source']!=='form') $reason='call_origin_google_contract_unsupported';
-                            elseif (!preg_match('/^ff:[1-9][0-9]*:[1-9][0-9]*$/D',$inq['transaction_id']??'')) $reason='form_origin_required';
-                            elseif ($o['provider']!=='fieldedge' || !$e['synthetic'] || $o['value_policy_id']!=='synthetic-usd-demo-1' || $o['currency']!=='USD' || $o['amount']==='0.00') $reason='value_policy_requires_review';
+                            if($e['source']==='call')$reason=self::call_review_reason($e,$o)?:'outcome_persisted';
+                            elseif ($e['source']!=='form'||!preg_match('/^ff:[1-9][0-9]*:[1-9][0-9]*$/D',$inq['transaction_id']??'')) $reason='form_origin_required';
+                            if($reason==='outcome_persisted'&&($o['provider']!=='fieldedge' || !$e['synthetic'] || $o['value_policy_id']!=='synthetic-usd-demo-1' || $o['currency']!=='USD' || $o['amount']==='0.00')) $reason='value_policy_requires_review';
                         }
                     }
                 }
@@ -230,7 +255,7 @@ final class SiteEngine_Ads_Bridge_Outcomes {
         try { $evidence=$api::read($identity); }
         catch (Throwable $e) { return ['ok'=>false,'reason_code'=>'call_evidence_read_unavailable']; }
         if (!is_array($evidence) || ($evidence['contract']??null)!=='siteengine.call-evidence.v1' ||
-            !is_array($evidence['unavailable']??null) || !in_array($evidence['status']??null,['found','invalid_identity','not_found','storage_error','identity_conflict'],true))
+            !is_array($evidence['unavailable']??null) || !in_array($evidence['status']??null,['found','invalid_identity','not_found','storage_error','identity_conflict','capture_invalid'],true))
             return ['ok'=>false,'reason_code'=>'call_bridge_contract_invalid'];
         if ($evidence['status']!=='found') return ['ok'=>false,'reason_code'=>'call_evidence_'.$evidence['status']];
         $call=$evidence['call']??null;

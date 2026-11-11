@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SiteEngine Ads Bridge
  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
- * Version: 0.8.2-dev.1
+ * Version: 0.8.2-dev.2
  * Requires PHP: 8.3
  * Requires Plugins: siteengine-base
  * Author: SiteEngine
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SEAB_VERSION', '0.8.2-dev.1' );
+define( 'SEAB_VERSION', '0.8.2-dev.2' );
 define( 'SEAB_PLUGIN_FILE', __FILE__ );
 define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -40,6 +40,7 @@ require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-inquiries.p
 require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/Foundation.php';
 require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/Retry.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-outcomes.php';
+require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-prospective.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-doctor.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-admin.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-crm-import.php';
@@ -159,3 +160,9 @@ function seab_external_outcome_submit(string $body): array { return SiteEngine_A
 function seab_external_outcome_review(array $evidence): array { return SiteEngine_Ads_Bridge_Outcomes::review($evidence); }
 function seab_external_outcome_read(string $receipt_id): ?array { return SiteEngine_Ads_Bridge_Outcomes::read($receipt_id); }
 function seab_external_call_evidence(string $call_sid,string $inquiry_id): array { return SiteEngine_Ads_Bridge_Outcomes::call_evidence($call_sid,$inquiry_id); }
+/** Trusted prospective submission: durable claim; connector transport stays outside. */
+function seab_prospective_prepare(string $intent_json): array { return SiteEngine_Ads_Bridge_Prospective::prepare($intent_json); }
+function seab_prospective_claim(string $intent_id,string $request_body_sha256): array { return SiteEngine_Ads_Bridge_Prospective::claim($intent_id,$request_body_sha256); }
+function seab_prospective_observe(string $intent_id,string $permit,string $observation_json): array { return SiteEngine_Ads_Bridge_Prospective::observe($intent_id,$permit,$observation_json); }
+function seab_prospective_read(string $intent_id): array { return SiteEngine_Ads_Bridge_Prospective::read($intent_id); }
+function seab_prospective_by_lead(string $tenant_id,string $lead_id): array { return SiteEngine_Ads_Bridge_Prospective::by_lead($tenant_id,$lead_id); }
