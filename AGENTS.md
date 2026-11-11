@@ -1,3 +1,17 @@
+## Authorized synthetic CRM projection — November 11, 2026
+
+AB Helper's direct assignment verified in pinned AB Codex chat authorizes one
+FE-owned synthetic FieldEdge-to-FluentCRM customer/job projection and lead-create
+dry-run payload. FE Helper retains direction;AB Codex owns integration/installation.
+Use supported installed FluentCRM3.3.1 APIs only,three explicit owned custom fields,
+bounded synthetic .invalid contact/job fixtures. Preserve unrelated fields,status,
+DNC,tags/lists and sending controls. New isolated synthetic contact may initialize
+unsubscribed;existing status never written. No production CRM/provider writes,
+shared core/loader changes,framework,schema,HTTP receiver,cron,ad attribution or
+Google export. Do not reopen the closed original-entry investigation or unused GET
+slot. Return source/tests/field definitions/runnable isolated command to AB Codex;
+no independent server/allocation action. See docs/integrations/fieldedge/CRM-PROJECTION.md.
+
 ## Authorized selected-entry targeted extension — November 10, 2026
 
 AB Helper's direct instruction through AB Codex now authorizes narrowly allowlisted

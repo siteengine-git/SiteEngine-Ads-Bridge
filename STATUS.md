@@ -1,3 +1,26 @@
+## Synthetic FluentCRM projection — November 11, 2026
+
+FE-owned unreleased source in the existing worktree/branch from cab9352;accepted
+AB baseline and closed production evidence unchanged. AB Helper assignment verified
+in pinned AB Codex chat;FE Helper directs FE scope. Actual installed FluentCRM3.3.1
+API source inspected privately. Narrow model/custom-field adapter retains provider,
+tenant,customer/job IDs in three owned text/textarea fields. Supported unique-email
+insert creates only a synthetic unsubscribed contact;updates write owned custom
+fields only. Exact replay skips writes;ambiguous/unapproved/foreign bindings,stale
+or conflicting snapshots,invalid summaries and uncertain results hold. No ledger,
+framework,production input,shared loader,provider call,CRM schema or server action.
+
+Explicit AB-only CLI demo checks isolated home/root and marker;fixed synthetic
+fixtures,at most one contact/three custom fields per invocation,no network/email.
+Concrete lead-create payload/digest and duplicate/uncertain handling are dry-run
+only;no POST transport,assumed idempotency or production permission.
+
+Focused local31 synthetic projection/dry-run assertions PASS;all6 new PHP files
+lint clean;git diff check clean. Actual installed
+FluentCRM/automation/queue/readback verification is AB-owned and not yet claimed.
+Next:AB Codex performs the isolated installed test using CRM-PROJECTION.md;consolidates
+results/pins with AB Helper. No source release,package replacement or deployment by FE.
+
 ## Selected-entry targeted discovery extension — November 10, 2026
 
 FE-only changes authorized by AB Helper through pinned AB Codex execution lead.
