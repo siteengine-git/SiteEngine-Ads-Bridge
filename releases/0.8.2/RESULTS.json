@@ -1,0 +1,104 @@
+{
+  "version": "0.8.2",
+  "source_commit": "cffd3a9d6d40d71c785ef6c81f332f7e0f197ace",
+  "package_sha256": "76333e62c2e610637bc6a8fefa946e9272b53d19daf13d1dc3752c8ce2e3b1d2",
+  "manifest_sha256": "3cb8766e102811c0c03f85067c28487ea73dc4512f71af440f56a4d682cddd8f",
+  "implemented": true,
+  "packaged": true,
+  "main_installed": true,
+  "focused_verified": true,
+  "released": false,
+  "local": {
+    "ZIP_CRC_and_exact_members": "PASS",
+    "members": 69,
+    "PHP_lints": 46
+  },
+  "main": {
+    "PHP": "8.3.36",
+    "web_SAPI": "litespeed",
+    "web_OPcache_enabled": false,
+    "web_file_cache": "none",
+    "exact_members": 69,
+    "PHP_lints": 46,
+    "configuration_validation": [],
+    "settings_and_effective_configuration_unchanged": true,
+    "export_families": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "Sheets_connection_enabled_preserved": true,
+    "Doctor": {
+      "PASS": 35,
+      "WARN": 5,
+      "FAIL": 1,
+      "PENDING": 0
+    },
+    "Doctor_failure": "Google Sheets credentials: parent unavailable or inaccessible under exact CLI UID; no credential contents read or permissions changed",
+    "pending_inquiry_configuration_operation": "none",
+    "all_four_installed_admin_renderers": "PASS",
+    "installed_help": "PASS",
+    "shipped_successor_readback": "PASS",
+    "visual_browser_test": false,
+    "preservation": {
+      "tables_and_schemas": 74,
+      "retained_options": 579,
+      "cron_definitions": 27,
+      "raw_cron_under_fence": "identical",
+      "dependency_files": 138,
+      "all_compared_native_rows": "identical",
+      "no_new_schema_migration": true
+    },
+    "site_reopened_HTTP": 200,
+    "controls_restored": true,
+    "job_complete": true,
+    "independent_executor_check": "free"
+  },
+  "retained_failures": [
+    {
+      "phase": "before replacement",
+      "cause": "collector initially rejected unrelated table prefixes",
+      "recovery": "original configuration restored; unchanged original51 files verified; separate attempt retained"
+    },
+    {
+      "phase": "before replacement",
+      "cause": "full historical checkpoint transfer exhausted collector bound",
+      "recovery": "server-computed per-field hashes preserve exact-content comparison with bounded result bytes; separate attempt retained; no resource ceiling increased"
+    },
+    {
+      "phase": "after successful restoration",
+      "cause": "checker expected200 for canonical index.php redirect301",
+      "recovery": "independent same-host root200/configuration/members/snapshots/dependencies checks; durable closeout explicitly completed"
+    }
+  ],
+  "carried_evidence": {
+    "accepted_dev3": "d6d81394270a74df20df3910812b6ed57bcd4d30",
+    "dev3_zip": "216f22986aa77be8817ceaa95ecca9e6f98bd70f01fb781b6492d02416cbb090",
+    "accepted_form_route_tools": "68fc5bab1886bb731b03e8cb347647ebdcf0475f",
+    "form_route_checkpoint": "f246bd6110370fbf1b3f2901276b6d94d29597ce",
+    "frozen_worksheet_runtime": "daca8d6acfd28eb0375dd027a69cc8540c4b9897",
+    "frozen_worksheet_zip": "a6779cbf61928e589e4ee3bffd0f0c133e09f595e9c7606442608cdf08d86391",
+    "frozen_worksheet_manifest": "86c8fce8ba4a947eb197af1aa965b053975bac975a9cd6cb329267f4dc8e26cb",
+    "no_repeated_append_or_acceptance_campaign": true
+  },
+  "CRM_compatibility": {
+    "owner_review": "compatible at exact stable source; bootstrap/inquiry unchanged from reviewed candidate",
+    "installed_version": "0.3.18",
+    "exact_successor_export_binding": "rejects0.8.2; CRM-owned update pending",
+    "new_export_run": false,
+    "Ads_core_release_gate": false
+  },
+  "limits": [
+    "No live provider POST/token use, calls/messages/payments, Google submissions or ordinary export activation",
+    "No productionFE lead/job continuity or positive call Consent",
+    "Credentials accessibility/live customer delivery unverified",
+    "Historical pre0.8.0 serialized cron payload uncaptured, not pending restoration",
+    "No client/AWS rollout or other-plugin source changes"
+  ],
+  "remaining_resources": {
+    "AB": "restricted installation attempts, plugin backup and hash-only preservation receipts retained by AB; no active worker/fence/executor",
+    "preexisting_isolation": "prior fixture/audit graphs and worksheet journal retain recorded ownership; no cleanup/recreation",
+    "CB": "main0.1.7 preserved; stable publication remains CB-owned"
+  }
+}

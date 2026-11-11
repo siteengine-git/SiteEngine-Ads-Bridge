@@ -1,0 +1,11 @@
+{
+  "status": "compatible source review; exact installed CRM binding update remains pending",
+  "reviewer": "CRM Helper",
+  "reviewed_Ads_source": "cffd3a9d6d40d71c785ef6c81f332f7e0f197ace",
+  "bootstrap_sha256": "57655ab50138d0773c02aa2014457e1a8448933b684c6b39c0512a13d0080419",
+  "inquiry_sha256": "1cff11686b76b1d4014b93725e26b1368994457f21123548077df99fd0f5fd96",
+  "installed_CRM": "0.3.18",
+  "CRM_source": "9076e3d62237bc1fceb79a0064355d8815fe81e6",
+  "no_new_export_or_CRM_mutation": true,
+  "effect": "CRM0.3.18 producer gates reject0.8.2 until CRM owner updates exact reviewed bindings; separate destination importer remains supported without CRM plugin"
+}

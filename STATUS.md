@@ -1,3 +1,33 @@
+## Stable0.8.2 main installation verified — November11,2026
+
+Single AB writer completed existing main executor job; original controls restored,
+canonical rootHTTP200, independent executor check free. Sourcecffd3a9d6d40d71c785ef6c81f332f7e0f197ace;
+ZIP76333e62c2e610637bc6a8fefa946e9272b53d19daf13d1dc3752c8ce2e3b1d2;
+manifest3cb8766e102811c0c03f85067c28487ea73dc4512f71af440f56a4d682cddd8f.
+69exact members/46local+46nativePHP8.3.36lints; four installed admin renderers,
+updated help and shipped readback PASS. Not a new visual/browser/producer campaign.
+74main tables/schema/rows,579retainedoptions,27cron definitions/raw cron identical
+under fence;138dependencyfiles preserved includingCB0.1.7. No migration/fixture or
+external traffic. All4exportfamiliesfalse; existingSheetssinktrue preserved.
+Doctor35PASS5WARN1FAIL: existingcredentialsparentaccessfailure, not hidden or fixed.
+
+Prior dev.3/form-route/native/broker/replay/uncertainty/worksheet evidence carried;
+no completed append/fixture/call was repeated. Two preinstall collector failures
+and a canonical index.php301/root200 closeout correction are retained privately,
+with verified original configuration/files and explicit recovery. No unknown write
+was declared complete. No change to FE/CB/Consent source or unrelated services.
+
+| Owner | Actual state | Executable next action | Boundary | Milestone |
+| --- | --- | --- | --- | --- |
+| AB Codex | Main exact0.8.2/focused checks complete; metadata/helper/help updated | Publish exact verified ZIP/tag/assets and promote physical single-ZIP delivery | No runtime changes or repeated campaign needed | Stable release/delivery verification |
+| CRM Helper | Exact source compatible; currentCRM0.3.18 gates still rejectnewpins | CRM owner updates optional producer binding within its own assignment | No CRMsource/server/export changes in ABjob | Separate producer update, not Ads core blocker |
+| FE/Consent/CB | Prior owned work andCBmain0.1.7 preserved | No work required for this supported core release | FEproduction/calladvertising remain held | Explicit limits, no fabricated authority |
+
+Private installation attempts/backups/hash receipts are retained by AB. No active
+task worker/fence/executor remains. Stable0.8.1 physical delivery stays intact until
+verified promotion; exact manifest/limits/results in releases/0.8.2. Historical
+sections below are carried evidence and superseded task scopes.
+
 ## Current stable-release execution queue — November 11, 2026
 
 AB Codex is the single Ads source/main-site release writer. Runtime baseline is
