@@ -1,3 +1,17 @@
+## Google test-sheet access checked — November 11, 2026
+
+Both supplied existing credential files are readable in the exact isolated owner/CLI
+context and represent different service accounts. Both authenticate HTTP200. Dedicated
+test-spreadsheet access returns403 PERMISSION_DENIED (caller lacks permission).
+Selected Ads service-account sharing action sent through AB Helper;private account/
+path/target evidence stays outside Git. No worksheet/tab/header/append writes attempted.
+Three token requests/three metadata GETs total:two distinct-account probes plus one
+selected-account diagnostic,no automatic retries. Original receipt/ledger0/settings/
+target/credential bytes preserved;all four ordinary exports and isolated sink disabled.
+Runtime/package pins unchanged;see candidates/climatrol-20261111/GOOGLE-ACCESS.json.
+Resume the retained Google journal after the exact sharing action;do not recreate
+fixtures,reset the journal or replay an uncertain append. Overall demonstration held.
+
 ## Parallel integration milestones — November 11, 2026
 
 Integrated runtime sourcedaca8d6acfd28eb0375dd027a69cc8540c4b9897 pushed. Unaccepted
