@@ -57,3 +57,40 @@ frozen in AB; no historical acquisition is reconstructed. Reviewed synthetic cal
 business outcomes use existing outcome receipts/dedup. Google inspection freshly
 checks current DNC and holds the unavailable authoritative call Consent/Google call
 identity contract; no advertising row is released and no call delivery is enabled.
+
+## Exact one-shot private review gate
+
+Additive trusted PHP functions:
+
+```php
+seab_prospective_pilot_review(string $card_json): array;
+seab_prospective_pilot_read(string $card_sha256): array;
+seab_prospective_pilot_claim(string $card_sha256, string $intent_id, string $request_sha256): array;
+```
+
+The pin is SHA-256 of exact UTF-8 bytes, never reserialized JSON. Strict card keys:
+contract_version `1`, mode `review_only`, card_id, target, intent_json, request_budget,
+unresolved, subject_kind. Target has provider `fieldedge`, environment, tenant_id and
+credential_reference_sha256 (opaque reference identifier bytes, not secret contents).
+Target tenant equals the intent tenant. Budget is exactly1 token POST/1 lead POST/
+0 retries. Only synthetic subjects with no unresolved inputs are reviewable today.
+The pending real card remains owner_designation_required and held without writes.
+
+One immutable review in existing outcome evidence binds the card and intent; no
+new ledger/schema. New reviews refuse pre-existing intents, including consumed
+synthetic receipts. A different card cannot replace an origin/target review. Exact
+replay can finish its own interrupted review-to-intent persistence, but cannot clear
+claim/result. Missing intent behind retained review is pending, not launch proof.
+Claim checks source and hashes under the existing lock and returns before transport.
+
+Review returns the prepare-like base plus card_sha256/production_post_enabled false.
+Read returns reviewed/pending/not_found, original card_json and existing prospective
+read shape. Claim returns the existing claim response plus card_sha256 and production
+false. Existing three-field claim/observation/reconciliation remain unchanged. FE
+verifies exact card/readback at each callback before any synthetic transport.
+No native production permit is issued. Disabled execution holds before credentials.
+
+Windows DPAPI launcher and Alma trusted PHP are separate execution hosts. This gate
+does not add REST, credential transfer or an approval service. A later completed live
+card must resolve the execution route, actual subject/service values and provider
+effects under separate exact authorization. Existing credentials are not requested.

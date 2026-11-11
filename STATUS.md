@@ -1,3 +1,22 @@
+## Controlled pilot preparation — November 11, 2026 (in progress)
+
+Accepted dev.2/runtime402597d/package9c7310b8...e2727 is preserved. Current task
+adds exact one-shot review/claim binding and focused call-import diagnostics only;
+no live POST, new call, worksheet append, main/client install or stable promotion.
+
+| Owner | Actual state | Executable next action | Concrete boundary | Next milestone |
+| --- | --- | --- | --- | --- |
+| AB Codex | Exact-card gate implemented;18 validator/15 call-shape/8 hold-double checks PASS | Integrate pinned FE wrapper, install real source delta in existing isolation, verify one fresh review/claim context | Native production POST disabled; pending actual pilot inputs and execution route | Exact successor/pilot card and focused native proof |
+| FE Codex / FE Helper | Existing session active; official full OpenAPI examined; wrapper/extraction tests running | Finish exact source pin/private card/native fixture wrapper | Provider side effects and company identity still unverified; no provider requests | Callable reviewed card path and concrete pending owner decisions |
+| CB Codex / CB Helper | Capture .1.7 closed; no new source required | Preserve supported evidence; contribute exact Consent/caller/start gaps | No published call Consent issuer/association or caller/start fields | Owner-confirmed contract boundary, no speculative capture work |
+| Consent Codex / Consent Helper | Read-only consultation answered at34ccc2c | No source work assigned | No supported call-bound authority; no legitimate positive-call Consent fixture | Subject-typed original association/current-withdrawal owner decision |
+
+Official linked Google CSV downloaded:8 columns, SHA b9054427...461056e. Pure
+preview cannot export; Consent columns blank and existing21/94 contracts unchanged.
+Exact current fields/references and limits:docs/GOOGLE-CALL-IMPORT-CONTRACT.md.
+Existing Windows DPAPI and Alma same-site PHP are separate contexts; no secret
+transfer, REST/approval service or missing-privilege workaround is introduced.
+
 ## Active execution queue — November 11, 2026, isolated pilot milestone complete
 
 AB Codex is integration lead; AB Helper owns consolidated conclusions. Existing FE

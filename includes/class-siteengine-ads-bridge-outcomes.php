@@ -86,7 +86,8 @@ final class SiteEngine_Ads_Bridge_Outcomes {
             if(!$contact||!is_iterable($contact->lists)||!is_scalar($name)||(string)$name==='')return ['status'=>'held','reason_code'=>'current_dnc_unavailable','missing_evidence'=>$missing];
             foreach($contact->lists as$list){if(!isset($list->id,$list->title))return ['status'=>'held','reason_code'=>'current_dnc_unavailable','missing_evidence'=>$missing];if((ctype_digit((string)$name)&&(int)$name===(int)$list->id)||$list->title===(string)$name)$dnc=true;}
         }catch(Throwable $e){return ['status'=>'held','reason_code'=>'current_dnc_unavailable','missing_evidence'=>$missing];}
-        return ['status'=>'held','reason_code'=>$dnc?'current_dnc':'call_consent_authority_contract_unavailable','association_status'=>'attributed','current_dnc'=>$dnc,'missing_evidence'=>$missing,'google_call_delivery'=>false];
+        return ['status'=>'held','reason_code'=>$dnc?'current_dnc':'call_consent_authority_contract_unavailable','association_status'=>'attributed','current_dnc'=>$dnc,'missing_evidence'=>$missing,'google_call_delivery'=>false,
+            'google_call_identity_requirements'=>SiteEngine_Ads_Bridge_Call_Import::requirements()];
     }
     private static function digest($v): string {
         if (!is_string($v) || !preg_match('/^[a-f0-9]{64}$/D',$v)) throw new InvalidArgumentException('invalid_digest');

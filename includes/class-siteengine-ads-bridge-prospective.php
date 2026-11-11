@@ -73,6 +73,63 @@ final class SiteEngine_Ads_Bridge_Prospective {
             }
             self::put('result',$id,['observation_json'=>$body,'observation'=>$o],$relationship);return self::read_locked($id);});
     }
+    /** Exact private review bytes; this contract never authorizes native production POST. */
+    private static function pilot_card(string $bytes): array {
+        if(strlen($bytes)>65536)throw new InvalidArgumentException('prospective_pilot_card_too_large');
+        $c=json_decode($bytes,true,24,JSON_THROW_ON_ERROR);
+        $keys=['contract_version','mode','card_id','target','intent_json','request_budget','unresolved','subject_kind'];
+        if(!is_array($c)||array_diff(array_keys($c),$keys)||array_diff($keys,array_keys($c))||($c['contract_version']??null)!=='1'||($c['mode']??null)!=='review_only'||($c['subject_kind']??null)!=='synthetic')throw new InvalidArgumentException('prospective_pilot_card_invalid');
+        self::id($c['card_id']);
+        if(!is_array($c['unresolved'])||!array_is_list($c['unresolved'])||$c['unresolved']!==[])throw new InvalidArgumentException('prospective_pilot_owner_inputs_unresolved');
+        $t=$c['target'];$b=$c['request_budget'];
+        if(!is_array($t)||array_diff(array_keys($t),['provider','environment','tenant_id','credential_reference_sha256'])||count($t)!==4||$t['provider']!=='fieldedge')throw new InvalidArgumentException('prospective_pilot_target_invalid');
+        self::id($t['environment']);self::id($t['tenant_id']);self::hash($t['credential_reference_sha256']);
+        if(!is_array($b)||count($b)!==3||($b['oauth_token_posts']??null)!==1||($b['lead_posts']??null)!==1||($b['automatic_retries']??null)!==0)throw new InvalidArgumentException('prospective_pilot_budget_invalid');
+        if(!is_string($c['intent_json']))throw new InvalidArgumentException('prospective_pilot_intent_invalid');
+        $r=self::parse($c['intent_json']);if($r['tenant_id']!==$t['tenant_id'])throw new InvalidArgumentException('prospective_pilot_target_mismatch');
+        return $c;
+    }
+    private static function pilot_identity(array $r): string {
+        return hash('sha256',self::json([SiteEngine_Ads_Bridge_Outcomes::capability()['destination'],$r['provider'],$r['tenant_id'],$r['inquiry_id']]));
+    }
+    private static function pilot_read_locked(string $sha): array {
+        self::hash($sha);$review=self::get('review',$sha);
+        $base=['contract_version'=>'1','card_sha256'=>$sha,'production_post_enabled'=>false];
+        if(!$review)return $base+['status'=>'not_found'];
+        if(!is_string($review['card_json']??null)||hash('sha256',$review['card_json'])!==$sha)throw new RuntimeException('prospective_pilot_review_corrupt');
+        $c=self::pilot_card($review['card_json']);$r=self::parse($c['intent_json']);$id=self::pilot_identity($r);
+        if(($review['intent_id']??null)!==$id)throw new RuntimeException('prospective_pilot_review_corrupt');
+        $v=self::read_locked($id);
+        if(($v['status']??null)==='not_found')return $base+['status'=>'pending','card_json'=>$review['card_json'],'prospective'=>$v];
+        if(($v['intent_json']??null)!==$c['intent_json'])throw new RuntimeException('prospective_pilot_intent_mismatch');
+        return $base+['status'=>'reviewed','card_json'=>$review['card_json'],'prospective'=>$v];
+    }
+    public static function pilot_review(string $bytes): array {
+        return self::guarded(static function()use($bytes){
+            $c=self::pilot_card($bytes);$r=self::parse($c['intent_json']);self::source($r);$sha=hash('sha256',$bytes);$id=self::pilot_identity($r);
+            $base=['contract_version'=>'1','card_sha256'=>$sha,'intent_id'=>$id,'body_sha256'=>$r['request']['body_sha256'],'production_post_enabled'=>false];
+            $old=self::get('review',$sha);$intent=self::get('intent',$id);
+            if(!$old){
+                if($intent)return $base+['status'=>'held','reason_code'=>'prospective_pilot_existing_intent_refused'];
+                global $wpdb;$t=SiteEngine_Ads_Bridge_Outcomes::table('evidence');$relationship=hash('sha256','pilot-review|'.$id);
+                if(self::rows($wpdb->prepare("SELECT evidence_id FROM `$t` WHERE relationship_key=%s LIMIT 1",$relationship)))return $base+['status'=>'conflict','reason_code'=>'prospective_pilot_card_already_bound'];
+                self::put('review',$sha,['card_json'=>$bytes,'intent_id'=>$id],$relationship);
+            }elseif(($old['card_json']??null)!==$bytes||($old['intent_id']??null)!==$id)throw new RuntimeException('prospective_pilot_review_corrupt');
+            if(!$intent)self::put('intent',$id,['intent_json'=>$c['intent_json']]);
+            $v=self::pilot_read_locked($sha);if($v['status']!=='reviewed')throw new RuntimeException('prospective_pilot_readback_unconfirmed');
+            return $base+['status'=>$old?'replayed':'prepared','reason_code'=>'prospective_pilot_review_only'];
+        });
+    }
+    public static function pilot_read(string $sha): array {return self::guarded(static fn()=>self::pilot_read_locked($sha));}
+    public static function pilot_claim(string $sha,string $id,string $digest): array {
+        return self::guarded(static function()use($sha,$id,$digest){
+            $review=self::pilot_read_locked($sha);$v=$review['prospective']??[];
+            if(($review['status']??null)!=='reviewed'||($v['intent_id']??null)!==$id||($v['status']??null)!=='prepared')return ['contract_version'=>'1','status'=>'held','reason_code'=>'prospective_pilot_claim_refused','production_post_enabled'=>false];
+            if(!hash_equals($v['body_sha256'],self::hash($digest)))return ['contract_version'=>'1','status'=>'conflict','reason_code'=>'prospective_request_digest_mismatch','production_post_enabled'=>false];
+            self::source(self::parse($v['intent_json']));$claim=['permit'=>bin2hex(random_bytes(32)),'body_sha256'=>$digest,'dispatch_mode'=>'synthetic_transport_only'];self::put('claim',$id,$claim);
+            return ['contract_version'=>'1','status'=>'claimed','intent_id'=>$id,'card_sha256'=>$sha,'production_post_enabled'=>false]+$claim;
+        });
+    }
     /** Exact provider identity lookup; no contact matching or record enumeration. */
     public static function by_lead(string $tenant,string $lead): array {
         return self::guarded(static function()use($tenant,$lead){self::id($tenant);if(!preg_match('/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/Di',$lead))throw new InvalidArgumentException('prospective_lead_identity_invalid');global $wpdb;$t=SiteEngine_Ads_Bridge_Outcomes::table('evidence');$key=hash('sha256',self::json(['provider-lead','fieldedge',$tenant,strtolower($lead)]));$rows=self::rows($wpdb->prepare("SELECT evidence_id FROM `$t` WHERE relationship_key=%s LIMIT 2",$key));if(!$rows)return ['contract_version'=>'1','status'=>'not_found'];if(count($rows)!==1||!str_starts_with($rows[0]['evidence_id'],'ps-result-'))throw new RuntimeException('prospective_lead_mapping_ambiguous');return self::read_locked(substr($rows[0]['evidence_id'],10));});

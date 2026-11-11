@@ -2,6 +2,7 @@
 /** Bounded, secret-safe create response evidence; no contact/attribution inference. */
 namespace SiteEngine\AdsBridge\Connectors\FieldEdge;
 require_once __DIR__ . '/Foundation.php';
+require_once __DIR__ . '/LeadReference.php';
 final class LeadResponse {
 	public const URL = 'https://api.fieldedge.com/open-api/v1/leads';
 	public static function allowed( string $method, string $url ): bool { return $method === 'POST' && $url === self::URL; }
@@ -24,8 +25,7 @@ final class LeadResponse {
 			if ( ! $object instanceof \stdClass || ! ( $object->data ?? null ) instanceof \stdClass ) { throw new \RuntimeException(); }
 			$data = $object->data;
 			if ( ! is_string( $data->leadId ?? null ) || ! preg_match( '/\A[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\z/Di', $data->leadId ) ) { throw new \RuntimeException(); }
-			$status = $data->status ?? null;
-			if ( null !== $status && ( ! is_string( $status ) || ! preg_match( '/\A[a-zA-Z][a-zA-Z0-9 _-]{0,79}\z/D', $status ) ) ) { throw new \RuntimeException(); }
+			$status = LeadReference::status( $data->status ?? null );
 			$at = isset( $data->receivedAt ) ? Foundation::timestamp( $data->receivedAt ) : null;
 			$e['classification'] = 'success'; $e['reason_code'] = 'provider_lead_created';
 			$e['lead_id'] = strtolower( $data->leadId ); $e['provider_status'] = $status; $e['received_at'] = $at;
