@@ -5,6 +5,16 @@ card and explicit synthetic transport. Native production dispatch remains disabl
 No credentials loaded,production record selected,provider request,shared core edit,
 new ledger,credential transfer or existing intent reset.
 
+Actual installed closeout:ABdev.3/runtime d6d8139 includes selected FE bytes from
+e3534eb30c749499a84c3325f2519838fdf0a7b4. FE read retained AB-owned native receipts:
+disabled0rows,review2rows,simulation4totalnewrows with1lead-double/0token/0realHTTP/mail,
+exact replay0double/noadditionalrows;numericstatus code:0 persisted. Refusals and
+closure PASS;prior12rows,original controls/settings preserved,no newform/contact/call.
+AB reports112members/15changednative lints. This native durable-storage proof is
+separate from28gate+17reference local assertions and does not authorize live writes.
+No runtime correction or old-suite rerun was needed. Owner subject/service/address/
+appointment,provider effects and supported live-execution host remain unresolved.
+
 ## Official specification findings
 
 The public [leads.md](https://docs-dev.fieldedge.com/leads.md) OpenAPI is available

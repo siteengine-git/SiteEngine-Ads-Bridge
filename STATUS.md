@@ -16,8 +16,18 @@ lead/job continuity guarantees remain unestablished. PilotPayload validates exac
 bytes without inventing business/appointment values or changing old accepted payloads.
 
 Focused new28card/payload/gate+17reference assertions PASS;8affectedPHP lints PASS;
-diff check clean. No old campaign rerun. Native persistence pending AB-only execution
-at≤1fresh review+intent+claim+result (4rows),0actualHTTP/mail. Private real card remains
+diff check clean. No old campaign rerun. Actual installed ABdev.3/runtime d6d8139
+contains exact FE e3534eb30c749499a84c3325f2519838fdf0a7b4 selected files. Read retained
+AB-owned pilot-preparation-20261111 native receipts:admit/disabled/review/simulate/
+replay/refusals/closure allPASS. Disabled0rows,review2,simulation4totalnewrows;
+simulation1lead-double/0token/0realHTTP/mail;exactreplay0double/noadditionalrows.
+Numericcode:0 persisted. Completedclaim/newcard/unresolved/target/missingreview
+refusals passed. Prior12prospectiverows,alloriginaltables/options/controls preserved;
+no newcontact/form/call;coordinationlockfree/transactionabsent. AB reports112members/
+15changednativePHP lints;this is installed durable gate proof,not localdoubles or
+an authenticated FE create. No FE runtime change or completed-case repeat.
+
+Private real card09b729e3...e9a73a remains
 held for owner inputs and WindowsDPAPI/Alma same-process boundary;no live command,
 secret transfer or unsupported authorization is manufactured. Existing dev.2/frozen
 archives/stable0.8.1 and closed production evidence unchanged.
