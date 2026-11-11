@@ -1,3 +1,51 @@
+## Form-first Windows/Alma execution route — November 11, 2026, verified
+
+Tools-only successor to accepted dev.3; no new gate, plugin-runtime change, version
+bump, ZIP rebuild or plugin deployment. All111 accepted payload files/source bytes
+and dev.3/dev.2/worksheet archives/stable0.8.1 one-ZIP delivery remain unchanged.
+
+| Owner | Actual acknowledgment/state | Executable next action | Concrete boundary | Next milestone |
+| --- | --- | --- | --- | --- |
+| AB Codex | Actual Windows double→Alma durable API route passed;9 first+3 replay callbacks,12 distinct native connections | Deliver pinned tools/route addendum/provider draft and owner decisions to AB Helper | No live provider transport authorization or real subject/business values | One precisely completed form-first pilot card after provider clarification |
+| FE Codex / FE Helper | Runtime3f00361; post-send uncertainty tests2bda745; native closeout/doc71af81e acknowledged | Route ONE unsent provider clarification via AB Helper/Aubrey using retained contact route | Provider contract/effects/lead-job continuity unanswered; no production probe | Named provider answers plus designated test subject/values |
+| Consent Helper / Consent Codex | Owner rejected reservation linkage; conditional extension assignment narrowed to HOLD; Codex acknowledged no edits | Review only an explicitly proposed trusted interaction when separately accepted | No browser capability in current PSTN callback; no legitimate call authority | Owner-accepted single-use challenge/correlation contract before implementation |
+| CB Helper / CB Codex | Confirmed current route cannot prove linkage; capture .1.7 remains closed | Preserve evidence; future scoped interaction design only after owner decision | New provider-visible challenge/input required; caller/start facts alone insufficient | Prospective association contract, not speculative adapter/backfill |
+
+Native route: Windows launcher branches before DPAPI Read-Bundle; accepted callbacks
+travel via canonical Invoke-Site-Wp/owner CLI, transport DOUBLE stays Windows. Raw route
+binds host/SID/profile/runner/site/owner/database/prefix/runtime/bridge and exact original
+inquiry/source/tenant/operation/request. Existing card_id binds route digest; no REST,
+credential transfer, new vault/ledger/approval system or alternate access route.
+
+First9callbacks/one local lead double; exact fresh replay3/zero doubles.12 distinct native
+connections each proved actual owner/site, transaction absence and named lock release
+while still open. Independent readback:4 owned new review/intent/claim/result rows,
+old16 prospective/29 evidence rows and original selected tables/settings/cron/Google
+journal preserved. Newtotal20;no new contact/form/call,token/credential/provider access.
+All exports/sink false;task workers finished,lockfree;AB retains referenced audit/private
+staging/evidence,shared isolated slot at safe released checkpoint. No cleanup requested.
+
+Focused local:9 AB adapter preflight refusal cases with0SSH;9 FE initial process-double
+assertions and13 post-double loss assertions. n7/n8 failures retain original claim/digest
+and observation attempt,stop callbacks/no write retry;unknown counts remain unknown.
+Runtime proof is independent of these doubles. No completed campaign was repeated.
+
+ONE provider draft hash1ae7fdda17d2e084a6116024f41b5f339c975416fdc76e425ef5413fde9ca92e,
+private existing partnership contact route found;unsent. Questions precisely cover
+OpenAPI conflicts,customer/address/communications/dispatch effects and explicit lead/job
+identity/tracking retry semantics. No real subject or service/appointment invented.
+The exact tenant remains privately resolved;no credentials/accounts requested again.
+
+Consent owner decision is explicit:HOLD call implementation/positive authority until an
+accepted provider-visible per-intent challenge/equivalent verified correlation addresses
+shared-number dialing/replay. CB confirms a new interaction is required,not an adapter
+to current leases/tel-clicks/provider facts. Consent/CB source unchanged;form-first route
+continues independently. No new call/provider/Google/main/client action or stable release.
+
+Current protocol/limits/actual checks:docs/FORM-FIRST-WINDOWS-ALMA-ROUTE.md. Exact private
+route/commands/receipts stay outside Git; sanitized tooling results follow in this source.
+Historical accepted milestones below remain preserved.
+
 ## Controlled pilot preparation — November 11, 2026, completed isolated milestone
 
 AB Helper accepts dev.2 as foundation; preserved byte-identical. Actual source delta
