@@ -1,3 +1,21 @@
+## Active execution queue — November 11, 2026
+
+Controlling AB Helper;AB Codex is sole integration/execution lead. Existing FE/CB
+Helpers retain their Codex ownership. Direct session dispatch completed;no newwriters.
+
+| Owner | Actual state | Executable next action | Blocker/boundary | Next milestone |
+| --- | --- | --- | --- | --- |
+| AB Codex | Running;frozen model preserved | Package/install source-integrated FEfbad499 in retained isolated allocation;verify changed paths/behavior only | No external blocker;no stable delivery replacement | Exact successor ZIP/native delta record |
+| AB Codex | Inspecting existing inquiry/outcome guards | Implement protected prospective intent/claim/observation and explicit call-origin pilot identity using existing interfaces/storage | Missing evidence holds;ordinary/live delivery unauthorized | Synthetic durable replay/conflict/call-origin proof |
+| FE Codex / FE Helper | Dispatched to existing session | Implement narrow lead submission transport/doubles over AB-owned durable contract;reuse OAuth/dry-run | AB callable signature coordination in progress;productionPOST unauthorized | Callable connector + isolated persistence proof |
+| CB Codex / CB Helper | Dispatched to existing session | Inspect original-event snapshot gaps;smallest forward-only capture/interface delta if demonstrated | No newcalls/providerchanges;historical missing facts stay unknown | Pinned evidence contribution/native synthetic callback proof |
+
+Do not rerun the accepted worksheet/form/browser campaign,reset fixtures or reopen
+entries892/893. Preserve baseline daca8d6/ZIPa6779cbf...d86391/manifest86c8fce8...e26cb,
+stable0.8.1 and all journals/Consent. AB alone serializes overlapping isolatedwrites.
+Nextlivewrite requires an exact bounded reviewable request;no generalapprovalgate
+for the authorized development/packaging/isolatedsynthetic work above.
+
 ## Working-model worksheet demonstration VERIFIED and frozen — November 11, 2026
 
 Retained Google journal resumed after confirmed account sharing;actual authentication
