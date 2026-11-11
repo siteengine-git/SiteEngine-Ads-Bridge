@@ -59,7 +59,7 @@ New fieldedge-windows-pilot-acceptance.ps1 performs real Windows/PHP process IPC
 against an explicitly labeled adapter DOUBLE;9focused assertions PASS. It proves
 bounded framing,pins,per-action receipts and hold behavior for bad reply/lock/exit/
 size/permit/host cases. It makes no SSH/AB/provider call and is not installed evidence.
-Actual Windows→canonical runner→Alma durable proof is separately AB-owned/pending.
+Actual Windows→canonical runner→Alma proof is recorded separately below.
 No old acceptance campaign was repeated.
 
 Actual closeout now verified from retained AB receipts:runtime3f00361 firstsend has
