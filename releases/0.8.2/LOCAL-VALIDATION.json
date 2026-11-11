@@ -1,0 +1,196 @@
+{
+  "status": "PASS",
+  "ZIP_CRC": true,
+  "exact_payload_members": 68,
+  "PHP_lints": [
+    {
+      "path": "config/client.example.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-admin.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-call-import.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-cli.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-config.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-consent.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-coordination.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-crm-import.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-doctor.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-fields.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-inquiries.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-lifecycle.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-outcomes.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-prospective.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-runtime.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-settings.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-setup.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-storage.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-time.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/CRMProjection.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/ClimatrolWorkflow.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/FluentCRMProjectionContacts.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/Foundation.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/LeadCreateDryRun.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/LeadReference.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/LeadResponse.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/LeadSubmission.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/OAuthClient.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/PilotPayload.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/PilotReview.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/Retry.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/SubmissionAdapter.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/connectors/fieldedge/TargetedRead.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/admin.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/common.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/dependencies.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/engine.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/format.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/native.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/preview.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/recovery.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/sequences.php",
+      "exit": 0
+    },
+    {
+      "path": "includes/crm-import/session.php",
+      "exit": 0
+    },
+    {
+      "path": "siteengine-ads-bridge.php",
+      "exit": 0
+    },
+    {
+      "path": "tools/successor-readiness.php",
+      "exit": 0
+    },
+    {
+      "path": "uninstall.php",
+      "exit": 0
+    }
+  ],
+  "prior_native_evidence": "carried,not rerun",
+  "runtime_changes_from_dev3": [
+    "version metadata",
+    "administrator Help text only"
+  ]
+}
