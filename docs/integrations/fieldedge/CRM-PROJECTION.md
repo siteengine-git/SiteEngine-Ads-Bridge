@@ -19,7 +19,10 @@ Native name/phone/address, unrelated custom fields, tags/lists, DNC, consent and
 sending settings are outside the write allowlist. This is customer intelligence;
 there is no advertising-inquiry ID, attribution decision, outcome or export.
 
-The input requires synthetic=true, fieldedge, a synthetic tenant and .invalid email.
+The input requires synthetic=true, fieldedge, a synthetic tenant and, when supplied,
+a valid .invalid email. Missing source email uses only an existing verified provider
+customer binding. Without one it holds missing_email_contact_creation_unsupported;
+no phone-only CRM creation or invented email. Phone matching does not silently bind.
 The native adapter additionally restricts contacts to fe-projection-*@example.invalid,
 admin WP-CLI and an explicit isolated execution constant. There is no HTTP receiver.
 
@@ -41,6 +44,9 @@ Exact owned-field replay skips all writes. A newer snapshot replaces the same jo
 key; another job adds a distinct key, capped at20. Older or same-timestamp conflicting
 snapshots and corrupt existing data hold. No deletion, backfill, sweep or polling.
 Fresh custom-field readback verifies persisted owned values after each write.
+Every result retains a deterministic operation_id (provider/customer/job/source
+versions) and normalized snapshot_sha256 for caller evidence. Neither creates a
+durable AB outcome, attribution binding or extra CRM field.
 
 ## Supported API evidence
 
@@ -86,7 +92,8 @@ home/root and absolute installed FE file path; admin user and allocation remain 
 wp --user=<isolated-admin> eval 'define("SITEENGINE_FE_PROJECTION_ISOLATED", true); $args = ["initial", "<verified-isolated-home>", "<verified-isolated-root>"]; require "<FE-root>/tools/fieldedge/projection-wordpress-demo.php";'
 ```
 
-Actions: definitions (read-only), initial, updated, replay, conflict, read (read-only).
+Actions: definitions (read-only), initial, updated, replay, conflict, read (read-only),
+second-job,second-replay,phone-only,phone-only-new.
 First initial expects created/job_count1. Independently retain the created contact ID
 and baseline unrelated fields/status/DNC/tags/lists/queue/enrollment/settings. updated
 expects updated/job_count1. replay in a NEW PHP process expects replayed/same ID/count,
@@ -94,6 +101,11 @@ with exact persisted values unchanged. conflict expects held/provider_identity_c
 and no second contact. read produces fresh owned fields and unsubscribed check.
 Initial rerun after updated is a stale snapshot and must hold; do not reset fixtures.
 Use replay after the update. On uncertain execution, read first; never recreate.
+On the retained updated fixture,second-job adds synthetic-job-2 to the same customer;
+second-replay requires it already present and returns replayed/job_count2. A fresh
+read must show both IDs and original timestamps. phone-only resolves the verified
+binding without changing native email;phone-only-new holds missing-email creation
+with no new contact. These actions do not repeat the original creation campaign.
 
 Each invocation changes at most one test contact and three owned fields, adds at
 most one job summary, creates at most one unsubscribed contact, makes zero provider
@@ -105,26 +117,53 @@ Run from the FE worktree with the retained local PHP8.3.36 runtime:
 
 ```powershell
 & '..\local-test-runtime\php-8.3.36\php.exe' -n .\tests\fieldedge-projection-acceptance.php
-& '..\local-test-runtime\php-8.3.36\php.exe' -n .\tools\fieldedge\lead-create-dry-run.php
+& '..\local-test-runtime\php-8.3.36\php.exe' -n .\tests\fieldedge-lead-dry-run-acceptance.php
+& '..\local-test-runtime\php-8.3.36\php.exe' -n .\tools\fieldedge\lead-create-dry-run.php new
+& '..\local-test-runtime\php-8.3.36\php.exe' -n .\tools\fieldedge\lead-create-dry-run.php existing
 ```
 
-31 focused local assertions PASS;6 new PHP files lint clean. The contact-store
-fixtures are separate from actual FluentCRM installed
+31 projection assertions and31 lead dry-run assertions PASS;8 affected PHP files
+lint clean. The contact-store fixtures are separate from actual FluentCRM installed
 verification. They cover create/update/replay, identity ambiguity, job ownership,
 unrelated/status/DNC preservation, stale/conflicting snapshots and uncertain writes.
 
 ## Lead creation: dry run only
 
-lead-create-dry-run.php emits one concrete synthetic JSON payload and SHA256 for
-documented [POST /v1/leads](https://docs-dev.fieldedge.com/leads). It contains no
-credentials or HTTP executor. source/service values and required tenant semantics
-remain unvalidated. marketingEmailOptedIn=false is explicit; do not derive consent.
+LeadCreateDryRun validates concrete synthetic form/call inputs for documented
+[POST /v1/leads](https://docs-dev.fieldedge.com/leads),rechecked November11. A new
+customer may have phone only;existing customer uses existingCustomerId plus a
+locally verified matching tenant/customer evidence reference. No fabricated email,
+phone/email fallback resolution for existing customers,trackingId,click IDs or
+marketingEmailOptedIn are emitted. Original SiteEngine inquiry/binding stays local.
 
-Retain exact request identity/body and any returned leadId before any separately
-authorized future send. Known success/same body skips a new POST; different content
-holds. Timeout, disconnect,5xx or duplicate response holds for reconciliation with
-no automatic POST retry or regenerated trackingId. The documentation does not
-establish trackingId as an idempotency key or a lookup endpoint. GET by leadId is
-usable only when that ID is known independently; otherwise provider assistance is
-needed to resolve uncertainty. No new durable ledger or transport was built here.
+Local workflow validation requires customer mode,permitted contact method,name and
+phone-or-email for a new customer,verified UUID relationship for existing customer,
+source,valid appointment date/time/timezone/location and service description/type.
+Only known documented field names are emitted. These conservative local requirements
+are not a provider-requiredness claim:the published portal provides an example but
+no complete rendered required-field/enum schema. Source/service acceptance and actual
+tenant-specific minimum payload remain untested. Dry runs carry those explicit holds.
+
+Stable intent_id scopes provider/tenant/original inquiry;body_sha256 pins exact JSON.
+Caller-retained prepared state detects duplicate intent;changed body for same intent
+holds conflict. Unknown/timeout/disconnect/5xx or duplicate response never triggers a
+POST retry. A hypothetical201 with valid data.leadId yields a hypothetical tenant/
+leadId→exact initiating inquiry mapping. A repeated success skips another intent.
+Missing/invalid ID holds uncertainty. No response or mapping is claimed authenticated.
+
+State helpers are pure caller-owned synthetic arrays,with no durable ledger/storage
+or transport. They do not replace the future authorized application's durable request
+authority. GET by known leadId or provider-assisted reconciliation remains necessary
+for real uncertain sends;no trackingId idempotency or lookup guarantee was established.
 Granted leads:write is not permission to execute a production POST.
+
+## Retained installed baseline versus this supplement
+
+AB Codex reported installed3.3.1 proof for FE4f273be integrated in AB daca8d6:
+create/update/replay/conflict/fresh read,preserved DNC/tag/list/native fields and
+unchanged queue/enrollment/cron/AB settings,zero HTTP/mail attempts. Retained
+fe-native-observed-noop.json records8 observed queries/0writes;its corrected observer
+supersedes the earlier disabled-query observer. No FE defect was demonstrated.
+That proof is retained baseline evidence,not a fresh installed pass for this supplement.
+Only second-job/missing-email/operation-evidence additions need AB's scoped installed
+readback;no general acceptance round,fixture recreation or field-definition change.

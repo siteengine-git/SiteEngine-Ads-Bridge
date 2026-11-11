@@ -11,7 +11,7 @@ use SiteEngine\AdsBridge\Connectors\FieldEdge\FluentCRMProjectionContacts;
 use SiteEngine\AdsBridge\Tests\FieldEdge\ProjectionFixture;
 
 if ( $args[0] === 'definitions' ) { echo CRMProjection::json( CRMProjection::definitions() ) . "\n"; return; }
-if ( ! in_array( $args[0], array( 'initial', 'updated', 'replay', 'conflict', 'read' ), true ) ) { throw new InvalidArgumentException( 'unknown_fixture_action' ); }
+if ( ! in_array( $args[0], array( 'initial', 'updated', 'replay', 'conflict', 'read', 'second-job', 'second-replay', 'phone-only', 'phone-only-new' ), true ) ) { throw new InvalidArgumentException( 'unknown_fixture_action' ); }
 // Request-local backstops only; no existing sending/automation setting is changed.
 add_filter( 'pre_http_request', static fn() => new WP_Error( 'fe_synthetic_no_network' ), PHP_INT_MAX );
 add_filter( 'pre_wp_mail', static fn() => false, PHP_INT_MAX );
@@ -21,10 +21,20 @@ if ( $args[0] !== 'initial' ) {
 	$expected = CRMProjection::json( array( 'provider' => $input['provider'], 'tenant_id' => $input['tenant_id'], 'customer_id' => $input['customer']['id'] ) );
 	if ( ! $existing || ( $existing->custom_fields()[ CRMProjection::IDENTITY ] ?? null ) !== $expected ) { throw new RuntimeException( 'existing_owned_fixture_required' ); }
 }
-if ( in_array( $args[0], array( 'updated', 'replay', 'conflict' ), true ) ) {
+if ( in_array( $args[0], array( 'updated', 'replay', 'conflict', 'second-job', 'second-replay', 'phone-only', 'phone-only-new' ), true ) ) {
 	$input['job']['status'] = 'completed';
 	$input['job']['completed_at'] = '2026-11-12T15:00:00Z';
 	$input['job']['source_updated_at'] = '2026-11-12T15:05:00Z';
+}
+if ( in_array( $args[0], array( 'second-job', 'second-replay' ), true ) ) { $input['job']['id'] = 'synthetic-job-2'; }
+if ( in_array( $args[0], array( 'phone-only', 'phone-only-new' ), true ) ) { unset( $input['customer']['email'] ); }
+if ( $args[0] === 'phone-only-new' ) {
+	$input['customer']['id'] = $input['job']['customer_id'] = 'synthetic-customer-phone-only';
+	$input['job']['id'] = 'synthetic-job-phone-only';
+}
+if ( $args[0] === 'second-replay' ) {
+	$prior_jobs = json_decode( $existing->custom_fields()[ CRMProjection::JOBS ] ?? '{}', true, 12, JSON_THROW_ON_ERROR );
+	if ( ! isset( $prior_jobs['synthetic-job-2'] ) ) { throw new RuntimeException( 'second_job_not_present' ); }
 }
 if ( $args[0] === 'conflict' ) {
 	$input['customer']['id'] = $input['job']['customer_id'] = 'synthetic-customer-conflict';
@@ -41,4 +51,4 @@ if ( $args[0] === 'read' ) {
 }
 $result = CRMProjection::run( $input, new FluentCRMProjectionContacts() );
 echo CRMProjection::json( array( 'verification' => 'actual FluentCRM API in AB-selected isolated fixture', 'result' => $result ) ) . "\n";
-if ( $result['status'] === 'held' && $args[0] !== 'conflict' ) { throw new RuntimeException( 'projection_held_inspect_before_retry' ); }
+if ( $result['status'] === 'held' && ! in_array( $args[0], array( 'conflict', 'phone-only-new' ), true ) ) { throw new RuntimeException( 'projection_held_inspect_before_retry' ); }

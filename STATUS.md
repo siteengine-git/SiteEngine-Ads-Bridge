@@ -1,3 +1,29 @@
+## FE Helper projection/lead supplement — November 11, 2026
+
+Existing branch/worktree verified clean at4f273be before implementation. Retained
+AB-owned installed3.3.1 baseline proof:create/update/replay/conflict/fresh read,
+preservation/queue/settings checks,and corrected observer8reads/0writes. AB integrated
+source daca8d6/evidence3606705 remain separate;no accepted package changed here.
+
+FE-only additions:missing source email resolves verified provider binding only;
+new phone-only CRM creation holds missing_email_contact_creation_unsupported,never
+fabricates email. Derived operation_id/snapshot_sha256 returned for caller evidence.
+Isolated runner adds second-job/second-replay and phone-only/phone-only-new actions,
+retaining existing3 approved custom fields and all job IDs/timestamps. No new slugs.
+
+Validated synthetic lead generator now covers new phone-only and verified existing
+customer input,original form/call inquiry retained locally,stable intent/body hash,
+duplicate/content-conflict detection,uncertain-result hold and hypothetical returned
+leadId mapping. No marketing opt-in/tracking transport,credentials,storage or POST.
+Local workflow constraints verified;provider-requiredness/enums and actual tenant
+acceptance remain untested,explicit holds. No new request ledger or general framework.
+
+Focused local31 projection +31 lead assertions PASS;8affected PHP lints PASS;both
+CLI lead scenarios execute with0network requests. Prior installed baseline evidence
+is not a fresh installed supplement pass. AB owns scoped isolated second-job/phone-only
+verification and consolidation. No production/core/CRM source/server/package edits;
+closed production pass and evidence unchanged.
+
 ## Synthetic FluentCRM projection — November 11, 2026
 
 FE-owned unreleased source in the existing worktree/branch from cab9352;accepted
