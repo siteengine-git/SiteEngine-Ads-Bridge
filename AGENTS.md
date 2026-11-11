@@ -1,3 +1,17 @@
+## Authorized prospective submission foundation — November 11, 2026
+
+AB Helper's next direct assignment verified in pinned AB Codex chat authorizes
+connector-specific callable lead transport/submission foundation with doubles and
+AB-owned isolated persistence. Exact seab_prospective prepare/claim/observe/read
+contract supplied by AB Codex governs;never invent storage/signatures or native proof.
+Keep live/default lead POST disabled. Preserve OAuth/DPAPI path,fbad499 projection,
+closed production evidence,existing packages. FE-only code/tests/docs;AB owns core,
+durable claim/observation and sole isolated execution. No new ledger/credentials,
+production writes,client deployment,webhooks or general framework. Native harness
+is bounded4synthetic intents/12AB-owned evidence rows. Current executable queue:
+FE implements contract-bound adapter/doubles;AB implements actual durable callables
+and executes supplied native harness. See PROSPECTIVE-SUBMISSION.md.
+
 ## Authorized synthetic CRM projection — November 11, 2026
 
 AB Helper's direct assignment verified in pinned AB Codex chat authorizes one

@@ -10,11 +10,13 @@ final class OAuthClient {
 	private const MAX_BYTES = 65536;
 	private \Closure $transport;
 	private \Closure $clock;
+	private bool $injected;
 
 	/** Test transport receives method, fixed URL, headers and exact request body. */
 	public function __construct( ?callable $transport = null, ?callable $clock = null ) {
 		$this->transport = \Closure::fromCallable( $transport ?? array( self::class, 'https' ) );
 		$this->clock = \Closure::fromCallable( $clock ?? 'time' );
+		$this->injected = null !== $transport;
 	}
 
 	/** Only sanitized structure/status escapes this method, including on failures. */
@@ -69,6 +71,20 @@ final class OAuthClient {
 			$report['reason_code'] = in_array( $error->getMessage(), $allowed, true ) ? $error->getMessage() : 'connection_test_unconfirmed';
 		}
 		return $report;
+	}
+
+	/** Synthetic-only future dispatch seam. Native HTTPS still REFUSES lead POST. */
+	public function syntheticLead( array $credentials, array $intent ): array {
+		if ( ! $this->injected ) { throw new \RuntimeException( 'live_lead_transport_disabled' ); }
+		require_once __DIR__ . '/LeadCreateDryRun.php';
+		require_once __DIR__ . '/LeadResponse.php';
+		LeadCreateDryRun::decide( $intent );
+		if ( ( $credentials['target_id'] ?? null ) !== $intent['tenant_id'] || strlen( $intent['body'] ) > 16384 ) { throw new \RuntimeException( 'lead_tenant_or_body_refused' ); }
+		$report = array(); $session = $this->authenticate( $credentials, $report );
+		unset( $credentials );
+		if ( ( $this->clock )() + 5 >= $session['expires_at'] ) { throw new \RuntimeException( 'token_expired_or_too_short_for_read' ); }
+		return ( $this->transport )( 'POST', LeadResponse::URL,
+			array( 'Accept: application/json', 'Content-Type: application/json', 'Authorization: Bearer ' . $session['token'] ), $intent['body'] );
 	}
 
 	/** Shared original OAuth logic; credentials/token never persisted or returned to UI. */

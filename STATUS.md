@@ -1,3 +1,32 @@
+## Prospective lead submission foundation — November 11, 2026
+
+Source starts at verified clean fbad499 on existing FE branch/worktree. AB Helper's
+next assignment verified through pinned AB Codex. Exact4 AB callable signatures/read
+shapes received before binding. FE adapter prepares canonical source+exact request,
+verifies exclusive claim/readback before double transport,and trusts durable observed
+readback only. Success/replay,validation failure,uncertain/conflict and lost-storage
+holds implemented without any owned durable store. OAuth original authentication is
+reused only through explicit injected synthetic transport;native lead POST remains
+disabled before token. DPAPI/credential bundle/launcher unchanged.
+
+Queue:FE owns adapter/classifier/OAuth-double tests and native harness;AB owns actual
+storage/canonical contexts/native isolated execution. Executable next step:AB binds
+the exact4callables and runs ≤4fresh synthetic intents/≤12evidence rows using
+tools/fieldedge/lead-submission-wordpress-demo.php. Actual installed persistence is
+pending AB execution,not claimed by local in-memory doubles. No core/server/package,
+production record,webhook,client deployment or Google change by FE.
+
+Provider create identity fields verified against official examples;minimum proof
+retains original AB inquiry/source→durable request/claim→returned tenant/leadId.
+Lead→job shape/continuity and trackingId idempotency/lookup/propagation remain genuine
+provider limitations;contact match cannot fill them. Request fields/response parser
+bounded;unknown201,duplicate409,transport and5xx stay uncertain,no blind retries.
+Actual focused local checks:34transport+21submission double assertions PASS;
+43existingOAuth+44targeted+31dry-run regression assertions PASS;7affectedPHP lints
+clean;git diff check clean. Actual AB core file reviewed against the adapter's
+keys/read/claim/observation/mapping:compatible. Native persistence remains AB-owned
+pending execution. No installed pass or live provider call is inferred from doubles.
+
 ## FE Helper projection/lead supplement — November 11, 2026
 
 Existing branch/worktree verified clean at4f273be before implementation. Retained
