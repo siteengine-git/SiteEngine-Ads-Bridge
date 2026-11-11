@@ -1,5 +1,13 @@
 ## Parallel integration milestones — November 11, 2026
 
+Integrated runtime sourcedaca8d6acfd28eb0375dd027a69cc8540c4b9897 pushed. Unaccepted
+ZIPa6779cbf61928e589e4ee3bffd0f0c133e09f595e9c7606442608cdf08d86391;
+manifest86c8fce8ba4a947eb197af1aa965b053975bac975a9cd6cb329267f4dc8e26cb.
+Exact isolated package84/84members,49nativePHP lints PASS;fresh21/94 contracts,
+receipt/holds and all seven component pins verified. Five unrelated dependencies
+byte-unchanged. Current candidate records:candidates/climatrol-20261111/.
+Stable delivery still exactlyone byte-identical0.8.1 ZIP;no release promotion.
+
 CB supported-interface and FE synthetic projection are implemented/isolated-installed/
 focused-verified; real Google worksheet demonstration remains BLOCKED. One consolidated
 service-account reference/dedicated test-sheet request sent through AB Helper; no append,

@@ -1,0 +1,83 @@
+{
+  "cb": {
+    "members": 52,
+    "native_php_lints": 48,
+    "fresh_supported_api_requests": 2,
+    "records_options_settings_cron_unchanged": true,
+    "current_v1_receipts": 1,
+    "distinct_relationships": 1,
+    "audit_versions": 2,
+    "synthetic_nonnull_acquisition_fields": 0,
+    "unavailable_reasons": 27,
+    "call_origin_delivery": "held",
+    "actual_live_call_evidence": "CB-owned controlled-call/callback evidence retained separately; no copying into isolated fixture"
+  },
+  "fe": {
+    "source": "4f273be7f8125b7b5673f27d5bdc743e3e5a1b8b",
+    "local_owner_assertions": 31,
+    "native_php_lints": 6,
+    "created_contacts": 1,
+    "retained_job_summaries": 1,
+    "native_cases": [
+      "created",
+      "updated",
+      "replayed",
+      "provider_identity_conflict_hold",
+      "fresh_read",
+      "ambiguous_identity_hold"
+    ],
+    "zero_write_replay_queries": 8,
+    "zero_write_replay_write_statements": 0,
+    "native_status_dnc_tags_lists_unrelated_preserved": true,
+    "queue_enrollment_cron_settings_unchanged": true,
+    "http_mail_attempts": 0,
+    "lead_create": "dry-run only; no transport or production POST"
+  },
+  "ab_local": {
+    "cb_consumer_boundary_checks": 25,
+    "scope": "doubles, separate from native CB interface"
+  },
+  "google": {
+    "status": "BLOCKED",
+    "credential_reference_and_dedicated_target": "single consolidated dependency request through AB Helper",
+    "append_attempts": 0,
+    "retained_final_fe_receipt": "recorded; fresh21-cell eligible preview; exact canonical transaction ledger0rows",
+    "exports": "all four families disabled; isolated Sheets sink disabled"
+  },
+  "observer_limits": [
+    "Joined-id preservation observer failed; exact intended owned seed readback recovered without contact-write replay. Original failed evidence retained.",
+    "Initial SQL observer recorded0queries and is not zero-write proof; separate SAVEQUERIES/sentinel observation recorded8queries/0writes.",
+    "Final package installer admission initially omitted global wpdb; stopped before file mutation. Corrected invocation consumed the already verified stage, preserving original error and backups; final84member readback passed."
+  ],
+  "acceptance": "UNACCEPTED overall real worksheet demonstration; no stable publication",
+  "component_pins": {
+    "siteengine-base": {
+      "files": 42,
+      "manifest_sha256": "259ee7ece21cef6708e50d1af282563802671e9b0bef9a22e771d4d3f349b947"
+    },
+    "siteengine-consent": {
+      "files": 6,
+      "manifest_sha256": "14a8bf53e5a53e9b8f7972717931c6692d1ed65e3634a97d2f9eaf2a4db2b7ca"
+    },
+    "siteengine-call-bridge": {
+      "files": 52,
+      "manifest_sha256": "1f296ede153116eb2eb910f8626982c758a71ee38b0e21d8464be8ce0856b758"
+    },
+    "siteengine-ads-bridge": {
+      "files": 84,
+      "manifest_sha256": "f331fa283b8471c8824d9929d3527589cf3b5f06cb8576682506777add786bbf"
+    },
+    "fluentform": {
+      "files": 1241,
+      "manifest_sha256": "50be8a3ee0b6ee968835aeb0793fc429a86710d61c4512b351e1c6cf0c454aa5"
+    },
+    "fluent-crm": {
+      "files": 1186,
+      "manifest_sha256": "702325915ab6f4b10caa46c836749b78cbe1318fc1185ea686d6c6d9dc911232"
+    },
+    "fluentcampaign-pro": {
+      "files": 407,
+      "manifest_sha256": "f0389301f8bd6a075f8e3a2744062b2c72b272ca6b028d9921e67579ff226d3e"
+    }
+  }
+}

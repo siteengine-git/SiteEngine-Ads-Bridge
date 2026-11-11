@@ -1,0 +1,20 @@
+{
+  "candidate": "0.8.1-integration-UNACCEPTED-20261111",
+  "designation": "UNACCEPTED overall demonstration: real Google append/readback/replay blocked; stable release unchanged",
+  "source_commit": "daca8d6acfd28eb0375dd027a69cc8540c4b9897",
+  "zip_name": "siteengine-ads-bridge-0.8.1-integration-UNACCEPTED-20261111-86c8fce8ba4a.zip",
+  "sha256": "a6779cbf61928e589e4ee3bffd0f0c133e09f595e9c7606442608cdf08d86391",
+  "manifest_sha256": "86c8fce8ba4a947eb197af1aa965b053975bac975a9cd6cb329267f4dc8e26cb",
+  "members": 84,
+  "dependencies": {
+    "cb_source": "ccf9c0501812550e0e04977470635daf193a4974",
+    "cb_version": "0.1.6",
+    "cb_zip_sha256": "16a57e8d61e3abb90d6d95998dee993ba80742abaf7e0a56a58364f88de2c6d4",
+    "cb_manifest_sha256": "42edb7da01d62cb32e9fa65ee1c0156583306132d61e69c2d4754078f4ef9dd8",
+    "fe_projection_source": "4f273be7f8125b7b5673f27d5bdc743e3e5a1b8b"
+  },
+  "stable_delivery_replaced": false,
+  "google_real_append_verified": false,
+  "fe_projection_native_verified": true,
+  "cb_supported_interface_native_verified": true
+}
