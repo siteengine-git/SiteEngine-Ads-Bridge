@@ -1,31 +1,18 @@
-# Canonical Ads delivery directory
+# Build and delivery
 
-Use `tools/Get-DeliveryDirectory.ps1` to resolve the exact directory:
+Resolve the physical destination with `tools/Get-DeliveryDirectory.ps1`.
+The canonical path is `D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
+`..Deliverables` is a literal child of Plugins. `Plugins..Deliverables` is a
+different directory and must not receive deliveries.
 
-```powershell
-$delivery = & .\tools\Get-DeliveryDirectory.ps1 -VerifyCurrentZip
-```
+Freeze a scoped source commit. Build from exact Git blobs and an explicit payload
+allowlist, with each payload size/SHA-256 in embedded SUCCESSOR-MANIFEST.json.
+Record source, ZIP and manifest hashes in releases/<version>/DELIVERY.json.
+Exclude credentials, active config, private evidence, logs and development launchers.
+Lint packaged PHP and verify every archive member before installing the same ZIP.
+Keep later publication/installed evidence alongside the package without repacking.
 
-The canonical path is:
-`D:\SiteEngine\Plugins..Deliverables\PLUGIN — SiteEngine Ads-Bridge`.
-This is the exact task-specific destination explicitly named in the November 4
-Doctor-reporting assignment. It supersedes the earlier general child-directory
-default for this correction. Populate repositories normally; keep one latest
-installable ZIP and matching release documents here. Preserve historical packages
-outside delivery. Do not change a task's literal destination based on old receipts.
-
-Release source uses `releases/<version>/MANIFEST.json` and `DELIVERY.json`. Preserve
-their exact payload/embedded-manifest bytes and independent package hashes. A pinned
-package must be verified, not reconstructed for deployment. Publish only its exact
-installable ZIP and matching neutral metadata into the canonical directory. Keep
-exactly one current ZIP there, including subdirectories; preserve older artifacts
-under the existing project's delivery-history outside the delivery directory.
-No active configuration, credentials, logs or client data belong in an archive.
-
-The prior accepted 0.6.4.2 ZIP remains hash-preserved in project archives and its
-GitHub release. The 0.6.4.3 correction's exact package hash and installed reporting
-evidence are in `releases/0.6.4.3/`. Packaging never regenerates an accepted ZIP
-just to change its delivery location.
-
-Current product correction: releases/0.6.4.4; see PRODUCT-SETUP-0.6.4.4.md.
-The current user explicitly selects the literal Plugins..Deliverables destination.
+Stage and hash the successor before archiving the existing delivery outside this
+directory. Leave exactly one installable ZIP recursively, with matching manifest,
+checksums, instructions and results. Verify remote tag/source and published asset
+digests. Preserve historical ZIPs, frozen demonstrations and GitHub releases.

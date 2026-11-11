@@ -98,41 +98,22 @@ final class SiteEngine_Ads_Bridge_Admin {
 			return;
 		}
 
-		$ads_url        = admin_url( 'admin.php?page=' . self::PAGE_SLUG );
-		$diagnostics_url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=diagnostics' );
+		$ads_url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=setup' );
+		$advanced_url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=advanced' );
+		echo '<h2>SiteEngine Ads Bridge Setup</h2><p>Use Overview, Setup, Leads and Advanced. Incomplete setup is saveable; CRM import, credentials access and export readiness are not prerequisites to saving.</p>';
+		echo '<h3>Ordered setup</h3><ol>';
+		echo '<li><strong>Shared Business Data:</strong> Open <a href="' . esc_url( admin_url( 'admin.php?page=business-data' ) ) . '">Business Data</a> for name, timezone, currency and Google Ads account facts. A different WordPress timezone is not itself an error. Record the manual account/conversion-timezone confirmation in Setup.</li>';
+		echo '<li><strong>CRM configuration:</strong> Import a reviewed configuration when needed. Resume saved import for unfinished work using its original identity; do not start another import or initialize storage as recovery. The separate CRM Configuration plugin is not required on destination sites. Import does not authorize enrollment or email.</li>';
+		echo '<li><strong>Lead form:</strong> Select and verify the master form in <a href="' . esc_url( $ads_url ) . '">Setup</a>. Review detected fields; choose missing or ambiguous fields explicitly. Independently verify the Fluent Forms-to-CRM feed, including <code>{submission.id}</code> to <code>submission_id</code>. Field matching does not verify that feed. Record operator verification with its stated limits.</li>';
+		echo '<li><strong>Lifecycle:</strong> Review Customers, Future Customers, DNC and New/Qualified/Unqualified/Won. Use administrator setup to provision genuinely missing required CRM fields. Optional sources may remain Unused. Unqualified timing is recorded in Ads inquiries; no new <code>unqualified_at</code> CRM field is required and Unqualified produces no Google conversion.</li>';
+		echo '<li><strong>Connections:</strong> Configure the spreadsheet, conversion actions/value/date fields and external service-account JSON path. Saving a path does not prove file access under web or CLI identities. Google_Ads_Import has 21 columns and must be the first worksheet; All_Leads has 94 columns. Keep credentials outside the web root.</li>';
+		echo '<li><strong>Readiness:</strong> Overview shows the next action. <a href="' . esc_url( $advanced_url ) . '">Advanced</a> contains detailed diagnostics, full overrides, scheduler and storage/recovery tools. Healthy core storage needs no action; normal activation/administrator setup prepares absent core tables through protected additive routines. Never clear history to resolve incompatible schema or unfinished ownership.</li>';
+		echo '<li><strong>Explicit enablement:</strong> Review each feature before enabling it. All four export families remain disabled on the development installation; a configured Sheets connection does not enable a family. Advanced provides the site-specific scheduler command; this plugin does not install an operating-system cron job. Do not run live exports or Sheet provisioning merely to clear a warning.</li></ol>';
+		echo '<h3>Configuration authority</h3><p>Normal installations use WordPress settings plus Base shared facts. Intentional external <code>SEAB_CONFIG_FILE</code> remains authoritative until an administrator chooses Setup &gt; Configuration authority &gt; Use WordPress settings. This preserves saved values and original files, remains durable after file changes/removal, and does not import unavailable content. Import legacy settings is a separate optional action.</p>';
+		echo '<h3>Consent and delivery</h3><p>Form inquiries retain immutable <code>ff:{form_id}:{entry_id}</code> attribution. Signed original evidence, negative-choice veto, policy, fresh current eligibility and current DNC gate advertising browser payloads and every advertising dispatch/retry. Personalization is independent. Internal All_Leads reporting does not grant advertising permission. Google Ads API upload remains disabled; append-only Sheets is the supported sink.</p>';
+		echo '<h3>Development integration limits</h3><p>Production FieldEdge creation and lead-to-job continuity are not enabled. Trusted outcome/prospective interfaces retain synthetic-only preparation/replay controls; their optional development storage is not a normal setup requirement. Call advertising remains held for authoritative original-call Consent and provider identity/start evidence. Duration is not business qualification. No call may be represented as a fabricated form submission or grant.</p>';
+		echo '<h3>Safe inspection</h3><p><code>wp se-ads doctor</code> reports actual failures and warnings. Disabled, never-run, stale and failed exports are different states. Use read-only inspection before any explicitly authorized delivery; never reset journals, withdrawal barriers or uncertain append evidence.</p>';
 
-		echo '<h2>SiteEngine Ads Bridge Setup</h2>';
-		echo '<p>Ads Bridge reconciles the configured Fluent Form and FluentCRM lifecycle into append-only Google Sheets feeds for Google Ads Data Manager. The Golden Account model standardizes SE | Qualified Lead and SE | Converted Lead on one Google_Ads_Import worksheet. Google Ads API upload remains disabled.</p>';
-
-		echo '<h3>Setup checklist</h3><ol>';
-		echo '<li><strong>Storage:</strong> Normal activation and Setup prepare absent plugin-owned storage through protected migrations. Healthy storage needs no action. Advanced &rarr; Storage names incompatible schemas or unfinished work without resetting history.</li>';
-		echo '<li><strong>Business Data:</strong> In <a href="' . esc_url( admin_url( 'admin.php?page=business-data' ) ) . '">SiteEngine &rarr; Business Data</a>, configure Business Name, Business Timezone, Currency, and Google Ads Customer ID.</li>';
-		echo '<li><strong>Setup:</strong> In <a href="' . esc_url( $ads_url ) . '">SiteEngine &rarr; Ads Bridge</a>, set the stable client slug, short name, master Fluent Form, and consent policy version.</li>';
-		echo '<li><strong>CRM &amp; Lifecycle:</strong> Map Customers, Future Customers, DNC, and the four authoritative lifecycle tags: New, Qualified, Unqualified, and Won. Optional lifecycle automation keeps those states mutually exclusive and stamps milestone dates.</li>';
-		echo '<li><strong>Field Mapping:</strong> Confirm Fluent Form field names. The Fluent Forms &rarr; FluentCRM feed must map <code>{submission.id}</code> to the FluentCRM <code>submission_id</code> custom field. For Golden Account diagnostics, add hidden <code>se_cid</code>, <code>se_agid</code>, <code>se_adid</code>, <code>se_kw</code>, <code>se_mt</code>, <code>se_net</code>, <code>se_dev</code>, and <code>se_loc</code> fields populated from matching GET parameters.</li>';
-		echo '<li><strong>Exports:</strong> Configure All Leads, Qualified Lead, and Converted Lead (Won). Qualified and Converted events share <code>Google_Ads_Import</code>. Unqualified leads stay internal; their reason is read from the configured <code>customer_rating</code>-style field and recorded in the All_Leads lifecycle ledger.</li>';
-		echo '<li><strong>Google Sheets:</strong> Configure the spreadsheet and the external service-account JSON path. <code>Google_Ads_Import</code> must be the first/leftmost worksheet for Data Manager. Configure separate Data Manager filters for <code>Conversion action = SE | Qualified Lead</code> and <code>Conversion action = SE | Converted Lead</code>. Keep credentials outside the web root, normally under <code>/home/CPANEL_USER/.secrets/</code>.</li>';
-		echo '<li><strong>Provision:</strong> Run <code>wp se-ads provision-fields --apply</code> only when required, migrate the ledger if absent, then run <code>wp se-ads provision-sheets --apply</code>. The standard workbook is two tabs: <code>Google_Ads_Import</code> first, then <code>All_Leads</code>.</li>';
-		echo '<li><strong>Diagnostics:</strong> Run <a href="' . esc_url( $diagnostics_url ) . '">Diagnostics</a> or <code>wp se-ads doctor</code>. Resolve all FAIL results before live exports; documented operator/optional WARN results may remain.</li>';
-		echo '<li><strong>Acceptance:</strong> Use targeted dry-runs and one-record <code>--apply</code> canaries. Repeat the same stage/transaction and confirm the append-only ledger skips it before scheduling <code>wp se-ads export-enabled --apply</code>.</li><li><strong>Cron:</strong> Schedule <code>export-enabled --apply</code> every 10 minutes. The Setup tab generates the site-specific cPanel command and Diagnostics warns when the last runtime is stale or uses a different PHP version.</li>';
-		echo '</ol>';
-
-		echo '<h3>Configuration authority</h3>';
-		echo '<p>Normal installations use WordPress Ads Bridge settings plus shared SiteEngine Base data. Legacy external <code>SEAB_CONFIG_FILE</code> is retained until an administrator chooses WordPress settings in Setup > Configuration authority. Importing readable legacy values is optional. The explicit choice remains in effect when the preserved file changes or is removed. Plugin-local <code>config/client.php</code> is supported as a migration fallback.</p>';
-
-		echo '<h3>Export safety rules</h3><ul>';
-		echo '<li>Writes require explicit <code>--apply</code>; preview modes write nothing.</li>';
-		echo '<li>Google Sheets is the only export sink. Direct Google Ads API upload is disabled.</li>';
-		echo '<li>Qualified/Converted advertising exports require authoritative receipt-backed <code>ad_user_data=granted</code> consent and must not be on DNC. <code>ad_personalization</code> remains independent and is emitted separately.</li>';
-		echo '<li>Transaction IDs are deterministic: <code>ff:{form_id}:{entry_id}</code>.</li>';
-		echo '<li>Export, doctor, inspection, and Sheet provisioning commands do not mutate FluentCRM. When explicitly enabled, lifecycle compliance automation may attach/detach lifecycle tags and stamp qualified/unqualified/closed dates; it never fabricates invoice revenue.</li>';
-		echo '</ul>';
-
-		echo '<h3>Google Golden Account handoff</h3>';
-		echo '<ul><li>Create <code>SE | Lead</code> as the website conversion and configure GTM / Google tag to fire it from the <code>siteengine_ads_bridge_lead</code> dataLayer event. Ads Bridge exposes <code>se_transaction_id</code>, <code>se_hashed_email</code>, <code>se_hashed_phone</code>, and available Google click IDs; it does not fire Google tags directly.</li><li>Create offline <code>SE | Qualified Lead</code> and <code>SE | Converted Lead</code> actions with Count = Every for braid compatibility, then use Data Manager filters on the shared import worksheet.</li><li>Keep the canonical order ID <code>ff:{form_id}:{entry_id}</code> unchanged across Lead, Qualified, and Converted stages.</li></ul>';
-
-		echo '<h3>Useful CLI commands</h3>';
-		echo '<p><code>wp se-ads inspect-config</code><br><code>wp se-ads doctor</code><br><code>wp se-ads inspect-contact --id=&lt;contact_id&gt;</code><br><code>wp se-ads export-enabled --dry-run --limit=25</code></p>';
 	}
 
 	/**

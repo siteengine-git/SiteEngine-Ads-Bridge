@@ -1,3 +1,14 @@
+## 0.8.2
+
+- Promote the accepted dev.3 form-first integration foundation; retain explicit
+  identity, durable replay/uncertainty and fresh Consent/DNC protections.
+- Keep production FE transport and call advertising held; no automatic network
+  path, new ordinary export activation or fabricated positive call authority.
+- Refresh administrator Help / Reference and installation instructions; correct
+  the literal delivery directory and distinguish optional development storage.
+- Preserve the four-area UI, durable settings authority, importer recovery and
+  existing 21/94-column contracts. Main-Alma focused results recorded separately.
+
 ## 0.8.1
 
 - Add Setup > Configuration authority: explicitly select WordPress settings without

@@ -1,3 +1,21 @@
+## Current stable-release execution queue — November 11, 2026
+
+AB Codex is the single Ads source/main-site release writer. Runtime baseline is
+accepted dev.3 d6d81394270a74df20df3910812b6ed57bcd4d30; stable0.8.1 and all frozen
+archives remain preserved. Current authority permits scoped main-Alma installation
+through backup/drain/cache/verification/restoration without another approval.
+
+| Owner | Actual state | Executable next action | Boundary | Milestone |
+| --- | --- | --- | --- | --- |
+| AB Codex | Preparing0.8.2 from accepted runtime; correcting stale help/delivery docs | Freeze exact package, claim existing main executor, install and verify changed paths | No external writes, ordinary exports, client rollout or destructive cleanup | Stable publication and physical one-ZIP delivery |
+| Alma/CB | MainCB0.1.7 complete; executor observed free; no overlapping writer | Preserve dependency bytes while AB owns its job | No CB reinstall or repeated acceptance | Same completed main dependency |
+| FE/Consent | Completed form route retained; productionFE/call authority remain held | No source work needed for supported core release | Provider effects/continuity and legitimate call Consent unresolved | Explicitly excluded/disabled behavior |
+
+No provider clarification sent. No new fixture, Google access or completed campaign
+is needed for release. Prior evidence remains history; fresh results appear below
+when actually executed. Release documentation must not imply productionFE or call
+advertising support.
+
 ## Standing execution instruction recorded — November 11, 2026
 
 Project and source AGENTS.md now explicitly carry Aubrey's Alma development-server
