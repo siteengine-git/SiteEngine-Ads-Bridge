@@ -1,5 +1,22 @@
 ## Windows/Alma route preparation — November 11, 2026
 
+ACTUAL ROUTE CLOSEOUT:read AB-owned form-route-20261111 END-TO-END-PROOF.private.json
+and NATIVE-CLOSEOUT.json,bothPASS. Runtime3f0036182c07662e499f4661ff32d365006e5408:
+first9callbacks/1Windowslead-double,exactreplay3callbacks/0double,sameverifiedresult.
+All12distinctactualnativeconnections prove lockfree/transactionabsent/siteownerverified/
+productionfalse. IndependentSQL4newownedrows,total20prospectiverows;old16prospective
+rows and29old evidence rows preserved,original selectedtables/settings/Googlejournal/
+cron unchanged,no newcontact/form/call. Accepted112memberdev.3runtime unchanged;
+no ZIP rebuild. This is actual Windows→approvedowner/CLI→Alma durability with synthetic
+localtransport,not a provider POST. Providerrequests0/credentialsloadedfalse.
+
+Focused post-double losses delivered at2bda745c78a2f871218d9cff9b1e88417848cdb8:
+ONLY n7/n8 cases,13PASS;no worker/broker/runtime change. ProviderONEdraft remains
+unsent,privateSHA1ae7fdda...ca92e. Actual route engineering boundary is closed;
+remaining live boundary is provider answers and owner subject/business values plus
+separate exact completed-card/native-transport authorization. No new user request
+from FE. AB consolidates provider clarification and separate call-owner hold.
+
 Focused uncertainty follow-up:ONLY2new process-double cases run via
 fieldedge-windows-pilot-acceptance.ps1 -Group uncertainty;13assertionsPASS.
 Callback7post-double-read and8observe failures hold,preserve original request/permit/
