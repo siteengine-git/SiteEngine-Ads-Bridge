@@ -1,5 +1,16 @@
 # Prospective FE lead submission foundation — November 11, 2026
 
+Native verification closeout:AB's isolated0.8.2-dev.2/source402597d includes exact
+FE1c2fe6827069748c8c5b6ce3565600ce004efc9f. Retained actual AB/MariaDB receipts
+for success,validation400,timeout and exact replays PASS;3rows per initialcase and
+no row addition/token/lead double on replay. Contract receipt confirms exact lead
+mapping,rotation/observation conflicts,source refusal and ambienttransaction refusal.
+The initialcases record0realHTTP/mail. FE read this retained evidence without rerunning
+the cases. Corrected success/readback is authoritative;earlier failed inspection is
+preserved. This verifies actual durable storage with synthetic transport,not provider
+authentication/create or local-double persistence. Fourth explicit call-origin case
+remains separately AB/CB-owned. Runtimepin remains1c2fe68;this closeout changes docs only.
+
 FE-owned source extends fbad499 without changing accepted packages or production
 evidence. AB Codex alone owns durable storage,canonical inquiry authority,native
 allocation and integration. FE Helper retains scope. Default dispatch is disabled;
