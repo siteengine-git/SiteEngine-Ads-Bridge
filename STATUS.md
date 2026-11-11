@@ -21,7 +21,7 @@ retains original AB inquiry/source→durable request/claim→returned tenant/lea
 Lead→job shape/continuity and trackingId idempotency/lookup/propagation remain genuine
 provider limitations;contact match cannot fill them. Request fields/response parser
 bounded;unknown201,duplicate409,transport and5xx stay uncertain,no blind retries.
-Actual focused local checks:34transport+21submission double assertions PASS;
+Actual focused local checks:35transport+21submission double assertions PASS;
 43existingOAuth+44targeted+31dry-run regression assertions PASS;7affectedPHP lints
 clean;git diff check clean. Actual AB core file reviewed against the adapter's
 keys/read/claim/observation/mapping:compatible. Native persistence remains AB-owned

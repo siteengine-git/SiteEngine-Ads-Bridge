@@ -82,13 +82,21 @@ Full rendered required-field/enumeration schema is unavailable in the published 
 source/service values remain untested tenant semantics. No webhook registration or
 permission expansion was requested;webhooks:write is not granted.
 
+AB also supplies seab_prospective_by_lead(string $tenant_id,string $lead_id):array
+for exact indexed local lookup of the succeeded original-inquiry mapping. AB rejects
+reuse of the same tenant/lead ID for another intent. This local resolver can consume
+a future explicit provider lead-to-job reference;it cannot create that missing relation.
+The main FE adapter needs only the four callables above. A201 with valid lead ID may
+omit optional status/receipt time;those stay null. Supplied malformed metadata holds
+uncertain rather than being fabricated or silently reinterpreted.
+
 ## Tests versus native persistence
 
 Local tests use explicit in-memory AB contract doubles and OAuth/lead transport
 doubles. These are not WordPress APIs or evidence of installed durable persistence.
 No file-backed competing state store is built. AB executes the provided native harness
 against its actual implemented callables and existing protected evidence infrastructure.
-Focused results:34transport+21submission assertions PASS;43existingOAuth+44targeted+
+Focused results:35transport+21submission assertions PASS;43existingOAuth+44targeted+
 31dry-run assertions PASS;7affectedPHP lints clean. Actual AB implementation source
 was reviewed for exact field compatibility before handback;no core file was edited
 by FE. Installed effects still require AB's real isolated execution/readback.

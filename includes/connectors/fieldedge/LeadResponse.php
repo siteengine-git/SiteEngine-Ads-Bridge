@@ -23,11 +23,12 @@ final class LeadResponse {
 			$object = json_decode( $body, false, 16, JSON_THROW_ON_ERROR );
 			if ( ! $object instanceof \stdClass || ! ( $object->data ?? null ) instanceof \stdClass ) { throw new \RuntimeException(); }
 			$data = $object->data;
-			if ( ! is_string( $data->leadId ?? null ) || ! preg_match( '/\A[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\z/Di', $data->leadId ) ||
-				! is_string( $data->status ?? null ) || ! preg_match( '/\A[a-zA-Z][a-zA-Z0-9 _-]{0,79}\z/D', $data->status ) ) { throw new \RuntimeException(); }
-			$at = Foundation::timestamp( $data->receivedAt ?? null );
+			if ( ! is_string( $data->leadId ?? null ) || ! preg_match( '/\A[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\z/Di', $data->leadId ) ) { throw new \RuntimeException(); }
+			$status = $data->status ?? null;
+			if ( null !== $status && ( ! is_string( $status ) || ! preg_match( '/\A[a-zA-Z][a-zA-Z0-9 _-]{0,79}\z/D', $status ) ) ) { throw new \RuntimeException(); }
+			$at = isset( $data->receivedAt ) ? Foundation::timestamp( $data->receivedAt ) : null;
 			$e['classification'] = 'success'; $e['reason_code'] = 'provider_lead_created';
-			$e['lead_id'] = strtolower( $data->leadId ); $e['provider_status'] = $data->status; $e['received_at'] = $at;
+			$e['lead_id'] = strtolower( $data->leadId ); $e['provider_status'] = $status; $e['received_at'] = $at;
 		} catch ( \Throwable $error ) { $e['reason_code'] = 'provider_success_shape_unconfirmed'; }
 		return $e;
 	}
