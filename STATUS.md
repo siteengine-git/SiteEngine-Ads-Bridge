@@ -1,3 +1,14 @@
+## Standing execution instruction recorded — November 11, 2026
+
+Project and source AGENTS.md now explicitly carry Aubrey's Alma development-server
+authority: authorized installations include scoped backup/downtime/maintenance,
+PHP worker/cache handling, migration, verification and restoration as one job with
+no additional approval. Pause only for the stated concrete unrelated-service,
+destructive-data, missing-root or external-effect boundaries. Prepare exact root
+commands immediately and continue independent work; reuse completed evidence.
+This documentation update preserves current candidates, evidence and task scope.
+No installation, site action, runtime/package change or test campaign was executed.
+
 ## Form-first Windows/Alma execution route — November 11, 2026, verified
 
 Tools-only successor to accepted dev.3; no new gate, plugin-runtime change, version

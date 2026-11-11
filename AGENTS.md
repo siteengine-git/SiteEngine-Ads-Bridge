@@ -1,3 +1,21 @@
+## Standing Alma development installation authority — November 11, 2026
+
+Aubrey's direct instruction supersedes conflicting older installation approval,
+routing and executor restrictions in this project. Alma is a development server.
+An authorized plugin installation includes backups, brief affected-site downtime,
+temporary maintenance controls, necessary site-specific PHP worker/cache handling,
+migration, verification and restoration. Complete these as one job without another
+approval request. Serialize overlapping writes; coordination is not an approval gate.
+
+Pause only for a concrete risk to unrelated sites/services, destructive data changes,
+missing root privileges, or external effects such as real calls, messages, payments
+or advertising submissions. When root is required, immediately prepare the exact
+command and continue independent work. State the precise missing privilege and
+affected operation; do not substitute another planning or authorization handoff.
+Reuse completed evidence and repeat checks only for relevant changes or failures.
+Preserve existing access boundaries, configuration, data, journals and recovery state.
+Apply this authority within the authorized candidate, site and task scope.
+
 ## Current ordered correction and setup UI assignment
 
 Complete producer-record compatibility first in its own commit, then four-area setup
