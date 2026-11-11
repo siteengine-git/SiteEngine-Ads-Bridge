@@ -33,10 +33,10 @@ final class CRMProjection {
 	/** This milestone deliberately refuses production input; no provider records reused. */
 	private static function normalize( array $input ): array {
 		if ( ( $input['synthetic'] ?? null ) !== true || ( $input['provider'] ?? null ) !== 'fieldedge' ||
-			! str_starts_with( $input['tenant_id'] ?? '', 'synthetic-' ) ||
-			! filter_var( $input['customer']['email'] ?? '', FILTER_VALIDATE_EMAIL ) ||
-			! str_ends_with( strtolower( $input['customer']['email'] ), '.invalid' ) ) { throw new \InvalidArgumentException( 'synthetic_projection_input_required' ); }
+			! str_starts_with( $input['tenant_id'] ?? '', 'synthetic-' ) ) { throw new \InvalidArgumentException( 'synthetic_projection_input_required' ); }
 		$c = $input['customer']; $j = $input['job'];
+		$email = $c['email'] ?? '';
+		if ( ! is_string( $email ) || ( '' !== $email && ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) || ! str_ends_with( strtolower( $email ), '.invalid' ) ) ) ) { throw new \InvalidArgumentException( 'synthetic_projection_input_required' ); }
 		$identity = array( 'provider' => 'fieldedge', 'tenant_id' => Foundation::id( $input['tenant_id'] ), 'customer_id' => Foundation::id( $c['id'] ) );
 		$customer = array( 'customer_id' => $identity['customer_id'], 'name' => self::text( $c['name'] ), 'phone' => self::text( $c['phone'], 40 ),
 			'source_updated_at' => Foundation::timestamp( $c['source_updated_at'] ) );
@@ -47,15 +47,18 @@ final class CRMProjection {
 		foreach ( array( 'scheduled_at', 'completed_at' ) as $key ) { if ( isset( $j[ $key ] ) ) { $job[ $key ] = Foundation::timestamp( $j[ $key ] ); } }
 		$approved = $input['approved_contact_id'] ?? null;
 		if ( null !== $approved && ( ! is_int( $approved ) || $approved < 1 ) ) { throw new \InvalidArgumentException( 'invalid_approved_contact' ); }
-		return array( self::json( $identity ), strtolower( $c['email'] ), $customer, $job, $approved );
+		return array( self::json( $identity ), strtolower( $email ), $customer, $job, $approved );
 	}
 	public static function run( array $input, ProjectionContacts $contacts ): array {
 		list( $identity, $email, $customer, $job, $approved ) = self::normalize( $input );
-		return $contacts->locked( static function () use ( $contacts, $identity, $email, $customer, $job, $approved ) {
+		$snapshot = Foundation::digest( array( 'identity' => $identity, 'email' => $email, 'customer' => $customer, 'job' => $job ) );
+		$operation = 'fe-projection-' . Foundation::digest( array( 'identity' => $identity, 'job_id' => $job['job_id'], 'customer_revision' => $customer['source_updated_at'], 'job_revision' => $job['source_updated_at'] ) );
+		$result = $contacts->locked( static function () use ( $contacts, $identity, $email, $customer, $job, $approved ) {
 			$matches = $contacts->candidates( $identity, $email, $job['job_id'] );
 			$ids = array_values( array_unique( array_merge( $matches['identity'], $matches['email'], $matches['job'] ) ) );
 			if ( count( $matches['identity'] ) > 1 || count( $matches['email'] ) > 1 || count( $ids ) > 1 ) { return array( 'status' => 'held', 'reason' => 'ambiguous_identity' ); }
 			$id = $ids[0] ?? null;
+			if ( null === $id && '' === $email ) { return array( 'status' => 'held', 'reason' => 'missing_email_contact_creation_unsupported' ); }
 			$old = null === $id ? array() : $contacts->fields( $id );
 			if ( isset( $old[ self::IDENTITY ] ) && $old[ self::IDENTITY ] !== '' && $old[ self::IDENTITY ] !== $identity ) { return array( 'status' => 'held', 'reason' => 'provider_identity_conflict' ); }
 			if ( null !== $id && empty( $old[ self::IDENTITY ] ) && $approved !== $id ) { return array( 'status' => 'held', 'reason' => 'email_match_requires_explicit_contact_binding' ); }
@@ -90,5 +93,6 @@ final class CRMProjection {
 			} catch ( \Throwable $error ) { return array( 'status' => 'held', 'reason' => 'write_result_uncertain_inspect_before_retry' ); }
 			return array( 'status' => $created ? 'created' : 'updated', 'contact_id' => $id, 'job_count' => count( $jobs ) );
 		} );
+		return $result + array( 'operation_id' => $operation, 'snapshot_sha256' => $snapshot );
 	}
 }

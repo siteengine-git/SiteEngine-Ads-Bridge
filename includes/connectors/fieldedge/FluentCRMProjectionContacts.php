@@ -34,7 +34,7 @@ final class FluentCRMProjectionContacts implements ProjectionContacts {
 		$this->requireLock(); global $wpdb;
 		$model = $this->api->getInstance();
 		$by_identity = $this->ids( $model->whereHas( 'custom_field_meta', static fn( $q ) => $q->where( 'key', CRMProjection::IDENTITY )->where( 'value', $identity ) ) );
-		$by_email = $this->ids( $model->where( 'email', $email ) );
+		$by_email = '' === $email ? array() : $this->ids( $model->where( 'email', $email ) );
 		$i = json_decode( $identity, true, 4, JSON_THROW_ON_ERROR ); unset( $i['customer_id'] );
 		$tenant_prefix = substr( CRMProjection::json( $i ), 0, -1 ) . ',';
 		$job_pattern = '%' . $wpdb->esc_like( '"' . $job_id . '":' ) . '%';

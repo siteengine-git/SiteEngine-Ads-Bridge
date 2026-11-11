@@ -1,3 +1,16 @@
+## FE supplement source and scoped native execution — November 11, 2026
+
+FE derivativefbad4999338c8673ffe55946e7f4c7e5fd7f7d6e integrated into this source.
+Exact private staged derivative executed against retained FluentCRM3.3.1:secondjob
+added once,samecontact/twojobs;freshreplay and phone-only verified-binding reuse
+0writes;newphone-only contact held without fabrication/creation. Originaljob1,
+DNC/tag/native/status/unrelated fields,queues/settings/cron and Googlejournal unchanged.
+Nine stagedPHP lints PASS;owner31projection+31leadchecks carried forward. New/existing
+validated lead dryruns executed locally with0network/noPOST;hypothetical mappings only.
+NOT YET IN INSTALLABLE PACKAGE. Google-bound84member package remains exactdaca8d6/
+ZIPa6779cbf...d86391,unchanged while its permission action is pending. Do not relabel
+staged native proof as a replacement-package installation. See FE-SUPPLEMENT.json.
+
 ## Google test-sheet access checked — November 11, 2026
 
 Both supplied existing credential files are readable in the exact isolated owner/CLI

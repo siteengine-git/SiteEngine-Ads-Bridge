@@ -28,6 +28,7 @@ $pass = 0;
 function check( bool $value, string $label ): void { global $pass; if ( ! $value ) { throw new RuntimeException( 'FAIL: ' . $label ); } ++$pass; echo "PASS: $label\n"; }
 $s = new ContactsFixture(); $input = F::input();
 $r = P::run( $input, $s ); check( $r['status'] === 'created', 'new synthetic contact created' );
+check( P::run( $input, $s )['operation_id'] === $r['operation_id'] && P::run( $input, $s )['snapshot_sha256'] === $r['snapshot_sha256'], 'stable operation and exact snapshot evidence on replay' );
 check( count( $s->rows ) === 1 && $r['job_count'] === 1, 'one contact and one job summary' );
 $identity = json_decode( $s->rows[1]['fields'][P::IDENTITY], true );
 check( $identity === array( 'provider' => 'fieldedge', 'tenant_id' => $input['tenant_id'], 'customer_id' => $input['customer']['id'] ), 'provider tenant customer identity retained' );
@@ -43,6 +44,10 @@ check( P::run( $updated, $s )['status'] === 'replayed', 'updated snapshot replay
 $second = $updated; $second['job']['id'] = 'synthetic-job-2';
 check( P::run( $second, $s )['job_count'] === 2 && count( $s->rows ) === 1, 'distinct provider job shares the same customer contact' );
 check( P::run( $second, $s )['status'] === 'replayed', 'second job exact replay retains two unique summaries' );
+$phone = $updated; unset( $phone['customer']['email'] ); $before_phone = $s->rows; $phone_writes = $s->writes;
+check( P::run( $phone, $s )['status'] === 'replayed' && $s->rows === $before_phone && $s->writes === $phone_writes, 'verified customer binding permits missing source email without changing CRM email' );
+$phone_new = new ContactsFixture();
+check( P::run( $phone, $phone_new )['reason'] === 'missing_email_contact_creation_unsupported' && $phone_new->rows === array() && $phone_new->writes === 0, 'phone-only new contact held without fabricated email or mutation' );
 check( P::run( $input, $s )['reason'] === 'stale_or_conflicting_source_snapshot', 'older snapshot held' );
 $conflict = $updated; $conflict['job']['status'] = 'canceled';
 check( P::run( $conflict, $s )['reason'] === 'stale_or_conflicting_source_snapshot', 'same revision conflicting content held' );
@@ -79,8 +84,4 @@ foreach ( array( 'synthetic', 'customer', 'job' ) as $case ) {
 	if ( $case === 'job' ) { $bad['job']['customer_id'] = 'wrong'; }
 	try { P::run( $bad, new ContactsFixture() ); check( false, 'invalid input refused' ); } catch ( InvalidArgumentException $e ) { check( true, $case . ' production/mismatch input refused' ); }
 }
-ob_start(); require __DIR__ . '/../tools/fieldedge/lead-create-dry-run.php'; $lead = json_decode( ob_get_clean(), true, 16, JSON_THROW_ON_ERROR );
-check( $lead['network_requests'] === 0 && ! $lead['production_post_authorized'], 'lead dry run has no network executor' );
-check( $lead['payload']['customer']['marketingEmailOptedIn'] === false && str_ends_with( $lead['payload']['customer']['email'], '.invalid' ), 'lead fixture does not invent marketing consent' );
-check( isset( $lead['duplicate_and_uncertain_result_handling']['timeout_disconnect_5xx_or_unknown'] ) && in_array( 'trackingId_not_documented_as_idempotency_key', $lead['holds'], true ), 'uncertain/duplicate POST handling remains explicit hold' );
 echo "RESULT: $pass PASS, 0 FAIL; local synthetic fixtures only; no WordPress/provider requests.\n";

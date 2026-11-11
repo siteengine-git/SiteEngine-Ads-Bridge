@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-11",
+  "fe_source": "fbad4999338c8673ffe55946e7f4c7e5fd7f7d6e",
+  "prior_fe_source": "4f273be7f8125b7b5673f27d5bdc743e3e5a1b8b",
+  "source_integrated": true,
+  "execution_mode": "Exact private staged derivative executed with actual retained isolated FluentCRM3.3.1; no replacement of the Google-bound plugin package",
+  "staged_php_lints": 9,
+  "owner_local_projection_checks": 31,
+  "owner_local_lead_dryrun_checks": 31,
+  "native_results": {
+    "second_job": "updated, same contact, two distinct jobs, one write",
+    "fresh_second_replay": "replayed, matching deterministic operation/snapshot, zero writes",
+    "fresh_read": "two job identities and source timestamps retained",
+    "phone_only_existing_binding": "replayed, zero writes, no native email change",
+    "phone_only_new_contact": "held: missing_email_contact_creation_unsupported; zero writes, no fabricated email/contact",
+    "original_job_preserved": true,
+    "dnc_tags_lists_status_native_and_unrelated_fields_preserved": true,
+    "queues_enrollment_settings_cron_unchanged": true,
+    "google_journal_unchanged": true,
+    "named_lock_released_before_connection_close": true,
+    "http_mail_attempts": 0
+  },
+  "local_dryruns": {
+    "new_phone_only": "executed; no fabricated email",
+    "existing_customer": "executed; verified same-tenant synthetic relationship",
+    "duplicate_intent": "skip POST",
+    "uncertain_result": "held; no blind POST retry",
+    "hypothetical_response": "validated lead identity mapped to exact initiating inquiry/tenant",
+    "network_requests": 0,
+    "production_post_authorized": false,
+    "durable_request_authority": "not implemented; caller-state simulation only",
+    "provider_requiredness_enums_and_tenant_values": "not accepted or tested"
+  },
+  "installable_package_unchanged": true,
+  "current_package_source": "daca8d6acfd28eb0375dd027a69cc8540c4b9897",
+  "current_package_zip_sha256": "a6779cbf61928e589e4ee3bffd0f0c133e09f595e9c7606442608cdf08d86391",
+  "current_package_manifest_sha256": "86c8fce8ba4a947eb197af1aa965b053975bac975a9cd6cb329267f4dc8e26cb",
+  "supplement_in_installable_package": false,
+  "overall_demonstration": "unaccepted; real Google worksheet sharing permission pending",
+  "stable_release_or_production_sync": false
+}
