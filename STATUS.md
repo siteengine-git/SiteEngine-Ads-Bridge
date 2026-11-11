@@ -1,20 +1,45 @@
-## Active execution queue — November 11, 2026
+## Active execution queue — November 11, 2026, isolated pilot milestone complete
 
-Controlling AB Helper;AB Codex is sole integration/execution lead. Existing FE/CB
-Helpers retain their Codex ownership. Direct session dispatch completed;no newwriters.
+AB Codex is integration lead; AB Helper owns consolidated conclusions. Existing FE
+and CB Helpers/Codex sessions performed their owned changes; no competing writer.
 
 | Owner | Actual state | Executable next action | Blocker/boundary | Next milestone |
 | --- | --- | --- | --- | --- |
-| AB Codex | Running;frozen model preserved | Package/install source-integrated FEfbad499 in retained isolated allocation;verify changed paths/behavior only | No external blocker;no stable delivery replacement | Exact successor ZIP/native delta record |
-| AB Codex | Inspecting existing inquiry/outcome guards | Implement protected prospective intent/claim/observation and explicit call-origin pilot identity using existing interfaces/storage | Missing evidence holds;ordinary/live delivery unauthorized | Synthetic durable replay/conflict/call-origin proof |
-| FE Codex / FE Helper | Dispatched to existing session | Implement narrow lead submission transport/doubles over AB-owned durable contract;reuse OAuth/dry-run | AB callable signature coordination in progress;productionPOST unauthorized | Callable connector + isolated persistence proof |
-| CB Codex / CB Helper | Dispatched to existing session | Inspect original-event snapshot gaps;smallest forward-only capture/interface delta if demonstrated | No newcalls/providerchanges;historical missing facts stay unknown | Pinned evidence contribution/native synthetic callback proof |
+| AB Codex | Implemented, packaged, isolated-installed and focused-verified 0.8.2-dev.2 / 402597d | Hand exact package/pins and retained-resource disposition to AB Helper | Stable promotion, client deployment and live delivery unauthorized | Controlled-pilot review against this checkpoint |
+| FE Codex / FE Helper | Exact 1c2fe68 callable foundation integrated; local doubles and four AB native persistence contexts passed | Prepare exact private later-live request and minimum gated-transport delta | Native lead POST disabled; no provider write authorization; provider lead-to-job continuity unproven | Separately authorized one-create pilot, never automatic timeout retry |
+| CB Codex / CB Helper | 480b4ca / 0.1.7 / DB1.1.0 installed only in retained isolation; 12 native callback/read/retention phases passed | Preserve original capture/interface evidence and support concrete source defects only | Authoritative call Consent and Google call identity contract unavailable | Held call-origin pilot; no new call/provider change |
 
-Do not rerun the accepted worksheet/form/browser campaign,reset fixtures or reopen
-entries892/893. Preserve baseline daca8d6/ZIPa6779cbf...d86391/manifest86c8fce8...e26cb,
-stable0.8.1 and all journals/Consent. AB alone serializes overlapping isolatedwrites.
-Nextlivewrite requires an exact bounded reviewable request;no generalapprovalgate
-for the authorized development/packaging/isolatedsynthetic work above.
+AB ZIP SHA256 9c7310b80828cef66b7b31d4fc757756b23e2c825e91af3c7c43914df72e2727;
+manifest e8610ed33bf9cbd04e0b32d6008628639b9f25b9088a71d6775479a247e40cd7.
+99 exact installed members; 62 packaged PHP files linted natively (61 carried plus
+the added runner). Local14 AB validation,24 CB boundary-double and56 FE transport/
+submission assertions are distinct from native proof. See candidates/pilot-20261111/.
+
+Native prospective cases: form success/validation/timeout and call success; four
+intents/12 immutable rows, exact replays cause no further transport/rows. Real SQL,
+synthetic transport only. Lead lookup, operation rotation/observation conflicts,
+source mismatch and ambient-transaction refusal passed. Call transport observed no
+transaction or coordination lock. Explicit call inquiry has null form/entry; stored
+supported CB snapshot and one relationship match. Synthetic business outcome/replay
+passed; Google remains held for authoritative call Consent/identity and current DNC.
+
+CB53 members/49 native lints; three additive nullable columns, old projections and
+indexes unchanged, no backfill. All12 phases require exit0 AND PASS receipts. Frozen
+acquisition/lease and first terminal threshold survived context/duplicate/late events.
+Five unrelated component manifests unchanged. All original rows/settings/cron/Google
+journal preserved; all4 exports and sheet sink disabled. Processes finished, lock
+free, no transaction; shared isolated mutation slot released at safe checkpoint.
+
+Retain referenced synthetic graph: one AB contact/inquiry, one CB call/session/lease/
+number (number inactive, lease released), AB evidence/review/receipt and12 prospective
+rows. AB Codex owns isolated staging/backups/retention; CB owns capture provenance.
+No deletion authorized. Exact IDs/private receipts stay outside Git. Preserved failed
+98-member runner omission and stopped CB preflight; corrected results are explicit.
+
+Stable0.8.1 physical delivery remains exactly one byte-identical ZIP; accepted daca8d6
+worksheet archive unchanged. No new worksheet request, old fixture recreation,
+entries892/893 investigation or repeated broad campaign. This successor is NOT stable
+released. Historical sections below are retained and superseded by this current state.
 
 ## Working-model worksheet demonstration VERIFIED and frozen — November 11, 2026
 

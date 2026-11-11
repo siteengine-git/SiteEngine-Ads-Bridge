@@ -1,0 +1,215 @@
+{
+  "format": "siteengine.ads.pilot-milestone/1",
+  "date": "2026-11-11",
+  "implemented": true,
+  "packaged": true,
+  "isolated_installed": true,
+  "focused_verified": true,
+  "stable_released": false,
+  "runtime": {
+    "version": "0.8.2-dev.2",
+    "source": "402597db0f8e2f0e52b85a747ee874df0db05989",
+    "sha256": "9c7310b80828cef66b7b31d4fc757756b23e2c825e91af3c7c43914df72e2727",
+    "manifest_sha256": "e8610ed33bf9cbd04e0b32d6008628639b9f25b9088a71d6775479a247e40cd7",
+    "members": 99,
+    "fe_source": "1c2fe6827069748c8c5b6ce3565600ce004efc9f",
+    "zip_name": "siteengine-ads-bridge-0.8.2-dev.2-e8610ed33bf9.zip",
+    "designation": "Isolated development successor; not a stable release"
+  },
+  "components": {
+    "siteengine-base": {
+      "files": 42,
+      "manifest_sha256": "259ee7ece21cef6708e50d1af282563802671e9b0bef9a22e771d4d3f349b947"
+    },
+    "siteengine-consent": {
+      "files": 6,
+      "manifest_sha256": "14a8bf53e5a53e9b8f7972717931c6692d1ed65e3634a97d2f9eaf2a4db2b7ca"
+    },
+    "siteengine-call-bridge": {
+      "files": 53,
+      "manifest_sha256": "af15239397cfedde9514378a241ff9f1916e24e444dbcedf9d6c0ad936f64746"
+    },
+    "siteengine-ads-bridge": {
+      "files": 99,
+      "manifest_sha256": "d6311789fd7bb8d821854faa8c848047b564fefa47ee74b7e8b28ea6839ce2bd"
+    },
+    "fluentform": {
+      "files": 1241,
+      "manifest_sha256": "50be8a3ee0b6ee968835aeb0793fc429a86710d61c4512b351e1c6cf0c454aa5"
+    },
+    "fluent-crm": {
+      "files": 1186,
+      "manifest_sha256": "702325915ab6f4b10caa46c836749b78cbe1318fc1185ea686d6c6d9dc911232"
+    },
+    "fluentcampaign-pro": {
+      "files": 407,
+      "manifest_sha256": "f0389301f8bd6a075f8e3a2744062b2c72b272ca6b028d9921e67579ff226d3e"
+    }
+  },
+  "dependencies": {
+    "fe_runtime_source": "1c2fe6827069748c8c5b6ce3565600ce004efc9f",
+    "fe_native_closeout": "ba2b2a393208f1f6abf4542c9f45006cd8fd07f4",
+    "fe_supplement_incorporated": "fbad4999338c8673ffe55946e7f4c7e5fd7f7d6e",
+    "cb_source": "480b4ca2def17687a4db80e36891d03bf05ed003",
+    "cb_version": "0.1.7",
+    "cb_db_version": "1.1.0",
+    "cb_zip_sha256": "537700ab86592e6ceeabe0693be9f7e700e75f5fac6274a9628de0885d4e79ef",
+    "cb_runtime_manifest_sha256": "67c982e3e01ec59369542b7c69d593cc37dc5aa8f34d21c440aa59a37170e9c4"
+  },
+  "local": {
+    "ab_prospective_validation_assertions": 14,
+    "supported_cb_boundary_double_assertions": 24,
+    "fe_submission_and_transport_double_assertions": 56,
+    "claim": "Local doubles/validation only; native results below are separate"
+  },
+  "installed": {
+    "AB_exact_members": 99,
+    "AB_native_php_lints": 62,
+    "AB_lint_accounting": "61 original packaged PHP files plus one newly included runner; all final PHP bytes covered",
+    "CB_exact_members": 53,
+    "CB_native_php_lints": 49,
+    "CB_additive_nullable_columns": 3,
+    "old_CB_columns_indexes_preserved": true,
+    "old_new_fields_remain_null": true,
+    "unrelated_component_byte_pins_preserved": 5
+  },
+  "native": {
+    "fe_supplement_changed_paths": [
+      "second replay zero writes",
+      "phone-only existing binding replay zero writes",
+      "new phone-only contact held zero writes"
+    ],
+    "prospective_cases": [
+      "form success",
+      "form validation failure",
+      "form timeout uncertain",
+      "call success"
+    ],
+    "fresh_intents": 4,
+    "immutable_prospective_evidence_rows": 12,
+    "fresh_replays": "all four preserve exact result with no additional transport or rows",
+    "actual_provider_HTTP_requests": 0,
+    "mail_attempts": 0,
+    "transport_doubles": "Three form cases each one OAuth/one lead double; call case one lead double",
+    "call_transport_outside_transaction_and_coordination_lock": true,
+    "exact_lead_to_original_inquiry_readback": true,
+    "operation_rotation_conflict": true,
+    "changed_observation_conflict": true,
+    "source_mismatch_refused": true,
+    "ambient_transaction_refused": true,
+    "cb_phases": [
+      {
+        "phase": "prepare",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "voice",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "change",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "voice-replay",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "terminal",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "after-terminal-change",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "terminal-replay",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "late-progress",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "late-terminal",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "read-a",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "read-b",
+        "process_exit": 0,
+        "receipt": "PASS"
+      },
+      {
+        "phase": "retain",
+        "process_exit": 0,
+        "receipt": "PASS"
+      }
+    ],
+    "cb_forward_capture": "Original acquisition/lease/pool preserved across context changes; first terminal threshold120 preserved after current threshold5; duration90 remains unqualified_short",
+    "call_identity": "Canonical twilio identity; form and entry columns null; no mutable contact historical timing inherited",
+    "supported_call_evidence_rows": 1,
+    "distinct_call_inquiries": 1,
+    "call_business_outcome": "Reviewed synthetic packet recorded; exact retry returns same receipt, changed body conflicts; association does not authorize Google",
+    "call_advertising": "No row or HTTP released; authoritative call Consent and Google identity contract unavailable; current DNC independently blocks; membership/status restored",
+    "original_rows_settings_cron_and_completed_google_journal_preserved": true,
+    "ownership": "All fixture processes finished; native coordination lock free and transaction absent"
+  },
+  "retention": {
+    "new_AB_call_contact": 1,
+    "new_AB_call_inquiry": 1,
+    "new_CB_rows": 4,
+    "CB_number_inactive_lease_released": true,
+    "AB_call_snapshot": 1,
+    "AB_call_review": 1,
+    "AB_call_outcome_receipt": 1,
+    "prospective_rows": 12,
+    "cleanup_owner": "AB Codex isolated allocation stewardship; CB owns capture provenance; reference checks required before any disposal",
+    "disposition": "Referenced audit graph, journals, options and backups retained; no automatic cleanup"
+  },
+  "limits": [
+    "Synthetic transport and native persistence are not provider lead creation or genuine call Consent",
+    "No new real call, provider write, worksheet request, browser campaign, main-site/client change or ordinary export activation",
+    "Native cURL lead POST remains disabled; controlled live transport needs separate exact authorization and reviewed gate",
+    "Provider trackingId idempotency and lead-to-job continuity are unproven; explicit relationship evidence required",
+    "Call-origin advertising remains held pending authoritative call Consent and reviewed Google call identity contract",
+    "Accepted worksheet freeze and stable0.8.1 delivery remain byte-identical"
+  ],
+  "retained_failed_attempts": [
+    "First 98-member development archive omitted native runner; invocation stopped before prospective intent/transport. Corrected99member archive installed, original refusal and zero-row inspection retained.",
+    "Initial CB local manifest preflight stopped before replacement; final r2 pin verified and installed. No unverified archive used."
+  ],
+  "private_receipt_sha256": {
+    "FE-SUCCESSOR-RESULTS.json": "2c4339f1dbd2073056c5a3c04fc4d37c999961456399a9864ac18456ad8335d8",
+    "CORE-SUCCESSOR-RESULTS.json": "5af3c2e5dd824acd2a2a24d10f9de86b04f20426bcbe4c81661e1de696a0f322",
+    "CORE-CORRECTED-SUCCESSOR-RESULTS.json": "c255039d1b5563237a85f25aefe167c56cfe71fd98764506a1601b0f335f99e0",
+    "CB-CAPTURE-INSTALL-RESULTS.json": "3de1316fb4ec93bf2eefd580fdc446aa76711e5a546c83b305d049c87126a6fd",
+    "CB-CAPTURE-NATIVE-RESULTS.json": "70b7dd61c046f3e74083614d1442a0d03c7a79a096b66f72455229caf6e11df9",
+    "prospective-success-corrected.json": "33b4cdac0729055d5f7f833cfd092b81e50c55c1c1265f90998e189648dbca3c",
+    "prospective-success-replay.json": "d52f93ab7ff1306a9c257f1af722cbe656a306561634e80743aadf08b13b867f",
+    "prospective-validation.json": "de33804fb9f8bf04f9e88f05142485bb62f2d43e7972ad3c53738c0fd2193bf9",
+    "prospective-validation-replay.json": "b2eb57394a3d435304c7597eeb8a0e8e087fe70537cec4c4bdb1a26aeec3d3c8",
+    "prospective-uncertain.json": "a8830904b964edac45f2ad94fc556572760244e32f76e17a4e3781694032ed30",
+    "prospective-uncertain-replay.json": "ef5e95d856c0a44deb882b5ca34ec860c116702d06244d8d502d115e20ab94d9",
+    "prospective-contract-native.json": "5d43b350e853e404342b9b8db751fa64e74bc42a0c10c844412914a32fea7bcf",
+    "call-pilot-admit.json": "f0cc87cdb688d39d9ce9a862695d60d1c55c47d3b4889d393db3ae85a5245904",
+    "call-pilot-prospective.json": "72b80ab663e292c9b64952966852a462e8bdfb610cf27f63749b1ca848edf666",
+    "call-pilot-outcome.json": "37ebc6693231560a0c3e7158db570f77d616ed58c938d5c148ef1d81cbb5f4fb",
+    "call-pilot-eligibility.json": "eaee19f081ac4d7a57018501aa0f76263b3a577b867524cb6baee93a4d4f81a7",
+    "call-pilot-closure.json": "c41e2836b4eded5e71f081f6e50c660a982aff1d5a2b9595fadb3fc42d58a900",
+    "final-component-pins.json": "c50bfbed5f0d0a1577a4f9b7061c28d17d232708f65e7d9cf230ee075ac99979"
+  }
+}
