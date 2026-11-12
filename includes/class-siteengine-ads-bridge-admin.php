@@ -36,6 +36,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		add_action( 'admin_post_seab_initialize_storage', array( __CLASS__, 'handle_storage' ) );
 		add_action('admin_post_seab_verify_setup',array(__CLASS__,'handle_verification'));
 		add_action('admin_post_seab_provision_fields',array(__CLASS__,'handle_fields'));
+		add_action( 'admin_post_seab_provision_fieldedge', array( __CLASS__, 'handle_fieldedge_fields' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_base_missing_notice' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_doctor_failures' ) );
 	}
@@ -112,6 +113,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '<h3>Configuration authority</h3><p>Normal installations use WordPress settings plus Base shared facts. Intentional external <code>SEAB_CONFIG_FILE</code> remains authoritative until an administrator chooses Setup &gt; Configuration authority &gt; Use WordPress settings. This preserves saved values and original files, remains durable after file changes/removal, and does not import unavailable content. Import legacy settings is a separate optional action.</p>';
 		echo '<h3>Consent and delivery</h3><p>Form inquiries retain immutable <code>ff:{form_id}:{entry_id}</code> attribution. Signed original evidence, negative-choice veto, policy, fresh current eligibility and current DNC gate advertising browser payloads and every advertising dispatch/retry. Personalization is independent. Internal All_Leads reporting does not grant advertising permission. Google Ads API upload remains disabled; append-only Sheets is the supported sink.</p>';
 		echo '<h3>Development integration limits</h3><p>Production FieldEdge creation and lead-to-job continuity are not enabled. Trusted outcome/prospective interfaces retain synthetic-only preparation/replay controls; their optional development storage is not a normal setup requirement. Call advertising remains held for authoritative original-call Consent and provider identity/start evidence. Duration is not business qualification. No call may be represented as a fabricated form submission or grant.</p>';
+		echo '<p>FieldEdge connector diagnostics and optional CRM field preparation are under <a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=advanced&section=fieldedge' ) ) . '">Advanced &gt; FieldEdge connector</a>. The status is read-only; adding missing FE field definitions requires separate administrator confirmation and does not enable live provider operations.</p>';
 		echo '<h3>Safe inspection</h3><p><code>wp se-ads doctor</code> reports actual failures and warnings. Disabled, never-run, stale and failed exports are different states. Use read-only inspection before any explicitly authorized delivery; never reset journals, withdrawal barriers or uncertain append evidence.</p>';
 
 	}
@@ -388,7 +390,7 @@ final class SiteEngine_Ads_Bridge_Admin {
         self::step('review','5. Review readiness and enable desired features',false,$section,static function()use($config){self::render_setup_issues($config);$d=new SiteEngine_Ads_Bridge_Doctor($config);$d->run();$sum=$d->summary();echo '<p>'.esc_html($sum['PASS'].' checks passed; '.$sum['WARN'].' warnings; '.$sum['FAIL'].' failed checks.').'</p><p>Review the exact failures and warnings in <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=advanced&section=diagnostics')).'">Advanced diagnostics</a>. Enable only separately authorized features using the explicit checkboxes in connection/export settings or CRM mapping settings. Nothing is enabled automatically.</p>';});
     }
     private static function render_advanced($config,$section) {
-        echo '<h2>Advanced</h2><p>Field overrides, diagnostics and recovery tools. Ordinary setup is on the Setup page.</p><details '.($section==='fields'?'open':'').'><summary>Field overrides and feed verification</summary>';self::render_fields($config);echo '</details><details '.($section==='diagnostics'?'open':'').'><summary>Detailed diagnostics</summary>';self::render_diagnostics($config);echo '</details><details><summary>Scheduler instructions</summary>';self::render_scheduler();echo '</details><details '.($section==='storage'?'open':'').'><summary>Storage inspection and recovery</summary>';self::render_storage();echo '</details><details><summary>Configuration details</summary>';self::render_source_banner($config);echo '</details>';
+        echo '<h2>Advanced</h2><p>Field overrides, diagnostics and recovery tools. Ordinary setup is on the Setup page.</p><details '.($section==='fields'?'open':'').'><summary>Field overrides and feed verification</summary>';self::render_fields($config);echo '</details><details '.($section==='diagnostics'?'open':'').'><summary>Detailed diagnostics</summary>';self::render_diagnostics($config);echo '</details><details '.($section==='fieldedge'?'open':'').'><summary>FieldEdge connector (disabled by default)</summary>';self::render_fieldedge_status();echo '</details><details><summary>Scheduler instructions</summary>';self::render_scheduler();echo '</details><details '.($section==='storage'?'open':'').'><summary>Storage inspection and recovery</summary>';self::render_storage();echo '</details><details><summary>Configuration details</summary>';self::render_source_banner($config);echo '</details>';
         if(in_array($config->configuration_source(),['local_file','external'],true)){echo '<details '.($section==='legacy'?'open':'').'><summary>Import legacy settings</summary>';self::render_migration($config);echo '</details>';}
     }
 
@@ -581,7 +583,65 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '<p style="margin-top:16px">CLI equivalent: <code>wp se-ads compliance</code></p>';
 	}
 
-	/** @return void */
+	/**
+	 * Display FieldEdge capability and field readiness without provider I/O.
+	 *
+	 * The connector is intentionally not a live lead-dispatch control.
+	 */
+	private static function render_fieldedge_status() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		try {
+			$status = \SiteEngine\AdsBridge\Connectors\FieldEdge\ConnectorDiagnostics::wordpress();
+		} catch ( \Throwable $error ) {
+			echo '<p>FieldEdge diagnostics unavailable. No connection or transport state was changed.</p>';
+			return;
+		}
+
+		$labels = array(
+			'crm_contact_api'         => 'FluentCRM contact API',
+			'crm_field_registry_read' => 'CRM field registry',
+			'crm_field_schema'        => 'FieldEdge CRM field definitions',
+			'crm_projection'          => 'Customer/job projection',
+			'ab_prospective_contract' => 'Ads Bridge inquiry bridge',
+			'provider_connection'     => 'FieldEdge connection',
+			'credential_state'        => 'Credentials',
+			'lead_creation'           => 'FieldEdge lead creation',
+			'provider_lead_job_link'  => 'Lead-to-work-order relationship',
+			'automatic_sync'          => 'Automatic synchronization',
+			'consent_and_dnc'         => 'Consent and DNC',
+			'advertising_attribution' => 'Advertising attribution',
+		);
+
+		echo '<p>Read-only diagnostics. Provider authentication is not tested here. Real FieldEdge lead creation, automatic synchronization and conversion delivery remain disabled.</p>';
+		echo '<table class="widefat striped" style="max-width:1000px"><thead><tr><th scope="col">Capability</th><th scope="col">Current state</th></tr></thead><tbody>';
+		foreach ( $labels as $key => $label ) {
+			echo '<tr><th scope="row">' . esc_html( $label ) . '</th><td>' . esc_html( (string) ( $status[ $key ] ?? 'unavailable' ) ) . '</td></tr>';
+		}
+		echo '</tbody></table>';
+
+		foreach ( array( 'crm_fields_missing' => 'Missing FieldEdge definitions', 'crm_fields_type_conflict' => 'Conflicting FieldEdge definitions' ) as $key => $label ) {
+			if ( ! empty( $status[ $key ] ) && is_array( $status[ $key ] ) ) {
+				echo '<p><strong>' . esc_html( $label ) . ':</strong> ' . esc_html( implode( ', ', $status[ $key ] ) ) . '</p>';
+			}
+		}
+
+		if ( isset( $_GET['seab_fe_fields'] ) && 'ready' === ( $status['crm_field_schema'] ?? '' ) ) {
+			echo '<div class="notice notice-success inline"><p>FieldEdge CRM definitions verified. No contacts or provider records were changed.</p></div>';
+		}
+		if ( 'missing_fields' === ( $status['crm_field_schema'] ?? '' ) && 'available' === ( $status['crm_field_registry_read'] ?? '' ) ) {
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			echo '<input type="hidden" name="action" value="seab_provision_fieldedge">';
+			wp_nonce_field( 'seab_provision_fieldedge' );
+			echo '<p><label><input type="checkbox" name="confirm" value="1" required> Create only the missing FieldEdge custom fields. Existing CRM definitions and contact values will be preserved.</label></p>';
+			submit_button( 'Create Missing FieldEdge Fields', 'secondary', 'submit', false );
+			echo '</form>';
+		}
+		echo '<p>This status does not enable FieldEdge access or alter Consent, subscriptions, job records or exports. Field provisioning requires an explicit administrator confirmation.</p>';
+	}
+
 	private static function render_diagnostics( $config ) {
 		$doctor  = new SiteEngine_Ads_Bridge_Doctor( $config );
 		$results = $doctor->run();
@@ -787,6 +847,34 @@ final class SiteEngine_Ads_Bridge_Admin {
         try{SiteEngine_Ads_Bridge_Setup::with_configuration(static function(){return SiteEngine_Ads_Bridge_Fields::provision(true);});}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
         wp_safe_redirect(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=fields'));exit;
     }
+
+	/**
+	 * Explicit protected provisioning of the three optional FE-owned CRM fields.
+	 * The shared vendor field manager merges with all existing definitions.
+	 */
+	public static function handle_fieldedge_fields() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Permission denied.' );
+		}
+		check_admin_referer( 'seab_provision_fieldedge' );
+		if ( self::post_text( 'confirm' ) !== '1' ) {
+			wp_die( 'Explicit FieldEdge field provisioning confirmation required.' );
+		}
+		try {
+			SiteEngine_Ads_Bridge_Setup::with_configuration(
+				static function () {
+					return SiteEngine_Ads_Bridge_Fields::provision(
+						true,
+						\SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()
+					);
+				}
+			);
+		} catch ( \Throwable $error ) {
+			wp_die( esc_html( $error->getMessage() ) );
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=advanced&section=fieldedge&seab_fe_fields=1' ) );
+		exit;
+	}
 
 	public static function handle_storage() {
 		if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Permission denied.' ); }

@@ -1,3 +1,10 @@
+## 0.8.3-rc.1
+
+- Add an administrator-only FieldEdge connector status panel under Advanced.
+- Inspect three FE-owned FluentCRM custom fields and supported AB prospective callables without reading credentials, contacting FieldEdge, or changing CRM records.
+- Allow separately confirmed creation of only missing FE field definitions through the existing protected CRM field manager; preserve unrelated fields and reject type conflicts.
+- Keep production FieldEdge POST, automatic synchronization, call advertising and ordinary Google export holds unchanged. This is a pre-release candidate, not a live provider launch.
+
 ## 0.8.2
 
 - Promote the accepted dev.3 form-first integration foundation; retain explicit
