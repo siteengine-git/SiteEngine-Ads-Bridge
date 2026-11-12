@@ -171,6 +171,19 @@ final class Engine {
         $bindings=$review?($j['review_bindings']??$j['registry']):$j['registry'];
         return $a['kind']==='settings'?Store::read('seab_settings_v2',[]):($a['id']===null?null:$native->read($a['kind'],$a['id'],$bindings));
     }
+    /** A replaced parent must not hide new collisions in its retired native scope. */
+    private static function assertCandidates(array $j,array $a,Native $native):void {
+        if($a['kind']==='settings')return;
+        $scopes=[$j['registry']];
+        $field=match($a['kind']){'sequence_email','step'=>'funnel_ref','email_sequence_mail'=>'sequence_ref',default=>null};
+        $key=$field===null?null:($a['body'][$field]??null);
+        if($key!==null&&isset($j['review_bindings']['objects'][$key])
+            &&(string)$j['review_bindings']['objects'][$key]['id']!==(string)($j['registry']['objects'][$key]['id']??''))$scopes[]=$j['review_bindings'];
+        foreach($scopes as$bindings){
+            $ids=$native->candidates($a['kind'],$a['body'],$bindings);
+            if(array_filter($ids,static fn($id)=>$a['id']===null||(string)$id!==(string)$a['id']))throw new RuntimeException('Native identity collision after review: '.$a['key']);
+        }
+    }
     private static function accept(array &$j,array $a,$body):void {
         if($a['kind']!=='settings')$j['registry']['objects'][$a['key']]=['kind'=>$a['kind'],'id'=>$a['id'],'body'=>$body,'source_hash'=>$a['source_hash']];
         $j['receipts'][$a['key']]=['id'=>$a['id'],'kind'=>$a['kind'],'body_hash'=>JSON::hash($body),'decision'=>$a['decision']];$j['cursor']++;$j['pending']=null;Store::save($j);
@@ -181,6 +194,7 @@ final class Engine {
         if($a['kind']==='settings')$a['body']=self::settingsBody($j,$a,$native);
         if($j['pending']!==null){
             if($a['id']===null)throw new RuntimeException('Uncertain create has no returned native ID: '.$a['key'].'. Preserve the journal; do not replay creation.');
+            self::assertCandidates($j,$a,$native);
             try{$actual=self::readAction($j,$a,$native);}
             catch(RuntimeException $e){
                 // Old condition IDs can be unmapped after their parents were
@@ -195,9 +209,8 @@ final class Engine {
             $actual=self::readAction($j,$a,$native,true);
             if(!self::same($actual,$a['before']))throw new RuntimeException('Destination changed since review: '.$a['key']);
             if(isset($a['replaces_id'])&&$native->read($a['kind'],$a['replaces_id'],$j['review_bindings'])!==null)throw new RuntimeException('Deleted managed identity reappeared since review: '.$a['key']);
-            if($a['kind']!=='settings'){$ids=$native->candidates($a['kind'],$a['body'],$j['registry']);if(array_filter($ids,fn($other)=>$a['id']===null||(string)$other!==(string)$a['id']))throw new RuntimeException('Native identity collision after review: '.$a['key']);}
+            self::assertCandidates($j,$a,$native);
             if(self::same($actual,$a['body'])&&empty($a['rebind_refs'])){self::accept($j,$a,$actual);return;}
-            if($a['id']===null&&$a['kind']!=='settings'&&$native->candidates($a['kind'],$a['body'],$j['registry']))throw new RuntimeException('New native collision after review: '.$a['key']);
             $j['pending']=$a;Store::save($j);
         }
         if(!in_array($a['decision'],['reuse','adopt'],true)){
@@ -207,11 +220,12 @@ final class Engine {
             else $a['id']=$native->save($a['kind'],$a['body'],$a['id']===null?null:(int)$a['id'],$j['registry']);
             $j['writes']++;$j['pending']=$a;Store::save($j);$session->check();
         }
+        self::assertCandidates($j,$a,$native);
         $actual=self::readAction($j,$a,$native);if(!self::same($actual,$a['body']))throw new RuntimeException('Native readback differs: '.$a['key']);
         self::accept($j,$a,$actual);
     }
     private static function verifyRange(array $j,Native $native,int $start,int $end):string {
-        $hashes=[];for($i=$start;$i<$end;$i++){$a=$j['actions'][$i];$r=$j['receipts'][$a['key']]??null;if(!$r)throw new RuntimeException('Missing native receipt.');$a['id']=$r['id'];$actual=self::readAction($j,$a,$native);
+        $hashes=[];for($i=$start;$i<$end;$i++){$a=$j['actions'][$i];$r=$j['receipts'][$a['key']]??null;if(!$r)throw new RuntimeException('Missing native receipt.');$a['id']=$r['id'];self::assertCandidates($j,$a,$native);$actual=self::readAction($j,$a,$native);
             if(JSON::hash($actual)!==$r['body_hash'])throw new RuntimeException('Completed import object changed: '.$a['key']);$hashes[$a['key']]=$r['body_hash'];}return JSON::hash($hashes);
     }
     public static function run():array {

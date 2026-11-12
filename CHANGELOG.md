@@ -1,3 +1,10 @@
+## 0.8.4
+
+- Check both retired and current parent scopes for new child collisions after a
+  parent is recreated, including pending and final readback. Preserve edited
+  portable bodies, old receipts, and the existing exact-before recovery behavior.
+- Add focused edited-child/campaign/independent sequence-parent regressions.
+
 ## 0.8.3
 
 - Review and recreate deliberately deleted managed CRM definitions during a new

@@ -1,4 +1,4 @@
-# SiteEngine Ads Bridge 0.8.3
+# SiteEngine Ads Bridge 0.8.4
 
 Ads Bridge connects a selected Fluent Forms lead form, FluentCRM lifecycle and
 SiteEngine Consent to immutable advertising inquiries and append-only Google
@@ -108,3 +108,7 @@ parents/tags are explicitly reviewed for relinking. Completed journals are never
 cleared. Ambiguous matches, invalid stored IDs, new collisions or deletions/edits
 after review stop without blindly recreating or replaying uncertain writes. See
 [focused correction](docs/MANAGED-RECREATION-0.8.3.md).
+
+For partially deleted graphs, collision checks cover both the retired and current
+parent IDs before writes, on pending readback and at final receipt verification.
+See [partial-graph correction](docs/PARTIAL-GRAPH-0.8.4.md).

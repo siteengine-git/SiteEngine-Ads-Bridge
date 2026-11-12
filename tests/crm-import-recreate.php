@@ -108,5 +108,34 @@ namespace {
     $j=single($j,$tagAction);advance($j);$j=single($j,$autoAction);$j['pending']=$autoAction;Store::save($j);$writes=Native::$writes;advance($j);
     ok(Native::$writes===$writes+1&&Native::$rows['automation'][$autoAction['id']]['conditions'][0][0]['value']===[(int)$j['registry']['objects'][$tag]['id']],'Unmapped old condition IDs safely recover via exact frozen-before readback');
     $j['status']='complete';Store::save($j);update_option(Store::CURRENT,$j['id']);$writes=Native::$writes;Engine::run();ok(Native::$writes===$writes,'Completed execution replay performs no additional vendor save');
+    // Partial graph: parent missing; surviving edited child; collision in either scope.
+    [$defs,$reg]=seed();$parent=array_key_first(array_filter($defs,fn($d)=>$d['kind']==='automation'));
+    $childKey=array_key_first(array_filter($defs,fn($d)=>$d['kind']==='sequence_email'&&($d['body']['funnel_ref']??null)===$parent));
+    $childID=$reg['objects'][$childKey]['id'];$oldChild=Native::$rows['sequence_email'][$childID];$oldChild['html']='Keep this surviving edited email';Native::$rows['sequence_email'][$childID]=$oldChild;
+    unset(Native::$rows['automation'][$reg['objects'][$parent]['id']]);Engine::preview($map,[$childKey=>'keep']);$j=Store::job();
+    $parentAction=current(array_filter($j['actions'],fn($a)=>$a['key']===$parent));$childAction=current(array_filter($j['actions'],fn($a)=>$a['key']===$childKey));
+    ok($childAction['decision']==='relink'&&$childAction['body']['html']===$oldChild['html'],'Partial graph review retains edited child body while relinking');
+    $j=single($j,$parentAction);advance($j);$j=single($j,$childAction);Native::$rows['sequence_email'][9000]=$oldChild;$writes=Native::$writes;
+    refuses(function()use(&$j){advance($j);},'Native identity collision after review');
+    ok(Native::$writes===$writes&&$j['pending']===null,'New child in retired-parent scope blocks before write');
+    unset(Native::$rows['sequence_email'][9000]);Native::$rows['sequence_email'][9001]=Native::encode($childAction['body'],$j['registry']);
+    refuses(function()use(&$j){advance($j);},'Native identity collision after review');
+    ok(Native::$writes===$writes,'New child in current-parent scope also blocks');unset(Native::$rows['sequence_email'][9001]);
+    advance($j);ok(Native::$rows['sequence_email'][$childID]['html']===$oldChild['html']&&Native::$rows['sequence_email'][$childID]['funnel_ref']===$j['registry']['objects'][$parent]['id'],'Only reviewed relationship changes; surviving edited HTML intact');
+    $j=single($j,$childAction);$j['pending']=$childAction;Store::save($j);Native::$rows['sequence_email'][9000]=$oldChild;$writes=Native::$writes;
+    refuses(function()use(&$j){advance($j);},'Native identity collision after review');
+    ok(Native::$writes===$writes&&$j['pending']!==null,'Pending successful write cannot conceal newly ambiguous old-scope child');
+    unset(Native::$rows['sequence_email'][9000]);advance($j);Native::$rows['sequence_email'][9000]=$oldChild;
+    refuses(fn()=>$range->invoke(null,$j,new Native(),0,1),'Native identity collision after review');
+    ok(Native::$writes===$writes,'Final receipt verification rejects late old-scope collision without restoration/deletion');
+    [$defs,$reg]=seed();$stepKey=array_key_first(array_filter($defs,fn($d)=>$d['kind']==='step'&&isset($d['body']['settings']['campaign_ref'])));$campaign=$defs[$stepKey]['body']['settings']['campaign_ref'];$stepID=$reg['objects'][$stepKey]['id'];
+    Native::$rows['step'][$stepID]['settings']['editor_note']='Retain campaign-step edit';unset(Native::$rows['sequence_email'][$reg['objects'][$campaign]['id']]);Engine::preview($map,[$stepKey=>'keep']);$j=Store::job();$action=current(array_filter($j['actions'],fn($a)=>$a['key']===$stepKey));
+    ok($action['decision']==='relink'&&$action['body']['settings']['editor_note']==='Retain campaign-step edit','Missing campaign explicitly relinks an edited surviving step');
+    while($j['cursor']<count($j['actions']))advance($j);
+    ok(Native::$rows['step'][$stepID]['settings']['campaign_ref']===$j['registry']['objects'][$campaign]['id']&&Native::$rows['step'][$stepID]['settings']['editor_note']==='Retain campaign-step edit','Campaign ID rebuilt with edited settings preserved');
+    ok(is_string($range->invoke(null,$j,new Native(),0,count($j['actions']))),'Partial campaign graph final receipts read back exactly');
+    [$defs,$reg]=seed();$sequence=array_key_first(array_filter($defs,fn($d)=>$d['kind']==='email_sequence'));$mail=array_key_first(array_filter($defs,fn($d)=>$d['kind']==='email_sequence_mail'&&$d['body']['sequence_ref']===$sequence));$mailID=$reg['objects'][$mail]['id'];$oldMail=Native::$rows['email_sequence_mail'][$mailID];
+    unset(Native::$rows['email_sequence'][$reg['objects'][$sequence]['id']]);Engine::preview($map);$j=Store::job();$a=current(array_filter($j['actions'],fn($a)=>$a['key']===$sequence));$child=current(array_filter($j['actions'],fn($a)=>$a['key']===$mail));$j=single($j,$a);advance($j);$j=single($j,$child);Native::$rows['email_sequence_mail'][9000]=$oldMail;$writes=Native::$writes;
+    refuses(function()use(&$j){advance($j);},'Native identity collision after review');ok(Native::$writes===$writes,'Independent email-sequence old-parent scope also rejects new children');
     echo json_encode(['assertions'=>$n,'status'=>'PASS','native_SQL'=>false,'transport'=>'none','evidence'=>'Actual supervisor methods; simulated vendor/storage only'])."\n";
 }

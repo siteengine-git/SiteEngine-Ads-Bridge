@@ -1,3 +1,17 @@
+## Focused partial-graph continuation — November12,2026
+
+Helper's concrete coverage note exposed one additional collision gap in0.8.3:
+after replacing a parent, candidate lookup used only its current numeric ID and
+could miss a newly appearing child in the retired scope. Preserved counterexample
+fails old code and passes the focused two-scope/pending/final-readback correction.
+Existing frozen bindings/relink/Keep logic and completed acceptance remain retained.
+
+AB is the only source/site writer. Next finite action: package0.8.4, scoped backed-up
+GeneratePress replacement, actual saved-ZIP zero-change admin re-import and read-only
+native old/current scope checks. Do not recreate/delete the accepted56 definitions
+or rewrite any completed journal. All disabled delivery/enrollment controls stay.
+Local focused tests and installed results remain distinguished; no broad campaign.
+
 ## Repeat assignment reconciled; deliberate re-import verified — November12,2026
 
 Fresh assigned-site readback confirmed the repair was already installed as0.8.3,
