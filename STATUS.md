@@ -1,3 +1,25 @@
+## Repeat assignment reconciled; deliberate re-import verified — November12,2026
+
+Fresh assigned-site readback confirmed the repair was already installed as0.8.3,
+all70members matching,original saved import complete126/126,no missing/pending
+objects. No completed operation was reset and the56-object repair was not rerun.
+The additional explicit re-import requirement then passed as ONE new ordinary
+administrator review/import of the retained ZIP, linked to the completed predecessor.
+
+Normal authenticated page/nonce/preview/begin/16batches:126/126receipts,0native saves,
+125identical IDs/bodies,no duplicate objects,globalregistry/saved/effective settings,
+cron and activation unchanged. Four historical raw journals/autoloads byte-identical,
+including the original saved import. Temporary request control/probe/session removed;
+original configuration restored. All delivery/enrollment holds preserved.
+
+No source/version/ZIP/reinstall/test-campaign change. Exact0.8.3ZIP/hash and physical
+single-ZIP delivery remain unchanged. Initial199local/46native lints and actual56
+recreations are carried evidence; new native zero-change repeat is separate from
+completed-operation resume replay. Public supplemental results:releases/0.8.3/
+REIMPORT-RESULTS.json. Exact identities/receipts remain private under AB ownership.
+Current execution queue:AB requested repair and idempotency complete; no site writes
+or recovery outstanding. No separate stable GitHub promotion/other-site rollout.
+
 ## Managed-object recreation repair verified — November12,2026
 
 Implemented/packaged/assigned-template-installed/focused-verified0.8.3. Source
