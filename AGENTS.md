@@ -1,3 +1,16 @@
+## Current verified importer repair — November12,2026
+
+0.8.3 is the latest verified installable repair, source
+cf185a54a919c13ad67b5240c1315a0188beb1e8;ZIPb45b206bb3be5742d4fc64abe651735ef52147c80b801c3f46ad9ed99ab7f7a7.
+Assigned GeneratePress template only: ordinary authenticated saved import completed,
+56 deleted native definitions recreated/new IDs,69 survivors and original journals
+preserved,125 unique identities/126receipts,0extra replay saves. Details/limits in
+source/STATUS.md and releases/0.8.3. All delivery/enrollment holds unchanged; no
+registry/journal clearing. Current literal Plugins\..Deliverables child holds
+exactlyone0.8.3ZIP; previous0.8.2 delivery/history retained. This patch assignment
+performed no main-Alma/other-site rollout or separate stable GitHub promotion.
+Canonical source and standing access/ownership rules remain unchanged.
+
 ## Current accepted release — November11,2026
 
 Stable Ads Bridge0.8.2 is published and main-Alma focused-verified. Package source

@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "test": "crm-import-recreate.php",
+      "assertions": 85,
+      "status": "PASS"
+    },
+    {
+      "test": "crm-import-recovery.php",
+      "assertions": 15,
+      "status": "PASS"
+    },
+    {
+      "test": "crm-import-blockers.php",
+      "assertions": 21,
+      "status": "PASS"
+    },
+    {
+      "test": "crm-import-acceptance.php",
+      "assertions": 78,
+      "status": "PASS"
+    }
+  ],
+  "assertions": 199,
+  "native_SQL": false,
+  "test_wording_correction": "Existing setup blocker expectation updated to exact current Resume wording; setup runtime unchanged"
+}

@@ -1,3 +1,41 @@
+## Managed-object recreation repair verified — November12,2026
+
+Implemented/packaged/assigned-template-installed/focused-verified0.8.3. Source
+cf185a54a919c13ad67b5240c1315a0188beb1e8;ZIPb45b206bb3be5742d4fc64abe651735ef52147c80b801c3f46ad9ed99ab7f7a7;
+manifest576d5be06292adfaa7eaf0428c3138399b475fd450086e6c0e4e63c326914fdd.
+70 exact members/46localPHP8.3.36+46nativePHP8.4.27lints,JSsyntax and199focused
+local assertions PASS. No runtime change beyond importer review/reference handling,
+review labels and version/readiness metadata. All other accepted behavior retained.
+
+Existing saved configuration ZIP ec3beece625693abe25fa90267b249059e579848a7c83f139a3946e8e81cc6e5
+reused through actual authenticated ordinary administrator page/nonce/AJAX workflow:
+review,begin,16batches and completed replay,20HTTP200requests. Native125unique
+identities/126receipts;56creates(8tags/7automations/19sequenceemails/22steps),69
+surviving objects/edits exact,0extra replay saves. Original completed job bytes and
+retired binding preserved; current job complete/pendingnull. No registry clear.
+
+Saved/effective config,protected contact/form/inquiry/Consent/queue table hashes,
+activation and raw cron unchanged. All managed content draft; lifecycle/Sheets/all4
+exports false. Web8.4.27/litespeed changed-path OPcache invalidation verified. Owned
+maintenance/request guard/probe/session removed; originalwp-configbytes/mode/owner
+restored; ordinarysiteHTTP200. Existing protected migration found storage compatible;
+no DDL/schema change. Private backup/exactIDgraph retained locally/site by AB.
+
+| Owner | Actual state | Executable next action | Boundary |
+| --- | --- | --- | --- |
+| AB Codex | Requested source/install/ordinary native import correction and physical delivery complete | Preserve scoped checkpoint, backups and private exact-ID evidence | No further site operation required |
+| Other products/sites | Untouched; mainAlma remains prior accepted version | None in this assignment | No separate stable promotion/client rollout/sending |
+
+Partial-survivor relink and interruption/drift cases are actual Engine methods with
+local doubles,not new native destructive fault cases. Baseline blocker test had a
+stale expected message; wording corrected,setup runtime unchanged. Prior stable0.8.2
+history/frozenarchives remain retained. Exact results/limits:releases/0.8.3.
+Detailed site IDs,private resource references and payloads stay out of public Git.
+Authoritative delivery contains exactlyone0.8.3ZIP; previous0.8.2 delivery11files
+archived byte-exact outside delivery. Three historical raw journal option records
+and their autoload values independently verified unchanged. No stable GitHub release
+was created for this repair; source/checkpoint publication is distinct from promotion.
+
 ## Active managed-object recreation correction — November12,2026
 
 Current task supersedes the prior completed release queue. Canonical source remains
