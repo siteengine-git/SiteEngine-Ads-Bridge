@@ -15,6 +15,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 	/** @var bool */
 	private static $initialized = false;
+    private static $combined_form = false;
 
 	/**
 	 * Register hooks once.
@@ -34,8 +35,10 @@ final class SiteEngine_Ads_Bridge_Admin {
 		add_action( 'admin_post_seab_import_config', array( __CLASS__, 'handle_import' ) );
 		add_action('admin_post_seab_use_settings',array(__CLASS__,'handle_authority'));
 		add_action( 'admin_post_seab_initialize_storage', array( __CLASS__, 'handle_storage' ) );
-		add_action('admin_post_seab_verify_setup',array(__CLASS__,'handle_verification'));
 		add_action('admin_post_seab_provision_fields',array(__CLASS__,'handle_fields'));
+        add_action('admin_post_seab_crm_requirements',array(__CLASS__,'handle_crm_requirements'));
+        add_action('admin_post_seab_provision_fieldedge',array(__CLASS__,'handle_fieldedge_fields'));
+        add_action('wp_ajax_seab_test_sheets',array(__CLASS__,'test_sheets'));
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_base_missing_notice' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_doctor_failures' ) );
 	}
@@ -98,21 +101,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 			return;
 		}
 
-		$ads_url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=setup' );
-		$advanced_url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=advanced' );
-		echo '<h2>SiteEngine Ads Bridge Setup</h2><p>Use Overview, Setup, Leads and Advanced. Incomplete setup is saveable; CRM import, credentials access and export readiness are not prerequisites to saving.</p>';
-		echo '<h3>Ordered setup</h3><ol>';
-		echo '<li><strong>Shared Business Data:</strong> Open <a href="' . esc_url( admin_url( 'admin.php?page=business-data' ) ) . '">Business Data</a> for name, timezone, currency and Google Ads account facts. A different WordPress timezone is not itself an error. Record the manual account/conversion-timezone confirmation in Setup.</li>';
-		echo '<li><strong>CRM configuration:</strong> Import a reviewed configuration when needed. Resume saved import for unfinished work using its original identity; do not start another import or initialize storage as recovery. The separate CRM Configuration plugin is not required on destination sites. Import does not authorize enrollment or email.</li>';
-		echo '<li><strong>Lead form:</strong> Select and verify the master form in <a href="' . esc_url( $ads_url ) . '">Setup</a>. Review detected fields; choose missing or ambiguous fields explicitly. Independently verify the Fluent Forms-to-CRM feed, including <code>{submission.id}</code> to <code>submission_id</code>. Field matching does not verify that feed. Record operator verification with its stated limits.</li>';
-		echo '<li><strong>Lifecycle:</strong> Review Customers, Future Customers, DNC and New/Qualified/Unqualified/Won. Use administrator setup to provision genuinely missing required CRM fields. Optional sources may remain Unused. Unqualified timing is recorded in Ads inquiries; no new <code>unqualified_at</code> CRM field is required and Unqualified produces no Google conversion.</li>';
-		echo '<li><strong>Connections:</strong> Configure the spreadsheet, conversion actions/value/date fields and external service-account JSON path. Saving a path does not prove file access under web or CLI identities. Google_Ads_Import has 21 columns and must be the first worksheet; All_Leads has 94 columns. Keep credentials outside the web root.</li>';
-		echo '<li><strong>Readiness:</strong> Overview shows the next action. <a href="' . esc_url( $advanced_url ) . '">Advanced</a> contains detailed diagnostics, full overrides, scheduler and storage/recovery tools. Healthy core storage needs no action; normal activation/administrator setup prepares absent core tables through protected additive routines. Never clear history to resolve incompatible schema or unfinished ownership.</li>';
-		echo '<li><strong>Explicit enablement:</strong> Review each feature before enabling it. All four export families remain disabled on the development installation; a configured Sheets connection does not enable a family. Advanced provides the site-specific scheduler command; this plugin does not install an operating-system cron job. Do not run live exports or Sheet provisioning merely to clear a warning.</li></ol>';
-		echo '<h3>Configuration authority</h3><p>Normal installations use WordPress settings plus Base shared facts. Intentional external <code>SEAB_CONFIG_FILE</code> remains authoritative until an administrator chooses Setup &gt; Configuration authority &gt; Use WordPress settings. This preserves saved values and original files, remains durable after file changes/removal, and does not import unavailable content. Import legacy settings is a separate optional action.</p>';
-		echo '<h3>Consent and delivery</h3><p>Form inquiries retain immutable <code>ff:{form_id}:{entry_id}</code> attribution. Signed original evidence, negative-choice veto, policy, fresh current eligibility and current DNC gate advertising browser payloads and every advertising dispatch/retry. Personalization is independent. Internal All_Leads reporting does not grant advertising permission. Google Ads API upload remains disabled; append-only Sheets is the supported sink.</p>';
-		echo '<h3>Development integration limits</h3><p>Production FieldEdge creation and lead-to-job continuity are not enabled. Trusted outcome/prospective interfaces retain synthetic-only preparation/replay controls; their optional development storage is not a normal setup requirement. Call advertising remains held for authoritative original-call Consent and provider identity/start evidence. Duration is not business qualification. No call may be represented as a fabricated form submission or grant.</p>';
-		echo '<h3>Safe inspection</h3><p><code>wp se-ads doctor</code> reports actual failures and warnings. Disabled, never-run, stale and failed exports are different states. Use read-only inspection before any explicitly authorized delivery; never reset journals, withdrawal barriers or uncertain append evidence.</p>';
+        echo '<h2>Ads Bridge</h2><p>Setup has one Save settings action. Incomplete configuration is saveable. Shared Business Data is read-only from Base; Consent owns the required policy. Set up CRM requirements creates only missing definitions, never marketing content or contacts. Select the lead form and inspect its separate FluentCRM integration. Configuration checks do not prove contact delivery.</p><p>Test connection reads spreadsheet identity with entered draft values, without saving or appending rows. A successful read does not prove write permission. Select the Google Ads account timezone independently of business timezone. Enable only explicitly authorized features; saving never runs exports.</p><p>API Setup contains dormant connector information. Settings contains custom field overrides, detailed diagnostics, preserved-operation recovery and scheduler instructions. Printed commands do not prove cron installation. Existing imported content, smartcodes and journals are preserved. No production FieldEdge creation or call advertising is enabled.</p>';
 
 	}
 
@@ -131,7 +120,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 				$messages[] = $issue['label'] . ': ' . $issue['message'] . ' Open ' . $issue['destination'] . '.';
 			}
 			if ( 'external' === $source ) {
-				$messages[] = 'External configuration is active; UI saves do not replace SEAB_CONFIG_FILE. Open Ads Bridge > Setup > Configuration authority.';
+				$messages[] = 'External configuration is active; UI saves do not replace SEAB_CONFIG_FILE. Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority.';
 			}
 			return array(
 				'status'  => 'setup_required',
@@ -165,7 +154,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		if ( 'local_file' === $source ) {
 			return array(
 				'status'  => 'warning',
-				'label'   => 'Migration Available',
+				'label'   => 'Legacy settings source',
 				'message' => 'Existing plugin-local PHP config is active. Import it into Base-managed settings when ready.',
 			);
 		}
@@ -245,6 +234,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		foreach ( $shared as $key => $definition ) { $labels[ $key ] = $definition[1]; }
 		foreach ( array( 'new', 'qualified', 'unqualified', 'won' ) as $role ) { $labels[ 'fluentcrm.tags.lifecycle.' . $role ] = ucfirst( $role ) . ' lifecycle tag'; }
 		$issues = array();
+		$labels[ 'google_sheets.account_timezone' ] = 'Google Ads account timezone';
 		$add = static function( $key, $message ) use ( &$issues, $shared, $labels ) {
 			$base = isset( $shared[ $key ] );
 			$tab = 'setup';
@@ -253,7 +243,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 			if ( strpos( $key, 'exports.' ) === 0 ) { $tab = 'exports'; }
 			if ( strpos( $key, 'google_sheets.' ) === 0 ) { $tab = 'sheets'; }
 			if ( strpos( $key, 'storage.' ) === 0 ) { $tab = 'storage'; }
-			$names = array( 'setup' => 'Setup', 'lifecycle' => 'CRM & Lifecycle', 'fields' => 'Field Mapping', 'exports' => 'Exports', 'sheets' => 'Google Sheets', 'storage' => 'Storage' );
+			$names = array( 'setup' => 'Setup', 'lifecycle' => 'Setup > CRM requirements', 'fields' => 'Settings > Advanced field overrides', 'exports' => 'Setup > Export configuration', 'sheets' => 'Setup > Google Sheets', 'storage' => 'Settings > Detailed diagnostics' );
 			$issues[] = array( 'key' => $key, 'label' => $labels[ $key ] ?? ( $key ? ucwords( str_replace( array( '.', '_' ), ' ', $key ) ) : 'Ads configuration' ), 'message' => str_replace($key?:'__no_key__',$labels[$key]??ucwords(str_replace(array('.','_'),' ',$key)),(string)$message), 'destination' => $base ? 'Business Data' : 'Ads setup > ' . $names[ $tab ], 'url' => $base ? self::business_data_url($shared[$key][0]) : admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tab) );
 		};
 		$source = $config->configuration_source();
@@ -284,24 +274,44 @@ final class SiteEngine_Ads_Bridge_Admin {
 					if ( ! is_string( $title ) || '' === trim( $title ) ) { continue; }
 					$table = $wpdb->prefix . 'fc_tags';
 					$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM `{$table}` WHERE BINARY title = %s", $title ) );
-					if ( $wpdb->last_error || ! is_array( $ids ) || count( $ids ) !== 1 ) { $add( $key, 'The selected title must match exactly one existing FluentCRM tag. Create missing tags or resolve duplicate titles in FluentCRM > Contacts > Tags, then select the tag in CRM & Lifecycle.' ); }
+					if ( $wpdb->last_error || ! is_array( $ids ) || count( $ids ) !== 1 ) { $add( $key, 'The selected title must match exactly one existing FluentCRM tag. Use Setup > Set up CRM requirements for missing tags. Resolve duplicate titles in FluentCRM before provisioning; custom role overrides are in Settings > Advanced field overrides.' ); }
 				}
 				if ( (int) $config->get( 'fluent_forms.form_id', 0 ) <= 0 ) { $add( 'fluent_forms.form_id', 'Select the existing master form in Ads Bridge > Setup.' ); }
 			}
 			if ( ! SiteEngine_Ads_Bridge_Inquiries::table_exists() || ! SiteEngine_Ads_Bridge_Inquiries::schema_ready() ) {
-				$add( 'storage.inquiries', 'Required inquiry storage is not initialized at schema 2. Normal setup prepares absent storage automatically. Open Advanced > Storage for the exact blocker; existing incompatible schemas are preserved.' );
+				$add( 'storage.inquiries', 'Required inquiry storage is not initialized at schema 2. Normal setup prepares absent storage automatically. Open Settings > Detailed diagnostics for the exact blocker; existing incompatible schemas are preserved.' );
 			} else {
 				$guard = SiteEngine_Ads_Bridge_Coordination::migrate( false );
-				if ( $guard['status'] !== 'preview' || empty( $guard['exists_before'] ) ) { $add( 'storage.configuration_guard', 'Required configuration guard storage is missing, incomplete or blocked: ' . $guard['reason_code'] . '. Open Storage for initialization or pending-work diagnosis.' ); }
+				if ( $guard['status'] !== 'preview' || empty( $guard['exists_before'] ) ) { $add( 'storage.configuration_guard', 'Required configuration guard storage is missing, incomplete or blocked: ' . $guard['reason_code'] . '. Open Settings > Detailed diagnostics for pending-work diagnosis.' ); }
 			}
 		}
+        if ( class_exists( 'SiteEngine_Ads_Bridge_Product_Setup' ) ) {
+            $form_id = (int) $config->get( 'fluent_forms.form_id', 0 );
+            if ( $form_id > 0 ) {
+                $feed = SiteEngine_Ads_Bridge_Product_Setup::feed( $form_id );
+                if ( ! $feed['configured'] ) {
+                    $issues[] = array( 'key' => 'fluent_forms.feed', 'label' => 'FluentCRM form integration', 'message' => $feed['message'], 'destination' => 'FluentCRM integration', 'url' => $feed['url'] );
+                }
+            }
+            if ( ! $config->get( 'fluentcrm.lifecycle_automation.enabled', false ) ) {
+                $add( 'fluentcrm.lifecycle_automation.enabled', 'Enable Ads lifecycle handling in Setup so lead states and qualification times are recorded.' );
+            }
+            try {
+                $requirements = SiteEngine_Ads_Bridge_Product_Setup::crm( false );
+                if ( array_filter( $requirements['terms'], static fn( $term ) => ! $term['id'] ) || $requirements['fields']['missing'] ) {
+                    $add( 'fluentcrm.requirements', 'Required CRM definitions are missing. Use Set up CRM requirements on this page.' );
+                }
+            } catch ( Throwable $error ) {
+                $add( 'fluentcrm.requirements', $error->getMessage() );
+            }
+        }
 		return $issues;
 	}
 
 	/** Escaped, actionable list for the Ads screen; module messages stay plain text. */
 	public static function render_setup_issues( $config ) {
 		$issues = self::setup_issues( $config );
-		if ( ! $issues ) { return; }
+		if ( ! $issues ) { echo '<p>Setup configuration complete.</p>'; return; }
 		echo '<div class="notice notice-error inline"><h2>Complete Ads Bridge setup</h2><ul>';
 		foreach ( $issues as $issue ) {
 			echo '<li><strong>' . esc_html( $issue['label'] ) . ':</strong> ' . esc_html( $issue['message'] ) . ' <a href="' . esc_url( $issue['url'] ) . '">Open ' . esc_html( $issue['destination'] ) . '</a></li>';
@@ -328,38 +338,101 @@ final class SiteEngine_Ads_Bridge_Admin {
 	 */
     public static function render() {
         if(!current_user_can('manage_options'))return;
-        $config=SiteEngine_Ads_Bridge_Config::instance();$requested=sanitize_key(wp_unslash($_GET['tab']??'overview'));
-        $legacy=['lifecycle'=>['setup','crm'],'crm-import'=>['setup','crm'],'fields'=>['advanced','fields'],'exports'=>['setup','review'],'sheets'=>['setup','connections'],'compliance'=>['leads',''],'diagnostics'=>['advanced','diagnostics'],'migration'=>['advanced','legacy'],'storage'=>['advanced','storage']];
-        [$tab,$section]=$legacy[$requested]??[$requested,sanitize_key(wp_unslash($_GET['section']??''))];
-        $tabs=['overview'=>'Overview','setup'=>'Setup','leads'=>'Leads','advanced'=>'Advanced'];if(!isset($tabs[$tab]))$tab='overview';
-        echo '<div class="wrap seab-admin"><h1>SiteEngine Ads Bridge</h1>';
-        echo '<style>.seab-primary{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.seab-primary a{padding:10px 18px;border:1px solid #8c8f94;border-radius:4px;text-decoration:none;background:#fff}.seab-primary a[aria-current]{background:#135e96;color:white}.seab-admin details{padding:14px 18px;border:1px solid #c3c4c7;background:white;margin:14px 0;max-width:1100px}.seab-admin summary{cursor:pointer;font-size:16px;font-weight:600}.seab-admin summary:focus-visible,.seab-admin a:focus-visible{outline:3px solid #2271b1;outline-offset:3px}.seab-admin .form-table input.regular-text,.seab-admin select{max-width:100%}.seab-admin pre{white-space:pre-wrap;overflow-wrap:anywhere}.seab-scroll{overflow-x:auto}.seab-admin .notice{margin:12px 0}@media(max-width:600px){.seab-admin details{padding:12px}.seab-admin .form-table th,.seab-admin .form-table td{display:block;width:auto;padding:8px 0}.seab-admin .widefat{font-size:12px}.seab-primary a{flex:1;text-align:center}.seab-admin input.regular-text{width:100%}.seab-admin code{overflow-wrap:anywhere}}</style>';
-        echo '<nav class="seab-primary" aria-label="Ads Bridge">';foreach($tabs as$key=>$label)echo '<a '.($key===$tab?'aria-current="page" ':'').'href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab='.$key)).'">'.esc_html($label).'</a>';echo '</nav>';
-        if(isset($_GET['seab_saved']))echo '<div class="notice notice-success" role="status"><p>Ads Bridge settings saved. Incomplete setup remains editable.</p></div>';
-        if(isset($_GET['seab_imported']))echo '<div class="notice notice-success" role="status"><p>Legacy settings imported. Original configuration preserved.</p></div>';
-        if($config->external_override_active()&&$tab!=='advanced')echo '<div class="notice notice-warning"><p>An external configuration controls these values. <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=setup&section=authority')).'">Choose configuration authority</a> before changing settings.</p></div>';
-        echo '<div class="seab-scroll">';
-        if($tab==='overview')self::render_overview($config);
-        elseif($tab==='setup')self::render_setup_workflow($config,$section);
-        elseif($tab==='leads')self::render_compliance($config);
+        $config=SiteEngine_Ads_Bridge_Config::instance();$requested=sanitize_key(wp_unslash($_GET['tab']??'setup'));
+        $tab=in_array($requested,['api','settings'],true)?$requested:(in_array($requested,['advanced','fields','diagnostics','storage','migration','leads','compliance'],true)?'settings':'setup');
+        $section=sanitize_key(wp_unslash($_GET['section']??$requested));
+        echo '<div class="wrap seab-admin"><h1>SiteEngine Ads Bridge</h1><style>.seab-primary{display:flex;gap:20px;margin:20px 0}.seab-admin .form-table input,.seab-admin select{max-width:100%}#seab-ordinary-settings .submit{position:sticky;bottom:0;padding:12px;background:#f0f0f1;z-index:2}.seab-admin pre{white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:600px){.seab-admin .form-table th,.seab-admin .form-table td{display:block;width:auto}}</style><nav class="seab-primary" aria-label="Ads Bridge">';
+        foreach(['setup'=>'Setup','api'=>'API Setup','settings'=>'Settings']as$key=>$title)echo '<a '.($key===$tab?'aria-current="page" ':'').'href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab='.$key)).'">'.esc_html($title).'</a>';echo '</nav>';
+        if(isset($_GET['seab_saved']))echo '<div class="notice notice-success" role="status"><p>Settings saved. These are the persisted values; disabled features remain disabled.</p></div>';
+        if(isset($_GET['seab_authority_saved']))echo '<div class="notice notice-success" role="status"><p>WordPress settings selected. Original configuration files are preserved. Review and save ordinary settings below.</p></div>';
+        if(isset($_GET['seab_imported']))echo '<div class="notice notice-success" role="status"><p>Legacy settings imported; original file preserved. Review the saved values below.</p></div>';
+        if(isset($_GET['seab_crm_ready']))echo '<div class="notice notice-success" role="status"><p>CRM requirements checked. Missing definitions created; existing definitions and contact values preserved. No email or enrollment was enabled.</p></div>';
+        if($tab==='setup')self::render_setup_workflow($config,$section);
+        elseif($tab==='api')self::render_api();
         else self::render_advanced($config,$section);
-        echo '</div></div>';
+        echo '</div>';
     }
-    private static function step($id,$title,$done,$section,$callback) {
-        echo '<details id="seab-step-'.esc_attr($id).'" '.(($section===$id||(!$done&&$section===''))?'open':'').'><summary>'.esc_html($title.' — '.($done?'Complete; edit':'Needs review')).'</summary>'; $callback();echo '</details>';
+    private static function render_api() {
+        echo '<h2>API Setup</h2><nav class="nav-tab-wrapper" aria-label="Connectors"><span class="nav-tab nav-tab-active">FieldEdge</span></nav><p>Disabled. No automatic synchronization, lead creation or provider request is enabled by this page.</p>';
+        self::render_fieldedge_status();
     }
-    private static function render_overview($config) {
-        echo '<h2>Setup progress</h2>';$issues=self::setup_issues($config);
-        if($issues){$next=$issues[0];echo '<p><strong>Next required action: '.esc_html($next['label']).'</strong> — '.esc_html($next['message']).' <a href="'.esc_url($next['url']).'">'.esc_html($next['destination']).'</a></p>';}
-        else echo '<p>Required setup checks are complete. Review readiness before explicitly enabling any features.</p>';
-        echo '<p><a class="button button-primary" href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=setup')).'">Continue setup</a> <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=advanced&section=diagnostics')).'">Detailed diagnostics</a></p>';
-        $doctor=new SiteEngine_Ads_Bridge_Doctor($config);$checks=$doctor->run();$fail=self::doctor_failures($checks);
-        if($fail){echo '<h3>Checks needing attention ('.count($fail).')</h3><ul>';foreach(array_slice($fail,0,4)as$f)echo '<li><strong>'.esc_html($f['check']).':</strong> '.esc_html($f['message']).($f['corrective_url']?' <a href="'.esc_url($f['corrective_url']).'">'.esc_html($f['corrective_label']).'</a>':'').'</li>';echo '</ul>';}
-        echo '<h2>Export status</h2><ul>';foreach(['all_leads'=>'All Leads','qualified_leads'=>'Qualified Lead','won_jobs'=>'Converted Lead']as$key=>$label)echo '<li>'.esc_html($label).': <strong>'.($config->get('exports.'.$key.'.enabled',false)?'Enabled':'Disabled').'</strong></li>';echo '</ul>';
-        $last=get_option('seab_last_export_runtime',[]);echo '<p>Last successful aggregate run: '.esc_html(isset($last['timestamp'])?gmdate('Y-m-d H:i:s',(int)$last['timestamp']).' UTC — recorded successful runtime':'Never recorded').'.</p>';
-        $attempt=get_option('seab_last_export_attempt',[]);if(is_array($attempt)&&!empty($attempt['status']))echo '<p>Latest recorded operation: '.esc_html($attempt['status']).'. See Advanced for scheduler and failure evidence.</p>';
-        echo '<p>No export is run from this page. Google Ads API delivery remains disabled.</p>';
-    }
+	private static function render_fieldedge_status() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		try {
+			$status = \SiteEngine\AdsBridge\Connectors\FieldEdge\ConnectorDiagnostics::wordpress();
+		} catch ( \Throwable $error ) {
+			echo '<p>FieldEdge diagnostics unavailable. No connection or transport state was changed.</p>';
+			return;
+		}
+
+		$labels = array(
+			'crm_contact_api'         => 'FluentCRM contact API',
+			'crm_field_registry_read' => 'CRM field registry',
+			'crm_field_schema'        => 'FieldEdge CRM field definitions',
+			'crm_projection'          => 'Customer/job projection',
+			'ab_prospective_contract' => 'Ads Bridge inquiry bridge',
+			'provider_connection'     => 'FieldEdge connection',
+			'credential_state'        => 'Credentials',
+			'lead_creation'           => 'FieldEdge lead creation',
+			'provider_lead_job_link'  => 'Lead-to-work-order relationship',
+			'automatic_sync'          => 'Automatic synchronization',
+			'consent_and_dnc'         => 'Consent and DNC',
+			'advertising_attribution' => 'Advertising attribution',
+		);
+
+		echo '<p>Read-only diagnostics. Provider authentication is not tested here. Real FieldEdge lead creation, automatic synchronization and conversion delivery remain disabled.</p>';
+		echo '<table class="widefat striped" style="max-width:1000px"><thead><tr><th scope="col">Capability</th><th scope="col">Current state</th></tr></thead><tbody>';
+		foreach ( $labels as $key => $label ) {
+			echo '<tr><th scope="row">' . esc_html( $label ) . '</th><td>' . esc_html( (string) ( $status[ $key ] ?? 'unavailable' ) ) . '</td></tr>';
+		}
+		echo '</tbody></table>';
+
+		foreach ( array( 'crm_fields_missing' => 'Missing FieldEdge definitions', 'crm_fields_type_conflict' => 'Conflicting FieldEdge definitions' ) as $key => $label ) {
+			if ( ! empty( $status[ $key ] ) && is_array( $status[ $key ] ) ) {
+				echo '<p><strong>' . esc_html( $label ) . ':</strong> ' . esc_html( implode( ', ', $status[ $key ] ) ) . '</p>';
+			}
+		}
+
+		if ( isset( $_GET['seab_fe_fields'] ) && 'ready' === ( $status['crm_field_schema'] ?? '' ) ) {
+			echo '<div class="notice notice-success inline"><p>FieldEdge CRM definitions verified. No contacts or provider records were changed.</p></div>';
+		}
+		if ( 'missing_fields' === ( $status['crm_field_schema'] ?? '' ) && 'available' === ( $status['crm_field_registry_read'] ?? '' ) ) {
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			echo '<input type="hidden" name="action" value="seab_provision_fieldedge">';
+			wp_nonce_field( 'seab_provision_fieldedge' );
+			echo '<p><label><input type="checkbox" name="confirm" value="1" required> Create only the missing FieldEdge custom fields. Existing CRM definitions and contact values will be preserved.</label></p>';
+			submit_button( 'Create Missing FieldEdge Fields', 'secondary', 'submit', false );
+			echo '</form>';
+		}
+		echo '<p>This status does not enable FieldEdge access or alter Consent, subscriptions, job records or exports. Field provisioning requires an explicit administrator confirmation.</p>';
+	}
+
+	public static function handle_fieldedge_fields() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Permission denied.' );
+		}
+		check_admin_referer( 'seab_provision_fieldedge' );
+		if ( self::post_text( 'confirm' ) !== '1' ) {
+			wp_die( 'Explicit FieldEdge field provisioning confirmation required.' );
+		}
+		try {
+			SiteEngine_Ads_Bridge_Setup::with_configuration(
+				static function () {
+					return SiteEngine_Ads_Bridge_Fields::provision(
+						true,
+						\SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()
+					);
+				}
+			);
+		} catch ( \Throwable $error ) {
+			wp_die( esc_html( $error->getMessage() ) );
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=api&seab_fe_fields=1' ) );
+		exit;
+	}
     /** Resolve the actual Base/ACF field identity, including legacy definitions. */
     private static function business_data_url($key='') {
         $url=admin_url('admin.php?page=business-data');if($key===''||!function_exists('acf_get_field_groups')||!function_exists('acf_get_fields'))return $url;
@@ -374,22 +447,28 @@ final class SiteEngine_Ads_Bridge_Admin {
         echo '</tbody></table>';
     }
     private static function render_setup_workflow($config,$section) {
-        $base=true;foreach(['business_name','timezone','currency','google_ads_customer_id']as$k)if(!function_exists('siteengine_has')||!siteengine_has($k))$base=false;
-        $job=\SiteEngine\AdsBridge\Import\Store::job();$imported=$job&&($job['status']??'')==='complete';
-        $form=SiteEngine_Ads_Bridge_Setup::form_connection((int)$config->get('fluent_forms.form_id',0),(array)$config->get('fluent_forms.fields',[]));
-        if($section==='')$section=!$base?'business':(!$imported?'crm':(!$form['ready']?'form':(($config->get('google_sheets.spreadsheet_id','')===''||$config->get('google_sheets.credentials_path','')==='')?'connections':'review')));
-        self::render_authority($config);
-        echo '<h2>Complete setup in order</h2><p>Save each step as you go. Completed steps stay collapsed and editable. Saving incomplete setup does not enable delivery.</p>';
-        self::step('business','1. Read shared Business Data',$base,$section,static fn()=>self::render_shared_business($config));
-        self::step('crm','2. Import CRM configuration',$imported,$section,static function()use($config,$imported){if($imported)echo '<p>Imported configuration and CRM mappings are retained; no need to enter them again.</p>';else echo '<p>CRM configuration has not been imported. This does not block saving Ads settings and does not mean FluentCRM is missing. Existing mappings may be configured below; missing dependencies and invalid mappings are reported separately.</p>';\SiteEngine\AdsBridge\Import\Admin::render();echo '<details><summary>Edit CRM mappings and optional sources</summary>';self::render_lifecycle($config);echo '</details><details><summary>Standard CRM field definitions</summary>';self::render_field_provisioning();echo '</details>';});
-        self::step('form','3. Select and verify the lead form',$form['ready']&&$form['mapping']===(array)$config->get('fluent_forms.fields',[])&&SiteEngine_Ads_Bridge_Setup::verification('submission',$config)['valid'],$section,static fn()=>self::render_setup($config));
-        $connection=$config->get('google_sheets.spreadsheet_id','')!==''&&$config->get('google_sheets.credentials_path','')!=='';
-        self::step('connections','4. Google Sheets and conversion settings',$connection,$section,static function()use($config){self::render_sheets($config);self::render_exports($config);self::verification_form('timezone',$config);});
-        self::step('review','5. Review readiness and enable desired features',false,$section,static function()use($config){self::render_setup_issues($config);$d=new SiteEngine_Ads_Bridge_Doctor($config);$d->run();$sum=$d->summary();echo '<p>'.esc_html($sum['PASS'].' checks passed; '.$sum['WARN'].' warnings; '.$sum['FAIL'].' failed checks.').'</p><p>Review the exact failures and warnings in <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=advanced&section=diagnostics')).'">Advanced diagnostics</a>. Enable only separately authorized features using the explicit checkboxes in connection/export settings or CRM mapping settings. Nothing is enabled automatically.</p>';});
+        echo '<h2>Setup</h2><p>Save incomplete configuration at any time. Saving does not run exports, send email or enroll contacts.</p>';
+        self::render_shared_business($config);
+        echo '<h2>CRM requirements</h2><p>Only three lists, four lifecycle roles and required contact fields are needed. Marketing templates, campaigns, sequences and the CRM builder are not prerequisites.</p>';
+        try{$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();$missing=count(array_filter($plan['terms'],static fn($x)=>!$x['id']))+count($plan['fields']['missing']);echo '<p>'.esc_html($missing?$missing.' required definitions are missing.':'Required CRM definitions exist.').'</p><ul>';foreach($plan['terms']as$t)if(!$t['id'])echo '<li>'.esc_html($t['title'].' — '.$t['kind']).'</li>';foreach($plan['fields']['missing']as$f)echo '<li>'.esc_html($f['label'].' — contact field').'</li>';echo '</ul>';}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';}
+        echo '<form id="seab-crm-requirements" method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_crm_requirements">';wp_nonce_field('seab_crm_requirements');submit_button('Set up CRM requirements','secondary');echo '<p id="seab-crm-setup-status" role="status"></p></form>';
+        if($config->external_override_active())echo '<p>An intentional external configuration controls these values. <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=settings&section=diagnostics')).'">Review settings source in Diagnostics</a>.</p>';
+        self::form_open('product');self::$combined_form=true;
+        self::render_setup($config);
+        echo '<h2>Lifecycle handling</h2><table class="form-table"><tbody>';self::checkbox_row('Enable Ads lifecycle handling','lifecycle_automation_enabled',(bool)$config->get('fluentcrm.lifecycle_automation.enabled',false),'Records Ads inquiry events and lifecycle state. This does not authorize marketing email or enrollment.');echo '</tbody></table>';
+        self::render_sheets($config);self::render_exports($config);
+        echo '<table class="form-table"><tbody>';self::text_row('Google Ads account timezone','account_timezone',$config->get('google_sheets.account_timezone',''),'Use the IANA timezone shown in your Google Ads account. Separate from Base business timezone; Google Ads has not been queried.');echo '</tbody></table>';
+        self::$combined_form=false;self::form_close();
+        echo '<p id="seab-unsaved" role="status">Save settings retains all values on this page. Saving does not run exports.</p><h2>Remaining requirements</h2>';self::render_setup_issues($config);
+        echo '<p>Disabled optional exports are intentional. Readiness is not permission to deliver. Detailed diagnostics are in Settings.</p><script src="'.esc_url(SEAB_PLUGIN_URL.'includes/product-setup.js?ver='.SEAB_VERSION).'"></script>';
     }
     private static function render_advanced($config,$section) {
-        echo '<h2>Advanced</h2><p>Field overrides, diagnostics and recovery tools. Ordinary setup is on the Setup page.</p><details '.($section==='fields'?'open':'').'><summary>Field overrides and feed verification</summary>';self::render_fields($config);echo '</details><details '.($section==='diagnostics'?'open':'').'><summary>Detailed diagnostics</summary>';self::render_diagnostics($config);echo '</details><details><summary>Scheduler instructions</summary>';self::render_scheduler();echo '</details><details '.($section==='storage'?'open':'').'><summary>Storage inspection and recovery</summary>';self::render_storage();echo '</details><details><summary>Configuration details</summary>';self::render_source_banner($config);echo '</details>';
-        if(in_array($config->configuration_source(),['local_file','external'],true)){echo '<details '.($section==='legacy'?'open':'').'><summary>Import legacy settings</summary>';self::render_migration($config);echo '</details>';}
+        $items=['fields'=>'Advanced field overrides','diagnostics'=>'Detailed diagnostics','scheduler'=>'Scheduler','leads'=>'Lead compliance'];if($section==='compliance')$section='leads';if(!isset($items[$section]))$section='diagnostics';
+        echo '<h2>Settings</h2><nav class="nav-tab-wrapper" aria-label="Settings sections">';foreach($items as$key=>$label)echo '<a class="nav-tab '.($key===$section?'nav-tab-active':'').'" href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=settings&section='.$key)).'">'.esc_html($label).'</a>';echo '</nav>';
+        if($section==='fields'){echo '<p>Defaults are populated; existing custom overrides are retained. Not every field is required: requirements depend on the selected feature and actual form.</p>';self::render_fields($config);self::render_lifecycle($config);}
+        elseif($section==='scheduler'){self::render_scheduler();$d=new SiteEngine_Ads_Bridge_Doctor($config);foreach($d->run()as$r)if(in_array($r['check']??'',['Scheduled export runtime','Scheduled export freshness','Cron PHP runtime'],true))echo '<p>'.esc_html(($r['status']??'').': '.($r['message']??'')).'</p>';}
+        elseif($section==='leads')self::render_compliance($config);
+        else{self::render_source_banner($config);self::render_diagnostics($config);self::render_storage();$job=\SiteEngine\AdsBridge\Import\Store::job();if($job&&in_array($job['status']??'',['running','uncertain'],true)){echo '<h3>Retained unfinished configuration operation</h3>';$recovery=\SiteEngine\AdsBridge\Import\Recovery::inspect();\SiteEngine\AdsBridge\Import\Recovery::render($recovery);if(!empty($recovery['resume']))echo '<button type="button" class="button" id="seab-resume-operation" data-nonce="'.esc_attr(wp_create_nonce('seab_crm_import')).'">Resume original saved operation</button><p id="seab-resume-result" role="status"></p><script src="'.esc_url(SEAB_PLUGIN_URL.'includes/saved-operation-recovery.js?ver='.SEAB_VERSION).'"></script>';echo '<p>The original operation and receipts are retained. Use supported exact-operation recovery; ordinary setup never resets it.</p>';}}
     }
 
 	/** @return void */
@@ -403,20 +482,20 @@ final class SiteEngine_Ads_Bridge_Admin {
 		);
 		$label = isset( $labels[ $source ] ) ? $labels[ $source ] : $source;
 		echo '<p><strong>Configuration authority:</strong> ' . esc_html( $label ) . '.</p>';
-		self::render_authority($config);
+        if(in_array($source,['external','local_file'],true))self::render_authority($config);
 	}
 
 	/** @return void */
     private static function render_setup($config) {
         $id=(int)$config->get('fluent_forms.form_id',0);$view=SiteEngine_Ads_Bridge_Setup::form_connection($id,(array)$config->get('fluent_forms.fields',[]));
         self::form_open('setup');echo '<table class="form-table"><tbody>';
-        self::text_row('Client Slug','client_slug',$config->get('client.slug',''),'Stable business identifier.');self::text_row('Short Name','client_short_name',$config->get('client.short_name',''));
+
         echo '<tr><th><label for="seab-form-id">Lead form</label></th><td><select id="seab-form-id" name="form_id"><option value="0">Select a form</option>';foreach(self::get_fluent_forms()as$f)echo '<option value="'.esc_attr($f['id']).'" '.selected($id,$f['id'],false).'>'.esc_html($f['title']).'</option>';echo '</select><p>Save a new selection to inspect its fields.</p></td></tr>';
-        self::text_row('Required Consent Policy','consent_policy',$config->get('consent.required_policy_version',''),'Must match SiteEngine Consent; never inferred from email subscription.');echo '</tbody></table>';
+        echo '</tbody></table>';
         echo '<h3>Form connection</h3><p>'.esc_html($view['ready']?'Required advertising fields have unique selectors. Save to retain any newly detected mappings.':$view['error']).'</p>';
         foreach($view['needs']as$key=>$candidates){echo '<p><label for="seab-choice-'.esc_attr($key).'">'.esc_html(ucwords(str_replace('_',' ',$key))).'</label> <select id="seab-choice-'.esc_attr($key).'" name="form_field_'.esc_attr($key).'"><option value="">Choose field; leave incomplete</option>';foreach($view['fields']as$name=>$f)if($f['count']===1&&(!$candidates||in_array($name,$candidates,true)))echo '<option value="'.esc_attr($name).'">'.esc_html($f['label'].' ('.$name.')').'</option>';echo '</select></p>';}
-        echo '<p>Standard unique mappings are used by default. Existing custom mappings are preserved. Full overrides are in Advanced.</p>';self::form_close();
-        echo '<p><strong>CRM feed is separate.</strong> Field-name checks only verify Ads reading. They do not verify Fluent Forms → FluentCRM delivery or the submission ID feed.</p>';self::verification_form('submission',$config);
+        echo '<p>Standard unique mappings are used by default. Existing custom mappings are preserved. Full overrides are in Settings > Advanced field overrides.</p>';self::form_close();
+        echo '<p><strong>CRM feed is separate.</strong> Field-name checks only verify Ads reading. They do not verify Fluent Forms → FluentCRM delivery or the submission ID feed.</p>';$feed=SiteEngine_Ads_Bridge_Product_Setup::feed((int)$config->get('fluent_forms.form_id',0));echo '<p>'.esc_html($feed['message']).' <a href="'.esc_url($feed['url']).'">Edit FluentCRM integration</a></p>';
     }
     private static function render_scheduler() {
 		$cron = self::cron_guidance();
@@ -493,8 +572,8 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 	/** @return void */
 	private static function render_fields( $config ) {
-        self::render_field_provisioning();
-        self::verification_form('submission',$config);
+        echo '<p>Use Setup > Set up CRM requirements for missing definitions. This screen preserves custom overrides; blank optional sources remain unused.</p>';
+        $feed=SiteEngine_Ads_Bridge_Product_Setup::feed((int)$config->get('fluent_forms.form_id',0));echo '<p>'.esc_html($feed['message']).' <a href="'.esc_url($feed['url']).'">Edit FluentCRM integration</a></p>';
 		self::form_open( 'fields' );
 		echo '<h2>Fluent Form Field Mapping</h2><p>Map Ads Bridge canonical keys to the field names used by the configured master Fluent Form. Defaults match the standard SiteEngine lead form.</p>';
 		echo '<table class="widefat striped" style="max-width:900px"><thead><tr><th>Canonical Key</th><th>Fluent Forms Field Name</th></tr></thead><tbody>';
@@ -502,7 +581,11 @@ final class SiteEngine_Ads_Bridge_Admin {
 			$value = $config->get( 'fluent_forms.fields.' . $key, $default );
 			echo '<tr><td><code>' . esc_html( $key ) . '</code></td><td><input class="regular-text" aria-label="Form field: ' . esc_attr( ucwords(str_replace('_',' ',$key)) ) . '" name="field_' . esc_attr( $key ) . '" value="' . esc_attr( (string) $value ) . '"></td></tr>';
 		}
-		echo '</tbody></table>';
+		echo '</tbody></table><h3>CRM event field overrides</h3><table class="form-table"><tbody>';
+        self::text_row('Qualification timestamp field','qualified_date_field',$config->get('exports.qualified_leads.date_field','qualified_at'),'Required when Qualified export is enabled.');
+        self::text_row('Converted revenue field','won_value_field',$config->get('exports.won_jobs.value_field','invoiced_amount'),'Actual positive revenue is required for Converted export.');
+        self::text_row('Converted outcome date field','won_date_field',$config->get('exports.won_jobs.date_field','closed_date'),'Required when Converted export is enabled.');
+        echo '</tbody></table>';
 		self::form_close();
 	}
 
@@ -525,14 +608,14 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '</tbody></table><h3>SE | Qualified Lead</h3><table class="form-table"><tbody>';
 		self::checkbox_row( 'Enable Qualified Lead Export', 'qualified_enabled', (bool) $config->get( 'exports.qualified_leads.enabled', false ), 'Exports contacts with the configured qualification timestamp to the shared Google import tab.' );
 		self::text_row( 'Qualified Conversion Action', 'qualified_action', $config->get( 'exports.qualified_leads.conversion_action', 'SE | Qualified Lead' ) );
-		self::text_row( 'Qualification Timestamp Field', 'qualified_date_field', $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ), 'Recommended: qualified_at (date_time), populated by the CRM automation at the moment the lead becomes qualified.' );
+        if(!self::$combined_form){self::text_row( 'Qualification Timestamp Field', 'qualified_date_field', $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ), 'Recommended: qualified_at (date_time), populated by the CRM automation at the moment the lead becomes qualified.' );}
 		self::text_row( 'Qualified Lead Proxy Value', 'qualified_value', $config->get( 'exports.qualified_leads.conversion_value', '' ), 'Optional. Leave blank for no proxy value; if used, enter a non-negative numeric value.' );
 
 		echo '</tbody></table><h3>SE | Converted Lead</h3><table class="form-table"><tbody>';
 		self::checkbox_row( 'Enable Converted Lead Export', 'won_enabled', (bool) $config->get( 'exports.won_jobs.enabled', false ), 'Won contacts only; actual positive revenue is mandatory.' );
 		self::text_row( 'Converted Conversion Action', 'won_action', $config->get( 'exports.won_jobs.conversion_action', 'SE | Converted Lead' ) );
-		self::text_row( 'Converted Value Field', 'won_value_field', $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ), 'Must contain actual positive revenue. Ads Bridge never fabricates fallback revenue.' );
-		self::text_row( 'Outcome Date Field', 'won_date_field', $config->get( 'exports.won_jobs.date_field', 'closed_date' ), 'Recommended canonical field: closed_date (label it Outcome Date in CRM).' );
+        if(!self::$combined_form){self::text_row( 'Converted Value Field', 'won_value_field', $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ), 'Must contain actual positive revenue. Ads Bridge never fabricates fallback revenue.' );}
+        if(!self::$combined_form){self::text_row( 'Outcome Date Field', 'won_date_field', $config->get( 'exports.won_jobs.date_field', 'closed_date' ), 'Recommended canonical field: closed_date (label it Outcome Date in CRM).' );}
 
 		echo '</tbody></table><p><strong>Unqualified leads are intentionally not exported as Google conversions.</strong> Their current state and reason are retained in the All_Leads lifecycle ledger.</p>';
 		self::form_close();
@@ -545,6 +628,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 		self::checkbox_row( 'Enable Google Sheets', 'sheets_enabled', (bool) $config->get( 'google_sheets.enabled', false ), 'Required before any export family can be enabled.' );
 		self::text_row( 'Spreadsheet ID', 'spreadsheet_id', $config->get( 'google_sheets.spreadsheet_id', '' ), 'Paste the spreadsheet ID, not a service-account secret.' );
 		self::text_row( 'Service Account JSON Path', 'credentials_path', $config->get( 'google_sheets.credentials_path', '' ), 'Recommended: /home/CPANEL_USER/.secrets/se-ads-sa.json' );
+        echo '<tr><td colspan="2"><button type="button" class="button" id="seab-test-sheets" data-nonce="'.esc_attr(wp_create_nonce('seab_test_sheets')).'">Test connection</button><p id="seab-sheets-result" role="status"></p></td></tr>';
 		echo '</tbody></table><p><strong>Credentials stay outside WordPress.</strong> Ads Bridge stores only the filesystem path to the JSON credential file.</p>';
 		self::form_close();
 	}
@@ -622,6 +706,32 @@ final class SiteEngine_Ads_Bridge_Admin {
         echo '</section>';
     }
 
+    public static function handle_crm_requirements() {
+        if(!current_user_can('manage_options'))wp_die('Permission denied.');
+        check_admin_referer('seab_crm_requirements');
+        try{
+            if(SiteEngine_Ads_Bridge_Config::instance()->external_override_active())throw new RuntimeException('External settings are authoritative. Review Settings > Detailed diagnostics before provisioning mapped requirements.');
+            SiteEngine_Ads_Bridge_Setup::with_configuration(static function(){
+                $before=SiteEngine_Ads_Bridge_Settings::get();
+                $plan=SiteEngine_Ads_Bridge_Product_Setup::crm(true);
+                $data=SiteEngine_Ads_Bridge_Settings::merge(SiteEngine_Ads_Bridge_Settings::defaults(),$before?:SiteEngine_Ads_Bridge_Config::instance()->all());
+                foreach($plan['terms']as$t){
+                    if($t['kind']==='list')$data['fluentcrm']['lists'][$t['role']]=$t['title'];
+                    else $data['fluentcrm']['tags']['lifecycle'][$t['role']]=$t['title'];
+                }
+                if(SiteEngine_Ads_Bridge_Settings::get()!==$before)throw new RuntimeException('Settings changed during provisioning. Definitions are retained; reload before mapping them.');
+                SiteEngine_Ads_Bridge_Settings::save($data);
+                if(SiteEngine_Ads_Bridge_Settings::get()!==SiteEngine_Ads_Bridge_Settings::sanitize_config($data))throw new RuntimeException('CRM mapping readback failed; inspect saved configuration before retrying.');
+            });
+        }catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
+        wp_safe_redirect(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=setup&seab_crm_ready=1'));exit;
+    }
+    public static function test_sheets() {
+        if(!current_user_can('manage_options'))wp_send_json_error(['message'=>'Administrator permission required.'],403);
+        check_ajax_referer('seab_test_sheets');
+        try{wp_send_json_success(SiteEngine_Ads_Bridge_Product_Setup::test_connection(self::post_text('credentials_path'),self::post_text('spreadsheet_id')));}
+        catch(Throwable $e){wp_send_json_error(['message'=>$e->getMessage()],400);}
+    }
     public static function handle_authority() {
         if(!current_user_can('manage_options'))wp_die('Permission denied.');
         check_admin_referer('seab_use_settings');
@@ -644,7 +754,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 			wp_die( 'Permission denied.' );
 		}
 		check_admin_referer( 'seab_save_settings' );
-		if ( SiteEngine_Ads_Bridge_Config::instance()->external_override_active() ) { wp_die( 'External SEAB_CONFIG_FILE controls these values. Open Ads Bridge > Setup > Configuration authority to keep intentional file authority or choose WordPress settings without importing the file. File status: ' . SiteEngine_Ads_Bridge_Setup::config_file_status()['state'] ); }
+		if ( SiteEngine_Ads_Bridge_Config::instance()->external_override_active() ) { wp_die( 'External SEAB_CONFIG_FILE controls these values. Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority to keep intentional file authority or choose WordPress settings without importing the file. File status: ' . SiteEngine_Ads_Bridge_Setup::config_file_status()['state'] ); }
 		$tab = isset( $_POST['seab_tab'] ) ? sanitize_key( wp_unslash( $_POST['seab_tab'] ) ) : 'setup';
 		$saved_before = SiteEngine_Ads_Bridge_Settings::get();
 
@@ -658,7 +768,9 @@ final class SiteEngine_Ads_Bridge_Admin {
 		}
 		$data = SiteEngine_Ads_Bridge_Settings::merge( SiteEngine_Ads_Bridge_Settings::defaults(), $data );
 
-		if ( 'setup' === $tab ) {
+		if ('product' === $tab) {
+            try{$data=SiteEngine_Ads_Bridge_Product_Setup::values($data,$_POST);}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
+        } elseif ( 'setup' === $tab ) {
 			$data['client']['slug'] = self::post_text( 'client_slug' );
 			$data['client']['short_name'] = self::post_text( 'client_short_name' );
 			$data['fluent_forms']['form_id'] = self::post_int( 'form_id' );
@@ -689,6 +801,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 				$value = self::post_text( 'field_' . $key );
 				$data['fluent_forms']['fields'][ $key ] = '' !== $value ? $value : $default;
 			}
+            foreach(['qualified_date_field'=>['qualified_leads','date_field'],'won_value_field'=>['won_jobs','value_field'],'won_date_field'=>['won_jobs','date_field']]as$key=>$path)if(array_key_exists($key,$_POST))$data['exports'][$path[0]][$path[1]]=self::post_text($key);
 		} elseif ( 'exports' === $tab ) {
 			$data['exports']['all_leads']['enabled'] = self::post_bool( 'all_leads_enabled' );
 			$data['exports']['all_leads']['sheet_tab'] = self::post_text( 'all_leads_tab' );
@@ -713,7 +826,7 @@ final class SiteEngine_Ads_Bridge_Admin {
 			SiteEngine_Ads_Bridge_Settings::save( $data );
 			if ( SiteEngine_Ads_Bridge_Settings::get() !== SiteEngine_Ads_Bridge_Settings::sanitize_config( $data ) ) { throw new RuntimeException( 'Settings readback failed. Inspect current values before retrying.' ); }
 		} ); } catch ( Throwable $e ) { wp_die( esc_html( $e->getMessage() ) ); }
-		$url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . $tab . '&seab_saved=1' );
+		$url = admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=' . ($tab==='product'?'setup':$tab) . '&seab_saved=1' );
 		wp_safe_redirect( $url );
 		exit;
 	}
@@ -759,29 +872,9 @@ final class SiteEngine_Ads_Bridge_Admin {
         if(!$ledger['ready'])echo '<p>'.esc_html($ledger['reason']).'</p>';
 		\SiteEngine\AdsBridge\Import\Recovery::render($storage);
 		if (!$storage['can_initialize']) { echo '<p>Initialization is unavailable for this state. Use the reported owner/recovery workflow; it never clears pending operations.</p>'; return; }
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="seab_initialize_storage">';
-		wp_nonce_field( 'seab_initialize_storage' );
-		echo '<p><label><input required type="checkbox" name="confirm_storage" value="1"> Initialize required Ads storage on this site. Preserve all existing history and pending work.</label></p>';
-		submit_button( 'Initialize Required Ads Storage' );
-		echo '</form><p>Existing incomplete or unsupported schemas fail closed and require the supported inquiry-admin migration review. Pending inquiries/configuration journals must be recovered by their owner; initialization never resets them.</p>';
+        echo '<p>Normal activation and supported additive upgrades prepare absent plugin storage. Existing incompatible schemas or retained unfinished operations require the exact recovery described above; no rows or journals are reset.</p>';
 	}
 
-    private static function verification_form($kind,$config) {
-        echo '<h2>'.esc_html($kind==='timezone'?'Google Ads Account Timezone — Manual Verification':'Submission ID Feed — Operator Verification').'</h2>';
-        $v=SiteEngine_Ads_Bridge_Setup::verification($kind,$config);echo '<p>'.esc_html($v['reason']).'</p>';
-        if($v['valid'])echo '<p>'.esc_html('Operator #'.$v['record']['user_id'].'; '.gmdate('Y-m-d H:i:s',$v['record']['timestamp']).' UTC; method: manual_operator').'</p>';
-        try{$pin=SiteEngine_Ads_Bridge_Setup::verification_context($kind,$config);}catch(Throwable $e){return;}
-        echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_verify_setup"><input type="hidden" name="kind" value="'.esc_attr($kind).'"><input type="hidden" name="context" value="'.esc_attr($pin).'">';wp_nonce_field('seab_verify_setup');
-        if($kind==='timezone')echo '<p>Inspect Google Ads &gt; Admin &gt; Account settings for account '.esc_html($config->get('client.google_ads_customer_id','')).'. Effective conversion timezone: '.esc_html($config->get('client.timezone','')).'. This plugin does not query Google Ads.</p><label>Account IANA timezone <input required name="account_timezone"></label>';
-        else echo '<p>Inspect Fluent Forms &gt; master form Integrations &gt; FluentCRM: map {submission.id} to submission_id. Confirmation is bound to this form, field mapping and saved form/feed metadata. Optional exact IDs add stored-linkage readback only; no submission or export runs.</p><label>Contact ID (optional) <input type="number" min="1" name="contact_id"></label><label>Submission ID (optional) <input type="number" min="1" name="submission_id"></label>';
-        echo '<p><label><input required type="checkbox" name="confirm" value="1"> I inspected these exact inputs. Record my manual confirmation.</label></p>';submit_button('Record Operator Verification');echo '</form>';
-    }
-    public static function handle_verification() {
-        if(!current_user_can('manage_options'))wp_die('Permission denied.');check_admin_referer('seab_verify_setup');
-        if(self::post_text('confirm')!=='1')wp_die('Explicit operator confirmation required.');$kind=self::post_text('kind');
-        try{SiteEngine_Ads_Bridge_Setup::record_verification($kind,self::post_text('context'),['account_timezone'=>self::post_text('account_timezone'),'contact_id'=>self::post_int('contact_id'),'submission_id'=>self::post_int('submission_id')]);}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
-        wp_safe_redirect(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab='.($kind==='timezone'?'setup':'fields')));exit;
-    }
     public static function handle_fields() {
         if(!current_user_can('manage_options'))wp_die('Permission denied.');check_admin_referer('seab_provision_fields');if(self::post_text('confirm')!=='1')wp_die('Explicit provisioning confirmation required.');
         try{SiteEngine_Ads_Bridge_Setup::with_configuration(static function(){return SiteEngine_Ads_Bridge_Fields::provision(true);});}catch(Throwable $e){wp_die(esc_html($e->getMessage()));}
@@ -800,14 +893,16 @@ final class SiteEngine_Ads_Bridge_Admin {
 
 	/** @return void */
 	private static function form_open( $tab ) {
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		if(self::$combined_form)return;
+		echo '<form '.($tab==='product'?'id="seab-ordinary-settings" ':'').'method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="seab_save_settings"><input type="hidden" name="seab_tab" value="' . esc_attr( $tab ) . '">';
 		wp_nonce_field( 'seab_save_settings' );
 	}
 
 	/** @return void */
 	private static function form_close() {
-		submit_button( 'Save Ads Bridge Settings' );
+		if(self::$combined_form)return;
+		submit_button( 'Save settings' );
 		echo '</form>';
 	}
 

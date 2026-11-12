@@ -36,7 +36,15 @@ $issues=SiteEngine_Ads_Bridge_Admin::setup_issues($fake);ok($issues[0]['label']=
 ob_start();SiteEngine_Ads_Bridge_Admin::render_setup_issues($fake);$html=ob_get_clean();ok(strpos($html,'<script>')===false && strpos($html,'&lt;script&gt;')!==false,'all reported error HTML is escaped');
 ok(substr_count($html,'<li>')===2 && strpos($html,'Open Business Data')!==false && strpos($html,'Open Ads setup')!==false,'complete actionable list renders both destinations');
 $base['google_ads_customer_id']='123-456-7890';$options['seab_settings_v2']=$valid;$c=reset_config();source_as($c,'external');ok(SiteEngine_Ads_Bridge_Admin::module_status()['label']==='External Config Active','valid external authority remains a warning, not falsely Ready');
-source_as($c,'local_file');ok(SiteEngine_Ads_Bridge_Admin::module_status()['label']==='Migration Available','valid local-file migration behavior preserved');
+source_as($c,'local_file');ok(SiteEngine_Ads_Bridge_Admin::module_status()['label']==='Legacy settings source','legacy source reported without obsolete Migration instruction');
 source_as($c,'settings');SiteEngine_Ads_Bridge_Doctor::$fail=2;ok(SiteEngine_Ads_Bridge_Admin::module_status()['status']==='error','Doctor failures still prevent Ready');
 ok($writes===0,'reporting never saves configuration or Base data');
+$options['seab_settings_v2']=$valid;$options['seab_settings_v2']['google_sheets']['account_timezone']='America/Denver';$c=reset_config();
+ok($c->get('google_sheets.account_timezone')==='America/Denver','account timezone uses a separate setting');
+ok($c->get('client.timezone')===$base['timezone'],'Base business timezone remains unchanged');
+ok($c->get('timezone')===$base['timezone'],'legacy business timezone alias remains unchanged for All Leads and internal reporting');
+$options['seab_settings_v2']['google_sheets']['account_timezone']='';$options['seab_settings_v2']['exports']['qualified_leads']['enabled']=true;$c=reset_config();
+ok(count(array_filter($c->validate(),static fn($e)=>str_contains($e,'account_timezone')))===1,'advertising configuration cannot silently use missing account timezone');
+$options['seab_settings_v2']['exports']['qualified_leads']['enabled']=false;$c=reset_config();
+ok(!array_filter($c->validate(),static fn($e)=>str_contains($e,'account_timezone')),'disabled optional advertising does not force timezone setup failure');
 echo "SUMMARY: $n PASS; actual resolver/reporting, synthetic WordPress/Base/Doctor\n";

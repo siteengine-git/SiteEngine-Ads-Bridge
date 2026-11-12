@@ -37,6 +37,7 @@ class SiteEngine_Ads_Bridge_Config {
 	const SRC_CLIENT   = 'PHP config';
 	const SRC_SETTINGS = 'Ads Bridge settings';
 	const SRC_BASE     = 'SiteEngine Base';
+    const SRC_CONSENT  = 'SiteEngine Consent issuer';
 	const SRC_LEGACY   = 'legacy compatibility mapping';
 	const SRC_DEFAULT  = 'plugin default';
 
@@ -276,17 +277,17 @@ class SiteEngine_Ads_Bridge_Config {
 	private function load_php_config( $path ) {
 		if ( ! is_string( $path ) || '' === $path || ! file_exists( $path ) ) {
 			$state=class_exists('SiteEngine_Ads_Bridge_Setup')?SiteEngine_Ads_Bridge_Setup::config_file_status()['state']:'missing_or_unavailable';
-			$this->load_errors[] = 'Legacy configuration is unavailable ('.$state.'). Open Ads Bridge > Setup > Configuration authority; no content was imported.';
+			$this->load_errors[] = 'Legacy configuration is unavailable ('.$state.'). Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority; no content was imported.';
 			return;
 		}
 		if (!is_file($path)||!is_readable($path)) {
-			$this->load_errors[]='Legacy configuration file is not a readable regular file. Open Ads Bridge > Setup > Configuration authority; retain the external configuration or explicitly use WordPress settings without importing it.';
+			$this->load_errors[]='Legacy configuration file is not a readable regular file. Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority; retain the external configuration or explicitly use WordPress settings without importing it.';
 			return;
 		}
 
 		try { $raw = require $path; }
 		catch (Throwable $e) {
-			$this->load_errors[]='Legacy configuration could not be loaded ('.get_class($e).'). No content was imported. Open Ads Bridge > Setup > Configuration authority.';
+			$this->load_errors[]='Legacy configuration could not be loaded ('.get_class($e).'). No content was imported. Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority.';
 			return;
 		}
 		if ( ! is_array( $raw ) ) {
@@ -572,6 +573,7 @@ class SiteEngine_Ads_Bridge_Config {
 	 * @return void
 	 */
 	private function apply_defaults() {
+        if(class_exists('SiteEngine_Ads_Bridge_Product_Setup'))$this->set_canonical('consent.required_policy_version',SiteEngine_Ads_Bridge_Product_Setup::policy(),self::SRC_CONSENT);
 		$defaults = array(
 			'google_sheets.enabled'                => false,
 			'google_sheets.value_input_option'     => 'RAW',
@@ -924,6 +926,10 @@ class SiteEngine_Ads_Bridge_Config {
 	 */
 	private function validate_v2() {
 		$errors = array();
+        if($this->canonical_get('exports.qualified_leads.enabled',false)||$this->canonical_get('exports.won_jobs.enabled',false)){
+            $zone=$this->canonical_get('google_sheets.account_timezone','');
+            if(!is_string($zone)||!in_array($zone,timezone_identifiers_list(),true))$errors[]='google_sheets.account_timezone must be the Google Ads account IANA timezone before advertising export.';
+        }
 
 		$required_scalars = array(
 			'client.slug',

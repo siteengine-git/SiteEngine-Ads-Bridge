@@ -1,3 +1,78 @@
+## 0.9.0 setup replacement - actual execution checkpoint
+
+AB Helper is the sole writer/executor. Installed on the assigned development clone
+climatrol.siteengine.space only. Native PHP 8.4.27 lints and exact 77-member
+package readback passed. Supported authenticated browser verified the one-page
+Setup, CRM requirements utility, Save settings/reload, API Setup with retained
+FieldEdge controls, advanced fields, diagnostics and Scheduler. Actual remaining
+configuration requirements are form 40 disabled CRM feed and blank Ads account
+timezone. No readiness override or import/journal reset was used. Final metadata,
+independent data preservation, scoped guard cleanup and delivery are closing.
+The first PHP proc_close lint wrapper failed; independent direct native lints
+passed all 50 files. A private web probe returned 403 and was removed; security
+was not changed and ordinary authenticated page rendering verified compiled UI.
+All original backups and failure evidence remain private. No advertising row,
+mail, enrollment, call or FieldEdge provider action was requested.
+
+## Helper execution continuation - November 12, 2026
+
+The source worker was stopped at an idle command boundary. AB Helper is now the
+sole writer/executor, resolving actual vendor type schema and preserving existing
+enabled settings under temporary request-scoped test containment. Supported cloud
+browser administrator sign-in succeeded. Only climatrol.siteengine.space is the
+assigned installation target. Earlier unaccepted candidate hashes are superseded.
+
+## Agreed setup replacement in progress — November 12, 2026
+
+AB Codex is the sole canonical source writer under Aubrey's latest bounded setup
+replacement authorization. This supersedes the earlier preserve-import-UI plan.
+Accepted 0.8.4 template/source/archive and frozen evidence remain unchanged; the
+current installable delivery has not been replaced. Main Alma, GeneratePress and
+the separately confirmed development clone are distinct targets. No production
+client action is performed by this local checkpoint.
+
+Implemented candidate 0.9.0-rc.1 replaces normal setup with Setup / API Setup /
+Settings, one ordinary save, direct missing-only CRM requirements, real vendor
+feed inspection and a bounded draft read-only Sheets test. Historical import
+registry/jobs/native content remain intact; engine/native implementation files are
+unchanged. Smartcodes now belong to ordinary runtime. The installed reviewed FieldEdge
+read-only diagnostics supplement is carried byte-identically (78a7c9bc...) and
+displayed only in API Setup; its CRMProjection dependency matches canonical bytes. Only genuine unfinished
+operation recovery is exposed in Diagnostics, using existing identity/pin checks.
+Consent issuer policy and current eligibility remain authoritative; independent
+DNC, signed exact-row and dispatch/retry gates remain unchanged. Account timezone
+is separated from Base business timezone; no Google verification is invented.
+
+Actual local results: 48 replacement, 34 affected product/time/field, 16 form
+mapping, 35 setup reporting, 104 pinned-Consent consumer and 32 dispatch assertions;
+10 shipped-JS checks using a DOM/HTTP double. Total 279 checks/assertions. The first
+Consent invocation refused a missing dependency environment reference; the exact
+retained rc.2 inputs were then supplied and hash-verified, without relaxing pins.
+Packaged 50-PHP lint and exact-member ZIP validation are recorded in the candidate
+release directory. These are not native SQL, installed or visible-browser passes.
+
+Execution queue:
+- AB source/local validation: implemented and focused-verified; unaccepted candidate.
+- AB package: releases/0.9.0-rc.1; exact hashes in DELIVERY.json/SHA256SUMS.txt.
+- Actual admin host: checkpoint/push and scoped backed-up development-clone install
+  pending. Restricted execution account cannot write .git or delivery outside the
+  writable checkout; no access/key/policy workaround or denied probe was attempted.
+  Existing private target and executable host commands are excluded from Git.
+  The existing admin Remote Desktop Commander device was found online, but its
+  read-only hostname/whoami process was rejected before execution: requires
+  approval while approval policy is never. No command/server change occurred.
+  Exact private host scripts are ready; no unsupported browser route was retried.
+- Visible authenticated save/reload/CRM utility: NOT RUN. Previously rejected
+  Windows Firefox route is not retried. Requires the supported operator/browser
+  route already being checked by the controlling Helper.
+- Current single-ZIP delivery/publication: retain verified 0.8.4 until this successor
+  passes installed workflow acceptance. No stable promotion or external delivery.
+
+Source commit remains the existing e328c5a baseline plus the scoped working diff;
+this is not a committed/pushed checkpoint yet. Candidate manifest records exact
+source member digests and explicitly null source_commit until host checkpointing.
+No site was bootstrapped or changed by this local implementation session.
+
 ## Main-Alma exporter repair coordination — November12,2026
 
 AB Helper reports fresh actual-host canonical Invoke-Site-Wp verification: main Ads

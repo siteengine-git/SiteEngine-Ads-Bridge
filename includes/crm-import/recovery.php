@@ -185,7 +185,7 @@ final class Recovery {
     }
     public static function render(array $s):void {
         echo '<div class="notice notice-'.($s['kind']==='ready'&&in_array($s['shared']['kind'],['idle','none'],true)?'info':'warning').' inline"><p>'.esc_html($s['message']).'</p>';
-        if($s['resume'])echo '<p><a href="'.esc_url(admin_url('admin.php?page=siteengine-ads-bridge&tab=crm-import')).'">Open saved Ads import</a></p>';
+        if($s['resume'])echo '<p><a href="'.esc_url(admin_url('admin.php?page=siteengine-ads-bridge&tab=settings&section=diagnostics')).'">Inspect saved Ads operation in Diagnostics</a></p>';
         if(!empty($s['predecessor'])||!in_array($s['shared']['kind'],['none','idle'],true)){
             if(class_exists('\\SiteEngine\\CRM\\AdminConfiguration'))echo '<p><a href="'.esc_url(admin_url('admin.php?page=siteengine-crm-configuration')).'">Inspect original CRM saved session</a> â€” use only its exact supported recovery, not a new import.</p>';
             else echo '<p>Original CRM recovery tooling is unavailable in this request. Obtain the pinned predecessor recovery package and original private job/request/checkpoint records through its owner. Do not install a replacement operation or clear storage.</p>';

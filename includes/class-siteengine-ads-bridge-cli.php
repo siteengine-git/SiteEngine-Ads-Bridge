@@ -4572,10 +4572,10 @@ class SiteEngine_Ads_Bridge_CLI {
                         $ip = (string) $submission_context['row']['ip'];
                 }
 
-                $tz_string = (string)$config->get('client.timezone','UTC');
+                $tz_string = (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC'));
                 $date_field = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
                 $date_raw = isset( $custom[ $date_field ] ) ? (string) $custom[ $date_field ] : '';
-                $parsed = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)$config->get('client.timezone','UTC') );
+                $parsed = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC')) );
                 $conversion_time = $parsed['value'];
                 $time_err = $parsed['error'];
 
@@ -6077,7 +6077,7 @@ class SiteEngine_Ads_Bridge_CLI {
 
                 $date_field = trim( (string) $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ) );
                 $date_raw   = $this->get_contact_custom_value( $subscriber, $custom, $date_field );
-                $date       = $this->build_terminal_datetime( $date_raw, $time_of_day, (string) $config->get( 'client.timezone', 'UTC' ) );
+                $date       = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC')) );
                 if ( '' === $date_raw ) {
                         $reasons[] = $date_field . ' is not set';
                 } elseif ( '' === $date['value'] ) {
@@ -6328,7 +6328,7 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( '' === trim( $date_raw ) ) {
                         $reasons[] = $date_field . ' is not set';
                 }
-                $date = $this->build_terminal_datetime( $date_raw, $time_of_day, (string) $config->get( 'client.timezone', 'UTC' ) );
+                $date = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC')) );
                 if ( '' === $date['value'] ) {
                         $reasons[] = 'conversion time unresolved (' . $date['error'] . ')';
                 }
@@ -6728,75 +6728,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @param array $creds Decoded service-account JSON (needs client_email, private_key).
          * @return array{ok:bool,token:string,error:string}
          */
-        private function google_sa_access_token( $creds ) {
-                $out = array( 'ok' => false, 'token' => '', 'error' => '' );
-
-                if ( ! function_exists( 'openssl_sign' ) ) {
-                        $out['error'] = 'openssl extension unavailable; cannot sign the service-account JWT.';
-                        return $out;
-                }
-
-                $token_uri = ! empty( $creds['token_uri'] ) ? (string) $creds['token_uri'] : 'https://oauth2.googleapis.com/token';
-                $scope     = 'https://www.googleapis.com/auth/spreadsheets';
-                $now       = time();
-
-                $b64url = function ( $data ) {
-                        return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
-                };
-
-                $header_seg = $b64url( wp_json_encode( array( 'alg' => 'RS256', 'typ' => 'JWT' ) ) );
-                $claim_seg  = $b64url(
-                        wp_json_encode(
-                                array(
-                                        'iss'   => (string) $creds['client_email'],
-                                        'scope' => $scope,
-                                        'aud'   => $token_uri,
-                                        'iat'   => $now,
-                                        'exp'   => $now + 3600,
-                                )
-                        )
-                );
-
-                $signing_input = $header_seg . '.' . $claim_seg;
-                $signature     = '';
-                $signed        = openssl_sign( $signing_input, $signature, (string) $creds['private_key'], OPENSSL_ALGO_SHA256 );
-                if ( ! $signed ) {
-                        $out['error'] = 'openssl_sign failed (check the private_key in the service-account JSON).';
-                        return $out;
-                }
-                $jwt = $signing_input . '.' . $b64url( $signature );
-
-                $response = wp_remote_post(
-                        $token_uri,
-                        array(
-                                'timeout' => 20,
-                                'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ),
-                                'body'    => array(
-                                        'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                                        'assertion'  => $jwt,
-                                ),
-                        )
-                );
-
-                if ( is_wp_error( $response ) ) {
-                        $out['error'] = 'token request transport error: ' . $response->get_error_message();
-                        return $out;
-                }
-
-                $code = (int) wp_remote_retrieve_response_code( $response );
-                $body = (string) wp_remote_retrieve_body( $response );
-                $json = json_decode( $body, true );
-
-                if ( 200 !== $code || ! is_array( $json ) || empty( $json['access_token'] ) ) {
-                        $err = ( is_array( $json ) && isset( $json['error_description'] ) ) ? (string) $json['error_description'] : ( '' !== $body ? substr( $body, 0, 300 ) : 'no body' );
-                        $out['error'] = sprintf( 'token endpoint returned HTTP %d: %s', $code, $err );
-                        return $out;
-                }
-
-                $out['ok']    = true;
-                $out['token'] = (string) $json['access_token'];
-                return $out;
-        }
+        private function google_sa_access_token( $creds ) { return SiteEngine_Ads_Bridge_Google::token($creds); }
 
         /** Last dispatch boundary, including prepared batches and exact-body retries. */
         private function advertising_dispatch_error( $values, $context ) {

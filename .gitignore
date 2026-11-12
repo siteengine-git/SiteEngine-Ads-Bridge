@@ -19,3 +19,6 @@
 *.tar.gz
 /vendor/
 /node_modules/
+
+# Private host coordination and target evidence; never publish.
+/.private/

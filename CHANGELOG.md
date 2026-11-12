@@ -1,3 +1,12 @@
+## 0.9.0 — unaccepted setup replacement
+
+- One-page ordinary Setup and one save, API Setup, tabbed Settings.
+- Replace normal CRM ZIP-import UI with missing-only CRM requirements utility.
+- Retain original journals/content and runtime smartcodes independently of import UI.
+- Inspect the real FluentCRM feed map; remove operator-attestation/optional ID controls.
+- Draft read-only Sheets test; separate Google account timezone from Base timezone.
+- Local verification is distinct from pending installed/visible acceptance.
+
 ## 0.8.4
 
 - Check both retired and current parent scopes for new child collisions after a
