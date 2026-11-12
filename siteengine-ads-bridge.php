@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SiteEngine Ads Bridge
  * Description: Reconciliation-first bridge for Fluent Forms, FluentCRM, SiteEngine Consent, and Google Ads Data Manager feeds.
- * Version: 0.8.2
+ * Version: 0.8.3-rc.1
  * Requires PHP: 8.3
  * Requires Plugins: siteengine-base
  * Author: SiteEngine
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SEAB_VERSION', '0.8.2' );
+define( 'SEAB_VERSION', '0.8.3-rc.1' );
 define( 'SEAB_PLUGIN_FILE', __FILE__ );
 define( 'SEAB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEAB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -39,6 +39,7 @@ require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-coordinatio
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-inquiries.php';
 require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/Foundation.php';
 require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/Retry.php';
+require_once SEAB_PLUGIN_DIR . 'includes/connectors/fieldedge/ConnectorDiagnostics.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-outcomes.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-prospective.php';
 require_once SEAB_PLUGIN_DIR . 'includes/class-siteengine-ads-bridge-call-import.php';
