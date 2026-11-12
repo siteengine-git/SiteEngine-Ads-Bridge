@@ -1,3 +1,23 @@
+## Climatrol configuration completed - November 12, 2026
+
+The subsequent user instruction to complete the remaining setup has been handled.
+Installed Ads 0.9.0 now reports Ready with zero setup issues. Selected form 40's
+existing FluentCRM feed is enabled with existing Future Customers / Form Lead
+definitions, exact submission-ID mapping, force-subscribe disabled and unrelated
+tag-removal rules cleared. Referral source is corrected from Qualified to Referral.
+Ads account timezone is America/New_York using the previously confirmed account
+evidence. The saved spreadsheet ID was missing terminal -s; its existing Drive
+identity and service-account metadata read now pass. No sharing/credential change.
+Original import journals and other Ads option hashes remain unchanged; only
+seab_settings_v2 and the one existing feed record changed. No contacts, submissions,
+mail, enrollment, advertising rows or provider actions were performed. Sheets
+write permission and actual form delivery remain untested. The sole Doctor warning
+is that no scheduled export runtime has been recorded; no scheduler was started.
+Request-local CLI guards ended with their processes; no persistent control remains.
+See releases/0.9.0/SITE-CONFIGURATION-RESULTS-20261112.json. Runtime/package hashes
+are unchanged; no rebuild/reinstallation/release ceremony is needed. This
+follow-up supersedes the initial configuration-blocker observations below.
+
 ## Current execution closeout - Ads Bridge 0.9.0 (2026-11-12)
 
 The agreed setup replacement is completed and delivered; see STATUS.md and

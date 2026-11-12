@@ -1,3 +1,14 @@
+## Subsequent Climatrol setup completion - November 12, 2026
+
+The initial site configuration issues below have now been corrected. Ads Bridge
+reports Ready with zero setup issues. The selected form feed is configured and
+enabled without forced subscription; timezone is saved; the corrected existing
+spreadsheet passes authenticated read access. Referral no longer maps to Qualified.
+No contacts, email, enrollment or advertising export was used. Write permission
+and actual form delivery are not claimed. The remaining warning is no recorded
+scheduler run. See SITE-CONFIGURATION-RESULTS-20261112.json for the exact scope.
+The ZIP/manifest are unchanged; initial observations below remain historical.
+
 # SiteEngine Ads Bridge 0.9.0
 
 One Setup page with one Save settings button replaces the numbered wizard.

@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-12",
+  "site": "https://climatrol.siteengine.space",
+  "version": "0.9.0",
+  "configuration_status": "ready",
+  "remaining_setup_issues": 0,
+  "corrections": {
+    "Google_Ads_account_timezone": "America/New_York",
+    "spreadsheet_ID": "Restored missing terminal -s; verified against existing Drive metadata and service-account metadata GET",
+    "spreadsheet_ID_sha256": "5bb380645b508410f69866762dcf8090d96f801ac13e0c49c8c22daa6c4d80b0",
+    "form_feed": "Enabled existing selected form feed; binds existing Future Customers list and Form Lead source tag; preserves submission ID mapping",
+    "force_subscribe": false,
+    "unrelated_tag_removal": [],
+    "referral_source": "Referral, corrected from Qualified"
+  },
+  "verified": {
+    "feed_configured": true,
+    "Google_authentication_and_spreadsheet_read": true,
+    "spreadsheet_title": "SiteEngine Ads Bridge - Climatrol",
+    "original_import_history_preserved": true,
+    "changed_Ads_options": [
+      "seab_settings_v2"
+    ],
+    "changed_setting_paths": [
+      "fluentcrm.tags.sources.referral",
+      "google_sheets.spreadsheet_id",
+      "google_sheets.account_timezone"
+    ],
+    "changed_feed_keys": [
+      "list_id",
+      "tag_ids",
+      "force_subscribe",
+      "remove_tags",
+      "enabled"
+    ],
+    "wp_config_exact": true,
+    "active_plugins_exact": true,
+    "journeys_all_draft": true,
+    "configuration_guard_state": "complete",
+    "inflight": null
+  },
+  "warnings": [
+    {
+      "status": "WARN",
+      "check": "Scheduled export runtime",
+      "message": "No successful `export-enabled --apply` runtime has been recorded yet. Recommended schedule: every 10 minutes."
+    }
+  ],
+  "limits": {
+    "Sheets_write_permission_tested": false,
+    "actual_form_contact_delivery_tested": false,
+    "advertising_export_performed": false,
+    "contact_mutation_or_fixture": false,
+    "email_or_enrollment_requested": false,
+    "fresh_browser_check": "Fresh browser reached normal sign-in; current configuration and Ready status verified through installed native interfaces. Prior actual UI save workflow evidence is retained."
+  },
+  "cleanup": "All guards were request-local CLI controls; no persistent site control or configuration-file change was introduced. Private scoped backup and receipts retained.",
+  "artifact": "Existing 0.9.0 ZIP and manifest remain byte-identical; no rebuild, reinstallation or stable GitHub promotion."
+}
