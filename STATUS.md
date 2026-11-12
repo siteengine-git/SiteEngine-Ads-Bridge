@@ -1,3 +1,30 @@
+## Main-Alma exporter repair coordination — November12,2026
+
+AB Helper reports fresh actual-host canonical Invoke-Site-Wp verification: main Ads
+is0.8.3-rc.1, CRM0.3.19; its gate accepts0.8.2 and rejects this current RC. The delta
+includes FieldEdge ConnectorDiagnostics.php require plus version metadata, so it
+must not be treated as version-only. These are Helper-supplied live provenance,
+not fresh checks by this AB session or a newly accepted source/package baseline.
+Earlier main-installed version notes below are historical.
+
+Reported main SHA256 pins:
+- Bootstrap2cfb21a78ee932c919d9189340d0df4d8d70fdddce1a9c1016d27b69b2fcc160
+- Inquiry1cff11686b76b1d4014b93725e26b1368994457f21123548077df99fd0f5fd96
+- Coordination90c8ef86bd06b2b05dc57bc7b887fa86e2a55782f348a26455e5ba35503dc18a
+- Contracta8028f9adf5d251cf930c16de0cb309f3393d645a6293af7d2c3a12a9fec81b0
+- CRMgate88976e22c73ff9e8364eb337bd42dee0a97beb55656406af78659de04f0a5426
+
+CRM canonical owner has resumed source repair/compatibility tests; AB Helper supplies
+existing host installation/export execution for that one bounded job. No competing
+main Ads upgrade/downgrade, rollback or destination import is started. AB changes
+source only if CRM identifies a concrete supported-interface requirement. Preserve
+GeneratePress0.8.4 acceptance/delivery and all original/frozen archives unchanged.
+
+Queue: CRM owner/AB Helper exporter repair ACTIVE; AB implementation/server changes
+NOT REQUESTED. This coordination update performs no server read/bootstrap/write,
+package rebuild, test campaign or external action. Exact private owner/session
+reference retained in the existing project coordination evidence.
+
 ## Focused partial-graph correction complete — November12,2026
 
 Verified0.8.4 source853201d25cb488bda701849c68d561b96da5f45d;
