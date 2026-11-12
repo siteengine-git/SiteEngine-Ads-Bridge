@@ -1,0 +1,13 @@
+{
+  "version": "0.9.0",
+  "file": "siteengine-ads-bridge-0.9.0.zip",
+  "sha256": "43bda23c2b45e7ebc177f69d1535f6a30cdc10609cfda3aee0f1ed6913be6a60",
+  "manifest_sha256": "a26bb29541dbd55af5dde8686f9b32f7687e296a5608efbda8408df8437abb88",
+  "source_commit": "0dc681518f607b59a293656ea57d523e223b4bd1",
+  "physical_single_ZIP_verified": true,
+  "matching_delivery_files": 6,
+  "previous_files_archived_byte_exact": 11,
+  "previous_0_8_4_zip_sha256": "7de8d0454c9ed627dd83a3fcfd5671a7cbce5227e5872e5c4293aef0af4dfcd2",
+  "original_archives_retained": true,
+  "stable_github_published": false
+}

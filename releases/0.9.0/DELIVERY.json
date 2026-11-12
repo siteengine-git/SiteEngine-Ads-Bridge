@@ -1,0 +1,17 @@
+{
+  "version": "0.9.0",
+  "designation": "VERIFIED_SETUP_DELIVERY",
+  "package": "siteengine-ads-bridge-0.9.0.zip",
+  "sha256": "43bda23c2b45e7ebc177f69d1535f6a30cdc10609cfda3aee0f1ed6913be6a60",
+  "manifest_sha256": "a26bb29541dbd55af5dde8686f9b32f7687e296a5608efbda8408df8437abb88",
+  "source_snapshot_sha256": "d4d5c044b1e79a3be9a06149fac020602377e05ac6257f7957f2295a602e0fe2",
+  "source_commit": "0dc681518f607b59a293656ea57d523e223b4bd1",
+  "members": 77,
+  "PHP_files": 50,
+  "installed": true,
+  "released": true,
+  "current_delivery_replaced": true,
+  "focused_workflow_verified": true,
+  "installed_site": "https://climatrol.siteengine.space",
+  "stable_github_published": false
+}

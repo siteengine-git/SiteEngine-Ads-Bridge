@@ -1,3 +1,23 @@
+## CLOSED: Ads Bridge 0.9.0 setup delivery - November 12, 2026
+
+Implemented, packaged, scoped Climatrol development installation and actual
+authenticated CRM utility / single Save settings / reload are verified. Runtime
+source 0dc681518f607b59a293656ea57d523e223b4bd1. Full sanitized results and limits are in
+releases/0.9.0/RESULTS.json. User's selected form 40 has a disabled CRM feed, Ads
+account timezone is blank, and Google returned 404 for the saved spreadsheet
+after authentication. These configuration issues remain explicit, without false
+setup or delivery acceptance. No live conversion, provider POST, mail or call
+was requested. All original setting leaves, historical Ads option hashes except
+settings/version, native content table hashes, active plugins and cron definitions
+were preserved. Full fc_meta aggregate equality is not claimed; its mutable
+sending heartbeat advanced and no historical per-row baseline was retained.
+Temporary maintenance, browser guard and public probe were removed; original
+wp-config bytes match. Private backups and failed-attempt evidence remain.
+No active task worker/control/recovery remains. Main Alma, GeneratePress and
+production Climatrol were not replaced. Existing single-ZIP delivery is updated
+with previous files archived byte-exact outside it. No stable GitHub promotion.
+This closeout supersedes all earlier pending/unaccepted notes below.
+
 ## 0.9.0 setup replacement - actual execution checkpoint
 
 AB Helper is the sole writer/executor. Installed on the assigned development clone

@@ -1,3 +1,19 @@
+## Current execution closeout - Ads Bridge 0.9.0 (2026-11-12)
+
+The agreed setup replacement is completed and delivered; see STATUS.md and
+releases/0.9.0/RESULTS.json. Runtime/source pin is
+0dc681518f607b59a293656ea57d523e223b4bd1. Assigned installation was the
+Climatrol development clone climatrol.siteengine.space, not production
+climatrolairga.com, main Alma, or the separate accepted GeneratePress 0.8.4.
+Do not repeat the historical import/recreation campaign. User settings and
+original journals are retained. No active executor, task control, maintenance
+or recovery remains; private backups and failed-attempt evidence are retained.
+Normal setup no longer uses CRM ZIP import. Current actual configuration issues:
+form 40 disabled FluentCRM feed, blank Ads account timezone, and saved spreadsheet
+metadata GET returned HTTP 404 after authentication. These are recorded honestly;
+no live conversion delivery or stable GitHub promotion is claimed.
+This closeout supersedes older execution queue/pending notes below.
+
 ## Latest verified partial-graph repair — November12,2026
 
 0.8.4 supersedes the0.8.3 collision coverage limit for the assigned GeneratePress
