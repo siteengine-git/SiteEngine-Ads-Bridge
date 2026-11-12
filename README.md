@@ -1,4 +1,4 @@
-# SiteEngine Ads Bridge 0.8.2
+# SiteEngine Ads Bridge 0.8.3
 
 Ads Bridge connects a selected Fluent Forms lead form, FluentCRM lifecycle and
 SiteEngine Consent to immutable advertising inquiries and append-only Google
@@ -98,3 +98,13 @@ append/readback/replay are carried evidence, not repeated live-delivery claims.
 This release's focused main-Alma verification is recorded separately under
 `releases/0.8.2`. No client rollout, real customer Google delivery, FieldEdge POST,
 positive call Consent or provider lead-to-job continuity is claimed.
+
+## Recreating deleted managed definitions
+
+A deliberate new import reviews missing managed definitions as recreation, retains
+the old identities in its reviewed evidence, and assigns fresh native IDs. Surviving
+content/edits keep their normal Keep/Replace choices; relationships to recreated
+parents/tags are explicitly reviewed for relinking. Completed journals are never
+cleared. Ambiguous matches, invalid stored IDs, new collisions or deletions/edits
+after review stop without blindly recreating or replaying uncertain writes. See
+[focused correction](docs/MANAGED-RECREATION-0.8.3.md).

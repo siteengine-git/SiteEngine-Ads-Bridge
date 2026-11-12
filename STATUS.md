@@ -1,3 +1,19 @@
+## Active managed-object recreation correction — November12,2026
+
+Current task supersedes the prior completed release queue. Canonical source remains
+this checkout; stable0.8.2 and its archives/evidence are preserved. Explicitly
+assigned target: GeneratePress template site, not an unrequested client rollout.
+
+| Owner | Actual state | Executable next action | Boundary |
+| --- | --- | --- | --- |
+| AB Codex | Exact125 registry/56 missing/zero-write upload/previous-complete diagnosis independently reproduced | Package focused0.8.3, back up/install and use ordinary authenticated saved import | No registry/journal clearing; no sending/enrollment/advertising |
+| CRM Helper | Supplied diagnosis only | No source or destination changes needed from CRM | Producer ZIP retained, no producer campaign |
+
+Preview now supports explicit recreation/relink with old reference evidence and
+new native IDs. Surviving edits require Keep/Replace; after-review drift/collisions
+remain blocked. Local actual Engine methods tested with doubles; installed native
+results remain pending and must be recorded separately. No schema/runtime redesign.
+
 ## Stable0.8.2 released and delivered — November11,2026
 
 Implemented / packaged / main-installed / focused-verified / stable-released:

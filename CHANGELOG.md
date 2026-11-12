@@ -1,3 +1,11 @@
+## 0.8.3
+
+- Review and recreate deliberately deleted managed CRM definitions during a new
+  import, assigning new native IDs without clearing the registry or completed jobs.
+- Explicitly relink surviving relationships while preserving reviewed destination
+  edits and exact before/current readback. Keep post-review deletion, collision and
+  uncertain-write protection; no sending or enrollment enablement.
+
 ## 0.8.2
 
 - Promote the accepted dev.3 form-first integration foundation; retain explicit

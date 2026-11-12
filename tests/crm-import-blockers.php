@@ -38,7 +38,7 @@ $g=['state'=>'inflight','journal'=>json_encode(['operation_id'=>'ads-import.'.$j
 SiteEngine_Ads_Bridge_Coordination::$guard=$g;
 $s=Recovery::inspect();ok($s['resume']&&$s['guard']['completed_steps']===1&&!$s['can_initialize'],'Matching unfinished import routes to Resume; initialization unavailable');
 SiteEngine_Ads_Bridge_Coordination::$reason='coordination_configuration_recovery_required';
-refusal(fn()=>SiteEngine_Ads_Bridge_Setup::initialize_storage(),'Resume saved import');
+refusal(fn()=>SiteEngine_Ads_Bridge_Setup::initialize_storage(),'Resume its saved operation before preparing storage');
 ok(SiteEngine_Ads_Bridge_Coordination::$migrations===0,'Recovery blocker never runs a schema migration');
 ok(!str_contains(SiteEngine_Ads_Bridge_Setup::blocker_message('coordination_configuration_recovery_required'),'Existing incomplete schemas'),'No unrelated schema explanation appended');
 $options=[];$g['journal']=json_encode(['operation_id'=>'crm-predecessor.operation','plan_hash'=>str_repeat('c',64),'inflight'=>'step.1','receipts'=>[],'manifest'=>['step.1'=>[]]]);SiteEngine_Ads_Bridge_Coordination::$guard=$g;

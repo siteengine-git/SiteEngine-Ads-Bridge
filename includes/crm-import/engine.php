@@ -71,6 +71,17 @@ final class Engine {
     }
     private static function native(array $j):Native {return new Native(['bindings'=>['form.primary'=>$j['mappings']['form']]]);}
     private static function same($a,$b):bool {return JSON::hash($a)===JSON::hash($b);}
+    /** Only the supported portable relationships, never title/contact matching. */
+    private static function references(array $body):array {
+        $refs=[];foreach(['funnel_ref','parent_ref','sequence_ref'] as $key)if(!empty($body[$key]))$refs[]=$body[$key];
+        if(isset($body['settings']['campaign_ref']))$refs[]=$body['settings']['campaign_ref'];
+        foreach($body['conditions']??[] as $group)foreach($group as $condition){
+            [$provider,$field]=$condition['source'];
+            if($provider==='custom_fields')$refs[]=$field;
+            elseif($provider==='subscriber'&&in_array($field,['tags','lists'],true))foreach((array)$condition['value'] as $ref)$refs[]=$ref;
+        }
+        return array_values(array_unique($refs));
+    }
     /** Completed receipts remain immutable; reusing an upload creates a new operation. */
     private static function reviewIdentity(array $j):array {
         if($j['status']!=='complete')return $j;
@@ -105,17 +116,30 @@ final class Engine {
             $j=self::reviewIdentity($j);$j['source_pin']=self::sourcePin();Contract::validate($j['package']);
             $j['draft_mappings']=$input;$j['choices']=$choices;Store::save($j);Store::write(Store::CURRENT,$j['id']);
             $j['mappings']=self::mappings($input);$j['registry']=Store::read(Store::REGISTRY,['objects'=>[]]);$native=self::native($j);
-            $defs=self::definitions($j);new Session(array_unique(array_column($defs,'kind')));$actions=[];
+            // Freeze old native identities for exact pre-write checks. This is a
+            // new review, not permission to rewrite any completed journal.
+            $j['review_bindings']=['objects'=>array_map(static fn($r)=>['kind'=>$r['kind'],'id'=>$r['id']],$j['registry']['objects'])];
+            $defs=self::definitions($j);new Session(array_unique(array_column($defs,'kind')));$actions=[];$recreated=[];
             foreach($defs as $key=>$d){$known=$j['registry']['objects'][$key]??null;$id=$known['id']??null;
                 if($known&&$known['kind']!==$d['kind'])throw new RuntimeException('Managed identity kind changed: '.$key);
+                if($known&&$d['kind']!=='field'&&filter_var($id,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]])===false)throw new RuntimeException('Managed native identity is invalid: '.$key.'. Preserve the registry and establish its original ID before review.');
                 $ids=$native->candidates($d['kind'],$d['body'],$j['registry']);
                 if(count($ids)>1||($id!==null&&array_filter($ids,fn($other)=>(string)$other!==(string)$id)))throw new RuntimeException('Multiple native objects match '.$key.'. Resolve the ambiguity in FluentCRM.');
                 if($known&&$d['kind']==='field'&&(string)$id!==$d['body']['slug'])throw new RuntimeException('Managed field mapping changed: '.$key.'. Existing definitions and values are preserved.');
                 if($id===null)$id=$ids[0]??null;
-                $actual=$id===null?null:$native->read($d['kind'],$id,$j['registry']);if($known&&$actual===null)throw new RuntimeException('Managed destination object is missing: '.$key);
+                $actual=$id===null?null:$native->read($d['kind'],$id,$j['registry']);$replaces=null;
+                if($known&&$actual===null){$replaces=$id;$id=null;if($d['kind']!=='field')$recreated[]=$key;}
                 $a=self::decision($key,$d,$actual,$known,$choices[$key]??'');$a['id']=$id;$actions[]=$a;
+                if($replaces!==null)$actions[array_key_last($actions)]['replaces_id']=$replaces;
                 if($id!==null)$j['registry']['objects'][$key]=['kind'=>$d['kind'],'id'=>$id,'body'=>$actual,'source_hash'=>$known['source_hash']??null];
             }
+            foreach($actions as &$a){
+                $refs=array_values(array_intersect(self::references($a['body']),$recreated));
+                if($a['before']!==null&&$a['decision']!=='conflict'&&$refs){
+                    $a['rebind_refs']=$refs;
+                    if(in_array($a['decision'],['reuse','adopt'],true))$a['decision']='relink';
+                }
+            }unset($a);
             // A final exact settings action is part of the protected operation.
             $c=\SiteEngine_Ads_Bridge_Config::instance();if($c->external_override_active())throw new RuntimeException('An external Ads configuration is authoritative. Use Ads Bridge > Migration to deliberately select WordPress settings before importing. Your ZIP and mappings remain saved.');
             $before=\SiteEngine_Ads_Bridge_Settings::get();$after=\SiteEngine_Ads_Bridge_Settings::merge(\SiteEngine_Ads_Bridge_Settings::defaults(),$before?:$c->all());
@@ -126,7 +150,7 @@ final class Engine {
             $actions[]=['key'=>'ads.settings','kind'=>'settings','decision'=>'update','body'=>$after,'before'=>$before,'source_hash'=>JSON::hash($after),'id'=>'seab_settings_v2'];
             $j['actions']=$actions;$j['status']='review';$j['cursor']=0;$j['receipts']=[];$j['pending']=null;$j['writes']=0;
             $j['message']='Review inactive content and destination mappings. Import never enables lifecycle automation, Sheets, exports or enrollment.';
-            $j['plan_hash']=JSON::hash([$j['upload_sha256'],$j['mappings'],$actions,$j['source_pin']]);Store::save($j);return self::view($j);
+            $j['plan_hash']=JSON::hash([$j['upload_sha256'],$j['mappings'],$actions,$j['source_pin'],$j['review_bindings']]);Store::save($j);return self::view($j);
         });
     }
     public static function begin(string $pin):array {
@@ -143,8 +167,9 @@ final class Engine {
         foreach(['customers'=>'list.customers','future_customers'=>'list.future-customers','do_not_contact'=>'list.dnc'] as $role=>$key){$m=$j['registry']['objects'][$key];$b['fluentcrm']['lists'][$role]=$native->read('list',$m['id'],$j['registry'])['title'];}
         return \SiteEngine_Ads_Bridge_Settings::sanitize_config($b);
     }
-    private static function readAction(array $j,array $a,Native $native) {
-        return $a['kind']==='settings'?Store::read('seab_settings_v2',[]):($a['id']===null?null:$native->read($a['kind'],$a['id'],$j['registry']));
+    private static function readAction(array $j,array $a,Native $native,bool $review=false) {
+        $bindings=$review?($j['review_bindings']??$j['registry']):$j['registry'];
+        return $a['kind']==='settings'?Store::read('seab_settings_v2',[]):($a['id']===null?null:$native->read($a['kind'],$a['id'],$bindings));
     }
     private static function accept(array &$j,array $a,$body):void {
         if($a['kind']!=='settings')$j['registry']['objects'][$a['key']]=['kind'=>$a['kind'],'id'=>$a['id'],'body'=>$body,'source_hash'=>$a['source_hash']];
@@ -156,14 +181,22 @@ final class Engine {
         if($a['kind']==='settings')$a['body']=self::settingsBody($j,$a,$native);
         if($j['pending']!==null){
             if($a['id']===null)throw new RuntimeException('Uncertain create has no returned native ID: '.$a['key'].'. Preserve the journal; do not replay creation.');
-            $actual=self::readAction($j,$a,$native);
+            try{$actual=self::readAction($j,$a,$native);}
+            catch(RuntimeException $e){
+                // Old condition IDs can be unmapped after their parents were
+                // recreated. Only exact frozen-before readback may permit retry.
+                if(empty($a['rebind_refs']))throw $e;
+                if($e->getMessage()!=='condition_dependency_unmapped')throw $e;
+                $actual=null;
+            }
             if(self::same($actual,$a['body'])){self::accept($j,$a,$actual);return;}
-            if($a['decision']!=='update'||!self::same($actual,$a['before']))throw new RuntimeException('Uncertain native operation requires exact readback: '.$a['key']);
+            if(!in_array($a['decision'],['update','relink'],true)||!self::same(self::readAction($j,$a,$native,true),$a['before']))throw new RuntimeException('Uncertain native operation requires exact readback: '.$a['key']);
         }else{
-            $actual=self::readAction($j,$a,$native);
+            $actual=self::readAction($j,$a,$native,true);
             if(!self::same($actual,$a['before']))throw new RuntimeException('Destination changed since review: '.$a['key']);
+            if(isset($a['replaces_id'])&&$native->read($a['kind'],$a['replaces_id'],$j['review_bindings'])!==null)throw new RuntimeException('Deleted managed identity reappeared since review: '.$a['key']);
             if($a['kind']!=='settings'){$ids=$native->candidates($a['kind'],$a['body'],$j['registry']);if(array_filter($ids,fn($other)=>$a['id']===null||(string)$other!==(string)$a['id']))throw new RuntimeException('Native identity collision after review: '.$a['key']);}
-            if(self::same($actual,$a['body'])){self::accept($j,$a,$actual);return;}
+            if(self::same($actual,$a['body'])&&empty($a['rebind_refs'])){self::accept($j,$a,$actual);return;}
             if($a['id']===null&&$a['kind']!=='settings'&&$native->candidates($a['kind'],$a['body'],$j['registry']))throw new RuntimeException('New native collision after review: '.$a['key']);
             $j['pending']=$a;Store::save($j);
         }
@@ -220,7 +253,7 @@ final class Engine {
     public static function view(?array $j=null):array {
         $j??=Store::job();if(!$j)return ['status'=>'empty'];
         $actions=[];foreach($j['actions'] as $a){$changed=[];if(is_array($a['before']))foreach($a['body'] as $key=>$value)if(JSON::hash($a['before'][$key]??null)!==JSON::hash($value))$changed[]=$key;
-            $actions[]=['key'=>$a['key'],'kind'=>$a['kind'],'title'=>$a['body']['title']??$a['body']['label']??$a['key'],'current_title'=>$a['before']['title']??$a['before']['label']??null,'changed_fields'=>$changed,'decision'=>$a['decision'],'id'=>$j['receipts'][$a['key']]['id']??$a['id']];}
+            $actions[]=['key'=>$a['key'],'kind'=>$a['kind'],'title'=>$a['body']['title']??$a['body']['label']??$a['key'],'current_title'=>$a['before']['title']??$a['before']['label']??null,'changed_fields'=>$changed,'decision'=>$a['decision'],'id'=>$j['receipts'][$a['key']]['id']??$a['id'],'replaces_id'=>$a['replaces_id']??null,'rebind_refs'=>$a['rebind_refs']??[]];}
         return ['id'=>$j['id'],'revision'=>$j['revision'],'status'=>$j['status'],'message'=>$j['message'],'mappings'=>$j['draft_mappings']??$j['mappings'],'choices'=>$j['choices'],'actions'=>$actions,'cursor'=>$j['cursor'],'total'=>count($j['actions']),'writes'=>$j['writes'],'plan_hash'=>$j['plan_hash']??null,'package_revision'=>$j['package']['configuration_revision'],'upload_sha256'=>$j['upload_sha256']];
     }
 }
