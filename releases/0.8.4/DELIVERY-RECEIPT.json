@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
+  "ZIP_path": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge\\siteengine-ads-bridge-0.8.4.zip",
+  "ZIP_count": 1,
+  "sha256": "7de8d0454c9ed627dd83a3fcfd5671a7cbce5227e5872e5c4293aef0af4dfcd2",
+  "manifest_sha256": "9f3608b010c185180ad0c435de84f07edfbf5c0823908276badc2cbe3e96a582",
+  "prior0.8.3_files_archived": 11,
+  "prior_bytes_preserved": true,
+  "successor_verified_before_archive": true
+}

@@ -1,3 +1,14 @@
+## Latest verified partial-graph repair — November12,2026
+
+0.8.4 supersedes the0.8.3 collision coverage limit for the assigned GeneratePress
+repair. Source853201d25cb488bda701849c68d561b96da5f45d;ZIP7de8d0454c9ed627dd83a3fcfd5671a7cbce5227e5872e5c4293aef0af4dfcd2.
+Both retired/current parent scopes are checked at write, pending and final readback.
+Actual normal-admin import complete126/126/0native saves;125objects and5historical
+raw journals preserved. Source STATUS.md/releases/0.8.4 distinguish local partial
+fault fixtures from actual native reads/workflow. Physical delivery has one0.8.4ZIP;
+prior0.8.3/stable0.8.2 archives retained. No other-site rollout or stable promotion
+is implied; standing source/access/ownership and disabled-delivery rules remain.
+
 ## Current verified importer repair — November12,2026
 
 0.8.3 is the latest verified installable repair, source

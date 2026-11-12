@@ -1,3 +1,38 @@
+## Focused partial-graph correction complete — November12,2026
+
+Verified0.8.4 source853201d25cb488bda701849c68d561b96da5f45d;
+ZIP7de8d0454c9ed627dd83a3fcfd5671a7cbce5227e5872e5c4293aef0af4dfcd2;
+manifest9f3608b010c185180ad0c435de84f07edfbf5c0823908276badc2cbe3e96a582.
+Helper review produced an actual local counterexample: after recreating a parent,
+current-scope-only lookup missed a new child in the retired scope. Both-scope
+checks now apply before writes/pending acceptance/post-save/final receipts. Edited
+HTML/settings/conditions and necessary parent/tag/campaign relinking stay preserved.
+No historical completed receipt or source/operation was rewritten.
+
+214 focused local assertions(100recreation/partial,15recovery,21blockers,78contract),
+46localPHP8.3.36lints and46installedPHP8.4.27lints PASS;71 exact installed members.
+Web8.4.27/litespeed confirms the new compiled helper after site-path cache handling.
+Ordinary authenticated saved-ZIP page/review/begin/16batches complete126/126 with0
+native saves,125identical unique IDs/bodies,5raw historical journals/autoload values
+preserved. Globalregistry/settings/effectiveconfig/cron/activation unchanged. The
+accepted56creations were not repeated; no additional live objects deleted/inserted.
+
+Read-only realFluentCRM3.3.1 queries distinguish recorded retired/current scopes for
+funnel emails and steps(old0/new1 candidate),actual helper passes and mismatched
+identity refuses. These are native reads,not destructive partial-fixture or live
+collision-injection claims; mutation/fault branches are actual Engine/local doubles.
+
+Original configuration restored; owned maintenance/request guard/probe/session
+removed/revoked; siteHTTP200; pending inspectionnone. All4exportfamilies/Sheets/
+lifecycle automation false. Private backups/counterexample/ID graphs stay AB-owned.
+Exactlyone0.8.4installableZIP in physical Plugins\..Deliverables; previous0.8.3
+11deliveryfiles archived byte-exact outside delivery. Stable0.8.2/frozen archives
+preserved. No separate stableGitHubpromotion/mainAlma/client/provider action.
+
+Execution queue:AB implementation/package/assigned-template installation/normal
+workflow/native-readback/delivery complete; no active writer/control/recovery.
+Exact sanitized records and acceptance limits:releases/0.8.4.
+
 ## Focused partial-graph continuation — November12,2026
 
 Helper's concrete coverage note exposed one additional collision gap in0.8.3:

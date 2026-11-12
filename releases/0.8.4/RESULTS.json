@@ -1,0 +1,104 @@
+{
+  "status": "PASS",
+  "version": "0.8.4",
+  "source_commit": "853201d25cb488bda701849c68d561b96da5f45d",
+  "package_sha256": "7de8d0454c9ed627dd83a3fcfd5671a7cbce5227e5872e5c4293aef0af4dfcd2",
+  "manifest_sha256": "9f3608b010c185180ad0c435de84f07edfbf5c0823908276badc2cbe3e96a582",
+  "confirmed_gap": "After replacing a parent,0.8.3 candidates searched only the current numeric scope; a new child under the retired parent could be missed. Actual Engine/double counterexample retained before correction.",
+  "correction": [
+    "Check current and recorded retired scopes when a funnel/sequence parent ID changed",
+    "Revalidate candidate identity before writes, pending acceptance, post-save and final receipt verification",
+    "Keep original frozen reference before-images, edited body choices, exact interrupted-operation recovery and immutable completed receipts",
+    "Never delete, adopt or restore a foreign collision automatically"
+  ],
+  "local": {
+    "tests": [
+      {
+        "test": "crm-import-recreate.php",
+        "assertions": 100,
+        "status": "PASS"
+      },
+      {
+        "test": "crm-import-recovery.php",
+        "assertions": 15,
+        "status": "PASS"
+      },
+      {
+        "test": "crm-import-blockers.php",
+        "assertions": 21,
+        "status": "PASS"
+      },
+      {
+        "test": "crm-import-acceptance.php",
+        "assertions": 78,
+        "status": "PASS"
+      }
+    ],
+    "assertions": 214,
+    "native_SQL": false,
+    "new_partial_graph_assertions": 15,
+    "old_counterexample_retained": "managed-recreation-20261112/partial-graph-counterexample.txt"
+  },
+  "installed": {
+    "site": "assigned GeneratePress template only",
+    "members": 71,
+    "PHP_lints": 46,
+    "CLI_PHP": "8.4.27",
+    "web_PHP": "8.4.27",
+    "web_SAPI": "litespeed",
+    "compiled_assertCandidates_method": "verified",
+    "changed_site_paths_OPcache": "invalidated; no global restart",
+    "native_objects_preserved_during_replacement": 125,
+    "ordinary_saved_ZIP_reimport": "authenticated page/nonce/review/begin/16batches; complete126/126",
+    "ordinary_admin_HTTP_requests": 19,
+    "separate_cache_probes": 2,
+    "native_saves": 0,
+    "native_IDs_and_bodies_unchanged": 125,
+    "raw_historical_journals_and_autoload_unchanged": 5,
+    "registry_settings_effective_config_cron_activation": "unchanged",
+    "pending_native_action": null,
+    "original_configuration_restored": true,
+    "temporary_maintenance_request_guard_probe_session": "removed/revoked",
+    "site_HTTP": 200,
+    "four_export_families_Sheets_lifecycle_automation": "disabled, unchanged"
+  },
+  "native_read_only_scope_evidence": {
+    "status": "PASS",
+    "version": "0.8.4",
+    "PHP": "8.4.27",
+    "FluentCRM": "3.3.1",
+    "checks": [
+      {
+        "kind": "sequence_email",
+        "historical_parent_ID_differs": true,
+        "retired_scope_candidates": 0,
+        "current_scope_candidates": 1,
+        "actual_helper_pass": true,
+        "wrong_action_ID_refused": true
+      },
+      {
+        "kind": "step",
+        "historical_parent_ID_differs": true,
+        "retired_scope_candidates": 0,
+        "current_scope_candidates": 1,
+        "actual_helper_pass": true,
+        "wrong_action_ID_refused": true
+      }
+    ],
+    "native_model_reads": true,
+    "native_mutations": 0,
+    "limitations": "Read-only real ORM scopes using recorded historical IDs; no live duplicate insertion or destructive partial-graph fixture. Mutation/fault branches remain local doubles."
+  },
+  "preserved_prior_evidence": {
+    "initial_repair": "56definitions recreated,69survivors preserved,126receipts using normal administrator HTTP at0.8.3",
+    "deliberate_reimport": "normal new operation completed with0native saves",
+    "no_56_object_recreation_repeated": true
+  },
+  "limits": [
+    "Partial mutation, edited-body/campaign/tag/recovery and new collision injections use actual Engine methods with local storage/vendor doubles; not native destructive fault claims",
+    "Real native scope checks use recorded historical IDs and current ORM reads, with wrong-action-identity refusal; no live duplicate was inserted",
+    "No schema/registry/journal reset, unrelated plugin edit, provider send, enrollment, advertising, main-Alma or client rollout",
+    "No separate stable GitHub promotion in this focused continuation"
+  ],
+  "private_evidence": "Detailed IDs, original complete journals, failure receipt and backups remain local/site under AB ownership; excluded from public Git"
+}
