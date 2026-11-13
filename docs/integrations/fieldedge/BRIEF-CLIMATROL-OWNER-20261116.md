@@ -52,7 +52,7 @@ Agree on one acceptable inquiry -> job example and the business definitions for 
 ## Review links
 
 - Repository: https://github.com/siteengine-git/SiteEngine-Ads-Bridge
-- **FieldEdge review branch:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/codex/fieldedge-climatrol-081-20261106
-- **Start here:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/blob/codex/fieldedge-climatrol-081-20261106/FIELD-EDGE-REVIEW-START-HERE.md
+- **FieldEdge review branch:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/review/fieldedge-20261116
+- **Start here:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/blob/review/fieldedge-20261116/FIELD-EDGE-REVIEW-START-HERE.md
 
 The GitHub repository is publicly readable. Please do not post customer personal data or API credentials there.

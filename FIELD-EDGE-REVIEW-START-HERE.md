@@ -8,7 +8,7 @@
 
 **Review this branch, not the default branch:**
 
-[`codex/fieldedge-climatrol-081-20261106`](https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/codex/fieldedge-climatrol-081-20261106)
+[`review/fieldedge-20261116`](https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/review/fieldedge-20261116)
 
 The default `main` branch retains an earlier Ads Bridge baseline and does **not** represent the installed Climatrol or FieldEdge connector version. The FieldEdge implementation is maintained on a separate development branch to prevent unrelated Ads Bridge changes. Installed Climatrol DEV dependencies include Ads Bridge **0.9.1**; the stand-alone FieldEdge connector is **0.1.1**.
 

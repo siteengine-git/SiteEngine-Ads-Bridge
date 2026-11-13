@@ -12,8 +12,8 @@ We have a functioning, scoped read-only API integration and have demonstrated de
 
 Our source and sanitized acceptance evidence are reviewable at:
 
-- **Reviewer guide:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/blob/codex/fieldedge-climatrol-081-20261106/FIELD-EDGE-REVIEW-START-HERE.md
-- **Connector branch:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/codex/fieldedge-climatrol-081-20261106
+- **Reviewer guide:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/blob/review/fieldedge-20261116/FIELD-EDGE-REVIEW-START-HERE.md
+- **Connector branch:** https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/review/fieldedge-20261116
 - **Installable DEV plugin:** `releases/0.1.1/siteengine-fieldedge-connector-0.1.1.zip` on that branch, SHA-256 `33fd49a1e92ccf0f72299d6b03588e535a12b09a82b71fdaaaa93f5703a9bcac`.
 
 The repository is currently **public**. Please do not reply with credentials, tenant secrets, real customer data or privileged internal information in a public GitHub issue.
