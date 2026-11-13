@@ -10,6 +10,11 @@ final class SiteEngine_Ads_Bridge_Fields {
                                 'type'  => 'number',
                         ),
                         array(
+                                'slug'  => 'estimated_value',
+                                'label' => 'Estimated Value',
+                                'type'  => 'number',
+                        ),
+                        array(
                                 'slug'  => 'closed_date',
                                 'label' => 'Closed Date',
                                 'type'  => 'date',

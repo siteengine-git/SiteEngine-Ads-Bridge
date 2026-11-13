@@ -1,3 +1,17 @@
+## Estimated Value addition - 0.9.3 local verification (2026-11-13)
+
+Direct user request adds Estimated Value / estimated_value / number to minimum
+CRM setup. Combined contract now thirteen fields, eight terms. Fresh, existing,
+repeat and conflicting-type paths pass actual setup algorithms with vendor doubles.
+84 replacement and 34 product assertions passed; prior 0.9.2 lifecycle/inquiry/
+reason evidence reused because those runtime files are unchanged. New form 40
+reviewed read-only: Estimated Value source/feed destination match; role/permission,
+appointment naming, empty service conditional, FL default, force subscription and
+legacy consent/status mappings still require form-owner corrections. No uploaded
+form or live site was modified; no sending/enrollment/provider/Google operation.
+Package is local-verified, not native-installed or stable-published. Accepted
+current 0.9.1 delivery stays intact pending native acceptance of a successor.
+
 ## Customer Rating correction - 0.9.2 local verification (2026-11-13)
 
 User reports a SiteEngine.io Customer Rating field with Excellent/Good/Fair/Poor.

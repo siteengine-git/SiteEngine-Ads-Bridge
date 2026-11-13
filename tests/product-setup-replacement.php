@@ -63,14 +63,14 @@ require dirname(__DIR__).'/includes/connectors/fieldedge/ConnectorDiagnostics.ph
 function ck($v,$m){if(!$v)throw new \RuntimeException($m);$GLOBALS['n']++;echo 'PASS '.$m."\n";}
 function refuses($f,$m){try{$f();}catch(\RuntimeException $e){ck(true,$m);return;}throw new \LogicException('Expected refusal: '.$m);}
 ck(SiteEngine_Ads_Bridge_Product_Setup::policy()==='issuer-policy','policy comes from loaded issuer, not editable settings');
-$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();ck(count($plan['terms'])===8&&count($plan['fields']['missing'])===12&&$saves===0,'preview all eight terms and twelve Ads/FE fields without writes');
+$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();ck(count($plan['terms'])===8&&count($plan['fields']['missing'])===13&&$saves===0,'preview all eight terms and thirteen Ads/FE fields without writes');
 $fields=[['slug'=>'unrelated','label'=>'User edited','type'=>'text','private'=>'preserve']];$before=$fields;
 $plan=SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===8&&$field_saves===1&&$fields[0]===$before[0],'missing-only supported vendor saves preserve user definition');
 $snapshot=serialize([$terms,$fields]);SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===8&&$field_saves===1&&serialize([$terms,$fields])===$snapshot,'exact repeat no duplicate definitions or writes');
 ck(!in_array('unqualified_at',array_column($fields,'slug'),true),'no unqualified_at provisioning');
 $checkpoint=[$terms,$fields,$saves,$field_saves];
 $combined=SiteEngine_Ads_Bridge_Product_Setup::field_requirements();
-ck(count($combined)===12&&count(array_unique(array_column($combined,'slug')))===12,'one complete unique Ads and FE field contract');
+ck(count($combined)===13&&count(array_unique(array_column($combined,'slug')))===13,'one complete unique Ads and FE field contract');
 foreach(\SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()as$f)ck(in_array($f['slug'],array_column($fields,'slug'),true),'main setup includes '.$f['slug']);
 $lost=array_values(array_filter($plan['terms'],fn($t)=>$t['role']==='lost'))[0];
 ck($lost['title']==='Lost'&&$lost['purpose']==='outcome_summary'&&array_keys(SiteEngine_Ads_Bridge_Settings::defaults()['fluentcrm']['tags']['lifecycle'])===['new','qualified','unqualified','won'],'Lost is distinct and does not redefine the four lifecycle states');
@@ -121,6 +121,18 @@ refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'unrelated custom r
 ck($saves===0&&$field_saves===0,'custom conflict still blocks before writes');
 [$terms,$fields,$saves,$field_saves,SiteEngine_Ads_Bridge_Config::instance()->data]=$savedState;
 ck(SiteEngine_Ads_Bridge_Settings::defaults()['fluentcrm']['lifecycle_automation']['unqualified_reason_field']==='se_ads_unqualified_reason','fresh settings default uses separate Ads reason field');
+
+$estimateState=[$terms,$fields,$saves,$field_saves];
+$estimate=array_values(array_filter($fields,fn($f)=>$f['slug']==='estimated_value'))[0];
+ck($estimate['label']==='Estimated Value'&&$estimate['type']==='number'&&$estimate['field_key']==='number','Estimated Value has exact requested label slug and native numeric type');
+$terms=[];$fields=[['slug'=>'estimated_value','label'=>'Retained operator label','type'=>'text']];$saves=0;$field_saves=0;$estimateBefore=serialize([$terms,$fields]);
+refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'Estimated Value type collision refuses');
+ck($saves===0&&$field_saves===0&&serialize([$terms,$fields])===$estimateBefore,'Estimated Value conflict blocks all term and field writes');
+$fields=[['slug'=>'estimated_value','label'=>'Retained operator label','type'=>'number','retained_extension'=>'preserve']];$existingEstimate=$fields[0];
+SiteEngine_Ads_Bridge_Product_Setup::crm(true);
+ck($fields[0]===$existingEstimate,'compatible preexisting Estimated Value is adopted without replacing edits');
+[$terms,$fields,$saves,$field_saves]=$estimateState;
+
 $reason=array_values(array_filter($fields,fn($f)=>$f['slug']==='se_ads_unqualified_reason'))[0];ck($reason['type']==='select-one'&&$reason['field_key']==='single-select'&&$reason['options']===SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values(),'reason uses actual lifecycle vocabulary');
 $fields[1]['type']='wrong';refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'type conflict refuses before term creation');$fields[1]['type']='number';
 $terms[\FluentCrm\App\Models\Tag::class][] = clone $terms[\FluentCrm\App\Models\Tag::class][0];

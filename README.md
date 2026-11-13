@@ -1,4 +1,4 @@
-# SiteEngine Ads Bridge 0.9.2
+# SiteEngine Ads Bridge 0.9.3
 
 Ads Bridge connects a selected Fluent Forms lead form, FluentCRM lifecycle and
 SiteEngine Consent to retained advertising inquiries and append-only Google
@@ -8,11 +8,14 @@ The CRM Configuration builder plugin is not required on destination sites.
 
 The main CRM setup includes all three FieldEdge fields and a distinct Lost
 outcome-summary tag. FieldEdge diagnostics no longer require a second field
-provisioning action. See [the complete field contract](docs/CRM-REQUIREMENTS-0.9.2.md).
+provisioning action. See [the complete field contract](docs/CRM-REQUIREMENTS-0.9.3.md).
 
 Customer ratings remain independent of Ads disqualification. New setups use
 se_ads_unqualified_reason. The setup button repairs an incompatible legacy
 customer_rating mapping while preserving its definition and contact values.
+
+Setup also creates Estimated Value (estimated_value) as a numeric CRM field.
+Estimated value remains separate from actual invoiced revenue.
 
 ## Setup
 

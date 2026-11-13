@@ -1,3 +1,9 @@
+## 0.9.3 - Estimated Value CRM definition
+
+- Add estimated_value with label Estimated Value and native number type to the combined CRM setup contract.
+- Adopt compatible existing definitions and preserve edits; conflicting types block before any list, tag or field writes.
+- Preserve the 0.9.2 rating-field correction; no revenue fallback or additional form-field provisioning is introduced.
+
 ## 0.9.2 - Separate Unqualified Reason from Customer Rating
 
 - New setups use se_ads_unqualified_reason; preserve compatible explicit legacy reason mappings.

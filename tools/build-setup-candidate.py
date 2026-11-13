@@ -1,6 +1,6 @@
 ﻿from pathlib import Path
 import json,hashlib,zipfile,subprocess,os
-R=Path.cwd();VERSION='0.9.2';O=R/'releases'/VERSION;O.mkdir(exist_ok=True)
+R=Path.cwd();VERSION='0.9.3';O=R/'releases'/VERSION;O.mkdir(exist_ok=True)
 php=R.parent/'local-test-runtime/php-8.3.36/php.exe'
 checks=[]
 suites=['product-setup-replacement.php','product-setup-acceptance.php','setup-workflow-acceptance.php','setup-reporting-acceptance.php','inquiry-acceptance.php','lifecycle-acceptance.php','unqualified-internal-acceptance.php','reason-mapping-acceptance.php']
@@ -9,10 +9,10 @@ for name in suites:
  q=subprocess.run([str(php),'-n',str(R/'tests'/name)],capture_output=True,timeout=20);assert q.returncode==0,(name,q.stdout,q.stderr);checks.append({'test':name,'summary':q.stdout.decode().splitlines()[-1]})
 q=subprocess.run(['node',str(R/'tests/product-setup-browser-double.js')],capture_output=True,timeout=10);assert q.returncode==0;qout=q.stdout.decode().strip();checks.append({'test':'product-setup-browser-double.js','summary':qout})
 sha=lambda b:hashlib.sha256(b).hexdigest()
-prior=json.loads((R/'releases/0.9.1/MANIFEST.json').read_text(encoding='utf-8'))
+prior=json.loads((R/'releases/0.9.2/MANIFEST.json').read_text(encoding='utf-8'))
 paths={x['path']for x in prior['payload']}
 paths.discard('includes/crm-import/import.js') # no normal hidden import controller in successor
-paths|={'docs/CRM-REQUIREMENTS-0.9.2.md','includes/connectors/fieldedge/ConnectorDiagnostics.php','includes/class-siteengine-ads-bridge-product-setup.php','includes/class-siteengine-ads-bridge-google.php','includes/class-siteengine-ads-bridge-smartcodes.php','includes/product-setup.js','includes/saved-operation-recovery.js','docs/SETUP-0.9.0.md'}
+paths|={'docs/CRM-REQUIREMENTS-0.9.3.md','includes/connectors/fieldedge/ConnectorDiagnostics.php','includes/class-siteengine-ads-bridge-product-setup.php','includes/class-siteengine-ads-bridge-google.php','includes/class-siteengine-ads-bridge-smartcodes.php','includes/product-setup.js','includes/saved-operation-recovery.js','docs/SETUP-0.9.0.md'}
 bodies={p:(R/p).read_bytes()for p in sorted(paths)}
 for p,b in bodies.items():
  assert not p.startswith(('tests/','.private/')) and p!='config/client.php'
@@ -21,7 +21,7 @@ for p,b in bodies.items():
 manifest={k:v for k,v in prior.items()if k not in ['candidate','version','source_commit','scope','payload']}
 rows=[{'path':p,'bytes':len(b),'sha256':sha(b)}for p,b in bodies.items()]
 snapshot=sha(json.dumps(rows,sort_keys=True,separators=(',',':')).encode())
-manifest.update(version=VERSION,candidate=VERSION,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),source_base_commit='b5fa414',source_snapshot_sha256=snapshot,designation='Setup release; actual scoped acceptance and limits recorded in RESULTS.json',scope='Separate Unqualified Reason from real Customer Rating; preserve legacy mappings and historical inquiry reasons; no external actions',payload=rows)
+manifest.update(version=VERSION,candidate=VERSION,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),source_base_commit='3668dd7',source_snapshot_sha256=snapshot,designation='Setup release; actual scoped acceptance and limits recorded in RESULTS.json',scope='Add numeric Estimated Value to minimum CRM setup; retain 0.9.2 rating correction; no native or external actions',payload=rows)
 mb=(json.dumps(manifest,indent=2)+'\n').encode();(O/'MANIFEST.json').write_bytes(mb)
 zipname=f'siteengine-ads-bridge-{VERSION}.zip'
 with zipfile.ZipFile(O/zipname,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9)as z:
