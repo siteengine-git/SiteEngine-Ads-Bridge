@@ -1,0 +1,28 @@
+{
+  "version": "0.9.3",
+  "designation": "LOCAL-VERIFIED INSTALLABLE; NATIVE ACCEPTANCE PENDING",
+  "package": "siteengine-ads-bridge-0.9.3.zip",
+  "bytes": 342298,
+  "sha256": "8b070db7d3f38d41e11a2fd4447c9dca211956bb138fbc53dd6daa65c7d7a99a",
+  "manifest_sha256": "2178d398cec65a642bf8de894bc5cf822fd4d8a83a5188956e46adf134e02215",
+  "source_commit": "13e7c0c7ca99cf8bb21636a67a22d7b73aac125a",
+  "members": 80,
+  "PHP_files": 50,
+  "installed": false,
+  "native_browser_verified": false,
+  "released": false,
+  "current_delivery_replaced": false,
+  "requested_field": {
+    "label": "Estimated Value",
+    "slug": "estimated_value",
+    "type": "number"
+  },
+  "required_fields": 13,
+  "required_terms": 8,
+  "existing_values_and_edits_preserved_in_local_tests": true,
+  "conflict_before_any_terms_or_fields": true,
+  "repeat_no_duplicates": true,
+  "no_native_site_operation": true,
+  "form_review": "FORM-REVIEW.json",
+  "previous_rating_fix_retained": true
+}
