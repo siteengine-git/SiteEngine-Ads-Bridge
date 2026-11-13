@@ -1,3 +1,13 @@
+## 0.9.1 - Complete minimal CRM requirements
+
+- Main setup preflights and provisions the combined Ads/FE contract, including
+  se_fe_identity, se_fe_customer_json and se_fe_jobs_json.
+- Includes a distinct Lost outcome-summary tag without changing the four-state
+  contact lifecycle or inventing loss evidence.
+- Rejects duplicate/malformed required or existing fields before mutation.
+- Removes the second FieldEdge provisioning form; retains a protected no-write
+  redirect for old forms. No automation, transport or export is enabled.
+
 ## 0.9.0 — unaccepted setup replacement
 
 - One-page ordinary Setup and one save, API Setup, tabbed Settings.

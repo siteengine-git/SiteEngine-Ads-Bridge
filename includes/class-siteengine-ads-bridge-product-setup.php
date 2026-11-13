@@ -13,7 +13,19 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
             $out[]=['kind'=>'list','role'=>$role,'title'=>trim((string)($data['fluentcrm']['lists'][$role]??''))?:$default];
         foreach (['new'=>'New','qualified'=>'Qualified','unqualified'=>'Unqualified','won'=>'Won'] as $role=>$default)
             $out[]=['kind'=>'tag','role'=>$role,'title'=>trim((string)($data['fluentcrm']['tags']['lifecycle'][$role]??''))?:$default];
+        // Outcome summary only: Lost is distinct from Unqualified and is not a fifth lifecycle state.
+        $out[] = ['kind'=>'tag','role'=>'lost','purpose'=>'outcome_summary','title'=>'Lost'];
         return $out;
+    }
+    /** One complete setup contract, including connector storage but no live connector actions. */
+    public static function field_requirements(): array {
+        if (!class_exists('SiteEngine\\AdsBridge\\Connectors\\FieldEdge\\CRMProjection')) {
+            throw new RuntimeException('FieldEdge CRM definition contract is unavailable. No definitions were created.');
+        }
+        return array_merge(
+            SiteEngine_Ads_Bridge_Fields::required(),
+            \SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()
+        );
     }
     /** Preflight every definition before the first vendor write; adopt unique existing identities. */
     public static function crm(bool $apply=false): array {
@@ -29,7 +41,8 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
             if($existing && (string)$existing->title!==$title)throw new RuntimeException('CRM slug conflicts with another title: '.$title.'. Existing definition preserved.');
             $plan[]= $term+['class'=>$class,'slug'=>$slug,'id'=>$existing?(int)$existing->id:null];
         }
-        $fields=SiteEngine_Ads_Bridge_Fields::provision(false);
+        $definitions=self::field_requirements();
+        $fields=SiteEngine_Ads_Bridge_Fields::provision(false,$definitions);
         if($fields['conflicts'])throw new RuntimeException('CRM field definitions conflict: '.implode(', ',$fields['conflicts']).'. Existing fields and values preserved.');
         if($apply){
             foreach($plan as &$term){if($term['id'])continue;$c=$term['class'];
@@ -41,7 +54,7 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
                 $readback=$c::where('title',$term['title'])->orWhere('slug',$term['slug'])->limit(3)->get();
                 if(count($readback)!==1||(int)$readback[0]->id!==$term['id'])throw new RuntimeException('CRM creation identity readback is ambiguous for '.$term['title'].'. Definitions retained; stop and inspect.');
             }unset($term);
-            $fields=SiteEngine_Ads_Bridge_Fields::provision(true);
+            $fields=SiteEngine_Ads_Bridge_Fields::provision(true,$definitions);
         }
         return ['terms'=>$plan,'fields'=>$fields];
     }

@@ -399,40 +399,19 @@ final class SiteEngine_Ads_Bridge_Admin {
 		if ( isset( $_GET['seab_fe_fields'] ) && 'ready' === ( $status['crm_field_schema'] ?? '' ) ) {
 			echo '<div class="notice notice-success inline"><p>FieldEdge CRM definitions verified. No contacts or provider records were changed.</p></div>';
 		}
-		if ( 'missing_fields' === ( $status['crm_field_schema'] ?? '' ) && 'available' === ( $status['crm_field_registry_read'] ?? '' ) ) {
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			echo '<input type="hidden" name="action" value="seab_provision_fieldedge">';
-			wp_nonce_field( 'seab_provision_fieldedge' );
-			echo '<p><label><input type="checkbox" name="confirm" value="1" required> Create only the missing FieldEdge custom fields. Existing CRM definitions and contact values will be preserved.</label></p>';
-			submit_button( 'Create Missing FieldEdge Fields', 'secondary', 'submit', false );
-			echo '</form>';
-		}
-		echo '<p>This status does not enable FieldEdge access or alter Consent, subscriptions, job records or exports. Field provisioning requires an explicit administrator confirmation.</p>';
+        if ( 'missing_fields' === ( $status['crm_field_schema'] ?? '' ) ) {
+            echo '<p>FieldEdge definitions are included in <a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=setup' ) ) . '">Setup &gt; Set up CRM requirements</a>.</p>';
+        }
+        echo '<p>Diagnostics do not enable FieldEdge access or alter Consent, subscriptions, job records or exports.</p>';
 	}
 
-	public static function handle_fieldedge_fields() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Permission denied.' );
-		}
-		check_admin_referer( 'seab_provision_fieldedge' );
-		if ( self::post_text( 'confirm' ) !== '1' ) {
-			wp_die( 'Explicit FieldEdge field provisioning confirmation required.' );
-		}
-		try {
-			SiteEngine_Ads_Bridge_Setup::with_configuration(
-				static function () {
-					return SiteEngine_Ads_Bridge_Fields::provision(
-						true,
-						\SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()
-					);
-				}
-			);
-		} catch ( \Throwable $error ) {
-			wp_die( esc_html( $error->getMessage() ) );
-		}
-		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=api&seab_fe_fields=1' ) );
-		exit;
-	}
+    /** Retained old form endpoint: redirect without a separate provisioning mutation. */
+    public static function handle_fieldedge_fields() {
+        if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Permission denied.' ); }
+        check_admin_referer( 'seab_provision_fieldedge' );
+        wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG . '&tab=setup' ) );
+        exit;
+    }
     /** Resolve the actual Base/ACF field identity, including legacy definitions. */
     private static function business_data_url($key='') {
         $url=admin_url('admin.php?page=business-data');if($key===''||!function_exists('acf_get_field_groups')||!function_exists('acf_get_fields'))return $url;
@@ -449,7 +428,7 @@ final class SiteEngine_Ads_Bridge_Admin {
     private static function render_setup_workflow($config,$section) {
         echo '<h2>Setup</h2><p>Save incomplete configuration at any time. Saving does not run exports, send email or enroll contacts.</p>';
         self::render_shared_business($config);
-        echo '<h2>CRM requirements</h2><p>Only three lists, four lifecycle roles and required contact fields are needed. Marketing templates, campaigns, sequences and the CRM builder are not prerequisites.</p>';
+        echo '<h2>CRM requirements</h2><p>Setup provides three lists, four lifecycle roles, a distinct Lost outcome tag, and required Ads / FieldEdge contact fields. Marketing templates, campaigns, sequences and the CRM builder are not prerequisites.</p>';
         try{$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();$missing=count(array_filter($plan['terms'],static fn($x)=>!$x['id']))+count($plan['fields']['missing']);echo '<p>'.esc_html($missing?$missing.' required definitions are missing.':'Required CRM definitions exist.').'</p><ul>';foreach($plan['terms']as$t)if(!$t['id'])echo '<li>'.esc_html($t['title'].' — '.$t['kind']).'</li>';foreach($plan['fields']['missing']as$f)echo '<li>'.esc_html($f['label'].' — contact field').'</li>';echo '</ul>';}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';}
         echo '<form id="seab-crm-requirements" method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_crm_requirements">';wp_nonce_field('seab_crm_requirements');submit_button('Set up CRM requirements','secondary');echo '<p id="seab-crm-setup-status" role="status"></p></form>';
         if($config->external_override_active())echo '<p>An intentional external configuration controls these values. <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=settings&section=diagnostics')).'">Review settings source in Diagnostics</a>.</p>';
@@ -717,7 +696,7 @@ final class SiteEngine_Ads_Bridge_Admin {
                 $data=SiteEngine_Ads_Bridge_Settings::merge(SiteEngine_Ads_Bridge_Settings::defaults(),$before?:SiteEngine_Ads_Bridge_Config::instance()->all());
                 foreach($plan['terms']as$t){
                     if($t['kind']==='list')$data['fluentcrm']['lists'][$t['role']]=$t['title'];
-                    else $data['fluentcrm']['tags']['lifecycle'][$t['role']]=$t['title'];
+                    elseif (($t['purpose']??'')!=='outcome_summary') $data['fluentcrm']['tags']['lifecycle'][$t['role']]=$t['title'];
                 }
                 if(SiteEngine_Ads_Bridge_Settings::get()!==$before)throw new RuntimeException('Settings changed during provisioning. Definitions are retained; reload before mapping them.');
                 SiteEngine_Ads_Bridge_Settings::save($data);

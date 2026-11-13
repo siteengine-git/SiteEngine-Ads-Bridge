@@ -69,14 +69,37 @@ final class SiteEngine_Ads_Bridge_Fields {
         if ( ! is_array( $existing ) ) { throw new RuntimeException( 'Malformed existing custom-field registry.' ); }
         $by = array();
         foreach ( $existing as $field ) {
+            if ( ! is_array( $field ) || ! is_string( $field['type'] ?? null ) || '' === $field['type'] ) {
+                throw new RuntimeException( 'Malformed existing custom-field definition; registry preserved.' );
+            }
             $slug = $field['slug'] ?? '';
             if ( ! is_string( $slug ) || '' === $slug ) { throw new RuntimeException( 'Unidentified existing custom field; review in FluentCRM.' ); }
             if ( isset( $by[ $slug ] ) ) { throw new RuntimeException( 'Duplicate custom-field slug: ' . $slug ); }
             $by[ $slug ] = $field;
         }
+        $definitions = $required ?? self::required();
+        $definition_slugs = array();
+        foreach ( $definitions as $field ) {
+            if ( ! is_array( $field ) || ! is_string( $field['slug'] ?? null ) ||
+                ! preg_match( '/^[a-z][a-z0-9_]*$/D', $field['slug'] ) ||
+                ! is_string( $field['type'] ?? null ) || '' === $field['type'] ||
+                ! is_string( $field['label'] ?? null ) || '' === trim( $field['label'] ) ) {
+                throw new RuntimeException( 'Malformed required CRM definition; no fields were created.' );
+            }
+            if ( isset( $definition_slugs[ $field['slug'] ] ) ) {
+                throw new RuntimeException( 'Duplicate required CRM field: ' . $field['slug'] );
+            }
+            $definition_slugs[ $field['slug'] ] = true;
+            if ( isset( $field['options'] ) && ( ! is_array( $field['options'] ) ||
+                array_values( $field['options'] ) !== $field['options'] ||
+                count( array_filter( $field['options'], 'is_string' ) ) !== count( $field['options'] ) ||
+                count( array_unique( $field['options'] ) ) !== count( $field['options'] ) ) ) {
+                throw new RuntimeException( 'Malformed CRM choices for ' . $field['slug'] );
+            }
+        }
         $missing = array();
         $conflicts = array();
-        foreach ( $required ?? self::required() as $field ) {
+        foreach ( $definitions as $field ) {
             if ( ! isset( $supported[ $field['type'] ] ) ) { throw new RuntimeException( 'Unsupported vendor field type: ' . $field['type'] ); }
             if ( isset( $by[ $field['slug'] ] ) ) {
                 if ( ( $by[ $field['slug'] ]['type'] ?? null ) !== $field['type'] ||

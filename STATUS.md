@@ -1,3 +1,13 @@
+## Issue #3 additive CRM setup correction - 0.9.1 in progress
+
+AB Helper is the sole source writer for the user's request to include FE fields
+in minimum setup. Main builder now owns Ads + FE definitions and distinct Lost
+outcome-summary tag. No lifecycle redefinition, importer, automation or provider
+operation is introduced. 69 focused replacement assertions, 34 product, 16 form
+mapping and 35 reporting assertions pass locally. Actual Climatrol-dev installation
+and ordinary authenticated builder acceptance are next; no fresh native/browser
+PASS is claimed yet. Existing 0.9.0 package and prior evidence are retained.
+
 ## Climatrol configuration completed - November 12, 2026
 
 The subsequent user instruction to complete the remaining setup has been handled.

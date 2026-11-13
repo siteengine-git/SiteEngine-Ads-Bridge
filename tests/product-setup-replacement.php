@@ -63,11 +63,37 @@ require dirname(__DIR__).'/includes/connectors/fieldedge/ConnectorDiagnostics.ph
 function ck($v,$m){if(!$v)throw new \RuntimeException($m);$GLOBALS['n']++;echo 'PASS '.$m."\n";}
 function refuses($f,$m){try{$f();}catch(\RuntimeException $e){ck(true,$m);return;}throw new \LogicException('Expected refusal: '.$m);}
 ck(SiteEngine_Ads_Bridge_Product_Setup::policy()==='issuer-policy','policy comes from loaded issuer, not editable settings');
-$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();ck(count($plan['terms'])===7&&count($plan['fields']['missing'])===9&&$saves===0,'preview seven terms and nine fields without writes');
+$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();ck(count($plan['terms'])===8&&count($plan['fields']['missing'])===12&&$saves===0,'preview all eight terms and twelve Ads/FE fields without writes');
 $fields=[['slug'=>'unrelated','label'=>'User edited','type'=>'text','private'=>'preserve']];$before=$fields;
-$plan=SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===7&&$field_saves===1&&$fields[0]===$before[0],'missing-only supported vendor saves preserve user definition');
-$snapshot=serialize([$terms,$fields]);SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===7&&$field_saves===1&&serialize([$terms,$fields])===$snapshot,'exact repeat no duplicate definitions or writes');
+$plan=SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===8&&$field_saves===1&&$fields[0]===$before[0],'missing-only supported vendor saves preserve user definition');
+$snapshot=serialize([$terms,$fields]);SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===8&&$field_saves===1&&serialize([$terms,$fields])===$snapshot,'exact repeat no duplicate definitions or writes');
 ck(!in_array('unqualified_at',array_column($fields,'slug'),true),'no unqualified_at provisioning');
+$checkpoint=[$terms,$fields,$saves,$field_saves];
+$combined=SiteEngine_Ads_Bridge_Product_Setup::field_requirements();
+ck(count($combined)===12&&count(array_unique(array_column($combined,'slug')))===12,'one complete unique Ads and FE field contract');
+foreach(\SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()as$f)ck(in_array($f['slug'],array_column($fields,'slug'),true),'main setup includes '.$f['slug']);
+$lost=array_values(array_filter($plan['terms'],fn($t)=>$t['role']==='lost'))[0];
+ck($lost['title']==='Lost'&&$lost['purpose']==='outcome_summary'&&array_keys(SiteEngine_Ads_Bridge_Settings::defaults()['fluentcrm']['tags']['lifecycle'])===['new','qualified','unqualified','won'],'Lost is distinct and does not redefine the four lifecycle states');
+ck(!in_array('lost_date',array_column($fields,'slug'),true)&&!in_array('lost_at',array_column($fields,'slug'),true),'no speculative loss timestamp fields');
+// Actual product preflight must reject every FE collision before creating even a missing list.
+foreach(['se_fe_identity','se_fe_customer_json','se_fe_jobs_json']as$slug){
+ $terms=[];$fields=[['slug'=>$slug,'label'=>'Retained collision','type'=>'number']];$saves=0;$field_saves=0;$unchanged=serialize([$terms,$fields]);
+ refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'FE type collision refuses '.$slug);
+ ck($saves===0&&$field_saves===0&&serialize([$terms,$fields])===$unchanged,'complete preflight prevents partial terms/fields for '.$slug);
+}
+$terms=[];$fields=[['slug'=>'se_fe_identity','label'=>'One','type'=>'text'],['slug'=>'se_fe_identity','label'=>'Two','type'=>'text']];$saves=0;$field_saves=0;
+refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'duplicate existing FE identity definition refuses');ck($saves===0&&$field_saves===0,'duplicate FE registry causes zero mutations');
+$terms=[];$fields=[['slug'=>'se_fe_identity','label'=>'Malformed','type'=>[]]];$saves=0;$field_saves=0;
+refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'malformed existing FE definition refuses');ck($saves===0&&$field_saves===0,'malformed FE registry causes zero mutations');
+$fields=[];$terms=[];$saves=0;$field_saves=0;$duplicates=$combined;$duplicates[]=$combined[9];
+refuses(fn()=>SiteEngine_Ads_Bridge_Fields::provision(true,$duplicates),'duplicate required FE definition refuses');
+$malformed=$combined;$malformed[11]['label']=null;refuses(fn()=>SiteEngine_Ads_Bridge_Fields::provision(true,$malformed),'malformed required FE definition refuses');ck($saves===0&&$field_saves===0,'required-contract failures cause zero writes');
+// Compatible FE definitions, including edited labels and extension metadata, are adopted exactly.
+$fields=\SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions();foreach($fields as&$f){$f['label']='Operator edited '.$f['label'];$f['retained_extension']='keep';}unset($f);$existingFE=$fields;$terms=[];$saves=0;$field_saves=0;
+SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck(array_slice($fields,0,3)===$existingFE&&$saves===8&&$field_saves===1,'pre-existing compatible FE definitions adopted without replacement');
+$nativeSnapshot=serialize([$terms,$fields]);SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===8&&$field_saves===1&&serialize([$terms,$fields])===$nativeSnapshot,'second complete setup is idempotent with existing FE definitions');
+[$terms,$fields,$saves,$field_saves]=$checkpoint;
+
 $reason=array_values(array_filter($fields,fn($f)=>$f['slug']==='customer_rating'))[0];ck($reason['type']==='select-one'&&$reason['field_key']==='single-select'&&$reason['options']===SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values(),'reason uses actual lifecycle vocabulary');
 $fields[1]['type']='wrong';refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'type conflict refuses before term creation');$fields[1]['type']='number';
 $terms[\FluentCrm\App\Models\Tag::class][] = clone $terms[\FluentCrm\App\Models\Tag::class][0];
@@ -113,7 +139,7 @@ $_GET=['tab'=>'setup'];ob_start();SiteEngine_Ads_Bridge_Admin::render();$page=ob
 foreach(['>Setup</a>','>API Setup</a>','>Settings</a>']as$label)ck(substr_count($page,$label)===1,'primary navigation '.$label);
 ck(str_contains($page,'position:sticky')&&str_contains($page,'id="seab-ordinary-settings"'),'single save remains reachable in long ordinary setup');
 $_GET=['tab'=>'api'];ob_start();SiteEngine_Ads_Bridge_Admin::render();$api=ob_get_clean();
-ck(str_contains($api,'FieldEdge')&&str_contains($api,'Disabled.')&&str_contains($api,'Create Missing FieldEdge Fields'),'API page defaults dormant without live action');
+ck(str_contains($api,'FieldEdge')&&str_contains($api,'Disabled.')&&!str_contains($api,'type="submit"'),'API page defaults dormant without live action');
 ck(str_contains($api,'FieldEdge connection')&&str_contains($api,'not_tested_by_diagnostics'),'API uses retained read-only connector facts, never a fake live PASS');
 ck(hash_file('sha256',dirname(__DIR__).'/includes/connectors/fieldedge/ConnectorDiagnostics.php')==='78a7c9bc900dead2f30cfae6b7a47a23d5eb2e8933ffa3d649dcc0ca8b58d7bf','reviewed connector diagnostic bytes unchanged');
 $_GET=['tab'=>'crm-import'];ob_start();SiteEngine_Ads_Bridge_Admin::render();$old=ob_get_clean();

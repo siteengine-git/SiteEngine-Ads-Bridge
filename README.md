@@ -1,10 +1,14 @@
-# SiteEngine Ads Bridge 0.9.0
+# SiteEngine Ads Bridge 0.9.1
 
 Ads Bridge connects a selected Fluent Forms lead form, FluentCRM lifecycle and
 SiteEngine Consent to retained advertising inquiries and append-only Google
 Sheets feeds. PHP 8.3 and SiteEngine Base are required. Fluent Forms, FluentCRM
 and Consent supply their corresponding form and advertising capabilities.
 The CRM Configuration builder plugin is not required on destination sites.
+
+The main CRM setup includes all three FieldEdge fields and a distinct Lost
+outcome-summary tag. FieldEdge diagnostics no longer require a second field
+provisioning action. See [the complete field contract](docs/CRM-REQUIREMENTS-0.9.1.md).
 
 ## Setup
 
@@ -24,8 +28,8 @@ without saving. It authenticates and reads spreadsheet identity only; no rows
 are read or appended. Read access does not prove write permission.
 Google Ads account timezone is distinct from Base business timezone.
 
-API Setup contains FieldEdge diagnostics and the explicit missing-only field
-utility. FieldEdge transport and synchronization remain disabled.
+API Setup contains read-only FieldEdge diagnostics. The main CRM setup owns all
+required fields. FieldEdge transport and synchronization remain disabled.
 Settings retains advanced field overrides, detailed diagnostics, scheduler
 instructions and lead compliance. Printed cron instructions do not prove an OS
 schedule exists; recorded runs supply runtime and freshness evidence.
