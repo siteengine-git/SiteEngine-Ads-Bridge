@@ -1,3 +1,9 @@
+# November 2026 FieldEdge integration review
+
+**External reviewers: [START HERE — FieldEdge integration, November 16](FIELD-EDGE-REVIEW-START-HERE.md).** This branch contains SiteEngine FieldEdge Connector **0.1.1**, a verified DEV installation and scoped technical evidence. The older Ads Bridge version notes below are historical for this branch; they do not describe the current Climatrol DEV-installed Ads Bridge 0.9.1. The GitHub default `main` branch is also an older baseline.
+
+---
+
 # CRM configuration import — 0.7.0
 
 Ads Bridge now owns destination import. See [administrator instructions](docs/CRM-CONFIGURATION-IMPORT.md). The separate CRM Configuration plugin is not required on destination sites. Imported content remains inactive; importing never authorizes enrollment or email.
