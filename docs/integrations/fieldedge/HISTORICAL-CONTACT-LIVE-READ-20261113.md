@@ -37,9 +37,17 @@ No invoice amount, customer email, name, telephone, UUID or provider body has be
 
 ## Remaining shortest path
 
-1. Resolve a verified **original Fluent Forms submission/Ads Bridge inquiry ID** for CRM contact `#334` via a **separate read-only site query**; the contact export's `Fluent Forms Submission ID` is blank.
+1. **Completed:** Verified original form 39, entry 889, and successful native FluentCRM delivery to candidate contact `#334`. **Not an AB inquiry:** current master form is 40, and no inquiry ledger row exists for 889/334. Do not create an attribution record from this customer match.
 2. Seek an explicit provider `leadId` and authoritative `leadId <-> workOrderId` relation. Matching email/customer ID is not sufficient.
 3. Only after explicit identity evidence, apply AB's original-inquiry and Consent/DNC gates, approved value stage and replay policy. Historical CRM tags are never proof of outcome.
 4. Other read-only FE calls should be individual, independently journaled samples rather than replaying or widening this completed pass.
 
-**Status:** Bounded production API demonstration PASS for operational chain; attribution and automatic FE synchronization NOT VERIFIED.
+## Follow-up: original Fluent Forms evidence — 2026-11-13
+
+Read-only canonical WP-CLI inspection of `https://climatrol.siteengine.space` (verified site owner `clima6647`, PHP 8.4) confirmed original **form 39 / entry 889**. Entry timestamp `2026-11-04 06:14:36` exactly matches CRM contact `#334` creation. The entry email matches the existing CRM contact email exactly (no email or other PII printed). The original response contains populated `gclid`, `gbraid`, and `transaction_id` fields. The stored response transaction ID is **not** `ff:39:889`; do not reinterpret it as canonical AB inquiry proof.
+
+The actual native Fluent Forms log for source `submission_item`, source ID `889`, records `component=fluentcrm`, `status=success`, at `2026-11-04 06:14:36`. The form 39 FluentCRM feed is currently enabled and maps `{submission.id}` to `submission_id`, but the existing contact `#334` does **not** currently contain a saved `submission_id` custom field. This is a historic feed success, not proof of current field population.
+
+The current Ads Bridge configuration uses **form 40** as the master form; an exact read of `se_ads_inquiries` yielded **zero** rows for `(form_id=39, submission_id=889)`, `transaction_id=ff:39:889`, or `contact_id=334`. This is a historical form 39 entry, not an already adopted AB inquiry. No configuration change or backfill was made. **No provider `leadId` or originating inquiry-to-specific-work-order link was found.** Existing same-customer three work orders and one read invoice do not create attribution by association.
+
+**Status:** Bounded production API demonstration PASS for operational chain. Historical form-to-CRM delivery confirmed independently in WordPress. AB inquiry attribution and automatic FE synchronization NOT VERIFIED.
