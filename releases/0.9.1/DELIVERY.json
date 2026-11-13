@@ -1,0 +1,15 @@
+{
+  "version": "0.9.1",
+  "designation": "FOCUSED-VERIFIED DEVELOPMENT DELIVERY",
+  "package": "siteengine-ads-bridge-0.9.1.zip",
+  "sha256": "a70d0f573685db952f1591f7a1c793fe3e0ccabf8f83f186893f50e5baff027d",
+  "manifest_sha256": "170adab74f5dde4e84d8f14058176695a6e1e6130bac39425b7d4537cfb10b91",
+  "source_snapshot_sha256": "d7e4cc6c92630b778486319d8990f4df6a6be365a040df2209b2a0edbc866e32",
+  "source_commit": "f2f6720bf057db6f433e91a654d5903b7f650752",
+  "members": 78,
+  "PHP_files": 50,
+  "installed": true,
+  "released": false,
+  "current_delivery_replaced": true,
+  "focused_verified": true
+}

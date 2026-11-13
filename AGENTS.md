@@ -1,3 +1,19 @@
+## Issue #3 completed - Ads Bridge 0.9.1 (2026-11-13)
+
+The minimum setup now includes all three FE fields from CRMProjection::definitions(),
+plus a distinct Lost summary tag. One main setup utility owns provisioning; API Setup
+is read-only. All definitions preflight before writes; existing values/edits preserved.
+Runtime f2f6720bf057db6f433e91a654d5903b7f650752 installed on Climatrol dev only. Three normal
+authenticated administrator setup actions passed; all definitions preexisted, zero
+creates. Isolated action preserved all 11 captured tables, fields, settings/options,
+cron and original journals exactly. Login changed FluentCRM activity metadata; the
+initial strict comparison failure remains explicit in releases/0.9.1/RESULTS.json.
+69 + 34 + 16 + 35 local assertions, 10 JS-double checks, 50 local/native PHP lints.
+No importer, email, enrollment, FE sync, Google/provider call or scheduler operation.
+Existing flags retained. Temporary guard removed, maintenance absent, config exact,
+guard complete/inflight null. Private backups/failure receipts retained. Exact 0.9.1
+ZIP delivered; no stable GitHub promotion. Do not rerun old import campaigns.
+
 ## Climatrol configuration completed - November 12, 2026
 
 The subsequent user instruction to complete the remaining setup has been handled.

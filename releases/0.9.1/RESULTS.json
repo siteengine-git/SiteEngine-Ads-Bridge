@@ -1,0 +1,91 @@
+{
+  "version": "0.9.1",
+  "issue": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/issues/3",
+  "source_commit": "f2f6720bf057db6f433e91a654d5903b7f650752",
+  "target": "https://climatrol.siteengine.space",
+  "implemented": true,
+  "packaged": true,
+  "assigned_development_site_installed": true,
+  "focused_native_and_authenticated_workflow_verified": true,
+  "stable_github_promotion": false,
+  "package_sha256": "a70d0f573685db952f1591f7a1c793fe3e0ccabf8f83f186893f50e5baff027d",
+  "manifest_sha256": "170adab74f5dde4e84d8f14058176695a6e1e6130bac39425b7d4537cfb10b91",
+  "members": 78,
+  "native_PHP": "8.4.27",
+  "native_lints": 50,
+  "contract": {
+    "lists": 3,
+    "lifecycle_tags": 4,
+    "distinct_Lost_summary_tag": true,
+    "required_fields": 12,
+    "FE_fields": [
+      {
+        "slug": "se_fe_identity",
+        "type": "text"
+      },
+      {
+        "slug": "se_fe_customer_json",
+        "type": "textarea"
+      },
+      {
+        "slug": "se_fe_jobs_json",
+        "type": "textarea"
+      }
+    ],
+    "source": "CRMProjection::definitions()",
+    "single_provisioner": "Set up CRM requirements; API Setup diagnostics read-only"
+  },
+  "browser": {
+    "authenticated": true,
+    "normal_setup_successes": 3,
+    "first_and_repeat": "Success via normal administrator page, nonce and admin-post action",
+    "isolated_third_check": "Zero changes to all 11 captured native tables, custom definitions, Ads options/settings, active plugins, cron definitions or wp-config",
+    "created_definitions": 0,
+    "reason": "All required terms and fields already existed and were adopted unchanged",
+    "visible_status": "Required CRM definitions exist. Setup configuration complete."
+  },
+  "preservation": {
+    "before_install_pass": true,
+    "first_post_login_comparison_pass": false,
+    "first_comparison_explanation": "Two contact-table digests changed during authentication. Exactly one existing contact shows matching last_activity and _last_login timestamp; installed FluentCRM ContactActivityLogger::trackLogin updates both. No full pre-login contact-table byte equality is claimed.",
+    "first_comparison_other_data": "All other captured tables and global field definitions unchanged; only Ads version option changed and FluentCRM sender heartbeat advanced",
+    "isolated_button_pass": true,
+    "isolated_changed_tables": [],
+    "isolated_changed_Ads_options": [],
+    "global_fields_exact": true,
+    "saved_settings_exact": true,
+    "all_original_Ads_journal_hashes_exact": true,
+    "saved_import": "Existing review operation retained at cursor 0, no pending native action",
+    "guard": {
+      "state": "complete",
+      "inflight": null
+    },
+    "no_reset_or_restore": true
+  },
+  "limits": [
+    "Fresh creation and conflict/fault cases use actual algorithms with vendor/storage doubles; live definitions were not deleted to manufacture a fresh setup.",
+    "No FieldEdge authentication, synchronization, Won/Lost application, real form submission or advertising delivery acceptance.",
+    "Existing enabled Sheets/All Leads/Qualified/Converted/lifecycle settings preserved; Lost export remains false.",
+    "Existing scheduler warning retained; no scheduler started."
+  ],
+  "no_actions": [
+    "CRM import",
+    "email",
+    "marketing enrollment",
+    "provider request",
+    "Google request",
+    "contact creation",
+    "loss inference",
+    "production-site changes"
+  ],
+  "cleanup": {
+    "task_guard_removed": true,
+    "maintenance_absent": true,
+    "wp_config_exact": true,
+    "backups_retained": true,
+    "guard_state": {
+      "state": "complete",
+      "inflight": null
+    }
+  }
+}
