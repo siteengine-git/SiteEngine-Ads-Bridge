@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('Provision','Status','Test','Discover','PilotDouble','HistoricalRead')][string]$Action = 'Status',
+    [ValidateSet('Provision','Status','Test','Discover','PilotDouble','HistoricalRead','LiveSnapshot')][string]$Action = 'Status',
     [string]$EvidenceFile,
     [string]$EvidenceSha256,
     [string]$RouteFile,[string]$RouteSha256,[string]$CardFile,[string]$CardSha256,
@@ -99,7 +99,7 @@ try {
             '{"provisioned":true,"storage":"Windows DPAPI, current user and machine","network_requests":0}'
         }
     } else {
-        if ($Action -in @('Discover','HistoricalRead')) {
+        if ($Action -in @('Discover','HistoricalRead','LiveSnapshot')) {
             if ($EvidenceSha256 -notmatch '^[a-f0-9]{64}$' -or -not (Test-Path -LiteralPath $EvidenceFile -PathType Leaf)) { throw 'selected_evidence_unavailable' }
             Assert-NoLink $EvidenceFile
             if ((Get-FileHash -LiteralPath $EvidenceFile -Algorithm SHA256).Hash.ToLowerInvariant() -ne $EvidenceSha256) { throw 'selected_evidence_hash_mismatch' }
@@ -112,6 +112,7 @@ try {
         $probe = Join-Path $PSScriptRoot 'oauth-probe.php'
         if ($Action -eq 'Discover') { $probe = Join-Path $PSScriptRoot 'selected-case.php' }
         if ($Action -eq 'HistoricalRead') { $probe = Join-Path $PSScriptRoot 'historical-contact.php' }
+        if ($Action -eq 'LiveSnapshot') { $probe = Join-Path $PSScriptRoot 'live-snapshot.php' }
         $psi = New-Object Diagnostics.ProcessStartInfo
         $psi.FileName = $php
         # Runtime arguments contain paths and flags only; credential JSON goes to
@@ -131,10 +132,10 @@ try {
                 client_secret = Convert-ForProcess $bundle.client_secret
                 target_id = Convert-ForProcess $bundle.target_id
             }
-            if ($Action -in @('Discover','HistoricalRead')) {
+            if ($Action -in @('Discover','HistoricalRead','LiveSnapshot')) {
                 $inputObject.evidence_file = (Resolve-Path -LiteralPath $EvidenceFile).Path
                 $inputObject.evidence_sha256 = $EvidenceSha256
-                $prefix = if ($Action -eq 'HistoricalRead') { 'historical-contact-pass-20261113' } else { 'selected-case-pass' }
+                $prefix = if ($Action -eq 'LiveSnapshot') { 'live-snapshot-pass-20261113' } elseif ($Action -eq 'HistoricalRead') { 'historical-contact-pass-20261113' } else { 'selected-case-pass' }
                 $inputObject.journal_file = Join-Path $privateDirectory ($prefix + '.journal.json')
                 $inputObject.findings_file = Join-Path $privateDirectory ($prefix + '.findings.json')
                 Assert-NoLink $inputObject.journal_file
@@ -149,7 +150,7 @@ try {
             $process.StandardInput.Close()
             [Array]::Clear($inputBytes,0,$inputBytes.Length)
             Remove-Variable inputBytes,inputJson,inputObject,bundle
-            $ceilingMilliseconds = if ($Action -in @('Discover','HistoricalRead')) { 130000 } else { 40000 }
+            $ceilingMilliseconds = if ($Action -in @('Discover','HistoricalRead','LiveSnapshot')) { 130000 } else { 40000 }
             if (-not $process.WaitForExit($ceilingMilliseconds)) { $process.Kill(); $process.WaitForExit(); throw 'bounded_probe_timeout' }
             # Never echo raw stderr; provider/cURL diagnostics are not a log source.
             [void]$errTask.Result
