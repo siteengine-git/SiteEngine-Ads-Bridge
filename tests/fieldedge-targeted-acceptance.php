@@ -20,12 +20,12 @@ try {
 		array( 'customer_search', array( 'phone' => '+1 (555) 000-0101' ) ),
 		array( 'customer_work_orders', array( 'customerId' => $uuid ) ),
 		array( 'address_work_orders', array( 'postalCode' => '00000', 'city' => 'Synthetic', 'stateOrRegion' => 'ZZ', 'addressLine1' => 'Synthetic only' ) ),
-		array( 'work_order', array( 'id' => $uuid ) ), array( 'customer', array( 'id' => $uuid ) ), array( 'lead', array( 'id' => $uuid ) ),
+		array( 'work_order', array( 'id' => $uuid ) ), array( 'customer', array( 'id' => $uuid ) ), array( 'lead', array( 'id' => $uuid ) ), array( 'invoice', array( 'id' => $uuid ) ),
 	) as $case ) { tc( T::allowed( 'GET', T::url( ...$case ) ), 'documented targeted GET allowed with canonical parameters' ); }
 	foreach ( array(
 		array( 'customer_search', array() ), array( 'customer_search', array( 'email' => 'bad', 'offset' => 3 ) ),
 		array( 'customer_search', array( 'email' => "unsafe\r\nheader" ) ), array( 'customer_work_orders', array( 'customerId' => $uuid, 'updatedAfter' => '2026-01-01' ) ),
-		array( 'work_order', array( 'id' => '../escape' ) ), array( 'invoice', array( 'id' => $uuid ) ), array( 'leads_write', array() ),
+		array( 'work_order', array( 'id' => '../escape' ) ), array( 'invoice', array( 'id' => '../escape' ) ), array( 'leads_write', array() ),
 	) as $case ) { refused( fn() => T::url( ...$case ), 'missing/extra/unsupported selector or operation refused' ); }
 	$url = T::url( 'customer_search', array( 'email' => 'synthetic.selector@example.invalid' ) );
 	foreach ( array( 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD' ) as $method ) { tc( ! T::allowed( $method, $url ), 'non-GET business method refused' ); }

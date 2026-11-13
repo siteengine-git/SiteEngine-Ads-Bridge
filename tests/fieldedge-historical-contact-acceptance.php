@@ -1,0 +1,43 @@
+<?php
+/** Offline historical lookup assertions: no provider auth, no contact mutation. */
+require_once __DIR__ . '/../includes/connectors/fieldedge/HistoricalContactDiscovery.php';
+use SiteEngine\AdsBridge\Connectors\FieldEdge\HistoricalContactDiscovery;
+use SiteEngine\AdsBridge\Connectors\FieldEdge\SelectedCaseJournal;
+use SiteEngine\AdsBridge\Connectors\FieldEdge\TargetedRead;
+$n=0;
+$check=static function($ok,$label)use(&$n){ if(!$ok){throw new RuntimeException($label);}++$n;};
+$id1='00000000-0000-4000-8000-000000000001';
+$id2='00000000-0000-4000-8000-000000000002';
+$id3='00000000-0000-4000-8000-000000000003';
+$check(TargetedRead::url('invoice',['id'=>$id3])==='https://api.fieldedge.com/open-api/v1/invoices/'.$id3,'invoice exact URL');
+$check(TargetedRead::allowed('GET',TargetedRead::url('invoice',['id'=>$id3])),'invoice GET allowed');
+$check(!TargetedRead::allowed('POST',TargetedRead::url('invoice',['id'=>$id3])),'invoice POST refused');
+$check(!TargetedRead::allowed('GET','https://api.fieldedge.com/open-api/v1/invoices?offset=0'),'invoice enumeration refused');
+$tmp=tempnam(sys_get_temp_dir(),'fehist');
+unlink($tmp);
+$journal=new SelectedCaseJournal($tmp,str_repeat('a',64));
+$sequence=[];
+$get=static function($operation,$params)use(&$sequence,$id1,$id2,$id3){
+ $sequence[]=$operation;
+ if($operation==='customer_search')return ['total'=>1,'customers'=>[['id'=>$id1,'primaryEmail'=>'test@example.invalid']]];
+ if($operation==='customer_work_orders')return ['total'=>1,'data'=>[['workOrderId'=>$id2]]];
+ if($operation==='work_order')return ['workOrderId'=>$id2,'customerId'=>$id1,'invoiceId'=>$id3,'completed'=>true];
+ if($operation==='invoice')return ['invoiceId'=>$id3,'total'=>128.50,'balance'=>0,'payStatus'=>'Paid'];
+ throw new RuntimeException('unexpected test operation');
+};
+$c=[['crm_contact_id'=>'334','email'=>'test@example.invalid','source'=>'FluentForms','source_created_at'=>'2026-11-04 00:00:00','has_click_id'=>true]];
+$r=HistoricalContactDiscovery::run($get,$journal,$c);
+$check(count($r)===1 && $r[0]['provider_customer_found'],'exact customer matched');
+$check($r[0]['work_order_found'] && $r[0]['invoice_read_verified'],'work order and invoice');
+$check(!$r[0]['website_inquiry_attributed'] && $r[0]['status']==='Needs Review','no false attribution');
+$check($r[0]['crm_tags_used']===false,'tags ignored');
+$check($sequence===['customer_search','customer_work_orders','work_order','invoice'],'fixed bounded sequence');
+$check($r[0]['provider_relationships']['invoiceId']===$id3,'explicit invoice id');
+$check($r[0]['invoice_fields_present']===['total','balance','payStatus'],'invoice metadata only');
+unset($journal);unlink($tmp);
+$tmp=tempnam(sys_get_temp_dir(),'fehist');unlink($tmp);
+$journal=new SelectedCaseJournal($tmp,str_repeat('b',64));
+$notFound=HistoricalContactDiscovery::run(static fn($op,$p)=>['total'=>0,'customers'=>[]],$journal,$c);
+$check(!$notFound[0]['provider_customer_found'] && !$notFound[0]['work_order_found'],'no match holds');
+unset($journal);unlink($tmp);
+echo "PASS $n historical-contact assertions; provider requests=0\n";

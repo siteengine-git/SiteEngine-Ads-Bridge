@@ -28,7 +28,7 @@ final class TargetedRead {
 			unset( $value );
 			return $base . 'work-orders/search/by-address?' . http_build_query( $ordered + array( 'offset' => 0, 'limit' => 3 ), '', '&', PHP_QUERY_RFC3986 );
 		}
-		$routes = array( 'work_order' => 'work-orders/', 'customer' => 'customers/', 'lead' => 'leads/' );
+		$routes = array( 'work_order' => 'work-orders/', 'customer' => 'customers/', 'lead' => 'leads/', 'invoice' => 'invoices/' );
 		if ( isset( $routes[ $operation ] ) && $keys === array( 'id' ) ) {
 			self::id( $parameters['id'] );
 			return $base . $routes[ $operation ] . rawurlencode( $parameters['id'] );
@@ -66,8 +66,8 @@ final class TargetedRead {
 				unset( $query['offset'], $query['limit'] );
 				return self::url( 'address_work_orders', $query ) === $url;
 			}
-			if ( ! $query && preg_match( '#\A/open-api/v1/(work-orders|customers|leads)/([^/]+)\z#D', $p['path'] ?? '', $matches ) ) {
-				$operation = array( 'work-orders' => 'work_order', 'customers' => 'customer', 'leads' => 'lead' )[ $matches[1] ];
+			if ( ! $query && preg_match( '#\A/open-api/v1/(work-orders|customers|leads|invoices)/([^/]+)\z#D', $p['path'] ?? '', $matches ) ) {
+				$operation = array( 'work-orders' => 'work_order', 'customers' => 'customer', 'leads' => 'lead', 'invoices' => 'invoice' )[ $matches[1] ];
 				return self::url( $operation, array( 'id' => $matches[2] ) ) === $url;
 			}
 		} catch ( \Throwable $error ) { return false; }
