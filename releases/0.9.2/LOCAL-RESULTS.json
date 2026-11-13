@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "test": "product-setup-replacement.php",
+      "assertions": 80,
+      "status": "PASS"
+    },
+    {
+      "test": "product-setup-acceptance.php",
+      "assertions": 34,
+      "status": "PASS"
+    },
+    {
+      "test": "setup-workflow-acceptance.php",
+      "assertions": 16,
+      "status": "PASS"
+    },
+    {
+      "test": "setup-reporting-acceptance.php",
+      "assertions": 35,
+      "status": "PASS"
+    },
+    {
+      "test": "inquiry-acceptance.php",
+      "assertions": 45,
+      "status": "PASS"
+    },
+    {
+      "test": "lifecycle-acceptance.php",
+      "assertions": 18,
+      "status": "PASS"
+    },
+    {
+      "test": "unqualified-internal-acceptance.php",
+      "assertions": 6,
+      "status": "PASS"
+    },
+    {
+      "test": "reason-mapping-acceptance.php",
+      "assertions": 5,
+      "status": "PASS"
+    }
+  ],
+  "PHP_lints": 50,
+  "PHP": "8.3.36 -n",
+  "native_installed": false,
+  "native_browser_verified": false,
+  "Consent": "not rerun; dedicated reason row test explicitly makes no Consent acceptance claim",
+  "coverage": "Actual setup/lifecycle/inquiry/export algorithms, synthetic vendor/DB boundaries; no native/provider action"
+}

@@ -1,0 +1,15 @@
+{
+  "version": "0.9.2",
+  "designation": "LOCAL-VERIFIED INSTALLABLE; NATIVE ACCEPTANCE PENDING",
+  "package": "siteengine-ads-bridge-0.9.2.zip",
+  "bytes": 340031,
+  "sha256": "73af3771918fa2ca4a0b319df7218010a385c30decf31005e461a6f9f0b561b2",
+  "manifest_sha256": "8943c0a3a219ae0e3a82bcf6bb04448699660687314cffaf6958711708e7cd5c",
+  "source_commit": "bd0c57ef073b63f5c3f8c79077f77ad59a4e02eb",
+  "members": 79,
+  "PHP_files": 50,
+  "installed": false,
+  "native_browser_verified": false,
+  "released": false,
+  "current_delivery_replaced": false
+}
