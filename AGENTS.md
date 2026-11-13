@@ -1,3 +1,19 @@
+## Customer Rating correction - 0.9.2 local verification (2026-11-13)
+
+User reports a SiteEngine.io Customer Rating field with Excellent/Good/Fair/Poor.
+AB previously assumed customer_rating was its disqualification-reason dropdown.
+0.9.2 separates fresh defaults and normal setup mapping; preserves compatible
+explicit legacy mappings. Also removes unrelated rating reset during activation
+and preserves historical inquiry reasons under a dedicated mapping in All Leads.
+Local checks pass: 80 setup replacement, 34 product, 16 form, 35 reporting,
+45 inquiry, 18 lifecycle, 6 internal timing, 5 historical row assertions.
+No site installation or native/browser acceptance of 0.9.2 is claimed. Main
+SiteEngine.io is not a registered target in the inspected Access inventory;
+no owner/root/profile is invented and no production write has been performed.
+The accepted current 0.9.1 delivery remains intact until native acceptance.
+0.9.2 source and separately versioned local-verified package are ready for the
+reported main-site correction. No automation/provider/send/export action.
+
 ## Issue #3 completed - Ads Bridge 0.9.1 (2026-11-13)
 
 The minimum setup now includes all three FE fields from CRMProjection::definitions(),

@@ -17,13 +17,46 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
         $out[] = ['kind'=>'tag','role'=>'lost','purpose'=>'outcome_summary','title'=>'Lost'];
         return $out;
     }
+    /**
+     * Retain a compatible legacy reason field; never repurpose a real customer rating.
+     * Selection is read-only. The ordinary setup handler saves the resulting mapping.
+     */
+    public static function reason_field(): string {
+        $configured = SiteEngine_Ads_Bridge_Config::instance()->get(
+            'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason'
+        );
+        if (!is_string($configured)) {
+            throw new RuntimeException('Unqualified Reason field slug is invalid.');
+        }
+        if ($configured !== 'customer_rating') {
+            return $configured;
+        }
+        if (!class_exists('FluentCrm\\App\\Models\\CustomContactField')) {
+            throw new RuntimeException('FluentCRM custom-field manager unavailable.');
+        }
+        $manager = new \FluentCrm\App\Models\CustomContactField();
+        $global = $manager->getGlobalFields();
+        $fields = $global['fields'] ?? [];
+        if (!is_array($fields)) {
+            throw new RuntimeException('Malformed existing custom-field registry.');
+        }
+        $legacy = array_values(array_filter($fields, static fn($field) =>
+            is_array($field) && ($field['slug'] ?? null) === 'customer_rating'
+        ));
+        // Duplicate/malformed registries still fail the complete provisioning preflight.
+        if (count($legacy) === 1 && ($legacy[0]['type'] ?? null) === 'select-one' &&
+            array_values((array)($legacy[0]['options'] ?? [])) === SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values()) {
+            return 'customer_rating';
+        }
+        return 'se_ads_unqualified_reason';
+    }
     /** One complete setup contract, including connector storage but no live connector actions. */
-    public static function field_requirements(): array {
+    public static function field_requirements( ?string $reason_field = null ): array {
         if (!class_exists('SiteEngine\\AdsBridge\\Connectors\\FieldEdge\\CRMProjection')) {
             throw new RuntimeException('FieldEdge CRM definition contract is unavailable. No definitions were created.');
         }
         return array_merge(
-            SiteEngine_Ads_Bridge_Fields::required(),
+            SiteEngine_Ads_Bridge_Fields::required($reason_field ?? self::reason_field()),
             \SiteEngine\AdsBridge\Connectors\FieldEdge\CRMProjection::definitions()
         );
     }
@@ -41,7 +74,8 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
             if($existing && (string)$existing->title!==$title)throw new RuntimeException('CRM slug conflicts with another title: '.$title.'. Existing definition preserved.');
             $plan[]= $term+['class'=>$class,'slug'=>$slug,'id'=>$existing?(int)$existing->id:null];
         }
-        $definitions=self::field_requirements();
+        $reason_field=self::reason_field();
+        $definitions=self::field_requirements($reason_field);
         $fields=SiteEngine_Ads_Bridge_Fields::provision(false,$definitions);
         if($fields['conflicts'])throw new RuntimeException('CRM field definitions conflict: '.implode(', ',$fields['conflicts']).'. Existing fields and values preserved.');
         if($apply){
@@ -56,7 +90,8 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
             }unset($term);
             $fields=SiteEngine_Ads_Bridge_Fields::provision(true,$definitions);
         }
-        return ['terms'=>$plan,'fields'=>$fields];
+        return ['terms'=>$plan,'fields'=>$fields,'reason_field'=>$reason_field,
+            'reason_mapping_update_required'=>$reason_field !== ($data['fluentcrm']['lifecycle_automation']['unqualified_reason_field'] ?? 'se_ads_unqualified_reason')];
     }
     /** Exact configured feed evidence only; not proof a contact was delivered. */
     public static function feed(int $id): array {

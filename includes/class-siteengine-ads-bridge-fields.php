@@ -2,7 +2,7 @@
 /** Existing explicit vendor provisioning, shared by CLI and authenticated setup. */
 if (!defined('ABSPATH')) { exit; }
 final class SiteEngine_Ads_Bridge_Fields {
-    public static function required() {
+    public static function required( ?string $reason_field = null ) {
         $base = array(
                         array(
                                 'slug'  => 'invoiced_amount',
@@ -46,7 +46,7 @@ final class SiteEngine_Ads_Bridge_Fields {
                         ),
                 );
         $c=class_exists('SiteEngine_Ads_Bridge_Config')?SiteEngine_Ads_Bridge_Config::instance():null;
-        $slug=$c?$c->get('fluentcrm.lifecycle_automation.unqualified_reason_field','customer_rating'):'customer_rating';
+        $slug=$reason_field ?? ($c?$c->get('fluentcrm.lifecycle_automation.unqualified_reason_field','se_ads_unqualified_reason'):'se_ads_unqualified_reason');
         if(!is_string($slug)||!preg_match('/^[a-z][a-z0-9_]*$/D',$slug))throw new RuntimeException('Unqualified Reason field slug is invalid; review advanced lifecycle mappings.');
         foreach($base as$f)if($f['slug']===$slug)throw new RuntimeException('Unqualified Reason conflicts with standard field: '.$slug);
         $base[]=['slug'=>$slug,'label'=>'Unqualified Reason','type'=>'select-one','options'=>SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values()];

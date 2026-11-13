@@ -508,6 +508,15 @@ namespace {
     check_inq('retry'===$result['status'] && 'projection_field_mapping_invalid'===$result['reason_code'] && $calls===$contact->field_write_calls,'invalid reset field mapping cannot overwrite the canonical submission binding');
     SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
 
+
+    [$contact,$old,$new,$activation]=reset_case(48);
+    $contact->syncCustomFieldValues(array('customer_rating'=>'Excellent','se_ads_unqualified_reason'=>'Wrong Area'),false);
+    SiteEngine_Ads_Bridge_Config::instance()->overrides['fluentcrm.lifecycle_automation.unqualified_reason_field']='se_ads_unqualified_reason';
+    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
+    check_inq('committed'===$result['status'] && ($contact->custom_fields()['customer_rating']??null)==='Excellent','new inquiry activation preserves unrelated customer rating');
+    check_inq(!isset($contact->custom_fields()['se_ads_unqualified_reason']),'new inquiry activation resets configured reason only');
+    SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
+
     if (!defined('SEAB_INQUIRY_TEST_INCLUDE')) {
         echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
         exit($fails?1:0);

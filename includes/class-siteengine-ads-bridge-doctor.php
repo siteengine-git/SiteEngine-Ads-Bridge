@@ -769,7 +769,7 @@ class SiteEngine_Ads_Bridge_Doctor {
 			$required_fields[] = (string) $this->config->get( 'exports.won_jobs.date_field', 'closed_date' );
 		}
 		if ( (bool) $this->config->get( 'fluentcrm.lifecycle_automation.enabled', false ) ) {
-			$required_fields[] = (string) $this->config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' );
+			$required_fields[] = (string) $this->config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' );
 		}
 		$required_fields = array_values( array_unique( array_filter( $required_fields ) ) );
 

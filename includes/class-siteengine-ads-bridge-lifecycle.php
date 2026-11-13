@@ -422,7 +422,7 @@ final class SiteEngine_Ads_Bridge_Lifecycle {
 			}
 		}
 
-		$reason_field   = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+		$reason_field   = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 		$qualified_field = trim( (string) $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ) );
 		$unqualified_field = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 		$closed_field   = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );

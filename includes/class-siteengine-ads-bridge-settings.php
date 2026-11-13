@@ -99,7 +99,7 @@ final class SiteEngine_Ads_Bridge_Settings {
 				),
 				'lifecycle_automation' => array(
 					'enabled'                  => false,
-					'unqualified_reason_field' => 'customer_rating',
+					'unqualified_reason_field' => 'se_ads_unqualified_reason',
 					'unqualified_at_field'     => 'unqualified_at',
 					'stale_new_days'           => 3,
 				),

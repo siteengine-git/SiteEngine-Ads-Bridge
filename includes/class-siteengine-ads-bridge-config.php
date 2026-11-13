@@ -580,7 +580,7 @@ class SiteEngine_Ads_Bridge_Config {
 			'exports.all_leads.enabled'            => false,
 			'exports.all_leads.header_overrides'   => array(),
 			'fluentcrm.lifecycle_automation.enabled' => false,
-			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',
+			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'se_ads_unqualified_reason',
 			'fluentcrm.lifecycle_automation.unqualified_at_field' => 'unqualified_at',
 			'fluentcrm.lifecycle_automation.stale_new_days' => 3,
 			'exports.qualified_leads.enabled'       => false,

@@ -1,3 +1,11 @@
+## 0.9.2 - Separate Unqualified Reason from Customer Rating
+
+- New setups use se_ads_unqualified_reason; preserve compatible explicit legacy reason mappings.
+- Normal setup resolves an incompatible customer_rating mapping to the separate field after complete preflight; conflicting dedicated/custom fields still refuse.
+- Preserve Customer Rating during new-inquiry activation when it is not the configured reason field.
+- Historical inquiry reasons remain authoritative in All Leads with a dedicated CRM mapping; retain existing database and worksheet schemas.
+- No contact-value migration, marketing, sending, enrollment or external delivery.
+
 ## 0.9.1 - Complete minimal CRM requirements
 
 - Main setup preflights and provisions the combined Ads/FE contract, including

@@ -5643,14 +5643,18 @@ class SiteEngine_Ads_Bridge_CLI {
                 $sub_prop = function ( $name ) use ( $subscriber ) {
                         return is_object( $subscriber ) && isset( $subscriber->{$name} ) ? (string) $subscriber->{$name} : '';
                 };
-                $custom_value = function ( $slug ) use ( $subscriber, $custom, $inquiry ) {
+                $custom_value = function ( $slug ) use ( $subscriber, $custom, $inquiry, $config ) {
+                        // The historical column keeps its schema name; it stores this inquiry's reason.
+                        if (is_array($inquiry) && $slug === $config->get('fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason')) {
+                                return (string)($inquiry['customer_rating'] ?? '');
+                        }
                         if ( is_array( $inquiry ) && array_key_exists( $slug, $custom ) ) {
                                 return is_array( $custom[ $slug ] ) ? implode( '|', $custom[ $slug ] ) : (string) $custom[ $slug ];
                         }
                         return is_object( $subscriber ) ? $this->get_contact_custom_value( $subscriber, $custom, $slug ) : '';
                 };
 
-                $reason_field      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+                $reason_field      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
                 $qualified_field   = trim( (string) $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ) );
                 $unqualified_field = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 

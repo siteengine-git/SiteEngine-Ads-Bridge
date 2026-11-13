@@ -298,8 +298,8 @@ final class SiteEngine_Ads_Bridge_Admin {
             }
             try {
                 $requirements = SiteEngine_Ads_Bridge_Product_Setup::crm( false );
-                if ( array_filter( $requirements['terms'], static fn( $term ) => ! $term['id'] ) || $requirements['fields']['missing'] ) {
-                    $add( 'fluentcrm.requirements', 'Required CRM definitions are missing. Use Set up CRM requirements on this page.' );
+                if ( array_filter( $requirements['terms'], static fn( $term ) => ! $term['id'] ) || $requirements['fields']['missing'] || $requirements['reason_mapping_update_required'] ) {
+                    $add( 'fluentcrm.requirements', 'CRM definitions or their reason-field mapping need setup. Use Set up CRM requirements on this page.' );
                 }
             } catch ( Throwable $error ) {
                 $add( 'fluentcrm.requirements', $error->getMessage() );
@@ -429,7 +429,7 @@ final class SiteEngine_Ads_Bridge_Admin {
         echo '<h2>Setup</h2><p>Save incomplete configuration at any time. Saving does not run exports, send email or enroll contacts.</p>';
         self::render_shared_business($config);
         echo '<h2>CRM requirements</h2><p>Setup provides three lists, four lifecycle roles, a distinct Lost outcome tag, and required Ads / FieldEdge contact fields. Marketing templates, campaigns, sequences and the CRM builder are not prerequisites.</p>';
-        try{$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();$missing=count(array_filter($plan['terms'],static fn($x)=>!$x['id']))+count($plan['fields']['missing']);echo '<p>'.esc_html($missing?$missing.' required definitions are missing.':'Required CRM definitions exist.').'</p><ul>';foreach($plan['terms']as$t)if(!$t['id'])echo '<li>'.esc_html($t['title'].' — '.$t['kind']).'</li>';foreach($plan['fields']['missing']as$f)echo '<li>'.esc_html($f['label'].' — contact field').'</li>';echo '</ul>';}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';}
+        try{$plan=SiteEngine_Ads_Bridge_Product_Setup::crm();$missing=count(array_filter($plan['terms'],static fn($x)=>!$x['id']))+count($plan['fields']['missing']);echo '<p>'.esc_html($missing?$missing.' required definitions are missing.':'Required CRM definitions exist.').'</p><ul>';foreach($plan['terms']as$t)if(!$t['id'])echo '<li>'.esc_html($t['title'].' — '.$t['kind']).'</li>';foreach($plan['fields']['missing']as$f)echo '<li>'.esc_html($f['label'].' — contact field').'</li>';echo '</ul>';if($plan['reason_mapping_update_required'])echo '<p>Setup will use the separate Unqualified Reason field. Existing Customer Rating definitions and values are preserved.</p>';}catch(Throwable $e){echo '<p>'.esc_html($e->getMessage()).'</p>';}
         echo '<form id="seab-crm-requirements" method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="seab_crm_requirements">';wp_nonce_field('seab_crm_requirements');submit_button('Set up CRM requirements','secondary');echo '<p id="seab-crm-setup-status" role="status"></p></form>';
         if($config->external_override_active())echo '<p>An intentional external configuration controls these values. <a href="'.esc_url(admin_url('admin.php?page='.self::PAGE_SLUG.'&tab=settings&section=diagnostics')).'">Review settings source in Diagnostics</a>.</p>';
         self::form_open('product');self::$combined_form=true;
@@ -542,7 +542,7 @@ final class SiteEngine_Ads_Bridge_Admin {
         }
 		echo '</tbody></table><h2>Lifecycle Compliance Automation</h2><table class="form-table"><tbody>';
 		self::checkbox_row( 'Enable Lifecycle Compliance Automation', 'lifecycle_automation_enabled', (bool) $config->get( 'fluentcrm.lifecycle_automation.enabled', false ), 'When enabled: new master-form contacts receive New; lifecycle tags are kept mutually exclusive; Qualified stamps qualified_at; Unqualified records its event in Ads inquiry storage; Won stamps qualified_at and closed_date when blank. Invoice amount is never fabricated.' );
-		self::text_row( 'Unqualified Reason Field', 'unqualified_reason_field', $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ), 'Existing FluentCRM custom-field slug. Canonical choices: Wrong Area, Wrong Service, Wrong Product, Wrong Price, Spam / Junk, Other.' );
+		self::text_row( 'Unqualified Reason Field', 'unqualified_reason_field', $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ), 'Existing FluentCRM custom-field slug. Canonical choices: Wrong Area, Wrong Service, Wrong Product, Wrong Price, Spam / Junk, Other.' );
 		echo '<p>Unqualified event time is owned by the active Ads inquiry, not a required CRM field. Existing historical CRM values are preserved.</p>';
 		self::text_row( 'Stale New Warning (days)', 'stale_new_days', $config->get( 'fluentcrm.lifecycle_automation.stale_new_days', 3 ), 'Lead Compliance flags New contacts older than this threshold.' );
 		echo '</tbody></table>';
@@ -694,6 +694,7 @@ final class SiteEngine_Ads_Bridge_Admin {
                 $before=SiteEngine_Ads_Bridge_Settings::get();
                 $plan=SiteEngine_Ads_Bridge_Product_Setup::crm(true);
                 $data=SiteEngine_Ads_Bridge_Settings::merge(SiteEngine_Ads_Bridge_Settings::defaults(),$before?:SiteEngine_Ads_Bridge_Config::instance()->all());
+                $data['fluentcrm']['lifecycle_automation']['unqualified_reason_field']=$plan['reason_field'];
                 foreach($plan['terms']as$t){
                     if($t['kind']==='list')$data['fluentcrm']['lists'][$t['role']]=$t['title'];
                     elseif (($t['purpose']??'')!=='outcome_summary') $data['fluentcrm']['tags']['lifecycle'][$t['role']]=$t['title'];

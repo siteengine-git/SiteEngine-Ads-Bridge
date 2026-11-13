@@ -467,7 +467,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			$uf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 			$cf     = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
 			$vf     = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
-			$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+			$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 			$now    = self::utc_now();
 			$data   = array(
 				'inquiry_id'                   => $inquiry_id,
@@ -965,7 +965,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$uf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 		$cf     = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
 		$vf     = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
-		$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+		$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 		$lifecycle = self::subscriber_lifecycle_role( $subscriber );
         // Only an observed tag-add can establish an event, never a historical refresh.
         $unqualified_at=$row['unqualified_at']??null;
@@ -1279,7 +1279,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$uf      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 		$cf      = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
 		$vf      = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
-		$rf      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+		$rf      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 		$now     = self::utc_now();
 		$data = array(
 			'inquiry_id'                  => $inquiry_id,
@@ -1359,7 +1359,6 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			'qualified_at'                => '',
 			'closed_date'                 => '',
 			'invoiced_amount'             => '',
-			'customer_rating'             => '',
 			'lost_date'                   => '',
 			'ads_export_status'           => '',
 			'ads_exported_at'             => '',
@@ -1371,7 +1370,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			'exports.qualified_leads.date_field' => 'qualified_at',
 			'exports.won_jobs.date_field' => 'closed_date',
 			'exports.won_jobs.value_field' => 'invoiced_amount',
-			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',
+			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'se_ads_unqualified_reason',
 		);
 		foreach ( $fields as $key => $default ) {
 			$slug = trim( (string) $config->get( $key, $default ) );

@@ -94,7 +94,34 @@ SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck(array_slice($fields,0,3)===$ex
 $nativeSnapshot=serialize([$terms,$fields]);SiteEngine_Ads_Bridge_Product_Setup::crm(true);ck($saves===8&&$field_saves===1&&serialize([$terms,$fields])===$nativeSnapshot,'second complete setup is idempotent with existing FE definitions');
 [$terms,$fields,$saves,$field_saves]=$checkpoint;
 
-$reason=array_values(array_filter($fields,fn($f)=>$f['slug']==='customer_rating'))[0];ck($reason['type']==='select-one'&&$reason['field_key']==='single-select'&&$reason['options']===SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values(),'reason uses actual lifecycle vocabulary');
+
+// Regression: ordinary Customer Rating must remain unrelated to Ads disqualification.
+$savedState=[$terms,$fields,$saves,$field_saves,SiteEngine_Ads_Bridge_Config::instance()->data];
+$ratings=['slug'=>'customer_rating','label'=>'Customer Rating','type'=>'select-one','options'=>['Excellent','Good','Fair','Poor'],'retained_extension'=>'operator'];
+$terms=[];$fields=[$ratings];$saves=0;$field_saves=0;
+SiteEngine_Ads_Bridge_Config::instance()->data['fluentcrm']['lifecycle_automation']['unqualified_reason_field']='customer_rating';
+$p=SiteEngine_Ads_Bridge_Product_Setup::crm(false);
+ck($p['reason_field']==='se_ads_unqualified_reason'&&$p['reason_mapping_update_required']&&$fields===[$ratings]&&$saves===0&&$field_saves===0,'legacy rating collision previews separate reason field without writes');
+$p=SiteEngine_Ads_Bridge_Product_Setup::crm(true);
+ck($fields[0]===$ratings&&count(array_filter($fields,fn($f)=>$f['slug']==='se_ads_unqualified_reason'))===1,'setup preserves Excellent Good Fair Poor rating definition and creates separate reason field');
+$afterRating=serialize([$terms,$fields]);$counts=[$saves,$field_saves];SiteEngine_Ads_Bridge_Product_Setup::crm(true);
+ck($afterRating===serialize([$terms,$fields])&&[$saves,$field_saves]===$counts,'legacy collision repeat does not duplicate or replace definitions');
+SiteEngine_Ads_Bridge_Config::instance()->data['fluentcrm']['lifecycle_automation']['unqualified_reason_field']=$p['reason_field'];
+ck(!SiteEngine_Ads_Bridge_Product_Setup::crm()['reason_mapping_update_required'],'resolved saved reason mapping has no pending setup');
+$terms=[];$fields=[$ratings,['slug'=>'se_ads_unqualified_reason','label'=>'Conflicting reason','type'=>'text']];$saves=0;$field_saves=0;
+SiteEngine_Ads_Bridge_Config::instance()->data['fluentcrm']['lifecycle_automation']['unqualified_reason_field']='customer_rating';
+refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'dedicated reason collision still refuses');
+ck($fields[0]===$ratings&&$saves===0&&$field_saves===0,'dedicated conflict performs zero native definition writes');
+$fields=[['slug'=>'customer_rating','label'=>'Edited legacy reason','type'=>'select-one','options'=>SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values()]];
+$p=SiteEngine_Ads_Bridge_Product_Setup::crm(false);ck($p['reason_field']==='customer_rating'&&!$p['reason_mapping_update_required'],'compatible explicitly configured legacy reason field stays mapped');
+$fields=[];$p=SiteEngine_Ads_Bridge_Product_Setup::crm(false);ck($p['reason_field']==='se_ads_unqualified_reason','absent legacy reason field uses dedicated slug');
+$fields=[['slug'=>'custom_reason','label'=>'Custom reason','type'=>'text']];
+SiteEngine_Ads_Bridge_Config::instance()->data['fluentcrm']['lifecycle_automation']['unqualified_reason_field']='custom_reason';
+refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'unrelated custom reason mapping conflict is not silently redirected');
+ck($saves===0&&$field_saves===0,'custom conflict still blocks before writes');
+[$terms,$fields,$saves,$field_saves,SiteEngine_Ads_Bridge_Config::instance()->data]=$savedState;
+ck(SiteEngine_Ads_Bridge_Settings::defaults()['fluentcrm']['lifecycle_automation']['unqualified_reason_field']==='se_ads_unqualified_reason','fresh settings default uses separate Ads reason field');
+$reason=array_values(array_filter($fields,fn($f)=>$f['slug']==='se_ads_unqualified_reason'))[0];ck($reason['type']==='select-one'&&$reason['field_key']==='single-select'&&$reason['options']===SiteEngine_Ads_Bridge_Lifecycle::unqualified_reason_values(),'reason uses actual lifecycle vocabulary');
 $fields[1]['type']='wrong';refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'type conflict refuses before term creation');$fields[1]['type']='number';
 $terms[\FluentCrm\App\Models\Tag::class][] = clone $terms[\FluentCrm\App\Models\Tag::class][0];
 refuses(fn()=>SiteEngine_Ads_Bridge_Product_Setup::crm(true),'ambiguous tag identities refuse');array_pop($terms[\FluentCrm\App\Models\Tag::class]);

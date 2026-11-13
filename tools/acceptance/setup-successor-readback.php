@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 if(!current_user_can('manage_options'))throw new RuntimeException('Administrator identity required.');
 $plugin=SEAB_PLUGIN_DIR;$manifestFile=$plugin.'SUCCESSOR-MANIFEST.json';
 $m=json_decode(file_get_contents($manifestFile),true,128,JSON_THROW_ON_ERROR);
-if(($m['version']??null)!=='0.9.1'||SEAB_VERSION!=='0.9.1')throw new RuntimeException('Wrong installed candidate.');
+if(($m['version']??null)!=='0.9.2'||SEAB_VERSION!=='0.9.2')throw new RuntimeException('Wrong installed candidate.');
 $verified=0;foreach($m['payload']as$row){$p=$row['path'];if(str_contains($p,'..')||str_starts_with($p,'/')||str_contains($p,'\\'))throw new RuntimeException('Unsafe manifest path.');if(!is_file($plugin.$p)||!hash_equals($row['sha256'],hash_file('sha256',$plugin.$p)))throw new RuntimeException('Payload differs: '.$p);$verified++;}
 $c=SiteEngine_Ads_Bridge_Config::instance();$flags=['sheets'=>(bool)$c->get('google_sheets.enabled',false)];foreach(['all_leads','qualified_leads','won_jobs','lost_leads']as$family)$flags[$family]=(bool)$c->get('exports.'.$family.'.enabled',false);
 $feed=SiteEngine_Ads_Bridge_Product_Setup::feed((int)$c->get('fluent_forms.form_id',0));
