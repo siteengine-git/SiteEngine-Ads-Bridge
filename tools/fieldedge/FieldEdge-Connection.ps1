@@ -3,6 +3,7 @@ param(
     [ValidateSet('Provision','Status','Test','Discover','PilotDouble','HistoricalRead','LiveSnapshot')][string]$Action = 'Status',
     [string]$EvidenceFile,
     [string]$EvidenceSha256,
+    [string]$RunId,
     [string]$RouteFile,[string]$RouteSha256,[string]$CardFile,[string]$CardSha256,
     [string]$BridgeAdapterPath,[string]$BridgeAdapterSha256,
     [ValidateSet('review','simulate','disabled-execute')][string]$PilotMode='simulate'
@@ -99,6 +100,7 @@ try {
             '{"provisioned":true,"storage":"Windows DPAPI, current user and machine","network_requests":0}'
         }
     } else {
+        if ($RunId -and ($Action -ne 'LiveSnapshot' -or $RunId -notmatch '^[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8}$')) { throw 'invalid_live_run_id' }
         if ($Action -in @('Discover','HistoricalRead','LiveSnapshot')) {
             if ($EvidenceSha256 -notmatch '^[a-f0-9]{64}$' -or -not (Test-Path -LiteralPath $EvidenceFile -PathType Leaf)) { throw 'selected_evidence_unavailable' }
             Assert-NoLink $EvidenceFile
@@ -135,7 +137,7 @@ try {
             if ($Action -in @('Discover','HistoricalRead','LiveSnapshot')) {
                 $inputObject.evidence_file = (Resolve-Path -LiteralPath $EvidenceFile).Path
                 $inputObject.evidence_sha256 = $EvidenceSha256
-                $prefix = if ($Action -eq 'LiveSnapshot') { 'live-snapshot-pass-20261113' } elseif ($Action -eq 'HistoricalRead') { 'historical-contact-pass-20261113' } else { 'selected-case-pass' }
+                $prefix = if ($Action -eq 'LiveSnapshot') { if ($RunId) { 'live-snapshot-' + $RunId } else { 'live-snapshot-pass-20261113' } } elseif ($Action -eq 'HistoricalRead') { 'historical-contact-pass-20261113' } else { 'selected-case-pass' }
                 $inputObject.journal_file = Join-Path $privateDirectory ($prefix + '.journal.json')
                 $inputObject.findings_file = Join-Path $privateDirectory ($prefix + '.findings.json')
                 Assert-NoLink $inputObject.journal_file
@@ -168,7 +170,7 @@ try {
     $codes = @('unsafe_private_path','private_directory_acl_unconfirmed','credential_file_unavailable','credential_context_mismatch',
         'credential_bundle_incomplete','credential_bundle_decryption_unconfirmed','windows_dpapi_required','existing_bundle_preserved',
         'credential_input_incomplete','approved_php_runtime_unavailable','bounded_probe_timeout','probe_output_unconfirmed',
-        'selected_evidence_unavailable','selected_evidence_hash_mismatch')
+        'selected_evidence_unavailable','selected_evidence_hash_mismatch','invalid_live_run_id')
     $reason = if ($_.Exception.Message -in $codes) { $_.Exception.Message } else { 'secure_local_operation_unconfirmed' }
     [pscustomobject]@{provisioned_or_test_confirmed=$false;reason_code=$reason} | ConvertTo-Json -Compress
     if ($Action -eq 'Provision') { Write-Host 'No provider call was made. Existing credential files are preserved. Use -Action Status before retrying.' }
