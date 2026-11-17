@@ -1,3 +1,31 @@
+## Ads Bridge 0.9.5 ordinary Google credential Save ? November 17, 2026
+
+Integration Control's consolidated assignment completed from installed0.9.4.
+Source/runtime49fab3cb5e701c3090d9924337a2fdbf011fc207; exact Base2.6.1
+document-save-1 capability adopted in existing ads-bridge/google-sheets group.
+One translated write-only JSON field/Save through Base; Setup guidance updated.
+No Base/CB source edit or duplicate editor. File source/validator/test/switch preserved.
+ZIP7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5;
+82 exact installed members/51 local/native PHP lints;279 focused local checks;
+46 native WordPress/SQL handler assertions; authenticated synthetic browser valid,
+incomplete,malformed,blank Save/redaction and fresh revision1 readback passed.
+Fixture used a one-use synthetic session bootstrap, not main-site login acceptance.
+
+Actual credentials remain FILE; no real Base JSON/provider authentication/migration,
+provider request,Sheet write,export,call,message or client operation.0.9.4 file-auth
+evidence reused. Settings/effective config/journals/other covered options/autoload,
+18 tables,CRM fields,Base stores/key hash,Google file,wp-config preserved;105 frozen
+Base/CB file members unchanged. Cron digest changed; original raw payload uncaptured,
+cause/history restoration unproven. Current hooks inspected/no Ads export hook.
+Strict failure and bounded investigation retained; do not report complete cron equality.
+
+Two native/14 browser fixture tables,two synthetic users/sessions,fixture,key/config
+and request guards removed; maintenance absent; job AB-DOCUMENT-SAVE095-20261117
+complete/inflight null; executor independently FREE. AB private rollback backups retained.
+Versioned successor delivered; no stable publication or real credential transition.
+See releases/0.9.5/RESULTS.json and INTEGRATION-CONTROL-HANDOFF.md. All older overlapping
+credential prompts superseded; further shared-source work returns to Integration Control.
+
 ## Base Google credential adapter — 0.9.4 closeout, November 17, 2026
 
 Source00aef6caa7e1a3b355095da26f2df63e17f1e0d7; Base2.5.0/277c8c6 released dependency

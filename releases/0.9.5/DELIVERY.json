@@ -1,0 +1,16 @@
+{
+  "version": "0.9.5",
+  "designation": "Alma-installed development installable; focused synthetic UI acceptance; real file source retained",
+  "package": "siteengine-ads-bridge-0.9.5.zip",
+  "bytes": 348840,
+  "sha256": "7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5",
+  "manifest_sha256": "6d14a75357b3ec480d561192bc70d3efe26bd607fbf3d1881b6609099003a797",
+  "source_commit": "49fab3cb5e701c3090d9924337a2fdbf011fc207",
+  "members": 82,
+  "PHP_files": 51,
+  "installed": true,
+  "native_browser_verified": true,
+  "released": false,
+  "current_delivery_replaced": true,
+  "real_credentials_migrated": false
+}

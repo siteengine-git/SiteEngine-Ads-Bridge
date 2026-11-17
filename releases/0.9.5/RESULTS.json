@@ -1,0 +1,152 @@
+{
+  "version": "0.9.5",
+  "source_commit": "49fab3cb5e701c3090d9924337a2fdbf011fc207",
+  "scope": "AB-only adoption of Base document-save-1; ordinary document Save; preserve file runtime authority",
+  "dependency": {
+    "Base": {
+      "version": "2.6.1",
+      "source": "cdab9f1c9cb29e600b3cf492500f982a854711e4",
+      "evidence": "781c2ae4a32e277ffd66b58afbcf2cb438524749",
+      "contracts": [
+        "credentials-1",
+        "document-save-1"
+      ]
+    },
+    "CB": {
+      "version": "0.2.3",
+      "source_unchanged": true
+    }
+  },
+  "implementation": {
+    "module": "ads-bridge",
+    "group": "google-sheets",
+    "resource": "default",
+    "kind": "document",
+    "admin_mode": "simple",
+    "document_label": "Google service-account JSON",
+    "pure_complete_document_validator": "unchanged",
+    "capability_probe": "exact document-save-1; absent/wrong/throw preserves older Base administration",
+    "runtime_source_selection_and_authentication": "unchanged",
+    "no_duplicate_editor": true
+  },
+  "local": {
+    "runtime": "PHP8.3.36 with OpenSSL/Sodium",
+    "checks": 279,
+    "legacy_Base_assertions": 52,
+    "Base261_assertions": 53,
+    "missing_API_assertions": 1,
+    "capability_probe_cases": 4,
+    "setup_assertions": [
+      84,
+      34,
+      35,
+      16
+    ],
+    "PHP_lints": 51,
+    "limits": "Actual AB algorithms and pinned Base crypto/service; storage/WordPress/provider boundaries are doubles. Not native Google proof."
+  },
+  "native": {
+    "PHP": "8.3.36",
+    "installed_members": 82,
+    "installed_PHP_lints": 51,
+    "Save_assertions": 46,
+    "isolated_SQL": true,
+    "normal_admin_handler_with_real_WordPress_nonce": true,
+    "checks": [
+      "actual installed declaration",
+      "ordinary document Save",
+      "fresh complete JSON/PEM readback",
+      "AB resolver",
+      "invalid/malformed/private-key/provider-endpoint rejection",
+      "definite rejection preserves ciphertext and audit",
+      "blank retention",
+      "nonce/capability/CAS refusal",
+      "labeled write-only rendering",
+      "real file source isolation",
+      "no provider HTTP"
+    ],
+    "limits": "Native handler invoked from CLI with redirect interception; browser submissions are separately documented."
+  },
+  "browser": {
+    "authenticated_synthetic_fixture": true,
+    "consumer": "Exact installed AB0.9.5 credential class; installed Base2.6.1 copy; isolated WordPress core tables/key/configuration",
+    "authentication": "One-use disposable-fixture session bootstrap; not acceptance of password login or main administrator authentication",
+    "one_write_only_JSON_field": true,
+    "translated_label": true,
+    "one_Save": true,
+    "valid_document_saved": true,
+    "incomplete_document_rejected": true,
+    "malformed_JSON_rejected": true,
+    "blank_retains": true,
+    "field_empty_after_Save": true,
+    "provider_authentication_claimed": false,
+    "fresh_native_readback": {
+      "revision": 1,
+      "credential_rows": 1,
+      "audit_rows": 1,
+      "blank_and_rejected_input_preserves_exact_row_and_audit": true,
+      "synthetic_RSA_document_valid": true
+    },
+    "screenshot": "admin-document-save.jpg",
+    "main_full_Setup_browser_acceptance": false,
+    "main_Setup_native_render_guidance_and_deep_link": true,
+    "Cloudflare_policy_changed": false,
+    "limits": "Fresh cloud-browser fixture succeeded; prior 0.9.4 HTTP client's403/1010 is not declared universally fixed. No real main-site credential form submission."
+  },
+  "preservation": {
+    "settings_effective_configuration_and_existing_journals": true,
+    "other_covered_option_hashes_and_autoload": true,
+    "covered_table_snapshots": 18,
+    "CRM_fields": true,
+    "wp_config_exact": true,
+    "Base_ciphertext_audit_and_host_key_hash": true,
+    "Google_file_hash": true,
+    "Base_CB_frozen_file_members": 105,
+    "Base_CB_source_edits": false,
+    "cron_digest_equal": false,
+    "cron_limit": "Cron option digest changed during the job. Original serialized payload was not captured; exact historical per-event comparison/cause attribution/restoration is not established. Current hooks inspected; no Ads export hook. No cron or export job explicitly executed.",
+    "cron_before_sha256": "991d3beebd0ff825bb8617b9a0eb5afa5bf0bbce34dd4e7986264af46d3f69b4",
+    "cron_checkpoint_sha256": "393b73ef65671508b12ea9d70bab0549980650b8e8239db6b60d8f0be30e0bc4",
+    "request_local_guard_followup": "Schedule veto removed from task-only guard; subsequent pre_update_option_cron audit recorded no guarded-request writes. This does not establish the cause of prior drift. Current serialized cron retained privately for later comparison."
+  },
+  "actual_credentials": {
+    "source": "file",
+    "file_preserved": true,
+    "real_values_changed": false,
+    "Base_document_entered_by_administrator": false,
+    "Base_real_provider_authentication": false,
+    "source_transition": false,
+    "no_automatic_import_fallback_rotation_deletion": true,
+    "file_Google_authentication_evidence": "Accepted0.9.4 reused; not repeated in this job"
+  },
+  "cleanup": {
+    "native_synthetic_tables_removed": 2,
+    "browser_synthetic_tables_removed": 14,
+    "browser_users_sessions_removed": 2,
+    "fixture_removed": true,
+    "synthetic_key_configuration_removed": true,
+    "one_use_entry_removed": true,
+    "request_guards_removed": true,
+    "maintenance_absent": true,
+    "job": "AB-DOCUMENT-SAVE095-20261117",
+    "job_state": "complete",
+    "inflight": null,
+    "executor": "independently verified free",
+    "private_backups_retained": true
+  },
+  "failures_retained": [
+    "Local setup harness first omitted OpenSSL extension; no site mutation. Corrected extension configuration passed.",
+    "Initial native launch used unavailable pwsh executable; no native process started, no backup/replacement/maintenance. Independent readback preceded corrected powershell.exe invocation.",
+    "Strict preservation comparison refused cron digest drift. Bounded read-only investigation and explicit limitation retained; no speculative restoration."
+  ],
+  "UI_integration_completed": true,
+  "real_credentials_migrated_and_verified": false,
+  "Google_or_Twilio_requests": 0,
+  "Sheet_writes": 0,
+  "exports_calls_messages_client_operations": 0,
+  "implemented": true,
+  "packaged": true,
+  "installed": true,
+  "verified": "Focused local/native/synthetic-browser scope with explicit cron and real-credential limits",
+  "released": false
+}
