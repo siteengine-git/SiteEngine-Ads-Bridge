@@ -32,14 +32,17 @@ require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-google.php';
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-settings.php';
 $config=SiteEngine_Ads_Bridge_Config::$c=new SiteEngine_Ads_Bridge_Config(['google_sheets'=>['credentials_source'=>'base','spreadsheet_id'=>'synthetic_sheet_123','credentials_path'=>'/not-used']]);
 if(in_array('--without-base',$argv,true)){refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::resolve($config),'missing API refuses before file fallback');exit;}
-$root=getenv('SEAB_BASE_SOURCE');$pin=json_decode(file_get_contents(__DIR__.'/base-250-dependency-pins.json'),true);
-foreach($pin['files']as$f=>$sha){$p=$root.'/includes/'.$f;ck(is_file($p)&&hash_file('sha256',$p)===$sha,'exact Base2.5.0 '.$f);require $p;}
+$simple=in_array('--document-save',$argv,true);
+$root=getenv('SEAB_BASE_SOURCE');$pin=json_decode(file_get_contents(__DIR__.($simple?'/base-261-dependency-pins.json':'/base-250-dependency-pins.json')),true);
+foreach($pin['files']as$f=>$sha){$p=$root.'/includes/'.$f;ck(is_file($p)&&hash_file('sha256',$p)===$sha,'exact Base dependency '.$f);require $p;}
 $store=new MemoryStore;$key=str_repeat(chr(37),32);$installation='11111111-1111-4111-8111-111111111111';
 $service=new SiteEngine_Base_Credentials($store,fn()=>['installation'=>$installation,'active_key'=>'fixture','keys'=>['fixture'=>$key]]);
 $prop=new ReflectionProperty(SiteEngine_Base_Credentials::class,'service');$prop->setValue(null,$service);
 SiteEngine_Ads_Bridge_Credentials::register();SiteEngine_Ads_Bridge_Credentials::register();
 $d=SiteEngine_Base_Credential_Registry::get('ads-bridge','google-sheets');
 ck($d['kind']==='document'&&$d['purposes']===['sheets-auth']&&$d['authority']==='base','single stable document registration allows protected entry while file source remains selected');
+ck(($d['admin_mode']??'staged')===($simple?'simple':'staged'),'ordinary Save opt-in only on exact supported document contract');
+if($simple)ck($d['document_label']==='Google service-account JSON'&&str_contains(SiteEngine_Ads_Bridge_Credentials::setup_guidance(),'click Save credentials'),'translated document label and ordinary Save guidance');
 ck(!$d['allow_remove']&&!$d['allow_rollback']&&$d['allow_replace'],'no implicit remove or rollback; protected replacement supported');
 ck(str_contains(SiteEngine_Ads_Bridge_Credentials::admin_url(),'module=ads-bridge&credential=google-sheets'),'actual registered Base group link');
 $allowed=false;ck(SiteEngine_Ads_Bridge_Credentials::admin_url()===null,'unauthorized link safely omitted');$allowed=true;
@@ -52,8 +55,8 @@ try {
     ck(SiteEngine_Ads_Bridge_Credentials::document($raw)['private_key']===$pem,'formatted JSON and multiline RSA key preserved');
     $_SERVER['REQUEST_METHOD']='POST';$context=['nonce'=>'fixture','installation'=>$installation];
     $cmd=function($op,$extra=[])use($context,$service){$m=$service->metadata('ads-bridge','google-sheets','default');$r=$service->command(array_merge(['module'=>'ads-bridge','credential'=>'google-sheets','resource'=>'default','operation'=>$op,'expected_revision'=>$m['revision'],'operation_id'=>wp_generate_uuid4()],$extra),$context);if(is_wp_error($r))throw new RuntimeException('Fixture Base command failed '.$r->code);return $r;};
-    $stage=$cmd('stage',['candidate'=>$raw]);refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::resolve($config),'staged-only document not active');
-    $cmd('activate',['version_id'=>$stage['staged_version']]);
+    if($simple){$cmd('save',['candidate'=>$raw]);ck($service->metadata('ads-bridge','google-sheets','default')['staged_version']===null,'ordinary Save creates active document without intermediate stage');}
+    else{$stage=$cmd('stage',['candidate'=>$raw]);refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::resolve($config),'staged-only document not active');$cmd('activate',['version_id'=>$stage['staged_version']]);}
     ck(SiteEngine_Ads_Bridge_Credentials::resolve($config)['credentials']===$data,'actual encrypted Base service decrypts exact active document');
     ck(!str_contains(json_encode($store->rows),$pem)&&!str_contains(json_encode($store->audit),'private_key'),'encrypted store/audit contain no plaintext document');
     define('WP_CLI',true);require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-cli.php';
@@ -77,7 +80,7 @@ try {
     $options['seab_settings_v2']=$config->data;
     foreach(['authfail','denied','transport','mismatch']as$mode){$http=$mode;$w=$writes;refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::test_and_select('base',$file,'synthetic_sheet_123'),'provider '.$mode.' blocks transition');ck($writes===$w,'failed test does not select source');}
     $http='ok';$mutate=function()use($config){$GLOBALS['options']['seab_settings_v2']['late']='preserve';};refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::test_and_select('base',$file,'synthetic_sheet_123'),'concurrent settings change refuses transition');$options['seab_settings_v2']=$config->data;
-    $mutate=function()use($cmd,$raw){$stage=$cmd('stage',['candidate'=>$raw]);$cmd('activate',['version_id'=>$stage['staged_version']]);};refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::test_and_select('base',$file,'synthetic_sheet_123'),'credential change during test refuses transition');
+    $mutate=function()use($cmd,$raw,$simple){if($simple){$cmd('save',['candidate'=>$raw]);}else{$stage=$cmd('stage',['candidate'=>$raw]);$cmd('activate',['version_id'=>$stage['staged_version']]);}};refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::test_and_select('base',$file,'synthetic_sheet_123'),'credential change during test refuses transition');
     $busy=true;refusal(fn()=>SiteEngine_Ads_Bridge_Credentials::test_and_select('base',$file,'synthetic_sheet_123'),'active writer protects transition');$busy=false;
     $r=SiteEngine_Ads_Bridge_Credentials::test_and_select('base',$file,'synthetic_sheet_123');
     ck(!isset($r['identity'])&&$options['seab_settings_v2']['google_sheets']['credentials_source']==='base','explicit verified selection saves only source, not secret/fingerprint');

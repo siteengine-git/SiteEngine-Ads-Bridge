@@ -1,7 +1,9 @@
-# Google Sheets credentials — Ads Bridge 0.9.4
+# Google Sheets credentials — Ads Bridge 0.9.5
 
-Base 2.5.0 (released source `277c8c629dd3b3ffff32011030d055b942ea5076`)
-owns protected entry, encryption, staging and activation. Ads registers module
+Base 2.6.1 (accepted Alma source `cdab9f1c9cb29e600b3cf492500f982a854711e4`)
+owns protected entry, encryption and ordinary document Save. Ads opts in only when
+the exact additive `document-save-1` probe succeeds; older Base versions retain
+their existing document controls. Base 2.5.0 remains the published stable baseline. Ads registers module
 `ads-bridge`, group `google-sheets`, resource `default`, kind `document`, purpose
 `sheets-auth`. The Setup link uses Base's authorized group URL helper. No secret
 input/upload, browser secret readback or Media Library route is added to Ads.
@@ -12,8 +14,11 @@ input/upload, browser secret readback or Media Library route is added to Ads.
    absent. Keep the private absolute path in Setup. Page loads and Save settings
    make no Google requests. Saving incomplete setup remains supported.
 2. To use Base, follow **Manage Google service-account JSON in Base Credentials**.
-   Enter the complete JSON document in Base's write-only form, stage it, then
-   explicitly activate it using Base's protected controls. Staging is not activation.
+   Paste the complete JSON document into the field labeled **Google service-account
+   JSON** and click **Save credentials**. The document becomes active in Base's
+   protected store; Ads continues using its separately selected source. Ordinary
+   administration does not require separate Stage or Activate actions when the
+   exact document-save-1 capability is available.
    Ads does not read the legacy file into Base, replace it or change permissions.
 3. Save the desired spreadsheet ID and preserved file path in Ads Setup first.
    Select Base as the **source to test**, then **Test connection**. This deliberate
@@ -49,7 +54,7 @@ inquiry identity, replay protection and 21/94-column contracts are unchanged.
 CLI preflights and web tests use the same resolver. Actual scheduler execution
 remains a distinct context check; inspecting CLI is not running cron.
 
-Base's group remains available for staging while the Ads file source is selected.
+Base's group remains available for protected Save while the Ads file source is selected.
 That is protected Base document administration, not a transfer of Ads runtime
 source authority. Intentional external Ads configuration retains precedence:
 WordPress source switching is refused. Its owner must first verify the desired
@@ -62,8 +67,8 @@ Select File, then **Verify and use selected source** to deliberately return to
 the retained file/path after fresh verification. The old source label is retained
 as `credentials_previous_source`; it is not an automatic recovery policy. No old
 credential material, tokens or private fingerprints enter ordinary options,
-diagnostics, logs, exports or browser results. Base replacements require its own
-explicit stage/activate controls. Ads opts out of Base remove/rollback operations;
+diagnostics, logs, exports or browser results. Base replacements use its protected Save action with document-save-1;
+older Base versions retain explicit stage/activate controls. Ads opts out of Base remove/rollback operations;
 it does not purge audit/history, keys or encrypted tables.
 
 Before software rollback to a version lacking this adapter, deliberately switch
@@ -73,7 +78,7 @@ If that verification is unavailable, preserve state and keep delivery disabled.
 Back up plugin files/configuration and retain Base's existing paired encrypted
 data/key recovery custody; this adapter creates or removes neither.
 
-The 0.9.4 package also carries the already locally verified 0.9.2/0.9.3 Customer
+The 0.9.5 package also carries the already locally verified 0.9.2/0.9.3 Customer
 Rating/Unqualified Reason separation and Estimated Value definition. Their existing
 evidence remains distinct; a credential test does not establish a new native CRM
 provisioning, lifecycle, browser form or advertising acceptance campaign.

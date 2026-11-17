@@ -1,4 +1,4 @@
-# SiteEngine Ads Bridge 0.9.4
+# SiteEngine Ads Bridge 0.9.5
 
 Ads Bridge connects a selected Fluent Forms lead form, FluentCRM lifecycle and
 SiteEngine Consent to retained advertising inquiries and append-only Google
@@ -19,7 +19,8 @@ Estimated value remains separate from actual invoiced revenue.
 
 ## Google credentials
 
-Base2.5.0 supplies protected JSON entry, encryption and stage/activate controls.
+Base2.6.1 document-save-1 supplies one write-only JSON field and Save credentials.
+Earlier Base versions retain their existing protected document controls.
 Ads Setup links to its Google Sheets group. Existing file credentials stay active.
 Test connection performs only authentication and spreadsheet identity GET.
 Switch explicitly with Verify and use selected source after saving the target.

@@ -10,17 +10,37 @@ final class SiteEngine_Ads_Bridge_Credentials {
 
     public static function register(): void {
         if (self::$registered || !function_exists('siteengine_register_credentials_v1')) return;
-        $r = siteengine_register_credentials_v1(self::MODULE, self::GROUP, [
-            'label'=>'Google Sheets service-account JSON', 'module_label'=>'Ads Bridge',
+        $definition = [
+            'label'=>__('Google Sheets service-account JSON', 'siteengine-ads-bridge'),
+            'module_label'=>__('Ads Bridge', 'siteengine-ads-bridge'),
             'kind'=>'document', 'purposes'=>[self::PURPOSE], 'authority'=>'base',
             'validator'=>static function($value,$resource) {
                 if ($resource !== 'default') return false;
                 try { self::document($value); return true; } catch (Throwable $e) { return false; }
             },
-            // Base replacement requires a deliberate protected stage/activate. No automatic migration/removal.
+            // Base administration never changes Ads runtime source selection.
             'allow_replace'=>true, 'allow_remove'=>false, 'allow_rollback'=>false,
-        ]);
+        ];
+        if (self::simple_document_save()) {
+            $definition['admin_mode'] = 'simple';
+            $definition['document_label'] = __('Google service-account JSON', 'siteengine-ads-bridge');
+        }
+        $r = siteengine_register_credentials_v1(self::MODULE, self::GROUP, $definition);
         self::$registered = $r === true;
+    }
+    /** Exact additive capability probe; older Base document administration is preserved. */
+    public static function simple_document_save(): bool {
+        if (!function_exists('siteengine_credentials_document_save_contract_version')) return false;
+        try {
+            return siteengine_credentials_document_save_contract_version() === 'document-save-1';
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
+    public static function setup_guidance(): string {
+        return self::simple_document_save()
+            ? __('Paste the complete service-account JSON in Base Credentials and click Save credentials. Then test the Base source here before deliberately selecting it. Saving credentials does not switch the active source.', 'siteengine-ads-bridge')
+            : __('This Base version uses protected Stage and Activate controls. Complete those in Base Credentials, then test the Base source here before deliberately selecting it.', 'siteengine-ads-bridge');
     }
     public static function admin_url(): ?string {
         if (!function_exists('siteengine_credentials_admin_url_v1')) return null;
@@ -33,7 +53,7 @@ final class SiteEngine_Ads_Bridge_Credentials {
         if (!is_string($s) || !in_array($s,['file','base'],true)) throw new RuntimeException('Credential source is invalid. Choose a verified file or Base source in Setup; no fallback was used.');
         return $s;
     }
-    /** Pure format/key validation, shared by Base stage/activation and runtime reads. No provider request. */
+    /** Pure format/key validation, shared by Base credential administration and runtime reads. No provider request. */
     public static function document($raw): array {
         if (!is_string($raw) || strlen($raw)>self::LIMIT || !str_starts_with(ltrim($raw),'{')) throw new RuntimeException('Service-account document must be a JSON object within 128 KiB. Contents omitted.');
         $c=json_decode($raw,true,32);
@@ -56,7 +76,7 @@ final class SiteEngine_Ads_Bridge_Credentials {
             try { if(siteengine_credentials_contract_version()!=='credentials-1')throw new RuntimeException('Unknown contract');
                 $r=siteengine_credentials_runtime_read_v1(self::MODULE,self::GROUP,'default',self::PURPOSE); }
             catch (Throwable $e) { throw new RuntimeException('Base credential read is unavailable. No file fallback was used.'); }
-            if (is_wp_error($r) || !is_array($r) || ($r['kind']??null)!=='document' || !is_string($r['version_id']??null) || !preg_match('/^[a-f0-9-]{36}$/D',$r['version_id']) || !is_int($r['revision']??null)) throw new RuntimeException('No accessible active Base Google credential. Enter and activate the document in Base Credentials; no file fallback was used.');
+            if (is_wp_error($r) || !is_array($r) || ($r['kind']??null)!=='document' || !is_string($r['version_id']??null) || !preg_match('/^[a-f0-9-]{36}$/D',$r['version_id']) || !is_int($r['revision']??null)) throw new RuntimeException('No accessible active Base Google credential. '.self::setup_guidance().' No file fallback was used.');
             return ['credentials'=>self::document($r['value']??null),'source'=>'base','identity'=>$r['version_id'].':'.$r['revision']];
         }
         $path=$path??$config->get('google_sheets.credentials_path','');

@@ -610,7 +610,7 @@ final class SiteEngine_Ads_Bridge_Admin {
         $state=SiteEngine_Ads_Bridge_Credentials::status($config);
         echo '<tr><th>Credential source</th><td><strong>'.esc_html($state['source']).'</strong><p>'.esc_html($state['message']).'</p>';
         $url=SiteEngine_Ads_Bridge_Credentials::admin_url();
-        if($url)echo '<p><a href="'.esc_url($url).'">Manage Google service-account JSON in Base Credentials</a></p>';
+        if($url)echo '<p><a href="'.esc_url($url).'">Manage Google service-account JSON in Base Credentials</a></p><p>'.esc_html(SiteEngine_Ads_Bridge_Credentials::setup_guidance()).'</p>';
         else echo '<p>Base credential group is unavailable or you lack permission. No alternate credential entry is provided here.</p>';
         echo '<label for="seab-credential-test-source">Source to test / explicitly select</label> <select id="seab-credential-test-source"><option value="file" '.selected($state['source'],'file',false).'>File</option><option value="base" '.selected($state['source'],'base',false).'>Base protected document</option></select><p>Test connection never saves or changes the active source. To switch or roll back, first save draft path/spreadsheet changes, then verify and select the intended source. The old file and path remain untouched. Authentication failure never falls back.</p>';
         echo '<button type="button" class="button" id="seab-test-sheets" data-nonce="'.esc_attr(wp_create_nonce('seab_test_sheets')).'">Test connection</button> <button type="button" class="button" id="seab-select-credentials">Verify and use selected source</button><p id="seab-sheets-result" role="status"></p></td></tr>';
