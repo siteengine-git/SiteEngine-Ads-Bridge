@@ -13,21 +13,31 @@
         }
     });
     form.addEventListener('input', () => {
+        const priorResult = document.getElementById('seab-sheets-result');
+        if (priorResult) priorResult.textContent = 'Settings edited. Test the displayed values explicitly; no provider request was made.';
         status.textContent = new URLSearchParams(new FormData(form)).toString() === original
             ? 'Displayed settings match the saved values.' : 'Unsaved changes. Use Save settings to retain them.';
     });
     const button = document.getElementById('seab-test-sheets'), output = document.getElementById('seab-sheets-result');
-    button.addEventListener('click', async () => {
-        button.disabled = true; output.textContent = 'Testing draft connection (read only)…';
+    const select = document.getElementById('seab-select-credentials');
+    const test = async (choose = false) => {
+        if (choose && new URLSearchParams(new FormData(form)).toString() !== original) { output.textContent = 'Save your draft settings before switching credential source.'; return; }
+        button.disabled = true; if (select) select.disabled = true; output.textContent = 'Testing draft connection (read only)...';
         const body = new FormData();
         body.set('action', 'seab_test_sheets'); body.set('_ajax_nonce', button.dataset.nonce);
         for (const key of ['credentials_path', 'spreadsheet_id']) body.set(key, form.elements[key].value);
+        body.set('credential_test_source', document.getElementById('seab-credential-test-source')?.value || 'file');
+        if (choose) body.set('select_source', '1');
         const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 25000);
         try {
             const response = await fetch(ajaxurl, { method: 'POST', credentials: 'same-origin', body, signal: controller.signal });
             const result = await response.json();
+            if (choose && result.success === true) { window.location.reload(); return; }
             output.textContent = typeof result.data?.message === 'string' ? result.data.message : 'Connection test returned incomplete evidence; no write access is established.';
-        } catch (_) { output.textContent = 'Connection test did not complete. No export or row append was requested.'; }
-        finally { clearTimeout(timer); button.disabled = false; }
-    });
+        } catch (_) { output.textContent = 'Connection test/source selection did not complete. Reload to inspect the selected source before retrying. No export or row append was requested.'; }
+        finally { clearTimeout(timer); button.disabled = false; if (select) select.disabled = false; }
+    };
+    document.getElementById('seab-credential-test-source')?.addEventListener('change', () => { output.textContent = 'Source to test changed; active source is unchanged. Test explicitly.'; });
+    button.addEventListener('click', () => test(false));
+    if (select) select.addEventListener('click', () => test(true));
 })();

@@ -938,13 +938,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 			);
 		}
 
-        $context='Context: PHP '.PHP_VERSION.' / '.PHP_SAPI.'; effective UID '.(function_exists('posix_geteuid')?posix_geteuid():'unavailable').'. Web and scheduler users may differ; verify each context. No secret contents read.';
-        if($creds_path===''){$state='Missing path: set google_sheets.credentials_path in Ads Bridge > Google Sheets.';$ok=false;}
-        elseif(is_file($creds_path)&&is_readable($creds_path)){$state='Credential file exists and is readable in this execution context.';$ok=true;}
-        elseif(file_exists($creds_path)){$state='Configured path exists but is not a readable regular file. Have the administrator inspect the intended file and context; no permission change is performed.';$ok=false;}
-        elseif(is_dir(dirname($creds_path))&&is_readable(dirname($creds_path))&&(DIRECTORY_SEPARATOR==='\\'||is_executable(dirname($creds_path)))){$state='Configured credential file is missing in an accessible directory. Supply the intended credential file outside the web root.';$ok=false;}
-        else{$state='File existence/readability cannot be established because its parent is unavailable or inaccessible. Ask the administrator to verify this exact execution context.';$ok=false;}
-        $this->add_result($ok?self::STATUS_PASS:($enabled?self::STATUS_FAIL:self::STATUS_WARN),'Google Sheets credentials',$state.' '.$context);
+        $status=SiteEngine_Ads_Bridge_Credentials::status($this->config);
+        $context=' Context: PHP '.PHP_VERSION.' / '.PHP_SAPI.'; effective UID '.(function_exists('posix_geteuid')?posix_geteuid():'unavailable').'. Web and scheduler identities may differ.';
+        $this->add_result($status['locally_valid']?self::STATUS_PASS:($enabled?self::STATUS_FAIL:self::STATUS_WARN),'Google Sheets credentials','Source: '.$status['source'].'. '.$status['message'].$context);
 
 		if ( in_array( $vio, array( 'RAW', 'USER_ENTERED' ), true ) ) {
 			$this->add_result(

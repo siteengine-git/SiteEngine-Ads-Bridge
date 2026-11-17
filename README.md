@@ -1,4 +1,4 @@
-# SiteEngine Ads Bridge 0.9.3
+# SiteEngine Ads Bridge 0.9.4
 
 Ads Bridge connects a selected Fluent Forms lead form, FluentCRM lifecycle and
 SiteEngine Consent to retained advertising inquiries and append-only Google
@@ -16,6 +16,14 @@ customer_rating mapping while preserving its definition and contact values.
 
 Setup also creates Estimated Value (estimated_value) as a numeric CRM field.
 Estimated value remains separate from actual invoiced revenue.
+
+## Google credentials
+
+Base2.5.0 supplies protected JSON entry, encryption and stage/activate controls.
+Ads Setup links to its Google Sheets group. Existing file credentials stay active.
+Test connection performs only authentication and spreadsheet identity GET.
+Switch explicitly with Verify and use selected source after saving the target.
+No automatic import or fallback. See [credential setup and rollback](docs/GOOGLE-CREDENTIALS.md).
 
 ## Setup
 

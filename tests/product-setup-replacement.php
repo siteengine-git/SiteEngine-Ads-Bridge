@@ -57,6 +57,7 @@ require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-settings.php';
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-lifecycle.php';
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-setup.php';
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-fields.php';
+require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-credentials.php';
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-product-setup.php';
 require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-admin.php';
 require dirname(__DIR__).'/includes/connectors/fieldedge/ConnectorDiagnostics.php';
@@ -158,7 +159,9 @@ class WP_Error {}
 function is_wp_error($v){return $v instanceof WP_Error;}
 function wp_remote_get($url,$args){$GLOBALS['requests'][]=[$url,$args];return $GLOBALS['response'];}
 function wp_remote_retrieve_response_code($r){return $r['code'];}function wp_remote_retrieve_body($r){return $r['body'];}
-$credential=tempnam(sys_get_temp_dir(),'seab-fixture-');file_put_contents($credential,json_encode(['type'=>'service_account','client_email'=>'fixture@example.invalid','private_key'=>'synthetic-not-a-key']));
+$credential=tempnam(sys_get_temp_dir(),'seab-fixture-');
+$key=openssl_pkey_new(['private_key_bits'=>2048,'private_key_type'=>OPENSSL_KEYTYPE_RSA,'config'=>getenv('OPENSSL_CONF')]);openssl_pkey_export($key,$pem,null,['config'=>getenv('OPENSSL_CONF')]);
+file_put_contents($credential,json_encode(['type'=>'service_account','project_id'=>'synthetic','private_key_id'=>'test','client_id'=>'123','client_email'=>'fixture@synthetic.iam.gserviceaccount.com','private_key'=>$pem,'token_uri'=>'https://oauth2.googleapis.com/token']));
 try{
  $requests=[];$id='fixture_spreadsheet_123';$response=['code'=>200,'body'=>json_encode(['spreadsheetId'=>$id,'properties'=>['title'=>'Synthetic worksheet']])];
  $r=SiteEngine_Ads_Bridge_Product_Setup::test_connection($credential,$id);ck($r['write_verified']===false&&str_contains($r['message'],'Draft settings were not saved'),'read success never claims write or saved values');

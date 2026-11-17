@@ -606,9 +606,16 @@ final class SiteEngine_Ads_Bridge_Admin {
 		echo '<h2>Google Sheets Sink</h2><table class="form-table"><tbody>';
 		self::checkbox_row( 'Enable Google Sheets', 'sheets_enabled', (bool) $config->get( 'google_sheets.enabled', false ), 'Required before any export family can be enabled.' );
 		self::text_row( 'Spreadsheet ID', 'spreadsheet_id', $config->get( 'google_sheets.spreadsheet_id', '' ), 'Paste the spreadsheet ID, not a service-account secret.' );
-		self::text_row( 'Service Account JSON Path', 'credentials_path', $config->get( 'google_sheets.credentials_path', '' ), 'Recommended: /home/CPANEL_USER/.secrets/se-ads-sa.json' );
-        echo '<tr><td colspan="2"><button type="button" class="button" id="seab-test-sheets" data-nonce="'.esc_attr(wp_create_nonce('seab_test_sheets')).'">Test connection</button><p id="seab-sheets-result" role="status"></p></td></tr>';
-		echo '</tbody></table><p><strong>Credentials stay outside WordPress.</strong> Ads Bridge stores only the filesystem path to the JSON credential file.</p>';
+        self::text_row('Preserved file credential path','credentials_path',$config->get('google_sheets.credentials_path',''),'Private absolute server path. Saving it never imports or switches credentials.');
+        $state=SiteEngine_Ads_Bridge_Credentials::status($config);
+        echo '<tr><th>Credential source</th><td><strong>'.esc_html($state['source']).'</strong><p>'.esc_html($state['message']).'</p>';
+        $url=SiteEngine_Ads_Bridge_Credentials::admin_url();
+        if($url)echo '<p><a href="'.esc_url($url).'">Manage Google service-account JSON in Base Credentials</a></p>';
+        else echo '<p>Base credential group is unavailable or you lack permission. No alternate credential entry is provided here.</p>';
+        echo '<label for="seab-credential-test-source">Source to test / explicitly select</label> <select id="seab-credential-test-source"><option value="file" '.selected($state['source'],'file',false).'>File</option><option value="base" '.selected($state['source'],'base',false).'>Base protected document</option></select><p>Test connection never saves or changes the active source. To switch or roll back, first save draft path/spreadsheet changes, then verify and select the intended source. The old file and path remain untouched. Authentication failure never falls back.</p>';
+        echo '<button type="button" class="button" id="seab-test-sheets" data-nonce="'.esc_attr(wp_create_nonce('seab_test_sheets')).'">Test connection</button> <button type="button" class="button" id="seab-select-credentials">Verify and use selected source</button><p id="seab-sheets-result" role="status"></p></td></tr>';
+        echo '</tbody></table><p>Secret JSON is entered only through Base’s protected write-only document form. Ads settings store source selection and the legacy path only. Neither a local format check nor metadata read proves Sheet write permission. Ordinary saves and page loads make no Google requests.</p>';
+
 		self::form_close();
 	}
 
@@ -709,9 +716,15 @@ final class SiteEngine_Ads_Bridge_Admin {
     public static function test_sheets() {
         if(!current_user_can('manage_options'))wp_send_json_error(['message'=>'Administrator permission required.'],403);
         check_ajax_referer('seab_test_sheets');
-        try{wp_send_json_success(SiteEngine_Ads_Bridge_Product_Setup::test_connection(self::post_text('credentials_path'),self::post_text('spreadsheet_id')));}
-        catch(Throwable $e){wp_send_json_error(['message'=>$e->getMessage()],400);}
+        try {
+            $source=self::post_text('credential_test_source');
+            $path=self::post_text('credentials_path'); $id=self::post_text('spreadsheet_id');
+            if(self::post_text('select_source')==='1') $r=SiteEngine_Ads_Bridge_Credentials::test_and_select($source,$path,$id);
+            else { $r=SiteEngine_Ads_Bridge_Credentials::test(SiteEngine_Ads_Bridge_Config::instance(),$source,$path,$id); unset($r['identity']); }
+            wp_send_json_success($r);
+        } catch(Throwable $e) { wp_send_json_error(['message'=>$e->getMessage()],400); }
     }
+
     public static function handle_authority() {
         if(!current_user_can('manage_options'))wp_die('Permission denied.');
         check_admin_referer('seab_use_settings');

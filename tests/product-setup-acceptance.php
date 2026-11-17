@@ -8,7 +8,7 @@ namespace FluentCrm\App\Models {
  }
 }
 namespace {
-define('ABSPATH',__DIR__.'/');define('ARRAY_A','ARRAY_A');
+define('ABSPATH',__DIR__.'/');require dirname(__DIR__).'/includes/class-siteengine-ads-bridge-credentials.php';define('ARRAY_A','ARRAY_A');
 $opts=[];$registry=[['slug'=>'unrelated','type'=>'text','label'=>'Preserve','extra'=>['a'=>1]]];$field_saves=0;$zone='UTC';require_once dirname(__DIR__).'/includes/crm-import/recovery.php';
 $n=0;
 function get_option($k,$d=false){return $GLOBALS['opts'][$k]??$d;}function update_option($k,$v,$a=false){$GLOBALS['opts'][$k]=$v;return true;}
@@ -58,8 +58,8 @@ $c->data['google_sheets.enabled']=false;ck(str_contains($call('check_cron_health
 $c->data['google_sheets.enabled']=true;$c->data['exports.won_jobs.enabled']=true;ck(str_contains($call('check_cron_health')[0]['message'],'No successful'),'enabled never-run distinguished');
 $opts['seab_last_export_attempt']=['status'=>'failed'];ck(str_contains($call('check_cron_health')[0]['message'],'Failed'),'failed attempt distinguished');unset($opts['seab_last_export_attempt']);
 $opts['seab_last_export_runtime']=['timestamp'=>time()-4000,'php_version'=>PHP_VERSION];ck(str_contains($call('check_cron_health')[0]['message'],'ago'),'stale successful attempt distinguished');
-$c->data['google_sheets.credentials_path']='';$r=$call('check_google_sheets_config');ck(count(array_filter($r,static fn($v)=>str_contains($v['message'],'Missing path:')))===1,'missing credential path distinct');
+$c->data['google_sheets.credentials_path']='';$r=$call('check_google_sheets_config');ck(count(array_filter($r,static fn($v)=>str_contains($v['message'],'Missing credentials file path')))===1,'missing credential path distinct');
 $c->data['google_sheets.credentials_path']=__DIR__.'/definitely-absent.json';$r=$call('check_google_sheets_config');ck(count(array_filter($r,static fn($v)=>str_contains($v['message'],'file is missing')))===1,'missing file distinct');
-$c->data['google_sheets.credentials_path']=__FILE__;$r=$call('check_google_sheets_config');ck(count(array_filter($r,static fn($v)=>str_contains($v['message'],'exists and is readable')))===1,'readable credentials checked without contents');
+$c->data['google_sheets.credentials_path']=__FILE__;$r=$call('check_google_sheets_config');ck(count(array_filter($r,static fn($v)=>str_contains($v['message'],'JSON object')))===1,'readable non-JSON file does not pass local credential validation');
 echo "SUMMARY $n PASS; synthetic storage/vendor boundaries; actual product algorithms\n";
 }

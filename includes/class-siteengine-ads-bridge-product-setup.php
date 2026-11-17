@@ -132,24 +132,9 @@ final class SiteEngine_Ads_Bridge_Product_Setup {
         if(empty($data['client']['short_name']))$data['client']['short_name']=(string)($data['client']['name']??'')?:$data['client']['slug'];
         return $data;
     }
-    /** Two bounded Google requests maximum: token exchange and metadata GET. No retries/writes. */
+    /** Compatibility wrapper: same resolver as CLI; explicit draft file test. */
     public static function test_connection(string $path,string $id):array {
-        if($path==='')throw new RuntimeException('Missing service-account JSON path. Enter a private absolute file path.');
-        if(!preg_match('#^(?:/|[A-Za-z]:[\\\\/])#',$path))throw new RuntimeException('Credentials path must be absolute in this server execution context.');
-        if(!file_exists($path))throw new RuntimeException('Credentials file is missing or its parent cannot be traversed by this PHP identity.');
-        if(!is_file($path)||!is_readable($path))throw new RuntimeException('Credentials path is not a readable regular file for this PHP identity. No permissions were changed.');
-        $size=filesize($path);if($size===false||$size>65536)throw new RuntimeException('Credentials file size is unavailable or exceeds 64 KiB.');
-        if(!preg_match('/^[A-Za-z0-9_-]{10,200}$/D',$id))throw new RuntimeException('Enter a spreadsheet ID, not a URL.');
-        $raw=file_get_contents($path,false,null,0,65537);$c=is_string($raw)?json_decode($raw,true,16):null;unset($raw);
-        if(!is_array($c)||($c['type']??'')!=='service_account'||empty($c['client_email'])||empty($c['private_key']))throw new RuntimeException('Credentials file is not valid service-account JSON. Contents omitted.');
-        $token=SiteEngine_Ads_Bridge_Google::token($c);unset($c);
-        if(!$token['ok'])throw new RuntimeException($token['error']);
-        $response=wp_remote_get('https://sheets.googleapis.com/v4/spreadsheets/'.rawurlencode($id).'?fields=spreadsheetId,properties.title',[
-            'timeout'=>10,'redirection'=>0,'limit_response_size'=>65536,'headers'=>['Authorization'=>'Bearer '.$token['token']]]);unset($token);
-        if(is_wp_error($response))throw new RuntimeException('Spreadsheet metadata request failed. No rows were read or written; secret transport details omitted.');
-        $code=(int)wp_remote_retrieve_response_code($response);$body=json_decode((string)wp_remote_retrieve_body($response),true);unset($response);
-        if($code!==200)throw new RuntimeException('Spreadsheet read failed (HTTP '.$code.'). Check sharing, spreadsheet ID and API access; write permission remains unverified.');
-        if(!is_array($body)||($body['spreadsheetId']??null)!==$id||!is_string($body['properties']['title']??null))throw new RuntimeException('Spreadsheet identity response is incomplete or mismatched.');
-        return ['message'=>'Read access verified: '.sanitize_text_field($body['properties']['title']).'. Write permission is NOT verified. Draft settings were not saved; no rows appended.','spreadsheet_id'=>$id,'write_verified'=>false];
+        $r=SiteEngine_Ads_Bridge_Credentials::test(SiteEngine_Ads_Bridge_Config::instance(),'file',$path,$id);
+        unset($r['identity']); return $r;
     }
 }

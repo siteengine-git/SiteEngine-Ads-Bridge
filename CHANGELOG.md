@@ -1,3 +1,7 @@
+## 0.9.4 - Base-managed Google credential adapter
+
+Register a protected document in released Base2.5.0. One web/CLI resolver; explicit read-only authentication test and verified source selection. File deployments stay selected until deliberately switched; failures never fall back. No credentials imported or exports enabled.
+
 ## 0.9.3 - Estimated Value CRM definition
 
 - Add estimated_value with label Estimated Value and native number type to the combined CRM setup contract.

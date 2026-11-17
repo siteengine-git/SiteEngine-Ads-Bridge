@@ -949,8 +949,10 @@ class SiteEngine_Ads_Bridge_Config {
 			}
 		}
 
-		if ( true === (bool) $this->canonical_get( 'google_sheets.enabled', false ) ) {
-			foreach ( array( 'google_sheets.spreadsheet_id', 'google_sheets.credentials_path' ) as $key ) {
+		$credential_source=$this->canonical_get('google_sheets.credentials_source','file');
+        if(!in_array($credential_source,['file','base'],true))$errors[]='google_sheets.credentials_source must be file or base; no fallback is permitted.';
+        if ( true === (bool) $this->canonical_get( 'google_sheets.enabled', false ) ) {
+			foreach ( $credential_source==='base' ? ['google_sheets.spreadsheet_id'] : ['google_sheets.spreadsheet_id','google_sheets.credentials_path'] as $key ) {
 				$value = $this->canonical_get( $key );
 				if ( ! is_string( $value ) || '' === trim( $value ) ) {
 					$errors[] = sprintf( 'google_sheets.enabled is true but %s is missing or empty.', $key );

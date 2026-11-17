@@ -1955,7 +1955,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 $sheets_enabled = (bool) $config->get( 'sheets.enabled', false );
                 $spreadsheet_id = trim( (string) $config->get( 'sheets.spreadsheet_id', '' ) );
                 $tab            = trim( (string) $config->get( 'sheets.google_ads_import.tab', '' ) );
-                $creds_path     = trim( (string) $config->get( 'sheets.credentials_path', '' ) );
 
                 if ( true !== $sheets_enabled ) {
                         $missing[] = 'sheets.enabled (must be true)';
@@ -1966,11 +1965,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( '' === $tab ) {
                         $missing[] = 'sheets.google_ads_import.tab (worksheet/tab name)';
                 }
-                if ( '' === $creds_path ) {
-                        $missing[] = 'sheets.credentials_path (absolute path to a Google service-account JSON)';
-                } elseif ( ! is_readable( $creds_path ) ) {
-                        $missing[] = sprintf( 'sheets.credentials_path -> file not readable at "%s"', $creds_path );
-                }
                 if ( ! empty( $missing ) ) {
                         foreach ( $missing as $miss ) {
                                 WP_CLI::line( 'Missing: ' . $miss . '.' );
@@ -1978,10 +1972,8 @@ class SiteEngine_Ads_Bridge_CLI {
                         WP_CLI::error( 'Google Sheet append is not configured; failing closed. Nothing was written.' );
                 }
 
-                $creds = json_decode( (string) file_get_contents( $creds_path ), true );
-                if ( ! is_array( $creds ) || empty( $creds['client_email'] ) || empty( $creds['private_key'] ) ) {
-                        WP_CLI::error( sprintf( 'Service-account JSON at "%s" is missing client_email/private_key. Nothing written.', $creds_path ) );
-                }
+                try { $resolved=SiteEngine_Ads_Bridge_Credentials::resolve($config); $creds=$resolved['credentials']; unset($resolved); }
+                catch (Throwable $e) { WP_CLI::error($e->getMessage().' Nothing was written.'); }
 
                 $token = $this->google_sa_access_token( $creds );
                 if ( ! $token['ok'] ) {
@@ -6510,7 +6502,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 $missing        = array();
                 $enabled        = (bool) $config->get( 'google_sheets.enabled', false );
                 $spreadsheet_id = trim( (string) $config->get( 'google_sheets.spreadsheet_id', '' ) );
-                $creds_path     = trim( (string) $config->get( 'google_sheets.credentials_path', '' ) );
 
                 if ( ! $enabled ) {
                         $missing[] = 'google_sheets.enabled (must be true)';
@@ -6521,11 +6512,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( '' === trim( $tab ) ) {
                         $missing[] = 'target sheet tab';
                 }
-                if ( '' === $creds_path ) {
-                        $missing[] = 'google_sheets.credentials_path';
-                } elseif ( ! is_readable( $creds_path ) ) {
-                        $missing[] = 'credentials file is not readable at ' . $creds_path;
-                }
                 if ( ! empty( $missing ) ) {
                         foreach ( $missing as $item ) {
                                 WP_CLI::line( 'Missing: ' . $item . '.' );
@@ -6533,10 +6519,9 @@ class SiteEngine_Ads_Bridge_CLI {
                         WP_CLI::error( 'Google Sheet append is not configured; failing closed. Nothing was written.' );
                 }
 
-                $creds = json_decode( (string) file_get_contents( $creds_path ), true );
-                if ( ! is_array( $creds ) || empty( $creds['client_email'] ) || empty( $creds['private_key'] ) ) {
-                        WP_CLI::error( sprintf( 'Service-account JSON at "%s" is missing client_email/private_key.', $creds_path ) );
-                }
+                try { $resolved=SiteEngine_Ads_Bridge_Credentials::resolve($config); $creds=$resolved['credentials']; unset($resolved); }
+                catch (Throwable $e) { WP_CLI::error($e->getMessage().' Nothing was written.'); }
+
                 $token = $this->google_sa_access_token( $creds );
                 if ( ! $token['ok'] ) {
                         WP_CLI::error( 'Could not obtain a Google access token: ' . $token['error'] . '. Nothing written.' );

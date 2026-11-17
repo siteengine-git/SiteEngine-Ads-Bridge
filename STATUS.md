@@ -1,3 +1,7 @@
+## Google credentials adapter — active November 17, 2026
+
+Owner: AB Codex, sole canonical writer. Current checkpoint3b06576; retained0.9.3 pending package and stable0.9.1 delivery preserved. Implementing0.9.4 using released Base2.5.0/277c8c6 document contract. Local focused tests pass; packaging and backed-up main-Alma focused verification next. Main Alma Ads0.9.1/Base2.5.0/settings authority verified. No Base Google registration/material currently exists; administrator entry/activation is required for actual Base-source Google acceptance. Existing Alma file stays selected. No automatic import or credential/permission changes. Exports remain held. No client access or stable promotion.
+
 ## Alma Sheets path corrected - November 17, 2026
 
 Main Alma installed Ads0.9.1 saved the AWS /home/siteengi credential path, whose
