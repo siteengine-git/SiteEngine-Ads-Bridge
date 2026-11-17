@@ -1,0 +1,16 @@
+{
+  "version": "0.9.4",
+  "source_commit": "00aef6caa7e1a3b355095da26f2df63e17f1e0d7",
+  "package": "siteengine-ads-bridge-0.9.4.zip",
+  "sha256": "51cb79e6cb6256bd3fe5ad1e7655a57031aa03e87b1e07153828f5aa068efde4",
+  "manifest_sha256": "771cd95d98245f2c9179c8dad7b44bf54a28ef222c7f36b816b8ce3c0ff8ce49",
+  "members": 82,
+  "PHP_files": 51,
+  "installed": true,
+  "released": false,
+  "installed_target": "Alma development",
+  "native_cli_focused_verified": true,
+  "web_action_verified": false,
+  "Base_provider_verified": false,
+  "designation": "INSTALLED CLI-FOCUSED DEVELOPMENT DELIVERY; BASE MATERIAL / WEB ACCEPTANCE PENDING"
+}

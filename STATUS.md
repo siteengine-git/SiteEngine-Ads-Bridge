@@ -1,6 +1,40 @@
-## Google credentials adapter — active November 17, 2026
+## Base Google credential adapter — 0.9.4 closeout, November 17, 2026
 
-Owner: AB Codex, sole canonical writer. Current checkpoint3b06576; retained0.9.3 pending package and stable0.9.1 delivery preserved. Implementing0.9.4 using released Base2.5.0/277c8c6 document contract. Local focused tests pass; packaging and backed-up main-Alma focused verification next. Main Alma Ads0.9.1/Base2.5.0/settings authority verified. No Base Google registration/material currently exists; administrator entry/activation is required for actual Base-source Google acceptance. Existing Alma file stays selected. No automatic import or credential/permission changes. Exports remain held. No client access or stable promotion.
+Source00aef6caa7e1a3b355095da26f2df63e17f1e0d7; Base2.5.0/277c8c6 released dependency
+and completed evidence reused. Exact ZIP51cb79e6cb6256bd3fe5ad1e7655a57031aa03e87b1e07153828f5aa068efde4;
+manifest771cd95d98245f2c9179c8dad7b44bf54a28ef222c7f36b816b8ce3c0ff8ce49.
+One document group, one web/CLI resolver, safe group link, no automatic file import
+or fallback. Deliberate fresh verification precedes a protected source switch;
+prior path/source preserved. Secret JSON never enters ordinary options/readback.
+
+Main-Alma installation:82 exact members;51 native PHP8.3.36 lints. Native CLI actual
+Google authentication and spreadsheet-ID read passed with two requests, zero rows
+or worksheet writes. Genuine nonce/rendered-values/installed save handler passed
+under WordPress CLI, settings exact, zero provider requests. Local checks:51 real
+pinned-Base crypto/service plus1 missing-API;84 setup replacement;34 product;
+35 reporting;16 form;14 JS double.51 local lints. Doubles are not native proof.
+
+Private backups,18 covered table snapshots, original journals/settings/effective
+configuration/CRM fields/Base encrypted rows/audit/key metadata match. Configuration
+file restored exactly; temporary probe/session/maintenance removed; native lock
+released and shared executor idle. Existing enabled/disabled flags were preserved,
+not all disabled: no export activation or execution. No client/Base/CB/FE source edits.
+The separately packaged0.9.3, prior delivery/frozen archives and evidence remain.
+
+Actual limits: Base Google document absent, so installed Base-source authentication
+and switching remain unperformed. Direct HTTP verification was blocked before
+WordPress by Cloudflare403/error1010; no access policy workaround or fresh browser
+PASS. Cron digest changed; pre-run serialized cron was not captured. Current jobs
+inspected read-only, no Ads export hook; no unknown historical restore. Consent
+receipt/link snapshots match, chains were not independently snapshotted; no Consent
+mutation. All diagnostic failures and cleanup recovery receipts retained privately.
+
+Execution queue: AB source/package/install/native file-auth track complete; Base
+credential entry/activation belongs to the administrator in the registered group;
+fresh web-action acceptance remains held on the HTTP client restriction. No active
+source/server writer, worker or controls remain. No stable release is claimed.
+See releases/0.9.4/RESULTS.json and docs/GOOGLE-CREDENTIALS.md. Current development
+single-ZIP delivery updated only after installed member verification;0.9.1 archived.
 
 ## Alma Sheets path corrected - November 17, 2026
 
