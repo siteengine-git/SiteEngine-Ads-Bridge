@@ -1,3 +1,17 @@
+## Alma Sheets path corrected - November 17, 2026
+
+Main Alma installed Ads0.9.1 saved the AWS /home/siteengi credential path, whose
+parent does not exist on Alma. Same failure was retained on November11, before
+November16 CB/Base onboarding. Existing owner-only Alma Sheets file was intact.
+Backed up original settings and changed only google_sheets.credentials_path to
+/home/alma.siteengine.space/.secrets/se-ads-sa.json. Actual web PHP8.3.36/LiteSpeed
+UID5004 and independent owner CLI now report readability/Doctor PASS. No secret
+replacement, permission change, provider/export/call operation or plugin rebuild.
+CB credential pair/source, CB external config, wp-config, Base stores/key metadata,
+all other Ads settings/options and journals preserved. Public probe/private guard
+removed; no worker/maintenance/held lock. See verification/credential-path-20261117.
+Current 0.9.3 package remains separately local-verified, not deployed by this fix.
+
 ## Estimated Value addition - 0.9.3 local verification (2026-11-13)
 
 Direct user request adds Estimated Value / estimated_value / number to minimum

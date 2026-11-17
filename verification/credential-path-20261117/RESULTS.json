@@ -1,0 +1,71 @@
+{
+  "site": "https://alma.siteengine.space",
+  "old_path": "/home/siteengi/.secrets/se-ads-sa.json",
+  "new_path": "/home/alma.siteengine.space/.secrets/se-ads-sa.json",
+  "cause": "Saved AWS /home/siteengi path; /home/siteengi returns ENOENT on Alma; existing Alma private credential file is owner-readable",
+  "web": {
+    "PHP": "8.3.36",
+    "SAPI": "litespeed",
+    "uid": 5004,
+    "readable": true,
+    "Doctor": [
+      {
+        "status": "PASS",
+        "check": "Google Sheets credentials",
+        "message": "Credential file exists and is readable in this execution context. Context: PHP 8.3.36 / litespeed; effective UID 5004. Web and scheduler users may differ; verify each context. No secret contents read."
+      }
+    ]
+  },
+  "CLI": {
+    "PHP": "8.3.36",
+    "uid": 5004,
+    "readable": true,
+    "Doctor": [
+      {
+        "status": "PASS",
+        "check": "Google Sheets credentials",
+        "message": "Credential file exists and is readable in this execution context. Context: PHP 8.3.36 / cli; effective UID 5004. Web and scheduler users may differ; verify each context. No secret contents read."
+      }
+    ]
+  },
+  "only_path_setting_changed": true,
+  "wp_config_unchanged": true,
+  "CB_resolution_unchanged": true,
+  "CB_source": {
+    "source": "External configuration",
+    "local": "Format checked locally",
+    "configured": true
+  },
+  "Base_stores_unchanged": true,
+  "Base_key_metadata_unchanged": true,
+  "other_Ads_options_and_journals_exact": true,
+  "CB_external_configuration_matches_retained_CB_backup": true,
+  "wp_config_matches_retained_CB_backup": true,
+  "credential_file_metadata_preserved": true,
+  "configuration_guard": {
+    "state": "complete",
+    "inflight": null
+  },
+  "provider_operations": false,
+  "scope": "Local file access only; no Google authentication, spreadsheet read/write, export or actual scheduler execution.",
+  "PASS": true,
+  "cleanup": {
+    "public_probe_removed": true,
+    "temporary_guard_removed": true,
+    "comparison_salt_removed": true,
+    "maintenance_absent": true,
+    "private_backup_and_receipts_retained": true,
+    "worker_or_lock_retained": false
+  },
+  "historical_evidence": {
+    "AB": "releases/0.8.2/RESULTS.json: November 11 existing credentials-parent failure under UID 5004",
+    "Base": "Base verification/host-init-20261116/initialize.php.txt and readiness-final.json; created absent owner-only key in .siteengine-base",
+    "CB": "CB verification/0.2.1-onboarding.md; current external configuration and wp-config match retained November 16 backups"
+  },
+  "permissions_changed": false,
+  "plugin_code_or_package_changed": false,
+  "sheets_credential_contents_read": false,
+  "Base_key_contents_read": false,
+  "private_recovery": "/home/alma.siteengine.space/.seab-diagnostics/ab-credential-20261117-284285b5",
+  "scheduler_limit": "Owner CLI context verified without running cron or export-enabled; actual scheduler identity/execution not asserted."
+}
