@@ -1,0 +1,43 @@
+{
+  "runtime": "PHP8.3.36 + OpenSSL/Sodium; Node",
+  "checks": [
+    {
+      "test": "base-credentials-acceptance.php",
+      "args": [],
+      "result": "SUMMARY 51 PASS; actual pinned Base crypto/AB code; storage, configuration lock and HTTP doubles, NOT installed Google acceptance"
+    },
+    {
+      "test": "base-credentials-acceptance.php",
+      "args": [
+        "--without-base"
+      ],
+      "result": "PASS missing API refuses before file fallback"
+    },
+    {
+      "test": "product-setup-replacement.php",
+      "args": [],
+      "result": "SUMMARY 84 PASS; actual algorithms/rendering, simulated vendor/DB; no installed/browser evidence"
+    },
+    {
+      "test": "product-setup-acceptance.php",
+      "args": [],
+      "result": "SUMMARY 34 PASS; synthetic storage/vendor boundaries; actual product algorithms"
+    },
+    {
+      "test": "setup-reporting-acceptance.php",
+      "args": [],
+      "result": "SUMMARY: 35 PASS; actual resolver/reporting, synthetic WordPress/Base/Doctor"
+    },
+    {
+      "test": "setup-workflow-acceptance.php",
+      "args": [],
+      "result": "SUMMARY 16 PASS;production detector;synthetic DB boundary"
+    },
+    {
+      "test": "product-setup-browser-double.js",
+      "result": "14 PASS; shipped JS with DOM/HTTP doubles; no native browser claim"
+    }
+  ],
+  "lints": 51,
+  "limits": "Real pinned Base crypto/service, AB code; WP/storage/HTTP/DOM doubles. No installed Google acceptance claimed."
+}

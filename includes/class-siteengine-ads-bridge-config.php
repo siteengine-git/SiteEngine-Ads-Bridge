@@ -8,10 +8,11 @@
  * and every consumer-facing read resolves against one canonical v2 tree.
  *
  * Configuration authority precedence:
- *   1. Explicit external SEAB_CONFIG_FILE (legacy/operator override)
- *   2. WordPress Ads Bridge settings, with shared client facts from SiteEngine Base
- *   3. Existing plugin-local config/client.php (migration fallback)
- *   4. Safe setup defaults with exports disabled
+ *   1. Explicit administrator choice of WordPress settings (durable)
+ *   2. Explicit external SEAB_CONFIG_FILE if no settings choice was recorded
+ *   3. Saved WordPress Ads Bridge settings, with shared facts from SiteEngine Base
+ *   4. Existing plugin-local config/client.php (only without an explicit choice)
+ *   5. Safe setup defaults with exports disabled
  *
  * Runtime call sites that still read legacy dot-keys (e.g. `timezone` and
  * `sheets.google_ads_import.tab`) resolve
@@ -36,6 +37,7 @@ class SiteEngine_Ads_Bridge_Config {
 	const SRC_CLIENT   = 'PHP config';
 	const SRC_SETTINGS = 'Ads Bridge settings';
 	const SRC_BASE     = 'SiteEngine Base';
+    const SRC_CONSENT  = 'SiteEngine Consent issuer';
 	const SRC_LEGACY   = 'legacy compatibility mapping';
 	const SRC_DEFAULT  = 'plugin default';
 
@@ -230,9 +232,9 @@ class SiteEngine_Ads_Bridge_Config {
 	 */
 	private function load() {
 		// An explicitly defined SEAB_CONFIG_FILE remains the highest-precedence
-		// authority for backward compatibility. UI settings are intentionally
-		// inert until the operator removes that explicit override.
-		if ( defined( 'SEAB_CONFIG_IS_EXTERNAL' ) && SEAB_CONFIG_IS_EXTERNAL ) {
+		// authority for backward compatibility unless an administrator deliberately
+		// chooses WordPress settings. File changes cannot undo that choice.
+		if ( defined( 'SEAB_CONFIG_IS_EXTERNAL' ) && SEAB_CONFIG_IS_EXTERNAL && ! ( class_exists( 'SiteEngine_Ads_Bridge_Setup' ) && SiteEngine_Ads_Bridge_Setup::settings_authority() ) ) {
 			$this->source = 'external';
 			$this->load_php_config( SEAB_CONFIG_FILE );
 			return;
@@ -247,8 +249,8 @@ class SiteEngine_Ads_Bridge_Config {
 		}
 
 		// Existing plugin-local configs continue running unchanged until the
-		// operator imports them through SiteEngine -> Ads Bridge -> Migration.
-		if ( defined( 'SEAB_CONFIG_FILE' ) && file_exists( SEAB_CONFIG_FILE ) ) {
+		// operator uses Ads Bridge -> Advanced -> Configuration authority.
+		if ( ! (class_exists('SiteEngine_Ads_Bridge_Setup') && SiteEngine_Ads_Bridge_Setup::settings_authority()) && defined( 'SEAB_CONFIG_FILE' ) && file_exists( SEAB_CONFIG_FILE ) ) {
 			$this->source = 'local_file';
 			$this->load_php_config( SEAB_CONFIG_FILE );
 			return;
@@ -274,11 +276,20 @@ class SiteEngine_Ads_Bridge_Config {
 	 */
 	private function load_php_config( $path ) {
 		if ( ! is_string( $path ) || '' === $path || ! file_exists( $path ) ) {
-			$this->load_errors[] = 'Config file is missing.';
+			$state=class_exists('SiteEngine_Ads_Bridge_Setup')?SiteEngine_Ads_Bridge_Setup::config_file_status()['state']:'missing_or_unavailable';
+			$this->load_errors[] = 'Legacy configuration is unavailable ('.$state.'). Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority; no content was imported.';
+			return;
+		}
+		if (!is_file($path)||!is_readable($path)) {
+			$this->load_errors[]='Legacy configuration file is not a readable regular file. Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority; retain the external configuration or explicitly use WordPress settings without importing it.';
 			return;
 		}
 
-		$raw = require $path;
+		try { $raw = require $path; }
+		catch (Throwable $e) {
+			$this->load_errors[]='Legacy configuration could not be loaded ('.get_class($e).'). No content was imported. Open Ads Bridge > Settings > Detailed diagnostics > Configuration authority.';
+			return;
+		}
 		if ( ! is_array( $raw ) ) {
 			$this->load_errors[] = 'Config file did not return an array.';
 			return;
@@ -562,13 +573,14 @@ class SiteEngine_Ads_Bridge_Config {
 	 * @return void
 	 */
 	private function apply_defaults() {
+        if(class_exists('SiteEngine_Ads_Bridge_Product_Setup'))$this->set_canonical('consent.required_policy_version',SiteEngine_Ads_Bridge_Product_Setup::policy(),self::SRC_CONSENT);
 		$defaults = array(
 			'google_sheets.enabled'                => false,
 			'google_sheets.value_input_option'     => 'RAW',
 			'exports.all_leads.enabled'            => false,
 			'exports.all_leads.header_overrides'   => array(),
 			'fluentcrm.lifecycle_automation.enabled' => false,
-			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',
+			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'se_ads_unqualified_reason',
 			'fluentcrm.lifecycle_automation.unqualified_at_field' => 'unqualified_at',
 			'fluentcrm.lifecycle_automation.stale_new_days' => 3,
 			'exports.qualified_leads.enabled'       => false,
@@ -914,6 +926,10 @@ class SiteEngine_Ads_Bridge_Config {
 	 */
 	private function validate_v2() {
 		$errors = array();
+        if($this->canonical_get('exports.qualified_leads.enabled',false)||$this->canonical_get('exports.won_jobs.enabled',false)){
+            $zone=$this->canonical_get('google_sheets.account_timezone','');
+            if(!is_string($zone)||!in_array($zone,timezone_identifiers_list(),true))$errors[]='google_sheets.account_timezone must be the Google Ads account IANA timezone before advertising export.';
+        }
 
 		$required_scalars = array(
 			'client.slug',
@@ -933,8 +949,10 @@ class SiteEngine_Ads_Bridge_Config {
 			}
 		}
 
-		if ( true === (bool) $this->canonical_get( 'google_sheets.enabled', false ) ) {
-			foreach ( array( 'google_sheets.spreadsheet_id', 'google_sheets.credentials_path' ) as $key ) {
+		$credential_source=$this->canonical_get('google_sheets.credentials_source','file');
+        if(!in_array($credential_source,['file','base'],true))$errors[]='google_sheets.credentials_source must be file or base; no fallback is permitted.';
+        if ( true === (bool) $this->canonical_get( 'google_sheets.enabled', false ) ) {
+			foreach ( $credential_source==='base' ? ['google_sheets.spreadsheet_id'] : ['google_sheets.spreadsheet_id','google_sheets.credentials_path'] as $key ) {
 				$value = $this->canonical_get( $key );
 				if ( ! is_string( $value ) || '' === trim( $value ) ) {
 					$errors[] = sprintf( 'google_sheets.enabled is true but %s is missing or empty.', $key );
@@ -974,13 +992,9 @@ class SiteEngine_Ads_Bridge_Config {
 
 		if ( true === (bool) $this->canonical_get( 'fluentcrm.lifecycle_automation.enabled', false ) ) {
 			$reason_field = trim( (string) $this->canonical_get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', '' ) );
-			$unqualified_at = trim( (string) $this->canonical_get( 'fluentcrm.lifecycle_automation.unqualified_at_field', '' ) );
 			$stale_days = (int) $this->canonical_get( 'fluentcrm.lifecycle_automation.stale_new_days', 0 );
 			if ( '' === $reason_field ) {
 				$errors[] = 'Lifecycle automation is enabled but fluentcrm.lifecycle_automation.unqualified_reason_field is empty.';
-			}
-			if ( '' === $unqualified_at ) {
-				$errors[] = 'Lifecycle automation is enabled but fluentcrm.lifecycle_automation.unqualified_at_field is empty.';
 			}
 			if ( $stale_days < 1 ) {
 				$errors[] = 'Lifecycle automation is enabled but fluentcrm.lifecycle_automation.stale_new_days is not a positive integer.';

@@ -1,0 +1,10 @@
+{
+  "revision": "r5-final",
+  "zip": "joint-consent-ads-operations-20261031-r5-final.zip",
+  "zip_sha256": "cdee7b75d0e4d5b5b047c9ee1fbb067380484f49318a3d37fd9c83f49aa132d1",
+  "package_manifest_sha256": "9d4747a485fa014d88d32512ac9f6a04c910b180c4aa952866e577cbd6d4e8e2",
+  "operations_manifest_sha256": "31e6e42eba8334ec016a19cb27745a04e7f66434b9f25705474b3d99d3dde806",
+  "members": 34,
+  "acceptance": "LOCAL_TOOLING_ONLY_J1_J6_HELD_FOR_FINAL_REVIEW",
+  "browser_requirement": "review/load temporary tab control in existing Firefox; native proof before capture"
+}

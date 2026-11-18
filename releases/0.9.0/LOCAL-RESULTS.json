@@ -1,0 +1,31 @@
+{
+  "checks": [
+    {
+      "test": "product-setup-replacement.php",
+      "summary": "SUMMARY 48 PASS; actual algorithms/rendering, simulated vendor/DB; no installed/browser evidence"
+    },
+    {
+      "test": "product-setup-acceptance.php",
+      "summary": "SUMMARY 34 PASS; synthetic storage/vendor boundaries; actual product algorithms"
+    },
+    {
+      "test": "setup-workflow-acceptance.php",
+      "summary": "SUMMARY 16 PASS;production detector;synthetic DB boundary"
+    },
+    {
+      "test": "setup-reporting-acceptance.php",
+      "summary": "SUMMARY: 35 PASS; actual resolver/reporting, synthetic WordPress/Base/Doctor"
+    },
+    {
+      "test": "product-setup-browser-double.js",
+      "summary": "10 PASS; shipped JS with DOM/HTTP doubles; no native browser claim"
+    }
+  ],
+  "Consent_consumer_assertions": "NOT RUN: supply pinned SEAB_CONSENT_AUTHORITY",
+  "Consent_dispatch_assertions": "NOT RUN: supply pinned SEAB_CONSENT_AUTHORITY",
+  "Consent_dependency": "Not rerun in this invocation; earlier pinned evidence is retained separately",
+  "PHP_lints": 50,
+  "runtime": "PHP 8.3.36 -n",
+  "coverage": "Actual algorithms/rendering; simulated WP/vendor/storage/transport; no installed/native/browser claim",
+  "initial_dependency_refusal": "Consent suites first refused missing SEAB_CONSENT_AUTHORITY; then exact retained pinned dependency supplied without changing hash checks"
+}

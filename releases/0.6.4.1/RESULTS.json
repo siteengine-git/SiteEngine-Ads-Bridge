@@ -1,0 +1,50 @@
+{
+  "version": "0.6.4.1",
+  "base_commit": "2734fad0bc05fc67c36f4c5f78423bf804278e19",
+  "scope": "Ads setup reporting only; no validation/Consent/transport/settings change",
+  "fresh_local_assertions": {
+    "reporting": 30,
+    "settings": 10,
+    "bootstrap": 19,
+    "static_package": 85,
+    "total": 144,
+    "failures": 0
+  },
+  "php_lint": 4,
+  "installed_client_diagnosis": {
+    "ads": "0.6.4",
+    "base": "2.2.2",
+    "consent": "0.6.1-rc.2",
+    "crm": "0.3.6",
+    "saved_timezone": "America/Chicago",
+    "shared_timezone": "America/Chicago",
+    "shared_timezone_present": true,
+    "effective_ads_timezone": "America/Chicago",
+    "timezone_valid": true,
+    "base_missing_prerequisites": [],
+    "source": "external",
+    "validation_keys": [
+      "fluentcrm.tags.lifecycle.new",
+      "fluentcrm.tags.lifecycle.qualified",
+      "fluentcrm.tags.lifecycle.unqualified"
+    ],
+    "saved_settings_also_missing_these_mappings": true,
+    "all_six_delivery_flags": false,
+    "limitations": "Scoped CLI PHP7.4.33 cannot parse unrelated CRM constructor syntax; CRM excluded for diagnosis only, not activation. No client web runtime assertion."
+  },
+  "runtime_unchanged": {
+    "includes/class-siteengine-ads-bridge-cli.php": "481ebff662e49f4f03391ae769ce84fa15be7ff6abea3072024edc71e35d59b9",
+    "includes/class-siteengine-ads-bridge-config.php": "d860a0fd93010f5e37ab77cb052bb81ee6b9fef0a7ba4b3c19aa52001e5148c2",
+    "includes/class-siteengine-ads-bridge-consent.php": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0",
+    "includes/class-siteengine-ads-bridge-coordination.php": "cf284aac38f02afc868418750bf1af5d99ef088a4b4af66fc580c1e62bf4f2bf",
+    "includes/class-siteengine-ads-bridge-doctor.php": "ab977846dc1b3e8b60a27834fb7e0fcc09c0a4fe12af2635b5d8db3ab4675b5d",
+    "includes/class-siteengine-ads-bridge-inquiries.php": "94716250aff3dd282605df6eae25ba96688e0afb64e52023e7b9b37890fb4097",
+    "includes/class-siteengine-ads-bridge-lifecycle.php": "a5ca5e96e8bec01b4736c5dfb71775fd0aec38491d9034b4cf5782cac5b752c7",
+    "includes/class-siteengine-ads-bridge-runtime.php": "b396f71fc8cd703de51d6de1350b22855c1eb1b3e9b2f96c48696830f5e588cb",
+    "includes/class-siteengine-ads-bridge-settings.php": "89e4b96c7f25d1a8219afae17b4f3fc8e689bf92cfdc2b8ca834fab85d826a7f"
+  },
+  "base_defect": "none demonstrated; Base source not edited",
+  "installed_correction": "NOT RUN",
+  "site_settings_writes": 0,
+  "native_acceptance_campaign": "NOT REPEATED"
+}

@@ -105,15 +105,27 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		if ( isset( self::$held_locks[ $contact_id ] ) ) {
 			return array( 'ok' => false, 'reason' => 'contact_transition_reentrant' );
 		}
+		$coordination = SiteEngine_Ads_Bridge_Coordination::enter_reconciliation();
+		if ( ! $coordination['ok'] ) { return $coordination; }
 		global $wpdb;
 		$database = defined( 'DB_NAME' ) ? DB_NAME : '';
 		$name = 'seab_i_' . substr( hash( 'sha256', $database . '|' . $wpdb->prefix . '|' . (int) $contact_id ), 0, 48 );
 		try {
 			$got = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $name ) );
+			$error = (string) $wpdb->last_error;
 		} catch ( \Throwable $e ) {
+			self::discard_connection();
+			SiteEngine_Ads_Bridge_Coordination::release();
+			return array( 'ok' => false, 'reason' => 'contact_lock_unavailable' );
+		}
+		if ( '' !== $error || ! in_array( (string) $got, array( '0', '1' ), true ) ) {
+			// A lost response may hide a granted lock. Never reuse that session.
+			self::discard_connection();
+			SiteEngine_Ads_Bridge_Coordination::release();
 			return array( 'ok' => false, 'reason' => 'contact_lock_unavailable' );
 		}
 		if ( '1' !== (string) $got ) {
+			if ( ! SiteEngine_Ads_Bridge_Coordination::release() ) { self::discard_connection(); }
 			return array( 'ok' => false, 'reason' => '0' === (string) $got ? 'contact_transition_busy' : 'contact_lock_unavailable' );
 		}
 		self::$held_locks[ $contact_id ] = $name;
@@ -125,6 +137,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @return void
 	 */
 	private static function assert_contact_lock( $contact_id ) {
+		SiteEngine_Ads_Bridge_Coordination::assert_owner();
 		global $wpdb;
 		if ( self::$connection_unusable || ! isset( self::$held_locks[ $contact_id ] ) || '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT IS_USED_LOCK(%s) = CONNECTION_ID()', self::$held_locks[ $contact_id ] ) ) ) {
 			throw new \RuntimeException( 'contact_lock_lost' );
@@ -136,21 +149,17 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @return bool
 	 */
 	private static function release_contact_lock( $contact_id ) {
-		global $wpdb;
-		if ( ! isset( self::$held_locks[ $contact_id ] ) ) {
-			return false;
-		}
-		$name = self::$held_locks[ $contact_id ];
-		unset( self::$held_locks[ $contact_id ] );
-		if ( self::$connection_unusable ) {
-			return false;
-		}
-		try {
-			return '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) );
-		} catch ( \Throwable $e ) {
-			return false;
-		}
-	}
+        global $wpdb;
+        $released=false;
+        try {
+            if ( !self::$connection_unusable && isset(self::$held_locks[$contact_id]) ) {
+                $released='1'===(string)$wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)',self::$held_locks[$contact_id]));
+            }
+        } catch (\Throwable $e) { $released=false; }
+        unset(self::$held_locks[$contact_id]);
+        $destination_released=SiteEngine_Ads_Bridge_Coordination::release();
+        return $released && $destination_released;
+    }
 
 	/**
 	 * Close the failed session so uncommitted changes/locks cannot leak.
@@ -458,7 +467,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			$uf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 			$cf     = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
 			$vf     = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
-			$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+			$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 			$now    = self::utc_now();
 			$data   = array(
 				'inquiry_id'                   => $inquiry_id,
@@ -466,12 +475,12 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 				'active_contact_id'            => $contact_id,
 				'previous_inquiry_id'          => null,
 				'state'                        => 'active',
-				'lifecycle'                    => self::subscriber_lifecycle_role( $subscriber ),
+				'lifecycle'                    => ($source['type'] ?? '') === 'call' ? 'new' : self::subscriber_lifecycle_role( $subscriber ),
 				'form_id'                      => isset( $binding['form_id'] ) ? $binding['form_id'] : null,
 				'submission_id'                => isset( $binding['entry_id'] ) ? $binding['entry_id'] : null,
 				'transaction_id'               => isset( $binding['transaction_id'] ) ? $binding['transaction_id'] : null,
 				'source_type'                  => isset( $source['type'] ) ? trim( (string) $source['type'] ) : 'adopted_current',
-				'source_reference'             => isset( $source['reference'] ) ? self::nullable_string( $source['reference'] ) : null,
+				'source_reference'             => ($source['type'] ?? '') === 'call' ? $source['identity'] : (isset( $source['reference'] ) ? self::nullable_string( $source['reference'] ) : null),
 				'reconciliation_id'            => null,
 				'request_event_id'             => $event_id,
 				'request_payload_hash'         => $payload_hash,
@@ -483,12 +492,12 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 				'projection_plan_hash'        => null,
 				'projection_verified_at_utc'  => null,
 				'contract_version'             => self::CONTRACT_VERSION,
-				'qualified_at'                 => self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
-				'unqualified_at'               => self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
-				'closed_date'                  => self::mysql_date_or_null( isset( $custom[ $cf ] ) ? $custom[ $cf ] : null ),
-				'invoiced_amount'              => self::positive_decimal_or_null( isset( $custom[ $vf ] ) ? $custom[ $vf ] : null ),
-				'customer_rating'              => self::nullable_string( isset( $custom[ $rf ] ) ? $custom[ $rf ] : null ),
-				'ads_conversion_value_frozen'  => self::positive_decimal_or_null( isset( $custom['ads_conversion_value_frozen'] ) ? $custom['ads_conversion_value_frozen'] : null ),
+				'qualified_at'                 => ($source['type'] ?? '') === 'call' ? null : self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
+				'unqualified_at'               => ($source['type'] ?? '') === 'call' ? null : self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
+				'closed_date'                  => ($source['type'] ?? '') === 'call' ? null : self::mysql_date_or_null( isset( $custom[ $cf ] ) ? $custom[ $cf ] : null ),
+				'invoiced_amount'              => ($source['type'] ?? '') === 'call' ? null : self::positive_decimal_or_null( isset( $custom[ $vf ] ) ? $custom[ $vf ] : null ),
+				'customer_rating'              => ($source['type'] ?? '') === 'call' ? null : self::nullable_string( isset( $custom[ $rf ] ) ? $custom[ $rf ] : null ),
+				'ads_conversion_value_frozen'  => ($source['type'] ?? '') === 'call' ? null : self::positive_decimal_or_null( isset( $custom['ads_conversion_value_frozen'] ) ? $custom['ads_conversion_value_frozen'] : null ),
 				'prepared_at_utc'              => $now,
 				'activated_at_utc'             => $now,
 				'archived_at_utc'              => null,
@@ -887,8 +896,9 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 
 	/** @param object $subscriber @param array $tag_ids @return void */
 	public static function sync_from_tag_change( $subscriber, $tag_ids ) {
-		unset( $tag_ids );
-		self::sync_active_from_subscriber( $subscriber );
+		$map=SiteEngine_Ads_Bridge_Lifecycle::configured_tag_map();
+		$observed=!empty($map['unqualified']['id'])&&in_array((int)$map['unqualified']['id'],array_map('intval',(array)$tag_ids),true);
+		self::sync_active_from_subscriber( $subscriber, $observed );
 	}
 
 	/** @param array $new_values @param object $subscriber @param array $update_values @return void */
@@ -906,7 +916,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @param object $subscriber FluentCRM subscriber.
 	 * @return bool
 	 */
-	public static function sync_active_from_subscriber( $subscriber ) {
+	public static function sync_active_from_subscriber( $subscriber, $observed_unqualified = false ) {
 		if ( self::$connection_unusable || self::$reconciling || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! self::table_exists() ) {
 			return false;
 		}
@@ -919,7 +929,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			self::assert_contact_lock( $contact_id );
 			// Do not mirror a stale model captured before another inquiry switch.
 			$fresh = self::find_subscriber( $contact_id );
-			$synced = self::sync_active_locked( $fresh );
+			$synced = self::sync_active_locked( $fresh, $observed_unqualified );
 			self::assert_contact_lock( $contact_id );
 		} catch ( \Throwable $e ) {
 			$synced = false;
@@ -936,7 +946,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 	 * @param object $subscriber Fresh contact resolved under its lock.
 	 * @return bool
 	 */
-	private static function sync_active_locked( $subscriber ) {
+	private static function sync_active_locked( $subscriber, $observed_unqualified = false ) {
 		if ( self::$reconciling || ! self::table_exists() || ! is_object( $subscriber ) || ! isset( $subscriber->id ) || ! method_exists( $subscriber, 'custom_fields' ) ) {
 			return false;
 		}
@@ -955,12 +965,17 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$uf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 		$cf     = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
 		$vf     = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
-		$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+		$rf     = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 		$lifecycle = self::subscriber_lifecycle_role( $subscriber );
+        // Only an observed tag-add can establish an event, never a historical refresh.
+        $unqualified_at=$row['unqualified_at']??null;
+        if(($unqualified_at===null||$unqualified_at==='')&&$observed_unqualified&&$lifecycle==='unqualified'){
+            $unqualified_at=self::mysql_datetime_or_null(SiteEngine_Ads_Bridge_Time::event_stamp());
+        }
 		$data = array(
 			'lifecycle'                   => $lifecycle,
 			'qualified_at'                => self::mysql_datetime_or_null( isset( $custom[ $qf ] ) ? $custom[ $qf ] : null ),
-			'unqualified_at'              => self::mysql_datetime_or_null( isset( $custom[ $uf ] ) ? $custom[ $uf ] : null ),
+			'unqualified_at'              => $unqualified_at,
 			'closed_date'                 => self::mysql_date_or_null( isset( $custom[ $cf ] ) ? $custom[ $cf ] : null ),
 			'invoiced_amount'             => self::positive_decimal_or_null( isset( $custom[ $vf ] ) ? $custom[ $vf ] : null ),
 			'customer_rating'             => self::nullable_string( isset( $custom[ $rf ] ) ? $custom[ $rf ] : null ),
@@ -1214,6 +1229,15 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			return array( 'ok' => false, 'reason' => 'invalid_source' );
 		}
 		$type = isset( $source['type'] ) ? trim( (string) $source['type'] ) : '';
+		if ( 'call' === $type ) {
+			$identity = $source['identity'] ?? null;
+			if (!is_string($identity) || !preg_match('/^twilio:CA[a-f0-9]{32}$/Di',$identity) || (isset($source['reference']) && $source['reference']!==$identity)) return array('ok'=>false,'reason'=>'call_source_identity_invalid');
+			$api='SiteEngine\\CallBridge\\Integration\\CallEvidence';
+			if (!class_exists($api) || !is_callable([$api,'read'])) return array('ok'=>false,'reason'=>'call_source_interface_unavailable');
+			try { $e=$api::read($identity); } catch (\Throwable $e) { return array('ok'=>false,'reason'=>'call_source_read_unavailable'); }
+			if (($e['contract']??null)!=='siteengine.call-evidence.v1' || ($e['status']??null)!=='found' || ($e['call']['identity']??null)!==$identity || ($e['call']['provider_call_sid']??null)!==substr($identity,7)) return array('ok'=>false,'reason'=>'call_source_evidence_unavailable');
+			return array('ok'=>true,'reason'=>'','form_id'=>null,'entry_id'=>null,'transaction_id'=>$identity);
+		}
 		if ( 'fluent_form' !== $type ) {
 			return array( 'ok' => true, 'reason' => '', 'form_id' => null, 'entry_id' => null, 'transaction_id' => null );
 		}
@@ -1255,7 +1279,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$uf      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 		$cf      = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
 		$vf      = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
-		$rf      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+		$rf      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
 		$now     = self::utc_now();
 		$data = array(
 			'inquiry_id'                  => $inquiry_id,
@@ -1292,6 +1316,7 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 			'created_at_utc'              => $now,
 			'updated_at_utc'              => $now,
 		);
+		self::assert_contact_lock( (int) $subscriber->id );
 		$ok = $wpdb->insert( $table, $data );
 		return false === $ok ? array( 'ok' => false, 'reason' => 'legacy_snapshot_persistence_failed' ) : array( 'ok' => true, 'reason' => '' );
 	}
@@ -1332,10 +1357,8 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$reset = array(
 			'submission_id'               => $entry_id,
 			'qualified_at'                => '',
-			'unqualified_at'              => '',
 			'closed_date'                 => '',
 			'invoiced_amount'             => '',
-			'customer_rating'             => '',
 			'lost_date'                   => '',
 			'ads_export_status'           => '',
 			'ads_exported_at'             => '',
@@ -1345,10 +1368,9 @@ final class SiteEngine_Ads_Bridge_Inquiries {
 		$config = SiteEngine_Ads_Bridge_Config::instance();
 		$fields = array(
 			'exports.qualified_leads.date_field' => 'qualified_at',
-			'fluentcrm.lifecycle_automation.unqualified_at_field' => 'unqualified_at',
 			'exports.won_jobs.date_field' => 'closed_date',
 			'exports.won_jobs.value_field' => 'invoiced_amount',
-			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'customer_rating',
+			'fluentcrm.lifecycle_automation.unqualified_reason_field' => 'se_ads_unqualified_reason',
 		);
 		foreach ( $fields as $key => $default ) {
 			$slug = trim( (string) $config->get( $key, $default ) );

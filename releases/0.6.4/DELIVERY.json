@@ -1,0 +1,14 @@
+{
+  "version": "0.6.4",
+  "tag": "v0.6.4",
+  "source_commit": "Published commit containing this file; release tag points to that checkpoint.",
+  "package": "siteengine-ads-bridge-0.6.4.zip",
+  "sha256": "00032ac65bfb118621741209bee5888b1d4a76185de14a10f34556781ef01c19",
+  "external_manifest_sha256": "fc9b1264c2444af74bbad5732506f13bacad3cabe31894f7fe6f9a949363c70b",
+  "embedded_manifest_sha256": "fa7a75bc043d39e526c5c64bbc16ae26be3695fa0054b1df5f72943de4c415e5",
+  "coordination_implementation_sha256": "cf284aac38f02afc868418750bf1af5d99ef088a4b4af66fc580c1e62bf4f2bf",
+  "php_minimum": "8.3",
+  "consent": "0.6.1-rc.2",
+  "consent_implementation": "1c0a42000927db720cfc60934ea5e2b31db28533",
+  "consent_contract_docs": "b8ceb8c292ff3a198bd34548ec2e5a2d13afe98f"
+}

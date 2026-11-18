@@ -1,0 +1,11 @@
+{
+  "version": "0.7.1",
+  "source_commit": "196be4aa3062d8484daab3b87a5f6ac51fd5a804",
+  "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
+  "ZIP_count": 1,
+  "sha256": "8baa93c3d3e2236ce8bb60cecac81b7baf202eccc5b05d814a02510fae3bc630",
+  "manifest_sha256": "c495e1f4290209559d086274ad56f57ed1a5dc583c2308667033181cc341defb",
+  "previous_0_7_0_archived_byte_identical": true,
+  "stable_publication": false,
+  "remaining_limit": "CRM-owner 0.7.1 exact-bootstrap binding review"
+}

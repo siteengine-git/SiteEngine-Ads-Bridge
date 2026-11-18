@@ -1,0 +1,28 @@
+{
+  "milestone": "FieldEdge Connector Foundation 1",
+  "date": "2026-11-05",
+  "timezone": "America/Chicago",
+  "baseline_tag": "v0.8.0",
+  "baseline_commit": "b9b6574529c9ce9a89dea7f1b7641d110d08d834",
+  "baseline_zip_sha256": "47e9f25cc430a78d49df7d69ab0fe4114a0a3dd0c384152889ad02f8d6563f58",
+  "branch": "codex/fieldedge-foundation-20261105",
+  "php": "8.3.36 Windows CLI NTS",
+  "test_command": "../local-test-runtime/php-8.3.36/php.exe -n tests/fieldedge-foundation-acceptance.php",
+  "assertions_passed": 62,
+  "assertions_failed": 0,
+  "php_files_linted": 3,
+  "provider_network_calls": 0,
+  "site_operations": 0,
+  "shared_runtime_changes": false,
+  "loader_enabled": false,
+  "installed": false,
+  "released": false,
+  "acceptance": "unaccepted development checkpoint; local synthetic verification only",
+  "limitations": [
+    "CoreDouble supplies in-memory consent, ledger and receipt behavior",
+    "No durable restart, concurrency or installed WordPress acceptance",
+    "No provider authentication or entitlement verified",
+    "No accepted external-outcome core contract or client value policy",
+    "No production transport, webhook endpoint, persistence or exporter"
+  ]
+}

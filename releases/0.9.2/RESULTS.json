@@ -1,0 +1,32 @@
+{
+  "version": "0.9.2",
+  "designation": "LOCAL-VERIFIED INSTALLABLE; NATIVE ACCEPTANCE PENDING",
+  "package": "siteengine-ads-bridge-0.9.2.zip",
+  "bytes": 340031,
+  "sha256": "73af3771918fa2ca4a0b319df7218010a385c30decf31005e461a6f9f0b561b2",
+  "manifest_sha256": "8943c0a3a219ae0e3a82bcf6bb04448699660687314cffaf6958711708e7cd5c",
+  "source_commit": "bd0c57ef073b63f5c3f8c79077f77ad59a4e02eb",
+  "members": 79,
+  "PHP_files": 50,
+  "installed": false,
+  "native_browser_verified": false,
+  "released": false,
+  "current_delivery_replaced": false,
+  "local_results": "LOCAL-RESULTS.json",
+  "reported_choices": [
+    "Excellent",
+    "Good",
+    "Fair",
+    "Poor"
+  ],
+  "new_reason_slug": "se_ads_unqualified_reason",
+  "rating_definition_and_values_preserved_by_local_algorithms": true,
+  "native_scope": "No site operations in this correction; main production registration unavailable",
+  "package_verified": true,
+  "limitations": [
+    "No native install or browser acceptance of 0.9.2",
+    "No external Google/FE/provider calls or delivery",
+    "Current accepted 0.9.1 delivery retained"
+  ],
+  "packaging_failed_attempts_retained": true
+}

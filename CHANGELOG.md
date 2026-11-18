@@ -1,4 +1,184 @@
+## 0.9.4 - Base-managed Google credential adapter
+
+Register a protected document in released Base2.5.0. One web/CLI resolver; explicit read-only authentication test and verified source selection. File deployments stay selected until deliberately switched; failures never fall back. No credentials imported or exports enabled.
+
+## 0.9.3 - Estimated Value CRM definition
+
+- Add estimated_value with label Estimated Value and native number type to the combined CRM setup contract.
+- Adopt compatible existing definitions and preserve edits; conflicting types block before any list, tag or field writes.
+- Preserve the 0.9.2 rating-field correction; no revenue fallback or additional form-field provisioning is introduced.
+
+## 0.9.2 - Separate Unqualified Reason from Customer Rating
+
+- New setups use se_ads_unqualified_reason; preserve compatible explicit legacy reason mappings.
+- Normal setup resolves an incompatible customer_rating mapping to the separate field after complete preflight; conflicting dedicated/custom fields still refuse.
+- Preserve Customer Rating during new-inquiry activation when it is not the configured reason field.
+- Historical inquiry reasons remain authoritative in All Leads with a dedicated CRM mapping; retain existing database and worksheet schemas.
+- No contact-value migration, marketing, sending, enrollment or external delivery.
+
+## 0.9.1 - Complete minimal CRM requirements
+
+- Main setup preflights and provisions the combined Ads/FE contract, including
+  se_fe_identity, se_fe_customer_json and se_fe_jobs_json.
+- Includes a distinct Lost outcome-summary tag without changing the four-state
+  contact lifecycle or inventing loss evidence.
+- Rejects duplicate/malformed required or existing fields before mutation.
+- Removes the second FieldEdge provisioning form; retains a protected no-write
+  redirect for old forms. No automation, transport or export is enabled.
+
+## 0.9.0 — unaccepted setup replacement
+
+- One-page ordinary Setup and one save, API Setup, tabbed Settings.
+- Replace normal CRM ZIP-import UI with missing-only CRM requirements utility.
+- Retain original journals/content and runtime smartcodes independently of import UI.
+- Inspect the real FluentCRM feed map; remove operator-attestation/optional ID controls.
+- Draft read-only Sheets test; separate Google account timezone from Base timezone.
+- Local verification is distinct from pending installed/visible acceptance.
+
+## 0.8.4
+
+- Check both retired and current parent scopes for new child collisions after a
+  parent is recreated, including pending and final readback. Preserve edited
+  portable bodies, old receipts, and the existing exact-before recovery behavior.
+- Add focused edited-child/campaign/independent sequence-parent regressions.
+
+## 0.8.3
+
+- Review and recreate deliberately deleted managed CRM definitions during a new
+  import, assigning new native IDs without clearing the registry or completed jobs.
+- Explicitly relink surviving relationships while preserving reviewed destination
+  edits and exact before/current readback. Keep post-review deletion, collision and
+  uncertain-write protection; no sending or enrollment enablement.
+
+## 0.8.2
+
+- Promote the accepted dev.3 form-first integration foundation; retain explicit
+  identity, durable replay/uncertainty and fresh Consent/DNC protections.
+- Keep production FE transport and call advertising held; no automatic network
+  path, new ordinary export activation or fabricated positive call authority.
+- Refresh administrator Help / Reference and installation instructions; correct
+  the literal delivery directory and distinguish optional development storage.
+- Preserve the four-area UI, durable settings authority, importer recovery and
+  existing 21/94-column contracts. Main-Alma focused results recorded separately.
+
+## 0.8.1
+
+- Add Setup > Configuration authority: explicitly select WordPress settings without
+  importing an unavailable legacy file; preserve saved values and original files.
+- Keep administrator authority durable after legacy file changes/removal, including
+  previously recorded explicit imports. Preserve intentional external overrides.
+- Diagnose missing/unreadable/invalid files without a fatal page; keep protected
+  ownership and settings saves independent of CRM import/credential readiness.
+- Replace obsolete Migration directions and distinguish import status from dependencies.
+
+## 0.8.0
+
+- Four primary areas: Overview, ordered Setup, existing Leads queue, Advanced.
+- Normal activation/Ads administrator setup prepares absent inquiry/guard/ledger storage
+  through protected routines; incompatible schemas and unfinished operations stay blocked.
+- Verify unique standard form selectors, retain custom mappings and request explicit
+  choices for missing/ambiguous fields; CRM feed verification remains separate.
+- Fresh optional source mappings default to Unused. Preserve existing/imported mappings.
+- Carry forward0.7.2 producer-compatible ownership projection and Consent protections.
+
+## 0.7.2
+
+- Accept growing completed producer deployment records using bounded JSON validation
+  and ownership-only projection; active and uncertain operations remain protected.
+
+## 0.7.1 — completed predecessor settings saves
+
+- Read bounded authoritative deployment state under exclusive executor ownership before considering historical administrator state.
+- Permit ordinary settings saves after proven completion without reading unrelated oversized/unreadable administrator payloads.
+- Name the exact ownership record and condition; preserve active,interrupted,uncertain and unknown-state holds and missing locks.
+- Keep credentials-path persistence and file diagnostics separate from ownership;no permission changes or credential fabrication.
+
+## 0.7.0 — destination CRM configuration import
+
+- Separate physical storage faults from unfinished configuration recovery; route exact saved Ads operations to Resume, retain predecessor CRM reservations, and preserve original operation/plan/returned-ID evidence during reviewed predecessor recovery.
+
+- Package configuration-only validators/native adapters inside Ads; no destination dependency on the CRM builder.
+- Add upload, destination mapping, review, automatic batching, exact operation recovery and native editor links.
+- Reuse compatible objects, retain client edits, and require explicit Keep/Replace for conflicts.
+- Include missing standard Ads fields through the reviewed import; Unqualified timing stays internal.
+- Allow incomplete disabled lifecycle setup and all optional sources Unused.
+- Preserve Consent/current-eligibility, inquiry/coordination contracts, customer data and disabled delivery.
+
 # Changelog
+
+##0.6.4.5 —2026-11-04
+
+- Remove the unqualified_at CRM definition/mapping requirement and missing-field creation. Preserve existing definitions and historical values.
+- Record first observed Unqualified event in existing active inquiry storage, preserving repeat/historical timing and All_Leads94 columns.
+- Keep Unqualified internal; preserve all Google advertising gates and portable0.6.4.4 corrections. No implicit schema/adoption or historical repair.
+
+## 0.6.4.4 - 2026-11-04
+
+- Fix site-local versus conversion-zone datetime reinterpretation; preserve explicit offsets and reject invalid/ambiguous DST wall times without historical rewrites.
+- Add administrator manual account/feed confirmations bound to current inputs, optional source selectors and shared missing-only custom-field provisioning.
+- Distinguish credential path/file/access states and disabled/never-run/stale/failed export telemetry; supply accurate quoted scheduler paths.
+- Use the same Doctor rows for module counts/reasons/destinations, including external configuration. Identify missing Converted action at its actual setting.
+- 390 local assertions,65 actual Alma setup/native assertions and17 installed PHP lints PASS. Owned fixtures cleaned; ordinary configuration/Base/fields/inquiry/Consent unchanged. No real delivery or client rollout.
+- Schema2 naive inquiry DST-fold timestamps remain blocked for review because their original offset is unavailable; no guessed history or schema expansion.
+
+## 0.6.4.3 - 2026-11-04
+
+- Replace count-only Doctor failure module messages with every failing check's readable name and original explanation.
+- Add direct Diagnostics and supported corrective destinations in Ads-owned dashboard/page notices; escape output and retain administrator capability checks.
+- Preserve Doctor algorithms/severity/validation, setup precedence, configuration authority, storage, Consent and disabled delivery/export behavior.
+- Alma initial inspection found zero failures; the previously reported single failure remains unidentified. No underlying functional cause is guessed or repaired.
+
+
+## 0.6.4.2 - 2026-11-03 (accepted; Alma administrator verification passed)
+
+- Add explicit Storage controls using the existing inquiry and configuration-guard migrations.
+- Select and validate distinct existing lifecycle tags; explain missing mappings and destinations.
+- Import external configuration with an explicit administrator choice to use WordPress settings, bound to the reviewed file path/hash. Preserve the PHP file and report authority drift.
+- Gate setup writes on the existing shared executor/job and destination locks; preserve pending history/journals.
+- Installed directly from 0.6.4. Actual authenticated administrator HTTP/native acceptance:60 assertions PASS; original Ads options/inquiry/Consent data preserved; owned test resources removed. No runtime defect/correction or client changes.
+
+
+## 0.6.4.1 — 2026-11-03
+
+- Show all unsaved/invalid setup failures with readable field labels and actions.
+- Link Base-owned prerequisites to Business Data and Ads-owned fields to Ads setup.
+- Distinguish explicit Base presence from runtime fallback and explain external
+  configuration precedence instead of recommending ineffective repeated resaves.
+- Preserve validation rules, Doctor failures, Consent, coordination and exports.
+
+## 0.6.4 — 2026-11-02
+
+- Finalize the Consent-repaired contract-1 successor after Alma setup/migration,
+  installed checks and native interrupted-journal recovery.
+- Correct recovery ordering: verify completed earlier receipts while a later step
+  is inflight; do not repeat writes or bypass unresolved intent/readback drift.
+- Explicit additive guard migration; PHP 8.3 minimum. No activation migration.
+- Preserve all disabled delivery/export controls and Consent withdrawal barriers.
+
+## 0.6.4-rc.1 — UNACCEPTED coordination successor, 2026-11-02
+
+- Integrate configuration-coordination contract1 from retained4c448ec into the
+  Consent-repaired maintenance runtime; preserve inquiry adapter1/schema2/tree2.
+- Serialize cooperating inquiry writers with destination protection, same-session
+  no-reconnect behavior and durable interrupted configuration-operation recovery.
+- Add explicit preview/apply guard migration: create absent InnoDB storage only;
+  never repair/reset existing data. No automatic activation/traffic migration.
+- Require PHP8.3 for the supported stock wpdb/mysqli coordination profile.
+- Preserve current Consent rc.2 eligibility and per-dispatch advertising gates.
+- Alma native/installed checks and CRM-owned source binding remain required.
+
+## 0.6.3.1-rc.1 — UNACCEPTED maintenance candidate, 2026-10-29
+
+- Preserve signed canonical v1 evidence and require real Consent rc.2 contract2
+  current eligibility, with strict fail-closed result validation.
+- Re-read at browser payload creation and at every actual advertising Sheet append,
+  including both batch families and retries; current DNC/policy remain required.
+- Withdrawal barriers keep older submissions blocked after re-grant. New captured
+  eligible submissions can proceed; effective personalization remains independent.
+- Block stale prepared consent flags without rewriting retry bodies or history.
+- Preserve All_Leads reporting and accepted inquiry schema2/adapter1/tree2. Exclude
+  unfinished configuration coordination and native diagnostic work.
+- No installed/engine/browser acceptance, deployment or transport enablement.
 
 ## 0.6.3 - 2026-10-23
 

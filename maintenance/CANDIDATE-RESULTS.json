@@ -1,0 +1,19 @@
+{
+  "candidate": "0.6.3.1-rc.1",
+  "status": "UNACCEPTED",
+  "source_commit": "2846305d19d550997295f85e58c7312b736925bd",
+  "zip_filename": "siteengine-ads-bridge-0.6.3.1-rc.1-UNACCEPTED-20261029.zip",
+  "zip_sha256": "34d75e77285aa1e6b8441e0a9f1f766e614150b533423549ce03a91cbd71b72f",
+  "manifest_filename": "siteengine-ads-bridge-0.6.3.1-rc.1-UNACCEPTED-20261029.manifest.json",
+  "manifest_sha256": "33bde105e09bda298b15e52564888ec3fe82563901f18ce5c07561a086cb8ac7",
+  "payload_files": 21,
+  "archive_members": 22,
+  "isolated_assertions": 488,
+  "isolated_failures": 0,
+  "isolated_suites": 12,
+  "php": "8.3.36 -n",
+  "php_lint_passes": 19,
+  "installed_tests": "NOT RUN",
+  "deployment": "NOT PERFORMED",
+  "transport": "NOT ENABLED"
+}

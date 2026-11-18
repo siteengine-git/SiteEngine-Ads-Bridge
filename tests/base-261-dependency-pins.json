@@ -1,0 +1,8 @@
+{
+  "commit": "cdab9f1c9cb29e600b3cf492500f982a854711e4",
+  "files": {
+    "class-credential-registry.php": "28b9ef98822fdfff947e1ea5b85a6ec1f912f54d89f17e05ee84c5b7a37b5518",
+    "class-credentials.php": "a201bac77a1e71c00c5bddc1cb30b98ab91f62f2f1c7b2b90d15b2987be74597",
+    "class-credential-admin.php": "d34aa940f0c9f25b626c68e1f10780e69668f4d45f55ecf9316391bf66d2aed2"
+  }
+}

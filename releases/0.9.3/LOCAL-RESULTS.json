@@ -1,0 +1,22 @@
+{
+  "version": "0.9.3",
+  "checks": [
+    {
+      "test": "product-setup-replacement.php",
+      "assertions": 84,
+      "status": "PASS"
+    },
+    {
+      "test": "product-setup-acceptance.php",
+      "assertions": 34,
+      "status": "PASS"
+    }
+  ],
+  "PHP_lints": 50,
+  "PHP": "8.3.36 -n",
+  "package_members": 80,
+  "payload_hashes_verified": 79,
+  "prior_evidence_reused": "0.9.2 lifecycle/inquiry/reason tests; those runtime files are unchanged",
+  "coverage": "Actual setup algorithms, synthetic vendor/storage boundaries; no native/browser claim",
+  "initial_test_correction": "Historical Ads-only field-count assertion updated from nine to ten after the requested additive field; failure retained in execution output"
+}

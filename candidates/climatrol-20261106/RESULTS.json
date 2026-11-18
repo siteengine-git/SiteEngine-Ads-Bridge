@@ -1,0 +1,144 @@
+{
+  "format": "siteengine.ads.climatrol-results/1",
+  "designation": "UNACCEPTED; actual Google worksheet prerequisite unresolved",
+  "baseline": {
+    "accepted_tag": "cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80",
+    "publication_closeout": "941f74973dabe18d581edd96d0f60a773fbe24ab"
+  },
+  "fieldedge": {
+    "foundation": "114324fd6c5a1d753265f91e9fe26e483575e273",
+    "incremental": "70b72248b700f58eb74a915d515f40688b273834",
+    "successor_preserved": "12f5b363ebfa9b3cc05da27e392c355e241b91be"
+  },
+  "local": {
+    "fieldedge_foundation_assertions": 62,
+    "fieldedge_climatrol_assertions": 51,
+    "consent_dispatch_assertions": 32,
+    "export_runtime_assertions": 9,
+    "failures_final": 0,
+    "scope": "PHP boundary/transport doubles; native integration recorded separately"
+  },
+  "native": {
+    "wordpress": "7.1.4",
+    "php": "8.3.36",
+    "plugin_php_lints": 37,
+    "cases": {
+      "native-outcome": {
+        "status": "PASS",
+        "evidence_sha256": "60ad9e2037597cd2eaad21499ad83b455a0d3bd78851297c427d8d59be0f2cd7"
+      },
+      "native-readback": {
+        "status": "PASS",
+        "evidence_sha256": "e651c17839acdaa58b35afe26f00d0d5842fbfd32775cf76ce9839e0448295ce"
+      },
+      "native-negative-cases": {
+        "status": "PASS",
+        "evidence_sha256": "f42c0a1765e8e505ff50af49b6f4aaf63f599bc7e47c79f93c593a3cb22bdc4e"
+      },
+      "native-permission-cases": {
+        "status": "PASS",
+        "evidence_sha256": "397c64ed63ba8381bb066b7e88b68106435a0f179d5579dff8b654480ec14b80"
+      },
+      "native-uncertain-receipt": {
+        "status": "PASS",
+        "evidence_sha256": "e826a5dfe2bea0f0352a1c5ac534a9ca14e05620eeda11c2c0449e3a2ad2d0b6"
+      },
+      "native-uncertain-recovery": {
+        "status": "PASS",
+        "evidence_sha256": "ab73e5944db7db27f128c2260ed40c206a0e2728b115d71a7460d7cbef528ed1"
+      },
+      "native-concurrency": {
+        "status": "PASS",
+        "evidence_sha256": "3c4f4000da79e715ee25eab84c3aa5747add0553367db3c6f70b90181dbc159f"
+      },
+      "native-fe-outcome": {
+        "status": "PASS",
+        "evidence_sha256": "a99f3bc7bfa09047df0a0a02970941f60fbfe018f20ddf81debd33a47f8d2038"
+      },
+      "native-fe-readback": {
+        "status": "PASS",
+        "evidence_sha256": "9831ffffa25f4344a8a17dd4d68c4087bc93a00f029ab29a183ff7b064574dda"
+      },
+      "native-call-evidence": {
+        "status": "PASS",
+        "evidence_sha256": "eb7cfb198c7bb682707a77fd90b2022ea997309b1c25d0449b938ee0b6fff669"
+      },
+      "native-protection-cases": {
+        "status": "PASS",
+        "evidence_sha256": "e054fe7156af4e5bcb165ac4087ef20bbbaf48c4f8271190da063117a1e8251c"
+      },
+      "native-evidence-recovery": {
+        "status": "PASS",
+        "evidence_sha256": "4242a6ed61dd12086847ac63ca035e8e9ffd74599cc30ff56ff2819469e8e155"
+      },
+      "native-association-dispatch-delta": {
+        "status": "PASS",
+        "evidence_sha256": "8dbf5aa4ce6d3fab9a382d7eceacffd13429720bd6dbeed86177bd3d6aefa77d"
+      }
+    },
+    "transport": {
+      "status": "PASS",
+      "physical_append_requests": 1,
+      "rows": 1,
+      "scope": "actual WordPress/SQL and exporter; synthetic Google HTTP worksheet only",
+      "lost_ack": "held; retry made no append; exact readback reconciled native ledger",
+      "legacy_dispatch": "blocked from bypassing pending intent",
+      "settings_restored": true,
+      "ephemeral_signing_fixture_removed": true
+    },
+    "http": {
+      "status": "PASS",
+      "authenticated_setup_get": true,
+      "status_code": 200,
+      "settings_hash_unchanged": true,
+      "owned_session_revoked": true
+    },
+    "components": {
+      "siteengine-base": {
+        "files": 42,
+        "manifest_sha256": "259ee7ece21cef6708e50d1af282563802671e9b0bef9a22e771d4d3f349b947"
+      },
+      "siteengine-consent": {
+        "files": 6,
+        "manifest_sha256": "14a8bf53e5a53e9b8f7972717931c6692d1ed65e3634a97d2f9eaf2a4db2b7ca"
+      },
+      "siteengine-call-bridge": {
+        "files": 51,
+        "manifest_sha256": "681da38f7f33d5dae7cef3125bf8303d740cc5ea1d17449dea8211bacc99c391"
+      },
+      "fluentform": {
+        "files": 1241,
+        "manifest_sha256": "50be8a3ee0b6ee968835aeb0793fc429a86710d61c4512b351e1c6cf0c454aa5"
+      },
+      "fluent-crm": {
+        "files": 1186,
+        "manifest_sha256": "702325915ab6f4b10caa46c836749b78cbe1318fc1185ea686d6c6d9dc911232"
+      },
+      "fluentcampaign-pro": {
+        "files": 407,
+        "manifest_sha256": "f0389301f8bd6a075f8e3a2744062b2c72b272ca6b028d9921e67579ff226d3e"
+      }
+    },
+    "dependency_versions": {
+      "base": "2.4.0",
+      "consent": "0.6.5-rc.1",
+      "call_bridge": "0.1.4",
+      "fluentform": "6.2.17",
+      "fluentcrm": "3.3.1",
+      "fluentcampaign_pro": "3.3.1"
+    }
+  },
+  "limits": [
+    "Actual Google service-account authentication, worksheet access and real synthetic append NOT VERIFIED; existing path unavailable and dedicated target requested",
+    "No live FieldEdge read/write, customer operation, Twilio call/callback replay, real form/browser submission or production Google delivery",
+    "Form rows and native consent captures are explicitly synthetic; review is trusted operator attestation",
+    "Call evidence uses native CB repository synthetic producer and AB persisted relation; call Google delivery explicitly held",
+    "No accepted candidate freeze or stable publication; stable ZIP/delivery untouched"
+  ],
+  "execution_notes": [
+    "Initial fixture used an invalid inquiry identifier; rejected inquiry recovered using existing explicitly owned synthetic graph, without recapture/duplication",
+    "Initial Consent child tests launched from wrong cwd; corrected cwd passed32/0, no source correction",
+    "Authenticated HTTP overview200 lacked Setup marker; exact Setup URL corrected, settings hash unchanged",
+    "Growing inline test command exceeded Windows process argument limit before SSH launch; staged driver required directly instead"
+  ]
+}

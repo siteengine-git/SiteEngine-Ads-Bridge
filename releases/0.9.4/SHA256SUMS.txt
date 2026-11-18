@@ -1,0 +1,2 @@
+51cb79e6cb6256bd3fe5ad1e7655a57031aa03e87b1e07153828f5aa068efde4  siteengine-ads-bridge-0.9.4.zip
+771cd95d98245f2c9179c8dad7b44bf54a28ef222c7f36b816b8ce3c0ff8ce49  MANIFEST.json

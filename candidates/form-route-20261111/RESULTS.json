@@ -1,0 +1,143 @@
+{
+  "format": "siteengine.ads.form-route-results/1",
+  "date": "2026-11-11",
+  "tooling_source_commit": "68fc5bab1886bb731b03e8cb347647ebdcf0475f",
+  "tooling_manifest_sha256": "550c445f08d33edc9ab1d0bed94279375b98a15650a6fc492ad099c57a0a3632",
+  "implemented": true,
+  "actual_cross_host_route_verified": true,
+  "plugin_runtime_changed": false,
+  "plugin_repackaged": false,
+  "plugin_deployed": false,
+  "stable_released": false,
+  "accepted_runtime": {
+    "version": "0.8.2-dev.3",
+    "source_commit": "d6d81394270a74df20df3910812b6ed57bcd4d30",
+    "zip_sha256": "216f22986aa77be8817ceaa95ecca9e6f98bd70f01fb781b6492d02416cbb090",
+    "manifest_sha256": "ac99201e387d5323f15ba256d5c76b5f84b20a4febf58291bd1f3d8fec462430",
+    "all_111_payload_source_files_unchanged": true,
+    "installed_manifest_reverified": true,
+    "stable_081_dev2_and_worksheet_archives_preserved": true
+  },
+  "route": {
+    "credential_host": "Existing Windows current-user DPAPI launcher; secrets stay local",
+    "durable_host": "Existing approved Alma owner/WP-CLI profile via canonical Invoke-Site-Wp",
+    "operations": [
+      "review",
+      "read",
+      "claim",
+      "observe"
+    ],
+    "transport": "Windows lead DOUBLE only; native provider networking disabled",
+    "new_REST_vault_credentials_access_route_approval_system_or_ledger": false,
+    "binding": [
+      "actual Windows hostname/SID",
+      "profile and shared runner hashes",
+      "actual isolated root/home/owner UID/database fingerprint/prefix/runtime manifest",
+      "bridge bytes",
+      "exact original inquiry/source/tenant/operation/intent/request/reference digests",
+      "raw route/card hashes"
+    ],
+    "limits": {
+      "callbacks_per_run": 12,
+      "run_seconds": 240,
+      "remote_call_seconds": 30,
+      "adapter_child_seconds": 40,
+      "broker_operation_seconds": 45,
+      "request_response_bytes": 131072,
+      "automatic_write_retries": 0
+    }
+  },
+  "actual_native": {
+    "first_callbacks": 9,
+    "replay_callbacks": 3,
+    "first_Windows_lead_doubles": 1,
+    "replay_lead_doubles": 0,
+    "distinct_native_database_connections": 12,
+    "each_open_connection_owner_site_transaction_lock_proof": true,
+    "last_fresh_native_read_checked_before_Windows_transport": true,
+    "known_successful_process_completion_and_IO": true,
+    "independent_exact_mapping_readback": true,
+    "owned_new_rows": 4,
+    "previous_prospective_rows_preserved": 16,
+    "previous_evidence_rows_preserved": 29,
+    "prospective_total_rows": 20,
+    "original_selected_tables_settings_cron_completed_Google_journal_preserved": true,
+    "provider_requests": 0,
+    "credentials_loaded": false,
+    "token_requests": 0,
+    "new_contacts_forms_calls": 0,
+    "all_exports_and_sink_disabled": true,
+    "transaction_absent_and_lock_free_at_close": true
+  },
+  "focused_local": {
+    "AB_adapter_preflight_refusal_cases": 9,
+    "AB_denial_tests_remote_invocations": 0,
+    "FE_initial_process_double_assertions": 9,
+    "FE_post_send_uncertainty_assertions": 13,
+    "FE_runtime_commit": "3f0036182c07662e499f4661ff32d365006e5408",
+    "FE_uncertainty_test_commit": "2bda745c78a2f871218d9cff9b1e88417848cdb8",
+    "FE_closeout_docs_commit": "71af81e69c7edef6b3715e8e093a559fed47337f",
+    "uncertainty_cases": [
+      "n7 post-double read failure: retain original claim/digest, no observe or later callback",
+      "n8 observation failure: retain original permit/exact classified observation attempt, no subsequent callback or write retry"
+    ],
+    "unknown_counts": "Not relabeled zero or success",
+    "claim": "Local process doubles distinct from actual native route proof; no old campaign rerun"
+  },
+  "provider_dependency": {
+    "one_draft_sha256": "1ae7fdda17d2e084a6116024f41b5f339c975416fdc76e425ef5413fde9ca92e",
+    "retained_approved_partnership_contact_found": true,
+    "external_contact_sent": false,
+    "new_provider_research_or_production_probe": false,
+    "questions": [
+      "Authoritative casing/conditional requiredness/enums/status/timezone where published schemas/examples conflict",
+      "Customer/address mutations and SMS/email/dispatch/job side effects and bounded test controls",
+      "Documented lead/work-order pair and trackingId retention/idempotency/uncertain-create reconciliation"
+    ]
+  },
+  "pilot_card": {
+    "private_route_addendum_sha256": "7f827852bcdc69522b162edebead26299a388fb553b21de8c3050db8924498d7",
+    "predecessor_card_preserved": true,
+    "route_engineering_boundary_closed": true,
+    "real_subject_or_business_values_selected": false,
+    "provider_answers_received": false,
+    "next_full_live_card": "Complete only after provider answers and privately designated original inquiry/test subject/customer/service/address/appointment/effects; no invented values",
+    "exact_tested_command": "Private Windows launcher PilotDouble command bound to immutable route/card/adapter files; now stored-result replay only",
+    "native_production_networking_enabled": false,
+    "new_credentials_or_accounts_requested": false
+  },
+  "call_owner_decision": {
+    "Consent_Helper": "Reservation/tel-click/provider facts rejected as browser-choice linkage; earlier conditional source assignment narrowed to HOLD",
+    "Consent_Codex_acknowledgment": "No call implementation/API/positive issuance started; existing form API unchanged",
+    "CB_finding": "Current PSTN callback has no browser capability; a different person can dial the number",
+    "minimum_future_owner_requirement": "An accepted single-use expiring browser challenge redeemed in the SAME provider call, bound to site/account/canonical call with replay/shared-number controls; new interaction and source contract not currently approved",
+    "current_callable": "CallEvidence::read remains advisory; no supported call Consent API exists",
+    "source_changes_to_CB_or_Consent": false,
+    "positive_call_eligibility_claimed": false,
+    "form_first_track_blocked_by_call_track": false
+  },
+  "resource_disposition": {
+    "task_workers_finished": true,
+    "shared_isolated_slot": "Safe checkpoint/released; no task lock/control retained",
+    "retained": "One private staged owner/CLI bridge, route/card and Windows request/response/run evidence, four referenced existing-table rows",
+    "cleanup_owner": "AB Codex existing isolated allocation/private execution evidence; CB owns prior capture provenance",
+    "cleanup_performed": false,
+    "historical_892_893_reopened": false
+  },
+  "limits": [
+    "Provider networking was not exercised and no live lead was created",
+    "The cross-host route is actual success/persistence/replay proof, not a synthetic-refusal substitute; it does not authorize production transport",
+    "Provider answers and real designated subject/business values remain necessary before completed-card/live authorization",
+    "Call authority requires the exact owner-approved new correlation interaction; no speculative Consent/CB edits or real calls",
+    "One local card helper initially encoded a Unicode path as a PHP literal; stopped before remote operations and was corrected with explicit UTF-8. Original local helper preserved. No unknown native write retried"
+  ],
+  "private_evidence_sha256": {
+    "FIRST-RUN.json": "d013db022eb735a7188b5a60e525f7feebe45865acd0660dae5dea072eeda246",
+    "REPLAY.json": "5669514da341b5e5a9be7c51b75d3d9f20c13f79c54754f47cdc640ccc2216b0",
+    "END-TO-END-PROOF.private.json": "51f717cdcc134fc7cd52200f4417cc287c12610ba21057187d9028fe3b6fe2e0",
+    "NATIVE-CLOSEOUT.json": "a5a2f4106395594208f31803a661bd8e988a93eb7cfd2402042390e46e5eb9cd",
+    "PRESERVATION.json": "062b98c071f413715320814a2b9d8bc2f623152d96241636838eb3458fab830b",
+    "LOCAL-ADAPTER-TESTS.json": "46719a74e01584c3a11a51451f692f4a5a7e8caedb6f11d94ef9fcb2c65cf0e5",
+    "TOOLING-MANIFEST.json": "550c445f08d33edc9ab1d0bed94279375b98a15650a6fc492ad099c57a0a3632"
+  }
+}

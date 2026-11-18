@@ -7,11 +7,18 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
+require_once __DIR__ . '/class-siteengine-ads-bridge-consent.php';
+
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
         return;
 }
 
+require_once __DIR__ . '/class-siteengine-ads-bridge-time.php';
+require_once __DIR__ . '/class-siteengine-ads-bridge-fields.php';
+require_once __DIR__ . '/class-siteengine-ads-bridge-storage.php';
+
 class SiteEngine_Ads_Bridge_CLI {
+        private $aggregate_failed=false;
 
         /**
          * Inspect active config.
@@ -294,197 +301,12 @@ class SiteEngine_Ads_Bridge_CLI {
         public function provision_fields( $args, $assoc_args ) {
                 $apply = (bool) WP_CLI\Utils\get_flag_value( $assoc_args, 'apply', false );
 
-                // Required field definitions. Slugs are LOCKED — the doctor asserts these
-                // exact slugs, and they are passed explicitly so saveGlobalFields() does
-                // not derive (and truncate) them. Labels and types are the schema.
-                $required = array(
-                        array(
-                                'slug'  => 'invoiced_amount',
-                                'label' => 'Invoiced Amount',
-                                'type'  => 'number',
-                        ),
-                        array(
-                                'slug'  => 'closed_date',
-                                'label' => 'Closed Date',
-                                'type'  => 'date',
-                        ),
-                        array(
-                                'slug'  => 'qualified_at',
-                                'label' => 'Qualified At',
-                                'type'  => 'date_time',
-                        ),
-                        array(
-                                'slug'  => 'unqualified_at',
-                                'label' => 'Unqualified At',
-                                'type'  => 'date_time',
-                        ),
-                        array(
-                                'slug'  => 'submission_id',
-                                'label' => 'Fluent Forms Submission ID',
-                                'type'  => 'text',
-                        ),
-                        array(
-                                'slug'  => 'ads_export_status',
-                                'label' => 'Ads Export Status',
-                                'type'  => 'text',
-                        ),
-                        array(
-                                'slug'  => 'ads_exported_at',
-                                'label' => 'Ads Exported At',
-                                'type'  => 'date_time',
-                        ),
-                        array(
-                                'slug'  => 'ads_conversion_value_frozen',
-                                'label' => 'Ads Conversion Value Frozen',
-                                'type'  => 'number',
-                        ),
-                        array(
-                                'slug'  => 'ads_export_error',
-                                'label' => 'Ads Export Error',
-                                'type'  => 'textarea',
-                        ),
-                );
+                try {
+                        $result = $apply ? SiteEngine_Ads_Bridge_Setup::with_configuration( static function(){ return SiteEngine_Ads_Bridge_Fields::provision(true); } ) : SiteEngine_Ads_Bridge_Fields::provision(false);
+                } catch (Throwable $e) { WP_CLI::error($e->getMessage()); return; }
+                WP_CLI::line(wp_json_encode($result));
+                WP_CLI::success($apply ? 'Missing definitions provisioned; existing definitions and contact values preserved.' : 'Preview only; use --apply deliberately.');
 
-                if ( ! class_exists( '\FluentCrm\App\Models\CustomContactField' ) ) {
-                        WP_CLI::error( 'FluentCRM is not active (CustomContactField model not found). Cannot provision fields.' );
-                }
-
-                $manager = new \FluentCrm\App\Models\CustomContactField();
-
-                // Validate every proposed type against this install's live field-type
-                // registry before touching anything.
-                $valid_types = array_keys( (array) $manager->getFieldTypes() );
-
-                $invalid = array();
-                foreach ( $required as $field ) {
-                        if ( ! in_array( $field['type'], $valid_types, true ) ) {
-                                $invalid[] = $field['slug'] . ' (' . $field['type'] . ')';
-                        }
-                }
-
-                if ( ! empty( $invalid ) ) {
-                        WP_CLI::error(
-                                'Unsupported field type(s) on this FluentCRM install: ' . implode( ', ', $invalid )
-                                . '. Valid types: ' . implode( ', ', $valid_types )
-                        );
-                }
-
-                // Read the existing full set.
-                $global   = $manager->getGlobalFields();
-                $existing = ( isset( $global['fields'] ) && is_array( $global['fields'] ) ) ? $global['fields'] : array();
-
-                $existing_by_slug = array();
-                foreach ( $existing as $field ) {
-                        if ( isset( $field['slug'] ) ) {
-                                $existing_by_slug[ $field['slug'] ] = $field;
-                        }
-                }
-
-                // Build the report and the append set (missing only).
-                $rows      = array();
-                $to_append = array();
-
-                foreach ( $required as $field ) {
-                        $slug = $field['slug'];
-
-                        if ( isset( $existing_by_slug[ $slug ] ) ) {
-                                $current_type = isset( $existing_by_slug[ $slug ]['type'] ) ? $existing_by_slug[ $slug ]['type'] : '';
-                                $note         = '';
-
-                                if ( $current_type !== $field['type'] ) {
-                                        $note = sprintf( 'existing type "%s" != expected "%s" (left unchanged)', $current_type, $field['type'] );
-                                }
-
-                                $rows[] = array(
-                                        'slug'   => $slug,
-                                        'type'   => $field['type'],
-                                        'state'  => 'exists',
-                                        'action' => 'skip',
-                                        'note'   => $note,
-                                );
-
-                                continue;
-                        }
-
-                        $rows[] = array(
-                                'slug'   => $slug,
-                                'type'   => $field['type'],
-                                'state'  => 'missing',
-                                'action' => $apply ? 'create' : 'would create',
-                                'note'   => '',
-                        );
-
-                        $to_append[] = array(
-                                'slug'  => $slug,
-                                'label' => $field['label'],
-                                'type'  => $field['type'],
-                        );
-                }
-
-                WP_CLI::line( 'SiteEngine Ads Bridge: provision FluentCRM custom fields' );
-                WP_CLI::line( '-------------------------------------------------------' );
-                WP_CLI::line( $apply ? 'Mode: APPLY (writing missing fields)' : 'Mode: DRY-RUN (no changes; pass --apply to write)' );
-                WP_CLI::line( '' );
-
-                WP_CLI\Utils\format_items( 'table', $rows, array( 'slug', 'type', 'state', 'action', 'note' ) );
-
-                // Surface (never act on) any existing field whose type differs.
-                foreach ( $rows as $row ) {
-                        if ( 'exists' === $row['state'] && '' !== $row['note'] ) {
-                                WP_CLI::warning( sprintf( '%s: %s', $row['slug'], $row['note'] ) );
-                        }
-                }
-
-                $missing_count = count( $to_append );
-
-                if ( 0 === $missing_count ) {
-                        WP_CLI::success( 'All required custom fields already exist. Nothing to do.' );
-                        return;
-                }
-
-                if ( ! $apply ) {
-                        WP_CLI::line( '' );
-                        WP_CLI::line( sprintf( '%d field(s) would be created. Re-run with --apply to write them.', $missing_count ) );
-                        WP_CLI::warning( 'Dry-run only. No changes were made.' );
-                        return;
-                }
-
-                // APPLY: save the full merged set (existing preserved verbatim, missing appended).
-                $merged = array_merge( $existing, $to_append );
-                $manager->saveGlobalFields( $merged );
-
-                // Re-read and assert every required slug now resolves.
-                $after        = $manager->getGlobalFields();
-                $after_fields = ( isset( $after['fields'] ) && is_array( $after['fields'] ) ) ? $after['fields'] : array();
-
-                $after_slugs = array();
-                foreach ( $after_fields as $field ) {
-                        if ( isset( $field['slug'] ) ) {
-                                $after_slugs[] = $field['slug'];
-                        }
-                }
-
-                $still_missing = array();
-                foreach ( $required as $field ) {
-                        if ( ! in_array( $field['slug'], $after_slugs, true ) ) {
-                                $still_missing[] = $field['slug'];
-                        }
-                }
-
-                if ( ! empty( $still_missing ) ) {
-                        WP_CLI::error(
-                                'Write completed but these required slugs did not materialize: '
-                                . implode( ', ', $still_missing ) . '. Inspect FluentCRM field storage before retrying.'
-                        );
-                }
-
-                WP_CLI::success(
-                        sprintf(
-                                '%d field(s) created. All %d required slugs verified present.',
-                                $missing_count,
-                                count( $required )
-                        )
-                );
         }
 
         /**
@@ -888,23 +710,10 @@ class SiteEngine_Ads_Bridge_CLI {
                 // timezone, formatted with a numeric UTC offset (DST-aware).
                 $tz_string = (string) $config->get( 'timezone', 'UTC' );
 
-                try {
-                        $tz = new \DateTimeZone( $tz_string );
-                } catch ( \Exception $e ) {
-                        WP_CLI::error( sprintf( 'Configured timezone "%s" is invalid: %s', $tz_string, $e->getMessage() ) );
-                }
-
-                $closed_raw = isset( $custom['closed_date'] ) ? (string) $custom['closed_date'] : '';
-                if ( ! preg_match( '/^(\d{4}-\d{2}-\d{2})/', $closed_raw, $m ) ) {
-                        WP_CLI::error( sprintf( 'closed_date "%s" is not a parseable Y-m-d date; cannot derive conversion time.', $closed_raw ) );
-                }
-                $closed_date = $m[1];
-
-                $dt = \DateTime::createFromFormat( 'Y-m-d H:i:s', $closed_date . ' ' . $time_of_day, $tz );
-                if ( false === $dt ) {
-                        WP_CLI::error( sprintf( 'Could not build a datetime from closed_date %s and time %s.', $closed_date, $time_of_day ) );
-                }
-                $conversion_time = $dt->format( 'Y-m-d H:i:sP' );
+                $closed_raw=isset($custom['closed_date'])?(string)$custom['closed_date']:'';
+                $parsed=$this->build_terminal_datetime($closed_raw,$time_of_day,$tz_string);
+                if($parsed['error']!=='')WP_CLI::error($parsed['error']);
+                $conversion_time=$parsed['value'];
 
                 // Conversion value: invoiced_amount, formatted to 2 decimals.
                 $invoiced       = (float) $custom['invoiced_amount'];
@@ -918,7 +727,7 @@ class SiteEngine_Ads_Bridge_CLI {
                 $hashed_phone = '' !== $norm_phone ? hash( 'sha256', $norm_phone ) : '';
 
                 // Acquisition / linkage identifiers (legacy integration fields). Read as
-                // diagnostics where present — NOT part of the six canonical Ads Bridge
+                // diagnostics where present â€” NOT part of the six canonical Ads Bridge
                 // fields. gbraid may not exist on this install; absent/empty -> (none).
                 $gclid         = isset( $custom['gclid'] ) ? trim( (string) $custom['gclid'] ) : '';
                 $gbraid        = isset( $custom['gbraid'] ) ? trim( (string) $custom['gbraid'] ) : '';
@@ -986,19 +795,20 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( ! $resolved['exportable'] ) {
                         WP_CLI::warning( 'Order ID UNRESOLVED: ' . $resolved['reason'] . ' Without a stable Order ID, re-uploads risk duplicate leads.' );
                 } elseif ( ! $resolved['deterministic'] ) {
-                        WP_CLI::warning( 'Order ID is fallback-derived (' . $resolved['reason'] . ') — a single email match today may not stay unique. Prefer storing submission_id on the contact at submission time.' );
+                        WP_CLI::warning( 'Order ID is fallback-derived (' . $resolved['reason'] . ') â€” a single email match today may not stay unique. Prefer storing submission_id on the contact at submission time.' );
                 }
                 if ( '' !== $phone && '' === $norm_phone ) {
                         WP_CLI::warning( 'Phone present but not in E.164 (no leading "+"/country code); skipped from hashing rather than guessing a country code.' );
                 }
-                WP_CLI::warning( sprintf( 'Conversion time uses config timezone %s. Confirm this equals your Google Ads account timezone before live import (WordPress site timezone is independent of this).', $tz_string ) );
+                 $verified=SiteEngine_Ads_Bridge_Setup::verification('timezone',$config);
+                if(!$verified['valid'])WP_CLI::warning('Google Ads account timezone is not manually confirmed for current inputs. Open Ads Bridge > Setup. WordPress timezone is independent.');
 
                 // Exportability verdict, driven by the Order ID resolver. A row is only
                 // exportable once a stable Order ID is resolved. This remains a dry-run
                 // regardless; nothing is written either way.
                 WP_CLI::line( '' );
                 if ( $resolved['exportable'] ) {
-                        WP_CLI::line( 'Exportable: YES  (Order ID ' . $order_id . ' via ' . $resolved['source'] . ( $resolved['deterministic'] ? ', deterministic' : ', fallback-derived/non-deterministic' ) . ') — dry-run only; nothing written.' );
+                        WP_CLI::line( 'Exportable: YES  (Order ID ' . $order_id . ' via ' . $resolved['source'] . ( $resolved['deterministic'] ? ', deterministic' : ', fallback-derived/non-deterministic' ) . ') â€” dry-run only; nothing written.' );
                 } else {
                         WP_CLI::line( 'Exportable: NO  (' . $resolved['reason'] . ')' );
                 }
@@ -1133,7 +943,7 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( empty( $tables ) ) {
                         WP_CLI::warning( 'No Fluent Forms tables found. Fluent Forms may be inactive or uses an unexpected prefix. Linkage cannot be assessed.' );
                         WP_CLI::line( '' );
-                        WP_CLI::line( 'Resolver recommendation: none possible — no Fluent Forms storage present.' );
+                        WP_CLI::line( 'Resolver recommendation: none possible â€” no Fluent Forms storage present.' );
                         return;
                 }
 
@@ -1196,7 +1006,7 @@ class SiteEngine_Ads_Bridge_CLI {
                 $matches  = array();
                 $match_by = array();
 
-                // (a) Linked WordPress user id — deterministic when both sides have it.
+                // (a) Linked WordPress user id â€” deterministic when both sides have it.
                 if ( $user_id > 0 && $has( 'user_id' ) ) {
                         $rows = $wpdb->get_results(
                                 $wpdb->prepare( "SELECT {$select_sql} FROM `{$submissions_table}` WHERE user_id = %d ORDER BY id DESC LIMIT 25", $user_id ),
@@ -1429,7 +1239,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * canonical (non-draft) Fluent Forms submissions table. On a hit the Order ID
          * is ff:{form_id}:{entry_id} and is marked deterministic. A present-but-invalid
          * stored submission_id (non-numeric or not found) is treated as a data error
-         * and does NOT fall through to email matching — a stored id signals intended
+         * and does NOT fall through to email matching â€” a stored id signals intended
          * linkage. Fallback (only when no submission_id is stored): a unique email
          * match in the same canonical table yields a fallback-derived, non-deterministic
          * Order ID; zero or multiple matches resolve to nothing. Draft and transaction
@@ -1617,7 +1427,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * normalized-but-unhashed values and let Data Manager hash instead. Header
          * labels default to Google's exact names and may be overridden per field via
          * sheets.google_ads_import.headers. "Transaction ID" carries the deterministic
-         * resolver Order ID (ff:{form_id}:{entry_id}) — never the form hidden field
+         * resolver Order ID (ff:{form_id}:{entry_id}) â€” never the form hidden field
          * transaction_id, which stays an internal/GTM correlation value.
          *
          * Export is gated: Exportable: YES requires all CRM Won gates to pass AND a
@@ -1738,22 +1548,22 @@ class SiteEngine_Ads_Bridge_CLI {
                 WP_CLI::line( '  country:        raw "' . $country . '" -> exported "' . $country_norm['value'] . '" (' . $country_norm['status'] . ')' );
 
                 WP_CLI::line( '' );
-                WP_CLI::line( 'Consent provenance (receipt authority — feeds the two consent columns and the export gate):' );
-                WP_CLI::line( '  canonical submission: ' . ( '' !== $consent['attached_entry_id'] ? 'entry #' . $consent['attached_entry_id'] . ' (form ' . $consent['attached_form_id'] . ')' : '(none — ' . ( '' !== $consent['block_reason'] ? $consent['block_reason'] : 'not deterministic' ) . ')' ) );
+                WP_CLI::line( 'Consent provenance (receipt authority â€” feeds the two consent columns and the export gate):' );
+                WP_CLI::line( '  canonical submission: ' . ( '' !== $consent['attached_entry_id'] ? 'entry #' . $consent['attached_entry_id'] . ' (form ' . $consent['attached_form_id'] . ')' : '(none â€” ' . ( '' !== $consent['block_reason'] ? $consent['block_reason'] : 'not deterministic' ) . ')' ) );
                 WP_CLI::line( '  receipt id:           ' . ( '' !== $consent['receipt_id'] ? $consent['receipt_id'] . ' [via ' . $consent['receipt_id_source'] . ']' : '(none)' ) );
                 WP_CLI::line( '  receipt row:          ' . ( $consent['receipt_found'] ? '#' . $consent['receipt_row_id'] . ' (policy_version="' . $consent['policy_version'] . '", banner_version="' . $consent['banner_version'] . '")' : '(not found)' ) );
                 WP_CLI::line( '  policy check:         ' . $consent['policy_check'] . ( '' !== $consent['current_policy'] ? ' (current="' . $consent['current_policy'] . '")' : ' (no current policy source available)' ) );
                 WP_CLI::line( '  ad_user_data:         ' . ( '' !== $consent['ad_user_data'] ? $consent['ad_user_data'] : '(unset)' ) . ' -> Ad measurement consent column = "' . ( '' !== $consent['measurement_feed'] ? $consent['measurement_feed'] : '(blank)' ) . '"' );
                 WP_CLI::line( '  ad_personalization:   ' . ( '' !== $consent['ad_personalization'] ? $consent['ad_personalization'] : '(unset)' ) . ' -> Ad personalization consent column = "' . ( '' !== $consent['personalization_feed'] ? $consent['personalization_feed'] : '(blank)' ) . '"' );
-                WP_CLI::line( '  consent decision:     ' . ( 'exportable' === $consent['decision'] ? 'OK (ad_user_data granted, receipt valid)' : 'BLOCK — ' . $consent['block_reason'] ) );
+                WP_CLI::line( '  consent decision:     ' . ( 'exportable' === $consent['decision'] ? 'OK (ad_user_data granted, receipt valid)' : 'BLOCK â€” ' . $consent['block_reason'] ) );
                 WP_CLI::line( '' );
-                WP_CLI::line( 'Consent diagnostics only (loose CRM/form copied fields — NOT used for export):' );
+                WP_CLI::line( 'Consent diagnostics only (loose CRM/form copied fields â€” NOT used for export):' );
                 WP_CLI::line( '    Ad measurement consent     <- ' . ( 'found' === $measurement_consent['status'] ? $measurement_consent['source'] . '="' . $measurement_consent['value'] . '"' : '(empty)' ) . '  [checked: ' . $measurement_consent['detail'] . ']' );
                 WP_CLI::line( '    Ad personalization consent <- ' . ( 'found' === $personalization_consent['status'] ? $personalization_consent['source'] . '="' . $personalization_consent['value'] . '"' : '(empty)' ) . '  [checked: ' . $personalization_consent['detail'] . ']' );
                 WP_CLI::line( '' );
                 WP_CLI::line( 'Pending / not-yet-wired columns:' );
-                WP_CLI::line( '  User agent: left empty — no wired source on the contact.' );
-                WP_CLI::line( '  Session attributes: left empty — no serialized payload defined.' );
+                WP_CLI::line( '  User agent: left empty â€” no wired source on the contact.' );
+                WP_CLI::line( '  Session attributes: left empty â€” no serialized payload defined.' );
                 if ( 'unknown' === $state_norm['status'] ) {
                         WP_CLI::warning( sprintf( 'State/region "%s" not recognized as a US state name or 2-letter code; left unchanged. Verify Data Manager accepts it.', $state ) );
                 }
@@ -1780,9 +1590,9 @@ class SiteEngine_Ads_Bridge_CLI {
 
                 WP_CLI::line( '' );
                 if ( empty( $reasons ) ) {
-                        WP_CLI::line( 'Exportable: YES  (deterministic Transaction ID ' . $order_id . ') — would append 1 row to Google_Ads_Import. Append-only: no local dedup, no ads_export_status check; Google de-duplicates via Transaction ID. Google upload DISABLED; nothing written.' );
+                        WP_CLI::line( 'Exportable: YES  (deterministic Transaction ID ' . $order_id . ') â€” would append 1 row to Google_Ads_Import. Append-only: no local dedup, no ads_export_status check; Google de-duplicates via Transaction ID. Google upload DISABLED; nothing written.' );
                 } else {
-                        WP_CLI::line( 'Exportable: NO  — ' . implode( '; ', $reasons ) . '.' );
+                        WP_CLI::line( 'Exportable: NO  â€” ' . implode( '; ', $reasons ) . '.' );
                 }
 
                 WP_CLI::success( 'Export dry-run complete. No sheet write, no Google upload, no CRM mutation.' );
@@ -2135,17 +1945,16 @@ class SiteEngine_Ads_Bridge_CLI {
                         return;
                 }
 
-                // Ledger table first — fail closed before any Sheet write.
+                // Ledger table first â€” fail closed before any Sheet write.
                 if ( ! $this->ensure_ledger_table() ) {
                         WP_CLI::error( sprintf( 'Could not create/verify ledger table %s; failing closed before any append. Nothing was written.', $this->ledger_table() ) );
                 }
 
-                // Sheet-append config preflight — same keys append-row enforces.
+                // Sheet-append config preflight â€” same keys append-row enforces.
                 $missing        = array();
                 $sheets_enabled = (bool) $config->get( 'sheets.enabled', false );
                 $spreadsheet_id = trim( (string) $config->get( 'sheets.spreadsheet_id', '' ) );
                 $tab            = trim( (string) $config->get( 'sheets.google_ads_import.tab', '' ) );
-                $creds_path     = trim( (string) $config->get( 'sheets.credentials_path', '' ) );
 
                 if ( true !== $sheets_enabled ) {
                         $missing[] = 'sheets.enabled (must be true)';
@@ -2156,11 +1965,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( '' === $tab ) {
                         $missing[] = 'sheets.google_ads_import.tab (worksheet/tab name)';
                 }
-                if ( '' === $creds_path ) {
-                        $missing[] = 'sheets.credentials_path (absolute path to a Google service-account JSON)';
-                } elseif ( ! is_readable( $creds_path ) ) {
-                        $missing[] = sprintf( 'sheets.credentials_path -> file not readable at "%s"', $creds_path );
-                }
                 if ( ! empty( $missing ) ) {
                         foreach ( $missing as $miss ) {
                                 WP_CLI::line( 'Missing: ' . $miss . '.' );
@@ -2168,10 +1972,8 @@ class SiteEngine_Ads_Bridge_CLI {
                         WP_CLI::error( 'Google Sheet append is not configured; failing closed. Nothing was written.' );
                 }
 
-                $creds = json_decode( (string) file_get_contents( $creds_path ), true );
-                if ( ! is_array( $creds ) || empty( $creds['client_email'] ) || empty( $creds['private_key'] ) ) {
-                        WP_CLI::error( sprintf( 'Service-account JSON at "%s" is missing client_email/private_key. Nothing written.', $creds_path ) );
-                }
+                try { $resolved=SiteEngine_Ads_Bridge_Credentials::resolve($config); $creds=$resolved['credentials']; unset($resolved); }
+                catch (Throwable $e) { WP_CLI::error($e->getMessage().' Nothing was written.'); }
 
                 $token = $this->google_sa_access_token( $creds );
                 if ( ! $token['ok'] ) {
@@ -2200,7 +2002,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                 continue;
                         }
 
-                        $append     = $this->google_sheets_append_row( $spreadsheet_id, $tab, $item['values'], $token['token'], $vio );
+                        $append     = $this->google_sheets_append_row( $spreadsheet_id, $tab, $item['values'], $token['token'], $vio, array_merge( $item, array( 'sink' => $sink ) ) );
                         $attempt_no = $this->ledger_attempt_count( $sink, $item['txn'] ) + 1;
 
                         if ( $append['ok'] ) {
@@ -2256,7 +2058,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                 // Sheet append failed: nothing is in the Sheet, so there is no
                                 // orphan risk here. Record the failed attempt for history. If THAT
                                 // ledger insert also fails, it is bookkeeping loss only (no Sheet
-                                // row, no dedupe poisoning) — warn, but do not gate the exit code.
+                                // row, no dedupe poisoning) â€” warn, but do not gate the exit code.
                                 $count['failed']++;
                                 $led = $this->ledger_insert(
                                         array(
@@ -2870,7 +2672,8 @@ class SiteEngine_Ads_Bridge_CLI {
                         ),
                         'unqualified' => array(
                                 'event' => 'Unqualified',
-                                'field' => trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) ),
+                                'field' => 'unqualified_at',
+                                'legacy_field' => trim((string)$config->get('fluentcrm.lifecycle_automation.unqualified_at_field','unqualified_at')),
                                 'sink'  => 'all_leads_lifecycle_unqualified',
                                 'mode'  => 'field',
                         ),
@@ -2921,7 +2724,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                         $subscribers = $selection['subscribers'];
                                         $legacy_skipped = $selection['ledger_skipped'];
                                 } else {
-                                        $found       = $this->discover_custom_field_subscribers( $stage['field'] );
+                                        $found       = $this->discover_custom_field_subscribers( $stage['legacy_field'] ?? $stage['field'] );
                                         $selection   = $this->select_current_unledgered_subscribers( $found, $stage['sink'], $remaining, $ledger_exists );
                                         $subscribers = $selection['subscribers'];
                                         $legacy_skipped = $selection['ledger_skipped'];
@@ -2981,7 +2784,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                         $record   = 'contact ' . $cid;
                                         $custom   = method_exists( $subscriber, 'custom_fields' ) ? (array) $subscriber->custom_fields() : array();
                                         $email    = isset( $subscriber->email ) ? (string) $subscriber->email : '';
-                                        $event_at = $this->get_contact_custom_value( $subscriber, $custom, $stage['field'] );
+                                        $event_at = $this->get_contact_custom_value( $subscriber, $custom, $stage['legacy_field'] ?? $stage['field'] );
                                 }
 
                                 if ( '' === trim( (string) $event_at ) ) {
@@ -3306,6 +3109,13 @@ class SiteEngine_Ads_Bridge_CLI {
                 WP_CLI::line( 'Qualified and Converted Lead share Google_Ads_Import with distinct ledger scopes. Unqualified remains internal in All_Leads.' );
                 WP_CLI::line( '' );
 
+                $attempt=null;$completed=false;
+                if(!$batch['dry']){
+                    $attempt=['id'=>bin2hex(random_bytes(16)),'timestamp'=>time(),'status'=>'running','scope'=>'aggregate export invocation; per-row failures tracked separately'];
+                    update_option('seab_last_export_attempt',$attempt,false);
+                    register_shutdown_function(static function()use(&$completed,$attempt){if(!$completed){$now=get_option('seab_last_export_attempt',[]);if(($now['id']??null)===$attempt['id']){$now['status']='failed';update_option('seab_last_export_attempt',$now,false);}}});
+                }
+                $this->aggregate_failed=false;
                 if ( (bool) $config->get( 'exports.all_leads.enabled', false ) ) {
                         $ran++;
                         $this->export_all_leads( array(), $mode_args );
@@ -3333,7 +3143,9 @@ class SiteEngine_Ads_Bridge_CLI {
                 }
 
                 if ( ! $batch['dry'] ) {
+                        if($this->aggregate_failed){WP_CLI::error('Aggregate operation contains failed rows. Inspect output/ledger before retrying.');}
                         $this->record_export_runtime();
+                        $completed=true;$attempt['status']='complete';update_option('seab_last_export_attempt',$attempt,false);
                 }
 
                 WP_CLI::success( sprintf( 'export-enabled complete; %d enabled family group(s) executed.', $ran ) );
@@ -3370,6 +3182,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @return void
          */
         private function print_export_batch_summary( $report, $count, $append_total, $dry ) {
+                if(!$dry&&!empty($count['failed']))$this->aggregate_failed=true;
                 WP_CLI::line( 'Per-row:' );
                 if ( empty( $report ) ) {
                         WP_CLI::line( '  (no candidates matched the selector)' );
@@ -3418,32 +3231,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @return bool True if the table exists after the call.
          */
         private function ensure_ledger_table() {
-                global $wpdb;
-                if ( $this->ledger_table_exists() ) {
-                        return true;
-                }
-                $t               = $this->ledger_table();
-                $charset_collate = $wpdb->get_charset_collate();
-                $sql             = "CREATE TABLE IF NOT EXISTS `{$t}` (
-                        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                        sink_slug VARCHAR(64) NOT NULL DEFAULT '',
-                        contact_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
-                        transaction_id VARCHAR(191) NOT NULL DEFAULT '',
-                        row_hash CHAR(64) NOT NULL DEFAULT '',
-                        spreadsheet_id VARCHAR(191) NOT NULL DEFAULT '',
-                        tab VARCHAR(191) NOT NULL DEFAULT '',
-                        updated_range VARCHAR(191) NOT NULL DEFAULT '',
-                        status VARCHAR(16) NOT NULL DEFAULT '',
-                        error TEXT NULL,
-                        attempts INT UNSIGNED NOT NULL DEFAULT 0,
-                        created_at DATETIME NOT NULL,
-                        updated_at DATETIME NOT NULL,
-                        PRIMARY KEY (id),
-                        KEY sink_txn (sink_slug, transaction_id),
-                        KEY sink_status (sink_slug, status)
-                ) {$charset_collate};";
-                $wpdb->query( $sql );
-                return $this->ledger_table_exists();
+                return SiteEngine_Ads_Bridge_Storage::ensure_ledger_exists();
         }
 
         /**
@@ -3666,7 +3454,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * This mirrors ensure_ledger_table() exactly. Defaults are expressed the way
          * SHOW FULL COLUMNS reports them: null means "no default", and a string means
          * that literal default value. Character set and collation are deliberately
-         * excluded — they follow wpdb::get_charset_collate() and are site-dependent.
+         * excluded â€” they follow wpdb::get_charset_collate() and are site-dependent.
          *
          * @return array
          */
@@ -4308,7 +4096,7 @@ class SiteEngine_Ads_Bridge_CLI {
          *
          * The Sheet is never scanned: every piece of evidence is supplied by the
          * operator and validated against configuration before any write. Reconciliation
-         * provenance is stated in console output only — it is deliberately NOT written
+         * provenance is stated in console output only â€” it is deliberately NOT written
          * into the error column, which stays empty so the row is indistinguishable in
          * shape from a normal successful append and dedupe behaves identically.
          *
@@ -4482,7 +4270,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * ledger-admin duplicates. Always read-only.
          *
          * Reports every sink + Transaction ID pair holding more than one
-         * status=appended row — the dedupe key that export-batch relies on — and prints
+         * status=appended row â€” the dedupe key that export-batch relies on â€” and prints
          * the full matching rows. Nothing is ever deleted, merged, or rewritten;
          * remediation is an operator decision made outside this plugin.
          *
@@ -4562,6 +4350,118 @@ class SiteEngine_Ads_Bridge_CLI {
          * @param string $time_of_day  Validated HH:MM:SS.
          * @return array
          */
+        /**
+         * Inspect/export one explicitly reviewed synthetic external outcome.
+         *
+         * ## OPTIONS
+         *
+         * --receipt=<sha256>
+         * [--apply]
+         * [--reconcile]
+         *
+         * @subcommand outcome
+         */
+        public function outcome($args,$assoc_args) {
+                $result=$this->external_outcome_export((string)($assoc_args['receipt']??''),isset($assoc_args['apply']),isset($assoc_args['reconcile']));
+                WP_CLI::line(wp_json_encode($result));
+        }
+
+        /** Same builder, authority checks, transport and stage ledger as form exports. */
+        public function external_outcome_export(string $receipt,bool $apply=false,bool $reconcile=false): array {
+                if (!current_user_can('manage_options')) return ['status'=>'held','reason_code'=>'administrator_required'];
+                try {
+                return SiteEngine_Ads_Bridge_Outcomes::protected_call(function() use($receipt,$apply,$reconcile) {
+                        global $wpdb;
+                        $stored=SiteEngine_Ads_Bridge_Outcomes::read($receipt);
+                        if (!$stored) return ['status'=>'held','reason_code'=>'outcome_not_found'];
+                        $response=json_decode($stored['response'],true,16,JSON_THROW_ON_ERROR);
+                        if ($response['status']!=='recorded') return ['status'=>'held','reason_code'=>'outcome_not_recorded'];
+                        if ($response['canonical_receipt_id']!==$receipt) {
+                                $stored=SiteEngine_Ads_Bridge_Outcomes::read($response['canonical_receipt_id']);
+                                if (!$stored) throw new RuntimeException('outcome_canonical_receipt_unavailable');
+                        }
+                        $o=json_decode($stored['body'],true,16,JSON_THROW_ON_ERROR);
+                        $association=SiteEngine_Ads_Bridge_Outcomes::association_reason($o);
+                        if ($association!=='') return ['status'=>'held','reason_code'=>$association,'association_status'=>'attributed'];
+                        $inq=SiteEngine_Ads_Bridge_Inquiries::get($o['inquiry_id']);
+                        if (!$inq || !in_array($inq['state'],['active','archived'],true)) return ['status'=>'held','reason_code'=>'inquiry_unavailable'];
+                        // Call identity is never rewritten as a Fluent Forms transaction.
+                        // No row/transport is released without a supported call Consent contract.
+                        if (($inq['source_type']??null)==='call') return SiteEngine_Ads_Bridge_Outcomes::call_eligibility($inq);
+                        $config=SiteEngine_Ads_Bridge_Config::instance();
+                        if ($config->get('exports.won_jobs.value_field','invoiced_amount')!=='invoiced_amount' || $config->get('exports.won_jobs.date_field','closed_date')!=='closed_date') return ['status'=>'held','reason_code'=>'external_outcome_field_mapping_unsupported'];
+                        $subscriber=\FluentCrm\App\Models\Subscriber::find((int)$inq['contact_id']);
+                        if (!$subscriber) return ['status'=>'held','reason_code'=>'contact_unavailable'];
+                        // This in-memory export view has no CRM/inquiry writes. The receipt
+                        // supplies economic evidence; the frozen inquiry supplies attribution.
+                        $view=$inq; $view['lifecycle']='won'; $view['closed_date']=substr($o['completed_at'],0,10);
+                        $view['invoiced_amount']=$o['amount']; $view['ads_conversion_value_frozen']=$o['amount'];
+                        $built=$this->build_google_ads_import($subscriber,$config,'12:00:00',$view);
+                        $values=$built['values'];
+                        $when=new DateTimeImmutable(preg_replace('/(\.\d{6})\d/','$1',$o['completed_at']));
+                        $values[0]=$when->format('Y-m-d H:i:sP'); $values[14]=$o['amount']; $values[15]=$o['currency'];
+                        $context=['cid'=>(int)$inq['contact_id'],'txn'=>$inq['transaction_id']];
+                        $dispatch=$this->advertising_dispatch_error($values,$context);
+                        $reason=$dispatch!==''?$dispatch:implode('; ',$built['reasons']);
+                        $reason_code=$dispatch==='current DNC blocks advertising dispatch'?'current_dnc':(str_contains($reason,'unsigned legacy consent')?'consent_evidence_missing':'advertising_ineligible');
+                        if (!$built['exportable'] || $dispatch!=='') return ['status'=>'held','reason_code'=>$reason_code,'association_status'=>'attributed','detail'=>$reason];
+                        if (!$apply && !$reconcile) return ['status'=>'eligible','reason_code'=>'fresh_authority_verified','association_status'=>'attributed','values'=>$values,'headers'=>$built['headers'],'inquiry_id'=>$o['inquiry_id']];
+                        $target=get_option('seab_outcome_demo_target_v1',[]);
+                        if (wp_get_environment_type()!=='staging' || ($target['destination']??null)!==seab_external_outcome_capability()['destination'] || ($target['tab']??null)!=='SYNTHETIC_Climatrol_20261109' || ($target['spreadsheet_id']??null)!==$config->get('google_sheets.spreadsheet_id','') || $o['value_policy_id']!=='synthetic-usd-demo-1') return ['status'=>'held','reason_code'=>'isolated_demo_target_required'];
+                        $sink='google_ads_import_converted_lead'; $txn=$inq['transaction_id']; $ledger=$this->ledger_table();
+                        if (!SiteEngine_Ads_Bridge_Storage::inspect_ledger()['ready']) throw new RuntimeException('outcome_ledger_unavailable');
+                        $rows=$wpdb->get_results($wpdb->prepare("SELECT * FROM `$ledger` WHERE sink_slug IN (%s,%s) AND transaction_id=%s ORDER BY id",$sink,'google_ads_import_sheet',$txn),ARRAY_A);
+                        if ($wpdb->last_error!=='' || !is_array($rows)) throw new RuntimeException('outcome_ledger_read_unavailable');
+                        foreach ($rows as $row) if ($row['status']==='appended') return ['status'=>'already_exported','reason_code'=>'converted_stage_already_appended'];
+                        $hash=hash('sha256',implode("\x1f",array_map('strval',$values)));
+                        if ($rows && !$reconcile) return ['status'=>'held','reason_code'=>'outcome_append_uncertain_reconcile_required'];
+                        // Obtain credentials only after all permission and destination gates.
+                        $sheet=$this->prepare_family_sheet_context($config,$target['tab']);
+                        $headers=$this->google_sheets_read_header($sheet['spreadsheet_id'],$target['tab'],$sheet['token']);
+                        if (!$headers['ok'] || $this->trim_trailing_empty_cells($headers['values'])!==$this->trim_trailing_empty_cells($built['headers'])) return ['status'=>'held','reason_code'=>'test_worksheet_headers_mismatch'];
+                        $event=['sink_slug'=>$sink,'contact_id'=>$inq['contact_id'],'transaction_id'=>$txn,'row_hash'=>$hash,'spreadsheet_id'=>$sheet['spreadsheet_id'],'tab'=>$target['tab'],'updated_range'=>'','status'=>'outcome_pending','error'=>'','attempts'=>1];
+                        if ($rows) {
+                                $first=$rows[0];
+                                if ($first['row_hash']!==$hash || $first['spreadsheet_id']!==$sheet['spreadsheet_id'] || $first['tab']!==$target['tab']) return ['status'=>'held','reason_code'=>'outcome_retry_body_or_destination_changed'];
+                                $url='https://sheets.googleapis.com/v4/spreadsheets/'.rawurlencode($sheet['spreadsheet_id']).'/values/'.rawurlencode($this->quote_sheet_title($target['tab']).'!A2:U');
+                                $read=$this->google_sheets_json_request('GET',$url,$sheet['token']);
+                                if (!$read['ok']) return ['status'=>'held','reason_code'=>'outcome_sheet_readback_unavailable'];
+                                $matches=[]; $all=$read['json']['values']??[];
+                                foreach ($all as $i=>$row) {
+                                        if (($row[1]??null)!==$txn || ($row[20]??null)!==$values[20]) continue;
+                                        if (array_pad($row,21,'')!==$values) return ['status'=>'held','reason_code'=>'outcome_sheet_body_conflict'];
+                                        $matches[]=$i+2;
+                                }
+                                if (count($matches)!==1) return ['status'=>'held','reason_code'=>count($matches)?'outcome_sheet_duplicate_requires_review':'outcome_append_unresolved_no_automatic_retry'];
+                                $event['status']='appended'; $event['updated_range']=$target['tab'].'!A'.$matches[0].':U'.$matches[0];
+                                if (!$this->external_outcome_ledger_insert($event)['ok']) throw new RuntimeException('outcome_reconciliation_write_unconfirmed');
+                                return ['status'=>'exported','reason_code'=>'outcome_append_reconciled','updated_range'=>$event['updated_range']];
+                        }
+                        // Persist intention and exact body hash before a physical request.
+                        $intent=$this->external_outcome_ledger_insert($event);
+                        if (!$intent['ok']) throw new RuntimeException('outcome_append_intent_unconfirmed');
+                        $check=$wpdb->get_row($wpdb->prepare("SELECT * FROM `$ledger` WHERE id=%d",$intent['insert_id']),ARRAY_A);
+                        if ($wpdb->last_error!=='' || !$check || $check['row_hash']!==$hash || $check['status']!=='outcome_pending') throw new RuntimeException('outcome_append_intent_readback_unconfirmed');
+                        SiteEngine_Ads_Bridge_Coordination::assert_owner();
+                        $context['outcome_intent_id']=$intent['insert_id'];
+                        $result=$this->google_sheets_append_row($sheet['spreadsheet_id'],$target['tab'],$values,$sheet['token'],'RAW',$context);
+                        if (!$result['ok'] || $result['updated_rows']!==1) return ['status'=>'held','reason_code'=>'outcome_append_uncertain_reconcile_required'];
+                        $event['status']='appended'; $event['updated_range']=$result['updated_range'];
+                        if (!$this->external_outcome_ledger_insert($event)['ok']) throw new RuntimeException('outcome_append_ack_unconfirmed');
+                        return ['status'=>'exported','reason_code'=>'synthetic_outcome_appended','updated_range'=>$result['updated_range']];
+                });
+                } catch (Throwable $error) { return ['status'=>'retry','reason_code'=>'outcome_export_unconfirmed']; }
+        }
+
+        private function external_outcome_ledger_insert(array $event): array {
+                global $wpdb; $insert=$this->ledger_insert($event);
+                if (!$insert['ok']) return $insert;
+                $row=$wpdb->get_row($wpdb->prepare('SELECT * FROM `'.$this->ledger_table().'` WHERE id=%d',$insert['insert_id']),ARRAY_A);
+                if ($wpdb->last_error!=='' || !is_array($row)) return ['ok'=>false,'insert_id'=>$insert['insert_id']];
+                foreach ($event as $key=>$value) if ((string)($row[$key]??'')!==(string)$value) return ['ok'=>false,'insert_id'=>$insert['insert_id']];
+                return $insert;
+        }
+
         private function build_google_ads_import( $subscriber, $config, $time_of_day, $inquiry = null ) {
                 $email   = (string) $subscriber->email;
                 $phone   = (string) $subscriber->phone;
@@ -4664,29 +4564,12 @@ class SiteEngine_Ads_Bridge_CLI {
                         $ip = (string) $submission_context['row']['ip'];
                 }
 
-                $tz_string       = (string) $config->get( 'timezone', 'UTC' );
-                $conversion_time = '';
-                $time_err        = '';
-                $tz              = null;
-                try {
-                        $tz = new \DateTimeZone( $tz_string );
-                } catch ( \Exception $e ) {
-                        $time_err = 'invalid configured timezone "' . $tz_string . '"';
-                }
+                $tz_string = (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC'));
                 $date_field = trim( (string) $config->get( 'exports.won_jobs.date_field', 'closed_date' ) );
-                $date_raw   = isset( $custom[ $date_field ] ) ? (string) $custom[ $date_field ] : '';
-                if ( null !== $tz ) {
-                        if ( preg_match( '/^(\d{4}-\d{2}-\d{2})/', $date_raw, $m ) ) {
-                                $dt = \DateTime::createFromFormat( 'Y-m-d H:i:s', $m[1] . ' ' . $time_of_day, $tz );
-                                if ( false !== $dt ) {
-                                        $conversion_time = $dt->format( 'Y-m-d H:i:sP' );
-                                } else {
-                                        $time_err = 'could not build datetime from ' . $date_field . '/time';
-                                }
-                        } else {
-                                $time_err = $date_field . ' "' . $date_raw . '" is not a parseable Y-m-d date';
-                        }
-                }
+                $date_raw = isset( $custom[ $date_field ] ) ? (string) $custom[ $date_field ] : '';
+                $parsed = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC')) );
+                $conversion_time = $parsed['value'];
+                $time_err = $parsed['error'];
 
                 $value_field = trim( (string) $config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ) );
                 $frozen      = isset( $custom['ads_conversion_value_frozen'] ) ? $custom['ads_conversion_value_frozen'] : '';
@@ -5729,6 +5612,10 @@ class SiteEngine_Ads_Bridge_CLI {
                 // milestones from a later FluentCRM contact projection. The bound
                 // submission remains the identity/attribution authority, while the
                 // Ads inquiry row supplies the historical lifecycle/value snapshot.
+                if(!is_array($inquiry)&&$txn!==''&&class_exists('SiteEngine_Ads_Bridge_Inquiries')){
+                    $mapped=SiteEngine_Ads_Bridge_Inquiries::get_by_transaction_id($txn);
+                    if(is_array($mapped)&&!empty($mapped['inquiry_id']))$inquiry=$mapped;
+                }
                 $inquiry_id = '';
                 if ( is_array( $inquiry ) && ! empty( $inquiry['inquiry_id'] ) ) {
                         $inquiry_id = (string) $inquiry['inquiry_id'];
@@ -5740,11 +5627,6 @@ class SiteEngine_Ads_Bridge_CLI {
                         if ( ! empty( $inquiry['lifecycle'] ) ) {
                                 $membership['lifecycle'] = array( ucfirst( (string) $inquiry['lifecycle'] ) );
                         }
-                } elseif ( '' !== $txn && class_exists( 'SiteEngine_Ads_Bridge_Inquiries' ) ) {
-                        $mapped = SiteEngine_Ads_Bridge_Inquiries::get_by_transaction_id( $txn );
-                        if ( is_array( $mapped ) && ! empty( $mapped['inquiry_id'] ) ) {
-                                $inquiry_id = (string) $mapped['inquiry_id'];
-                        }
                 }
 
                 $pick = function ( $primary, $fallback ) {
@@ -5753,14 +5635,18 @@ class SiteEngine_Ads_Bridge_CLI {
                 $sub_prop = function ( $name ) use ( $subscriber ) {
                         return is_object( $subscriber ) && isset( $subscriber->{$name} ) ? (string) $subscriber->{$name} : '';
                 };
-                $custom_value = function ( $slug ) use ( $subscriber, $custom, $inquiry ) {
+                $custom_value = function ( $slug ) use ( $subscriber, $custom, $inquiry, $config ) {
+                        // The historical column keeps its schema name; it stores this inquiry's reason.
+                        if (is_array($inquiry) && $slug === $config->get('fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason')) {
+                                return (string)($inquiry['customer_rating'] ?? '');
+                        }
                         if ( is_array( $inquiry ) && array_key_exists( $slug, $custom ) ) {
                                 return is_array( $custom[ $slug ] ) ? implode( '|', $custom[ $slug ] ) : (string) $custom[ $slug ];
                         }
                         return is_object( $subscriber ) ? $this->get_contact_custom_value( $subscriber, $custom, $slug ) : '';
                 };
 
-                $reason_field      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' ) );
+                $reason_field      = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' ) );
                 $qualified_field   = trim( (string) $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ) );
                 $unqualified_field = trim( (string) $config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' ) );
 
@@ -5871,7 +5757,7 @@ class SiteEngine_Ads_Bridge_CLI {
                         array( 'k' => 'se_loc',                  'h' => 'Google physical location criterion ID', 'v' => $pick( $form_values['se_loc'], $custom_value( 'se_loc' ) ) ),
                         array( 'k' => 'customer_rating',         'h' => 'Customer Rating',                'v' => $custom_value( $reason_field ) ),
                         array( 'k' => 'qualified_at',            'h' => 'Qualified at',                   'v' => $custom_value( $qualified_field ) ),
-                        array( 'k' => 'unqualified_at',          'h' => 'Unqualified at',                 'v' => $custom_value( $unqualified_field ) ),
+                        array( 'k' => 'unqualified_at',          'h' => 'Unqualified at',                 'v' => is_array($inquiry)?(string)($inquiry['unqualified_at']??''):$custom_value( $unqualified_field ) ),
                         array( 'k' => 'lifecycle_event',         'h' => 'Lifecycle event',                'v' => trim( (string) $lifecycle_event ) ),
                         array( 'k' => 'lifecycle_event_at',      'h' => 'Lifecycle event at',             'v' => trim( (string) $lifecycle_event_at ) ),
                         array( 'k' => 'inquiry_id',              'h' => 'Inquiry ID',                     'v' => $inquiry_id ),
@@ -6187,7 +6073,7 @@ class SiteEngine_Ads_Bridge_CLI {
 
                 $date_field = trim( (string) $config->get( 'exports.qualified_leads.date_field', 'qualified_at' ) );
                 $date_raw   = $this->get_contact_custom_value( $subscriber, $custom, $date_field );
-                $date       = $this->build_terminal_datetime( $date_raw, $time_of_day, (string) $config->get( 'client.timezone', 'UTC' ) );
+                $date       = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC')) );
                 if ( '' === $date_raw ) {
                         $reasons[] = $date_field . ' is not set';
                 } elseif ( '' === $date['value'] ) {
@@ -6381,27 +6267,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @return array{value:string,error:string}
          */
         private function build_terminal_datetime( $raw, $time_of_day, $timezone ) {
-                $out = array( 'value' => '', 'error' => '' );
-                try {
-                        $tz = new \DateTimeZone( $timezone );
-                } catch ( \Exception $e ) {
-                        $out['error'] = 'invalid configured timezone "' . $timezone . '"';
-                        return $out;
-                }
-
-                $raw = trim( (string) $raw );
-                if ( ! preg_match( '/^(\d{4}-\d{2}-\d{2})(?:[ T](\d{2}:\d{2}:\d{2}))?/', $raw, $match ) ) {
-                        $out['error'] = 'terminal date "' . $raw . '" is not parseable as Y-m-d';
-                        return $out;
-                }
-                $time = ! empty( $match[2] ) ? $match[2] : $time_of_day;
-                $dt   = \DateTime::createFromFormat( 'Y-m-d H:i:s', $match[1] . ' ' . $time, $tz );
-                if ( false === $dt ) {
-                        $out['error'] = 'could not build terminal datetime';
-                        return $out;
-                }
-                $out['value'] = $dt->format( 'Y-m-d H:i:sP' );
-                return $out;
+                return SiteEngine_Ads_Bridge_Time::conversion( $raw, $time_of_day, $timezone );
         }
 
         /**
@@ -6458,7 +6324,7 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( '' === trim( $date_raw ) ) {
                         $reasons[] = $date_field . ' is not set';
                 }
-                $date = $this->build_terminal_datetime( $date_raw, $time_of_day, (string) $config->get( 'client.timezone', 'UTC' ) );
+                $date = $this->build_terminal_datetime( $date_raw, $time_of_day, (string)($config->get('google_sheets.account_timezone','') ?: $config->get('client.timezone','UTC')) );
                 if ( '' === $date['value'] ) {
                         $reasons[] = 'conversion time unresolved (' . $date['error'] . ')';
                 }
@@ -6636,7 +6502,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 $missing        = array();
                 $enabled        = (bool) $config->get( 'google_sheets.enabled', false );
                 $spreadsheet_id = trim( (string) $config->get( 'google_sheets.spreadsheet_id', '' ) );
-                $creds_path     = trim( (string) $config->get( 'google_sheets.credentials_path', '' ) );
 
                 if ( ! $enabled ) {
                         $missing[] = 'google_sheets.enabled (must be true)';
@@ -6647,11 +6512,6 @@ class SiteEngine_Ads_Bridge_CLI {
                 if ( '' === trim( $tab ) ) {
                         $missing[] = 'target sheet tab';
                 }
-                if ( '' === $creds_path ) {
-                        $missing[] = 'google_sheets.credentials_path';
-                } elseif ( ! is_readable( $creds_path ) ) {
-                        $missing[] = 'credentials file is not readable at ' . $creds_path;
-                }
                 if ( ! empty( $missing ) ) {
                         foreach ( $missing as $item ) {
                                 WP_CLI::line( 'Missing: ' . $item . '.' );
@@ -6659,10 +6519,9 @@ class SiteEngine_Ads_Bridge_CLI {
                         WP_CLI::error( 'Google Sheet append is not configured; failing closed. Nothing was written.' );
                 }
 
-                $creds = json_decode( (string) file_get_contents( $creds_path ), true );
-                if ( ! is_array( $creds ) || empty( $creds['client_email'] ) || empty( $creds['private_key'] ) ) {
-                        WP_CLI::error( sprintf( 'Service-account JSON at "%s" is missing client_email/private_key.', $creds_path ) );
-                }
+                try { $resolved=SiteEngine_Ads_Bridge_Credentials::resolve($config); $creds=$resolved['credentials']; unset($resolved); }
+                catch (Throwable $e) { WP_CLI::error($e->getMessage().' Nothing was written.'); }
+
                 $token = $this->google_sa_access_token( $creds );
                 if ( ! $token['ok'] ) {
                         WP_CLI::error( 'Could not obtain a Google access token: ' . $token['error'] . '. Nothing written.' );
@@ -6734,7 +6593,7 @@ class SiteEngine_Ads_Bridge_CLI {
                                 continue;
                         }
 
-                        $append     = $this->google_sheets_append_row( $sheet['spreadsheet_id'], $tab, $item['values'], $sheet['token'], $sheet['vio'] );
+                        $append     = $this->google_sheets_append_row( $sheet['spreadsheet_id'], $tab, $item['values'], $sheet['token'], $sheet['vio'], array_merge( $item, array( 'sink' => $sink ) ) );
                         $attempt_no = $this->ledger_attempt_count( $sink, $item['txn'] ) + 1;
 
                         if ( $append['ok'] ) {
@@ -6830,6 +6689,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @return void
          */
         private function print_family_batch_summary( $report, $count, $append_total, $dry ) {
+                if(!$dry&&!empty($count['failed']))$this->aggregate_failed=true;
                 WP_CLI::line( 'Per-row:' );
                 if ( empty( $report ) ) {
                         WP_CLI::line( '  (no candidates matched)' );
@@ -6857,74 +6717,39 @@ class SiteEngine_Ads_Bridge_CLI {
          * @param array $creds Decoded service-account JSON (needs client_email, private_key).
          * @return array{ok:bool,token:string,error:string}
          */
-        private function google_sa_access_token( $creds ) {
-                $out = array( 'ok' => false, 'token' => '', 'error' => '' );
+        private function google_sa_access_token( $creds ) { return SiteEngine_Ads_Bridge_Google::token($creds); }
 
-                if ( ! function_exists( 'openssl_sign' ) ) {
-                        $out['error'] = 'openssl extension unavailable; cannot sign the service-account JWT.';
-                        return $out;
-                }
-
-                $token_uri = ! empty( $creds['token_uri'] ) ? (string) $creds['token_uri'] : 'https://oauth2.googleapis.com/token';
-                $scope     = 'https://www.googleapis.com/auth/spreadsheets';
-                $now       = time();
-
-                $b64url = function ( $data ) {
-                        return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
-                };
-
-                $header_seg = $b64url( wp_json_encode( array( 'alg' => 'RS256', 'typ' => 'JWT' ) ) );
-                $claim_seg  = $b64url(
-                        wp_json_encode(
-                                array(
-                                        'iss'   => (string) $creds['client_email'],
-                                        'scope' => $scope,
-                                        'aud'   => $token_uri,
-                                        'iat'   => $now,
-                                        'exp'   => $now + 3600,
-                                )
-                        )
-                );
-
-                $signing_input = $header_seg . '.' . $claim_seg;
-                $signature     = '';
-                $signed        = openssl_sign( $signing_input, $signature, (string) $creds['private_key'], OPENSSL_ALGO_SHA256 );
-                if ( ! $signed ) {
-                        $out['error'] = 'openssl_sign failed (check the private_key in the service-account JSON).';
-                        return $out;
-                }
-                $jwt = $signing_input . '.' . $b64url( $signature );
-
-                $response = wp_remote_post(
-                        $token_uri,
-                        array(
-                                'timeout' => 20,
-                                'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ),
-                                'body'    => array(
-                                        'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                                        'assertion'  => $jwt,
-                                ),
-                        )
-                );
-
-                if ( is_wp_error( $response ) ) {
-                        $out['error'] = 'token request transport error: ' . $response->get_error_message();
-                        return $out;
-                }
-
-                $code = (int) wp_remote_retrieve_response_code( $response );
-                $body = (string) wp_remote_retrieve_body( $response );
-                $json = json_decode( $body, true );
-
-                if ( 200 !== $code || ! is_array( $json ) || empty( $json['access_token'] ) ) {
-                        $err = ( is_array( $json ) && isset( $json['error_description'] ) ) ? (string) $json['error_description'] : ( '' !== $body ? substr( $body, 0, 300 ) : 'no body' );
-                        $out['error'] = sprintf( 'token endpoint returned HTTP %d: %s', $code, $err );
-                        return $out;
-                }
-
-                $out['ok']    = true;
-                $out['token'] = (string) $json['access_token'];
-                return $out;
+        /** Last dispatch boundary, including prepared batches and exact-body retries. */
+        private function advertising_dispatch_error( $values, $context ) {
+                try {
+                        if ( count( $values ) !== 21 || ! is_array( $context )
+                            || ! preg_match( '/^ff:([1-9][0-9]*):([1-9][0-9]*)$/D', $context['txn'] ?? '', $m )
+                            || ( $values[1] ?? null ) !== $context['txn'] || (int) ( $context['cid'] ?? 0 ) < 1 ) {
+                                return 'advertising dispatch lacks canonical context';
+                        }
+                        $config = SiteEngine_Ads_Bridge_Config::instance();
+                        if ( (int) $m[1] !== (int) $config->get( 'fluent_forms.form_id', 0 ) ) {
+                                return 'advertising dispatch form mismatch';
+                        }
+                        $subscriber = \FluentCrm\App\Models\Subscriber::find( (int) $context['cid'] );
+                        if ( ! $subscriber || ! is_iterable( $subscriber->lists ) ) { return 'current contact/DNC unavailable'; }
+                        $dnc = (string) $config->get( 'crm_map.lists.do_not_contact', 'DNC' );
+                        if ( '' === $dnc ) { return 'DNC authority unavailable'; }
+                        foreach ( $subscriber->lists as $list ) {
+                                if ( ! is_object( $list ) || ! isset( $list->title ) ) { return 'DNC membership malformed'; }
+                                if ( $list->title === $dnc ) { return 'current DNC blocks advertising dispatch'; }
+                        }
+                        $resolved = array( 'deterministic' => true, 'entry_id' => $m[2], 'form_id' => $m[1],
+                                'submissions_table' => $GLOBALS['wpdb']->prefix . 'fluentform_submissions' );
+                        $consent = $this->resolve_consent_provenance( $resolved, $config );
+                        if ( $consent['decision'] !== 'exportable' ) { return $consent['block_reason']; }
+                        // Never upgrade/alter a prepared retry body. A changed effective flag blocks it.
+                        if ( ( $values[16] ?? null ) !== $consent['measurement_feed']
+                            || ( $values[17] ?? null ) !== $consent['personalization_feed'] ) {
+                                return 'effective consent changed since preparation';
+                        }
+                        return '';
+                } catch ( \Throwable $error ) { return 'advertising dispatch authority unavailable'; }
         }
 
         /**
@@ -6939,7 +6764,7 @@ class SiteEngine_Ads_Bridge_CLI {
          * @param string $vio            valueInputOption (RAW or USER_ENTERED).
          * @return array{ok:bool,updated_range:string,updated_rows:int,error:string}
          */
-        private function google_sheets_append_row( $spreadsheet_id, $tab, $values, $access_token, $vio = 'RAW' ) {
+        private function google_sheets_append_row( $spreadsheet_id, $tab, $values, $access_token, $vio = 'RAW', $context = null ) {
                 $out = array( 'ok' => false, 'updated_range' => '', 'updated_rows' => 0, 'error' => '' );
 
                 $vio = in_array( $vio, array( 'RAW', 'USER_ENTERED' ), true ) ? $vio : 'RAW';
@@ -6953,6 +6778,25 @@ class SiteEngine_Ads_Bridge_CLI {
                 );
 
                 $payload = wp_json_encode( array( 'values' => array( array_values( $values ) ) ) );
+
+                // Every invocation/retry re-reads canonical evidence and current permission.
+                // Operational All_Leads is a different 94-column contract.
+                if ( ! ( count( $values ) === 94 && is_array( $context ) && in_array( $context['sink'] ?? '',
+                    array( 'all_leads_sheet', 'all_leads_lifecycle_qualified', 'all_leads_lifecycle_unqualified', 'all_leads_lifecycle_won' ), true ) ) ) {
+                        $error = $this->advertising_dispatch_error( $values, $context );
+                        if ( '' !== $error ) { $out['error'] = $error; return $out; }
+                        // An uncertain external Converted append cannot be bypassed by
+                        // switching to the older form exporter for this same stage.
+                        $config=SiteEngine_Ads_Bridge_Config::instance();
+                        if (($values[20]??null)===$config->get('exports.won_jobs.conversion_action','SE | Converted Lead') && $this->ledger_table_exists()) {
+                                global $wpdb;
+                                $pending=$wpdb->get_results($wpdb->prepare('SELECT id,row_hash FROM `'.$this->ledger_table().'` WHERE sink_slug=%s AND transaction_id=%s AND status=%s','google_ads_import_converted_lead',$context['txn'],'outcome_pending'),ARRAY_A);
+                                if ($wpdb->last_error!=='' || !is_array($pending)) { $out['error']='external outcome pending state unavailable'; return $out; }
+                                foreach ($pending as $intent) {
+                                        if ((int)$intent['id']!==(int)($context['outcome_intent_id']??0) || $intent['row_hash']!==hash('sha256',implode("\x1f",array_map('strval',$values)))) { $out['error']='external outcome append requires exact reconciliation'; return $out; }
+                                }
+                        }
+                }
 
                 $response = wp_remote_post(
                         $url,
@@ -6992,8 +6836,8 @@ class SiteEngine_Ads_Bridge_CLI {
 
         /**
          * Inspect FluentCRM custom field definitions and the values stored on one
-         * contact (read-only). Built to diagnose slug mismatches — notably
-         * FluentCRM's 25-character slug truncation — by listing the actual defined
+         * contact (read-only). Built to diagnose slug mismatches â€” notably
+         * FluentCRM's 25-character slug truncation â€” by listing the actual defined
          * slugs and the contact's stored values side by side, focused on consent /
          * Google-ad / analytics fields.
          *
@@ -7517,7 +7361,7 @@ class SiteEngine_Ads_Bridge_CLI {
          *
          * Pass-through only: the raw stored value is returned verbatim (trimmed). No
          * semantic mapping to Data Manager consent tokens (e.g. GRANTED/DENIED) is
-         * performed here — that is deliberately deferred so semantics are never guessed
+         * performed here â€” that is deliberately deferred so semantics are never guessed
          * silently. Reads CRM custom-field values only; never touches the consent
          * plugin namespace/constants/options. Returns the chosen source slug, the raw
          * value, a status (found|none), and a 'detail' string listing every candidate
@@ -7594,23 +7438,11 @@ class SiteEngine_Ads_Bridge_CLI {
          * already resolved for the Order ID. Read-only: never mutates FluentCRM,
          * Fluent Forms, the consent receipts table, the Sheet, or the ledger.
          *
-         * Authority chain:
-         *   1. Require a deterministic canonical submission (entry id) to attach to.
-         *      Arbitrary recent receipts are NEVER guessed.
-         *   2. Resolve the stamped receipt id from that submission, in precedence order:
-         *        a. response JSON `_se_consent_server.receipt_id` (server-captured)
-         *        b. response JSON flat `se_consent_receipt_id`
-         *        c. {prefix}fluentform_entry_details.field_name = 'se_consent_receipt_id'
-         *   3. Load the matching row from {prefix}se_consent_receipts (the PLURAL,
-         *      authoritative table).
-         *   4. Decode google_consent_json and read ad_user_data / ad_personalization.
-         *   5. Policy-version staleness: compare the receipt policy_version against the
-         *      configured consent.required_policy_version authority. Runtime consent
-         *      plugin policy values are diagnostic only.
-         *
-         * Emitted Sheet/Data Manager columns and the export gate derive ONLY from the
-         * receipt row's google_consent_json. Loose CRM/form copied fields are not used
-         * as authority anywhere in this method.
+         * Signed contract-v1 stamp and exact unambiguous digest-bound row required.
+         * Present invalid/negative evidence blocks every fallback. Unsigned legacy
+         * claims stay blocked; no historical grant backfill. Historical verification
+         * does not resolve current revocation. Policy/ad_user_data/caller DNC gates
+         * remain independent; personalization never grants measurement permission.
          *
          * @param array       $resolved Result of resolve_won_order_id() or direct submission context.
          * @param object|null $config   Config instance; loaded when omitted.
@@ -7657,96 +7489,30 @@ class SiteEngine_Ads_Bridge_CLI {
                 $out['attached_entry_id'] = $entry_id;
                 $out['attached_form_id']  = isset( $resolved['form_id'] ) ? (string) $resolved['form_id'] : '';
 
-                // 2. Resolve the stamped receipt id from the canonical submission.
-                $receipt_id = '';
-                $src        = 'none';
-
-                $table = isset( $resolved['submissions_table'] ) ? (string) $resolved['submissions_table'] : '';
-                if ( '' !== $table && preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {
-                        $cols = $this->table_columns( $table );
-                        if ( in_array( 'response', $cols, true ) ) {
-                                $resp_raw = $wpdb->get_var(
-                                        $wpdb->prepare( "SELECT response FROM `{$table}` WHERE id = %d", (int) $entry_id )
-                                );
-                                if ( is_string( $resp_raw ) && '' !== $resp_raw ) {
-                                        $resp = json_decode( $resp_raw, true );
-                                        if ( is_array( $resp ) ) {
-                                                // 2a: server-captured stamp (primary).
-                                                if ( isset( $resp['_se_consent_server'] ) && is_array( $resp['_se_consent_server'] )
-                                                        && isset( $resp['_se_consent_server']['receipt_id'] )
-                                                        && '' !== trim( (string) $resp['_se_consent_server']['receipt_id'] ) ) {
-                                                        $receipt_id = trim( (string) $resp['_se_consent_server']['receipt_id'] );
-                                                        $src        = 'response._se_consent_server.receipt_id';
-                                                }
-                                                // 2b: flat field (fallback).
-                                                if ( '' === $receipt_id && isset( $resp['se_consent_receipt_id'] )
-                                                        && '' !== trim( (string) $resp['se_consent_receipt_id'] ) ) {
-                                                        $receipt_id = trim( (string) $resp['se_consent_receipt_id'] );
-                                                        $src        = 'response.se_consent_receipt_id';
-                                                }
-                                        }
-                                }
-                        }
-                }
-
-                // 2c: normalized entry-details fallback (proven storage location on live).
-                if ( '' === $receipt_id ) {
-                        $details_table = $wpdb->prefix . 'fluentform_entry_details';
-                        $det_cols      = $this->table_columns( $details_table );
-                        if ( in_array( 'submission_id', $det_cols, true )
-                                && in_array( 'field_name', $det_cols, true )
-                                && in_array( 'field_value', $det_cols, true ) ) {
-                                $val = $wpdb->get_var(
-                                        $wpdb->prepare(
-                                                "SELECT field_value FROM `{$details_table}` WHERE submission_id = %d AND field_name = %s ORDER BY id DESC LIMIT 1",
-                                                (int) $entry_id,
-                                                'se_consent_receipt_id'
-                                        )
-                                );
-                                if ( is_string( $val ) && '' !== trim( $val ) ) {
-                                        $receipt_id = trim( $val );
-                                        $src        = 'fluentform_entry_details.se_consent_receipt_id';
-                                }
-                        }
-                }
-
-                $out['receipt_id']        = $receipt_id;
-                $out['receipt_id_source'] = $src;
-
-                if ( '' === $receipt_id ) {
-                        $out['block_reason'] = 'consent unresolved: canonical submission ' . $entry_id . ' has no stamped consent receipt id.';
-                        return $out;
-                }
-
-                // 3. Load the authoritative receipt row (PLURAL table).
-                $rtable = $wpdb->prefix . 'se_consent_receipts';
-                $rcols  = $this->table_columns( $rtable );
-                if ( ! in_array( 'receipt_id', $rcols, true ) || ! in_array( 'google_consent_json', $rcols, true ) ) {
-                        $out['block_reason'] = 'consent unresolved: authoritative receipts table ' . $rtable . ' is missing or lacks required columns.';
-                        $out['detail'][]     = 'receipts table columns seen: ' . ( ! empty( $rcols ) ? implode( ',', $rcols ) : '(none)' );
-                        return $out;
-                }
-
-                $row = $wpdb->get_row(
-                        $wpdb->prepare(
-                                "SELECT id, policy_version, banner_version, google_consent_json FROM `{$rtable}` WHERE receipt_id = %s ORDER BY id DESC LIMIT 1",
-                                $receipt_id
-                        ),
-                        ARRAY_A
+                // No flat/details fallback can establish historical signed authority.
+                $proof = SiteEngine_Ads_Bridge_Consent::current(
+                        (int) $entry_id, (int) $out['attached_form_id'],
+                        isset( $resolved['submissions_table'] ) ? $resolved['submissions_table'] : '', $wpdb,
+                        trim( (string) $config->get( 'consent.required_policy_version', '' ) )
                 );
-                if ( ! $row ) {
-                        $out['block_reason'] = 'consent unresolved: receipt id ' . $receipt_id . ' does not resolve to an authoritative receipt row.';
+                $out['receipt_id'] = $proof['receipt_id'];
+                $out['receipt_row_id'] = $proof['receipt_row_id'];
+                $out['receipt_id_source'] = $proof['receipt_id_source'];
+                $out['stamp_present'] = $proof['stamp_present'];
+                $out['revocation_check'] = $proof['revocation_check'];
+                if ( ! $proof['allowed'] ) {
+                        $out['block_reason'] = $proof['block_reason'];
                         return $out;
                 }
-
-                $out['receipt_found']  = true;
-                $out['receipt_row_id'] = (string) $row['id'];
-                $out['policy_version'] = (string) $row['policy_version'];
-                $out['banner_version'] = (string) $row['banner_version'];
-                $out['google_consent_json'] = (string) $row['google_consent_json'];
+                $receipt_id = $proof['receipt_id'];
+                $row = $proof['row'];
+                $out['receipt_found'] = true;
+                $out['policy_version'] = $row['policy_version'];
+                $out['banner_version'] = $row['banner_version'];
+                $out['google_consent_json'] = $row['google_consent_json'];
 
                 // 4. Decode google_consent_json.
-                $gc = json_decode( (string) $row['google_consent_json'], true );
+                $gc = $proof['current_google'];
                 if ( ! is_array( $gc ) ) {
                         $out['block_reason'] = 'consent invalid: receipt ' . $receipt_id . ' google_consent_json is missing or malformed.';
                         return $out;
@@ -7963,6 +7729,36 @@ class SiteEngine_Ads_Bridge_CLI {
                         return;
                 }
                 WP_CLI\Utils\format_items( 'table', $rows, array( 'inquiry_id','contact_id','state','lifecycle','transaction_id','previous_inquiry_id','qualified_at','unqualified_at','closed_date','invoiced_amount','customer_rating' ) );
+        }
+
+        /**
+         * Explicit additive configuration-guard migration or protected inspection.
+         *
+         * ## OPTIONS
+         *
+         * <operation>
+         * : migrate (preview by default) or inspect. No implicit activation migration.
+         *
+         * [--apply]
+         * : Create ONLY an absent guard table; never alter/reset existing storage.
+         *
+         * @subcommand configuration-admin
+         * @alias configuration_admin
+         */
+        public function configuration_admin( $args, $assoc_args ) {
+                $op = $args[0] ?? '';
+                if ( count($args) !== 1 || !in_array($op,array('migrate','inspect'),true)
+                        || array_diff(array_keys($assoc_args),array('apply')) ) {
+                        WP_CLI::error('Usage: se-ads configuration-admin <migrate|inspect> [--apply]');
+                }
+                $apply = (bool) WP_CLI\Utils\get_flag_value($assoc_args,'apply',false);
+                if ($op === 'inspect' && $apply) { WP_CLI::error('configuration-admin inspect does not accept --apply.'); }
+                $result = $op === 'migrate' ? seab_configuration_migrate($apply)
+                        : seab_configuration_inspect_pending(seab_configuration_capability());
+                WP_CLI::line(wp_json_encode($result));
+                if (($result['status'] ?? '') === 'blocked' || ($op === 'inspect' && empty($result['complete']))) {
+                        WP_CLI::error('Configuration guard blocked: '.$result['reason_code']);
+                }
         }
 
         /**

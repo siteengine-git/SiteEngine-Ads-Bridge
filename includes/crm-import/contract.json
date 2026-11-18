@@ -1,0 +1,318 @@
+{
+  "shapes": {
+    "automation": {
+      "kind": "automation",
+      "body": {
+        "conditions": null,
+        "description": null,
+        "settings": null,
+        "status": null,
+        "title": null,
+        "trigger": null
+      }
+    },
+    "campaign": {
+      "kind": "campaign",
+      "body": {
+        "design": null,
+        "html": null,
+        "scheduled": null,
+        "settings": {
+          "click_tracker": false,
+          "excludedSubscribers": [],
+          "footer_settings": {
+            "background_color": "transparent",
+            "custom_footer": "no",
+            "disable_footer": "yes",
+            "font_color": "#202020",
+            "font_size": 13,
+            "footer_content": "",
+            "footer_padding": 20
+          },
+          "mailer_settings": {
+            "from_email": "",
+            "from_name": "",
+            "is_custom": "no",
+            "reply_to_email": "",
+            "reply_to_name": ""
+          },
+          "open_tracker": false,
+          "subscribers": [],
+          "template_config": {
+            "design_template": "raw_html",
+            "disable_footer": "yes"
+          }
+        },
+        "status": null,
+        "subject": null,
+        "title": null
+      }
+    },
+    "email_sequence_mail": {
+      "kind": "email_sequence_mail",
+      "body": {
+        "delay": null,
+        "design": null,
+        "html": null,
+        "preheader": null,
+        "sequence_ref": null,
+        "settings": null,
+        "status": null,
+        "subject": null,
+        "title": null
+      }
+    },
+    "email_sequence": {
+      "kind": "email_sequence",
+      "body": {
+        "design": null,
+        "settings": null,
+        "status": null,
+        "title": null
+      }
+    },
+    "sequence_email": {
+      "kind": "sequence_email",
+      "body": {
+        "design": null,
+        "funnel_ref": null,
+        "html": null,
+        "scheduled": null,
+        "settings": {
+          "click_tracker": false,
+          "excludedSubscribers": [],
+          "footer_settings": {
+            "background_color": "transparent",
+            "custom_footer": "no",
+            "disable_footer": "yes",
+            "font_color": "#202020",
+            "font_size": 13,
+            "footer_content": "",
+            "footer_padding": 20
+          },
+          "mailer_settings": {
+            "from_email": "",
+            "from_name": "",
+            "is_custom": "no",
+            "reply_to_email": "",
+            "reply_to_name": ""
+          },
+          "open_tracker": false,
+          "subscribers": [],
+          "template_config": {
+            "design_template": "raw_html",
+            "disable_footer": "yes"
+          }
+        },
+        "status": null,
+        "subject": null,
+        "title": null
+      }
+    },
+    "step": {
+      "kind": "step",
+      "body": {
+        "action": null,
+        "c_delay": null,
+        "conditions": null,
+        "delay": null,
+        "funnel_ref": null,
+        "parent_ref": null,
+        "sequence": null,
+        "settings": null,
+        "status": null,
+        "title": null,
+        "type": null
+      }
+    },
+    "template": {
+      "kind": "template",
+      "body": {
+        "design": null,
+        "edit_type": null,
+        "excerpt": null,
+        "footer_settings": null,
+        "html": null,
+        "status": null,
+        "subject": null,
+        "template_config": null,
+        "title": null
+      }
+    }
+  },
+  "journeys": {
+    "inquiry": {
+      "entry": "accepted-current"
+    },
+    "conversation": {
+      "entry": "contacted"
+    },
+    "estimate": {
+      "entry": "estimate-sent"
+    },
+    "recovery": {
+      "entry": "approved-change"
+    },
+    "job": {
+      "entry": "won"
+    },
+    "retention": {
+      "entry": "completed"
+    },
+    "returning": {
+      "entry": "accepted-current"
+    }
+  },
+  "views": {
+    "needs-contact": {
+      "title": "Needs first conversation",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "estimate-open": {
+      "title": "Estimate decision pending",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "booked": {
+      "title": "Recorded booking",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "completed": {
+      "title": "Completed job history",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "returning": {
+      "title": "Returning customer / new inquiry",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "wrong-area": {
+      "title": "Wrong Area: expansion review",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "wrong-service": {
+      "title": "Wrong Service / Product: offering review",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "wrong-price": {
+      "title": "Wrong Price: scope/value review",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "other-reason": {
+      "title": "Other: staff notes required",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "junk": {
+      "title": "Spam / Junk excluded",
+      "scope": "inquiry",
+      "permission_to_send": false
+    },
+    "held": {
+      "title": "Evidence or purpose held",
+      "scope": "inquiry",
+      "permission_to_send": false
+    }
+  },
+  "logical_kinds": {
+    "automation.conversation": "automation",
+    "automation.estimate": "automation",
+    "automation.inquiry": "automation",
+    "automation.job": "automation",
+    "automation.recovery": "automation",
+    "automation.retention": "automation",
+    "automation.returning": "automation",
+    "campaign.completion.care": "campaign",
+    "campaign.completion.review": "campaign",
+    "campaign.conversation.prepare": "campaign",
+    "campaign.estimate.decision": "campaign",
+    "campaign.estimate.ready": "campaign",
+    "campaign.estimate.scope": "campaign",
+    "campaign.inquiry.ack": "campaign",
+    "campaign.inquiry.returning": "campaign",
+    "campaign.job.preparation": "campaign",
+    "campaign.job.progress": "campaign",
+    "campaign.recovery.area": "campaign",
+    "campaign.recovery.price": "campaign",
+    "campaign.recovery.service": "campaign",
+    "campaign.retention.maintenance": "campaign",
+    "campaign.retention.related": "campaign",
+    "campaign.staff.handover": "campaign",
+    "campaign.staff.new": "campaign",
+    "campaign.staff.recovery": "campaign",
+    "email-sequence-mail.estimate-proposal.estimate.decision": "email_sequence_mail",
+    "email-sequence-mail.estimate-proposal.estimate.scope": "email_sequence_mail",
+    "email-sequence-mail.future-customer.nurture.checkin": "email_sequence_mail",
+    "email-sequence-mail.future-customer.nurture.value": "email_sequence_mail",
+    "email-sequence-mail.new-inquiry.conversation.prepare": "email_sequence_mail",
+    "email-sequence-mail.new-inquiry.inquiry.followup": "email_sequence_mail",
+    "email-sequence.estimate-proposal": "email_sequence",
+    "email-sequence.future-customer": "email_sequence",
+    "email-sequence.new-inquiry": "email_sequence",
+    "sequence-email.conversation.conversation.prepare": "sequence_email",
+    "sequence-email.estimate.estimate.decision": "sequence_email",
+    "sequence-email.estimate.estimate.ready": "sequence_email",
+    "sequence-email.estimate.estimate.scope": "sequence_email",
+    "sequence-email.inquiry.inquiry.ack": "sequence_email",
+    "sequence-email.inquiry.staff.new": "sequence_email",
+    "sequence-email.job.job.preparation": "sequence_email",
+    "sequence-email.job.job.progress": "sequence_email",
+    "sequence-email.job.staff.handover": "sequence_email",
+    "sequence-email.recovery.recovery.area": "sequence_email",
+    "sequence-email.recovery.recovery.price": "sequence_email",
+    "sequence-email.recovery.recovery.service": "sequence_email",
+    "sequence-email.recovery.staff.recovery": "sequence_email",
+    "sequence-email.retention.completion.care": "sequence_email",
+    "sequence-email.retention.completion.review": "sequence_email",
+    "sequence-email.retention.retention.maintenance": "sequence_email",
+    "sequence-email.retention.retention.related": "sequence_email",
+    "sequence-email.returning.inquiry.returning": "sequence_email",
+    "sequence-email.returning.staff.new": "sequence_email",
+    "step.conversation.conversation.prepare": "step",
+    "step.estimate.estimate.decision": "step",
+    "step.estimate.estimate.ready": "step",
+    "step.estimate.estimate.scope": "step",
+    "step.inquiry.inquiry.ack": "step",
+    "step.inquiry.staff.new": "step",
+    "step.job.job.preparation": "step",
+    "step.job.job.progress": "step",
+    "step.job.staff.handover": "step",
+    "step.recovery.recovery.area": "step",
+    "step.recovery.recovery.price": "step",
+    "step.recovery.recovery.service": "step",
+    "step.recovery.staff.recovery": "step",
+    "step.retention.completion.care": "step",
+    "step.retention.completion.review": "step",
+    "step.retention.retention.maintenance": "step",
+    "step.retention.retention.related": "step",
+    "step.returning.inquiry.returning": "step",
+    "step.returning.staff.new": "step",
+    "template.completion.care": "template",
+    "template.completion.review": "template",
+    "template.conversation.prepare": "template",
+    "template.estimate.decision": "template",
+    "template.estimate.ready": "template",
+    "template.estimate.scope": "template",
+    "template.inquiry.ack": "template",
+    "template.inquiry.returning": "template",
+    "template.job.preparation": "template",
+    "template.job.progress": "template",
+    "template.recovery.area": "template",
+    "template.recovery.price": "template",
+    "template.recovery.service": "template",
+    "template.retention.maintenance": "template",
+    "template.retention.related": "template",
+    "template.staff.handover": "template",
+    "template.staff.new": "template",
+    "template.staff.recovery": "template",
+    "wait.estimate.estimate.decision": "step",
+    "wait.estimate.estimate.scope": "step",
+    "wait.retention.completion.review": "step"
+  }
+}

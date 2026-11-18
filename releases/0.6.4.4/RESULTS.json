@@ -1,0 +1,42 @@
+{
+  "local_assertions": {
+    "product_algorithms": 34,
+    "lifecycle": 18,
+    "module_reporting": 16,
+    "setup_reporting": 30,
+    "settings": 10,
+    "administrator_handlers": 18,
+    "bootstrap": 19,
+    "Consent_consumer": 104,
+    "Consent_dispatch": 32,
+    "aggregate_runtime_subprocess": 9,
+    "total": 390
+  },
+  "installed_assertions": {
+    "actual_authenticated_HTTP_and_vendor_setup": 44,
+    "native_WP_clock_and_status": 14,
+    "native_edge_probes": 7,
+    "total": 65
+  },
+  "installed_PHP_lints": 17,
+  "installed_members_verified": 33,
+  "cleanup": "PASS;2 owned users,4 options,1 marked shadow metadata table,MU,context and secret ledger removed; original Ads/Base/timezones/fields/inquiry/guard/Consent and flags preserved",
+  "remaining_site_requirements": [
+    "Missing unqualified_at: normal administrator Field Mapping can now create it as date_time; test-created only in owned registry.",
+    "Optional referral points to absent Referral Lead; normal CRM & Lifecycle can select existing Referral or Unused. Original unchanged.",
+    "Configured credential parent is unavailable/inaccessible to observed PHP8.3 CLI UID; file existence unknown; validate correct path and context, without broad permission changes.",
+    "Real Google Ads account/conversion timezone comparison unconfirmed. Test manually supplied a fictional account only; no Google Ads query.",
+    "Feed mapping not operator-confirmed for normal form inputs. Optional stored exact-ID linkage not supplied by this task; no lead fixture/replay.",
+    "All four export families disabled; no successful/fresh/failed live export acceptance claimed. Schedule only after separate delivery authorization."
+  ],
+  "limits": [
+    "Existing schema2 DATETIME does not retain UTC offsets. Ambiguous naive inquiry fold values fail closed; do not infer original timezone or rewrite history.",
+    "Native timezone checks use request-local WP filters, a dummy unreadable file and synthetic bounded timestamps; no historical date change.",
+    "Fresh/upgrade installed requests use owned settings and marked vendor meta registry. Real WordPress authentication, handlers, locks and vendor API; no ordinary registry changes.",
+    "No client access, Base edits, schema migration, browser lead exercise, live Sheets/Ads/mail delivery."
+  ],
+  "preserved_bytes": [
+    "Consent consumer/runtime, inquiry schema/adapters, configuration coordination class, Google_Ads_Import21/All_Leads94 contracts unchanged"
+  ],
+  "retained_failures": "Initial wrong-CWD Consent child checks and Windows fixture JSON serialization errors retained locally; corrected invocation/fixture encoding passed without runtime relaxation."
+}

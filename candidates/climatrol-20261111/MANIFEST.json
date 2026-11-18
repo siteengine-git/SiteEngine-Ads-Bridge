@@ -1,0 +1,436 @@
+{
+  "format": "siteengine.ads.climatrol-candidate/1",
+  "candidate": "0.8.1-integration-UNACCEPTED-20261111",
+  "designation": "UNACCEPTED overall demonstration: real Google append/readback/replay blocked; stable release unchanged",
+  "source_commit": "daca8d6acfd28eb0375dd027a69cc8540c4b9897",
+  "inquiry_schema": "2",
+  "outcome_schema": "1",
+  "outcome_contract": "1",
+  "guard_schema": "1",
+  "configuration_tree_schema": "2",
+  "php_minimum": "8.3",
+  "dependencies": {
+    "cb_source": "ccf9c0501812550e0e04977470635daf193a4974",
+    "cb_version": "0.1.6",
+    "cb_zip_sha256": "16a57e8d61e3abb90d6d95998dee993ba80742abaf7e0a56a58364f88de2c6d4",
+    "cb_manifest_sha256": "42edb7da01d62cb32e9fa65ee1c0156583306132d61e69c2d4754078f4ef9dd8",
+    "fe_projection_source": "4f273be7f8125b7b5673f27d5bdc743e3e5a1b8b"
+  },
+  "payload": [
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 23699,
+      "sha256": "9aa5c19024c3645e91a2ca1ecf82d5a0e06be669cb8fdb437e45f2fba0c73371"
+    },
+    {
+      "path": "README.md",
+      "bytes": 16088,
+      "sha256": "e9bd5fd8e1b2491259444c4598664eaa813c78abc4f311abd1f85e17922c4c7f"
+    },
+    {
+      "path": "candidates/climatrol-20261106/RESULTS.json",
+      "bytes": 5987,
+      "sha256": "ca81e45e4a1912f4629af0d4566065e25c285f103b7177ce68be7c43acb8e5c3"
+    },
+    {
+      "path": "config/client.example.php",
+      "bytes": 4328,
+      "sha256": "1c1b7ff8ec88360e43ad1e0a4848aa1afe6d7fac060118855c8d035a63e0639a"
+    },
+    {
+      "path": "contracts/CONFIGURATION-COORDINATION.md",
+      "bytes": 20503,
+      "sha256": "a8028f9adf5d251cf930c16de0cb309f3393d645a6293af7d2c3a12a9fec81b0"
+    },
+    {
+      "path": "docs/ADMINISTRATOR-SETUP-0.6.4.2.md",
+      "bytes": 6714,
+      "sha256": "6ad525a518d9a35c6ab2474966ace1a4830a05dcb0d37464c91b892ffe57fca9"
+    },
+    {
+      "path": "docs/CLIMATROL-DEMO.md",
+      "bytes": 9063,
+      "sha256": "4e688042dc0bc08b543696dc7320d831a1e5fae49c5693cccc379e375565346f"
+    },
+    {
+      "path": "docs/COORDINATION-SUCCESSOR.md",
+      "bytes": 11188,
+      "sha256": "3c540378c7fc1ea1ccbc683805d681fc73db8e1cce80b604fe8908de0eba6e3f"
+    },
+    {
+      "path": "docs/CRM-CONFIGURATION-IMPORT.md",
+      "bytes": 12397,
+      "sha256": "99d0ce6e1049de683af14e8e85b983a923300bd7281ffc17d7de642a19987bad"
+    },
+    {
+      "path": "docs/CRM-OPS-INQUIRY-CONTRACT.md",
+      "bytes": 16126,
+      "sha256": "f903176c8a563899e3a09f22ea5fcb609c46ddd58758fbd531469f5bf0bd010f"
+    },
+    {
+      "path": "docs/DOCTOR-REPORTING-0.6.4.3.md",
+      "bytes": 2148,
+      "sha256": "7db870b249f6fb782a0b467cb1914122e967d3b7d13f32dc1c2e7061e51ad9f3"
+    },
+    {
+      "path": "docs/EXTERNAL-OUTCOME-CONTRACT.md",
+      "bytes": 6824,
+      "sha256": "cf995b763b52360bfcbc70abc3ce8878b216dbae8b237114aad91798a3db3576"
+    },
+    {
+      "path": "docs/INTEGRATION-MILESTONES-20261111.md",
+      "bytes": 5842,
+      "sha256": "d3978912d16a62af499906159e4c9f872fdee19772d0de07fb6c843b3bd20f2e"
+    },
+    {
+      "path": "docs/INTERNAL-UNQUALIFIED-0.6.4.5.md",
+      "bytes": 2073,
+      "sha256": "ae6a22d9e9765a7674ca4fc0ef090d6ea66d5391cd7fc6f0f7bd340fb76345f5"
+    },
+    {
+      "path": "docs/MAINTENANCE-RELEASE.md",
+      "bytes": 9293,
+      "sha256": "c2aa55f51230b86c2d0231ea04cd61525175e91bf77d46da83c12105765afc8a"
+    },
+    {
+      "path": "docs/OPERATIONS.md",
+      "bytes": 5290,
+      "sha256": "deeb250b788c5b4544338d531f4d96a20c463787278c1689b08c2632109bc7ad"
+    },
+    {
+      "path": "docs/PRODUCT-SETUP-0.6.4.4.md",
+      "bytes": 4868,
+      "sha256": "bd8697185e096fa39ae38d96e1a2347d73c615217ddf4deb4e28c54894a69a60"
+    },
+    {
+      "path": "docs/SETUP-REPORTING-0.6.4.1.md",
+      "bytes": 3323,
+      "sha256": "cbda38ae11f23a871eac0e950dec8f8401694f73b56c79853c864ed70929a5c6"
+    },
+    {
+      "path": "docs/headers/all-leads-key-map.csv",
+      "bytes": 2702,
+      "sha256": "71334173dd3105b5cc926595d34aaf21c058f5994db8e64703eea9175a2dbdfd"
+    },
+    {
+      "path": "docs/headers/all-leads.csv",
+      "bytes": 1575,
+      "sha256": "148c0462162c597a2869b73f7d8144aee9a602cb50e65e4cbcaf557fe5527d99"
+    },
+    {
+      "path": "docs/headers/google-data-manager-key-map.csv",
+      "bytes": 581,
+      "sha256": "c3cd7cb8f050492e0c03c77b9fcda50ec4a57376a1e380ca3a9e2b6e6f912a8f"
+    },
+    {
+      "path": "docs/headers/google-data-manager.csv",
+      "bytes": 295,
+      "sha256": "84e146d30f6d8266df556ce975d4a8cfe31d55f63e54d4dde6078c84c478dd16"
+    },
+    {
+      "path": "docs/integrations/fieldedge/API-CAPABILITIES.md",
+      "bytes": 6831,
+      "sha256": "f7a63f2fd6c31aaaa26eb36442126cb796db7ca1ff0114885a2a1421953a8ff9"
+    },
+    {
+      "path": "docs/integrations/fieldedge/ARCHITECTURE.md",
+      "bytes": 7909,
+      "sha256": "fea1dc6749fc3974669302c59035f6902e73af7d4b25db06fa0ca91de98f3b4d"
+    },
+    {
+      "path": "docs/integrations/fieldedge/CLIMATROL-RUNBOOK.md",
+      "bytes": 7335,
+      "sha256": "393c7f633b2bf53f4ef47d6120de30458fb2d70b0609bf2f36e239187e9422b3"
+    },
+    {
+      "path": "docs/integrations/fieldedge/CLIMATROL-VERIFICATION.json",
+      "bytes": 1487,
+      "sha256": "7d13b31734800cbac8acc71075a1057c574c70a01640e82ab73aaa0e23012ccd"
+    },
+    {
+      "path": "docs/integrations/fieldedge/CORE-HANDOFF.md",
+      "bytes": 4970,
+      "sha256": "1a089863db6a8cf6883d9507e2e7b457193898d3710410548537ced5c41add34"
+    },
+    {
+      "path": "docs/integrations/fieldedge/CRM-PROJECTION.md",
+      "bytes": 7806,
+      "sha256": "a2722ea8313ce317d92b3b455f728729473df1f1aea3c9edba0c3dd998184b8d"
+    },
+    {
+      "path": "docs/integrations/fieldedge/VERIFICATION.json",
+      "bytes": 1191,
+      "sha256": "2aaaf73ca7b0ad2150a2210a1113f4e7bc258189d722609797489b729efd90dc"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-admin.php",
+      "bytes": 74109,
+      "sha256": "d342e2274ef0a994cc4c53108b8d72faa112383262ae452cc348596b7a4b49b9"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-cli.php",
+      "bytes": 468267,
+      "sha256": "f22fe16180cec3bd171871ca29a8dc5172a13f3c90d3c13decefd93327107777"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-config.php",
+      "bytes": 39404,
+      "sha256": "1f316ec226fdaa619fa4a6d4a7d0c5262c3d5c19e7413fda3afccfc06f9e49ab"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-consent.php",
+      "bytes": 12083,
+      "sha256": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-coordination.php",
+      "bytes": 28686,
+      "sha256": "90c8ef86bd06b2b05dc57bc7b887fa86e2a55782f348a26455e5ba35503dc18a"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-crm-import.php",
+      "bytes": 344,
+      "sha256": "6e642df521df8f33d344fabf55141295bc238901f0908e1d4ddee02a947ff1dc"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-doctor.php",
+      "bytes": 52908,
+      "sha256": "8039d7f135324a04518b25fc0d544514eb9d7cdb47e46ad2becce9f2fb8287f1"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-fields.php",
+      "bytes": 3787,
+      "sha256": "c5de808d37c963ea1008a77575a3e93b1591214c6a89e696b020fdf9b66d3625"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-inquiries.php",
+      "bytes": 80415,
+      "sha256": "d1cc0b1285b237f0866f79f7ea45968ac853f59a071c5503a077de56a6bf0454"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-lifecycle.php",
+      "bytes": 19661,
+      "sha256": "27a560d638bf8949f844e8d321e42a4615239b58c0435cafd2252961b2461915"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-outcomes.php",
+      "bytes": 22302,
+      "sha256": "50c86c551edc6f4fd6c4be766be7e92e7286450ce151f7e31eba6ee5bce2cc38"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-runtime.php",
+      "bytes": 6620,
+      "sha256": "b396f71fc8cd703de51d6de1350b22855c1eb1b3e9b2f96c48696830f5e588cb"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-settings.php",
+      "bytes": 12386,
+      "sha256": "cc620a7d0966dfedd5c428f2bd0ad93e52816d8e51dbcfa8d40c9dc480fad08a"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-setup.php",
+      "bytes": 19558,
+      "sha256": "cae5e06fd178d33612e4b51016473183dec5ef6f252b7781f517c091d209416b"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-storage.php",
+      "bytes": 14501,
+      "sha256": "36201aada9e819e039becd512bd4d8d17fe9a5e09bd72778c9545d6febefa4fb"
+    },
+    {
+      "path": "includes/class-siteengine-ads-bridge-time.php",
+      "bytes": 2968,
+      "sha256": "4ce7fc336271a51eaad62de9518534da2e6f9dd9489810ef0892a1bbe00a471d"
+    },
+    {
+      "path": "includes/connectors/fieldedge/CRMProjection.php",
+      "bytes": 7213,
+      "sha256": "064a17b12f1eb80a1265c5ed65bbb6c197ae47754bd2effc926df56547968e4f"
+    },
+    {
+      "path": "includes/connectors/fieldedge/ClimatrolWorkflow.php",
+      "bytes": 3796,
+      "sha256": "ad4b3a0ed673cf747e6ceb684c181d9721a8c5f7289bbf1e0a63e7e97ab2df86"
+    },
+    {
+      "path": "includes/connectors/fieldedge/FluentCRMProjectionContacts.php",
+      "bytes": 4330,
+      "sha256": "cfafa69e5bc0ff6a1724dcd1d1aa7e90c2859d77d938be43668ded1e30303fbf"
+    },
+    {
+      "path": "includes/connectors/fieldedge/Foundation.php",
+      "bytes": 8530,
+      "sha256": "61a6557a22e32405048463658019868f28bb4c50651690d17af37186153cf03e"
+    },
+    {
+      "path": "includes/connectors/fieldedge/Retry.php",
+      "bytes": 1350,
+      "sha256": "7225ff64046da37d8230d4ba7b9952ae9583a7eb2b8040e2fc8545f13ec7775b"
+    },
+    {
+      "path": "includes/connectors/fieldedge/SubmissionAdapter.php",
+      "bytes": 6461,
+      "sha256": "ca6a90f07e43898924abb48db30db980d19e599321dd98a492030e5feba78cbe"
+    },
+    {
+      "path": "includes/crm-import/PROVENANCE.json",
+      "bytes": 637,
+      "sha256": "e075d074844fec210f135231aa02699c63879799df6eeda30fc92d6049ae76dd"
+    },
+    {
+      "path": "includes/crm-import/admin.php",
+      "bytes": 7602,
+      "sha256": "d45bbbab79190bfd793e63fd8fa3be31fbe294aedc8bf3683a1fdc323c6fb257"
+    },
+    {
+      "path": "includes/crm-import/common.php",
+      "bytes": 4446,
+      "sha256": "88e66e65e05a562f5151cf3258a25d5fd591e808993d2298c393f55bc2941125"
+    },
+    {
+      "path": "includes/crm-import/contract.json",
+      "bytes": 10081,
+      "sha256": "b249b93ce0b88657b6aa880aa0c26a583783b9e5d96109d0471dfee4e701f116"
+    },
+    {
+      "path": "includes/crm-import/dependencies.php",
+      "bytes": 2941,
+      "sha256": "93461495aafc7f1a16ade57a528b2539217e4a8f178e68896e97d3a8646b4d07"
+    },
+    {
+      "path": "includes/crm-import/dependency-definitions.json",
+      "bytes": 5462,
+      "sha256": "9a0b8b9b15709d3ef98e787661edc3150fe0f35cfdd069ee4af24b80827a973e"
+    },
+    {
+      "path": "includes/crm-import/engine.php",
+      "bytes": 23090,
+      "sha256": "55cdca3ee505c1038a5b3251ad7d99db092647e8af765b0baed52a280f2eaea7"
+    },
+    {
+      "path": "includes/crm-import/format.php",
+      "bytes": 10336,
+      "sha256": "d3c724a735b2d9e30c894856788c23bab67dc60ab35e444df4f2a6fdd0774f7a"
+    },
+    {
+      "path": "includes/crm-import/import.js",
+      "bytes": 7514,
+      "sha256": "b52ae1d83566bd382da4cdb4c53824857fd37c9a52958645629d402b9af838c0"
+    },
+    {
+      "path": "includes/crm-import/native.php",
+      "bytes": 10408,
+      "sha256": "720f5d5006e91dcec1b65973b674750b638ef9e810efe09fbf98a86d315e9c5e"
+    },
+    {
+      "path": "includes/crm-import/preview.php",
+      "bytes": 1364,
+      "sha256": "390cce1e9dad0461b7fdc0ab47d6107931d3e26ad683ae3c971283128da542d5"
+    },
+    {
+      "path": "includes/crm-import/recovery.php",
+      "bytes": 19805,
+      "sha256": "e26af9e574273db951c4fa1f54efd5745b7c447e5e543e66edf16c640b340ac5"
+    },
+    {
+      "path": "includes/crm-import/sequences.php",
+      "bytes": 3209,
+      "sha256": "fd57a5071b0817a4c919990214519811e189d794f1d04d84ba1810994abbf3db"
+    },
+    {
+      "path": "includes/crm-import/session.php",
+      "bytes": 2620,
+      "sha256": "e7e325c85528b73c5ca9e1923d8be7f85c77b826b2235235a5998b428c92c526"
+    },
+    {
+      "path": "siteengine-ads-bridge.php",
+      "bytes": 6873,
+      "sha256": "8f6259429b9894d2180074a7fbf49149786a86ab039d7d6f3ede494b2c661e5f"
+    },
+    {
+      "path": "tests/call-evidence-consumer.php",
+      "bytes": 3850,
+      "sha256": "7436cc8f7af0036e7fe7ec7a9b4f931744829609beb1d6f91ed56e65ab2c93b7"
+    },
+    {
+      "path": "tests/fieldedge-climatrol-acceptance.php",
+      "bytes": 10925,
+      "sha256": "962bed4c9188c8a07e6d16903c745d63f600d0d6a62d5236179e2928e317cc73"
+    },
+    {
+      "path": "tests/fieldedge-foundation-acceptance.php",
+      "bytes": 14075,
+      "sha256": "a6271a5c1a4c626dadc8f23ae97d989e24da1049fbe8b0c4114d406aaedae5ae"
+    },
+    {
+      "path": "tests/fieldedge-projection-acceptance.php",
+      "bytes": 8562,
+      "sha256": "0f806e4bffeb8e67b0347ed7a4bcd6f02a0a9e8d67abe23de0481ea65179d810"
+    },
+    {
+      "path": "tests/fixtures/fieldedge/climatrol-synthetic.json",
+      "bytes": 515,
+      "sha256": "b0aeb756d1685c96be42bf531e468aa4b81e517853ccc9321e37ddcab36f68db"
+    },
+    {
+      "path": "tests/fixtures/fieldedge/records.json",
+      "bytes": 1252,
+      "sha256": "9c666d0c35be1ae9e491cb1dad5d02a78ceffbbd89e6cac2064bd0b73c3ab0c8"
+    },
+    {
+      "path": "tests/outcome-transport-native.php",
+      "bytes": 6811,
+      "sha256": "39deee17561171af5e2eaae011953be61f630287f96edb71a73d4cdbec90188a"
+    },
+    {
+      "path": "tests/support/fieldedge/ClimatrolFixture.php",
+      "bytes": 2569,
+      "sha256": "29684ae8b12f217ee20371ee762e5f6847e3b34536aade20dc76505b5530ce8f"
+    },
+    {
+      "path": "tests/support/fieldedge/ProjectionFixture.php",
+      "bytes": 738,
+      "sha256": "a96bc93438a073f7341fa2f97d3e4a3ffa65a619a85b27c0dd0ad45773fc4583"
+    },
+    {
+      "path": "tests/support/fieldedge/SyntheticOutcomeApi.php",
+      "bytes": 3040,
+      "sha256": "283d12b9efca396cc08eecb5316e6c9ae002d86cfe0a8d82610babf81e2cc37e"
+    },
+    {
+      "path": "tools/fieldedge/climatrol-demo.php",
+      "bytes": 3106,
+      "sha256": "08ef40e272d6f0987fe8115572c391ca7d06aa5cffbba474dd3dae70d205fe9f"
+    },
+    {
+      "path": "tools/fieldedge/climatrol-wordpress-demo.php",
+      "bytes": 2190,
+      "sha256": "36ad6b9f9ce0c3fb5195801d9223272bc1c511c3275885013c914849705b3c31"
+    },
+    {
+      "path": "tools/fieldedge/lead-create-dry-run.php",
+      "bytes": 2208,
+      "sha256": "3959701f2dda036f2c53de9299441ab8be6ab0c6a284083b8b3272fb45fec1dd"
+    },
+    {
+      "path": "tools/fieldedge/projection-wordpress-demo.php",
+      "bytes": 3291,
+      "sha256": "0a1e75b0c15be2405f6a69fa6c024def34cf7f28abb56fef0b7b0a1b94a7bb7a"
+    },
+    {
+      "path": "tools/outcome-demo-acceptance.php",
+      "bytes": 26047,
+      "sha256": "0694789baface4814d0acdb68bc7c3c6659d2972988cc903883089e6f036fa17"
+    },
+    {
+      "path": "tools/successor-readiness.php",
+      "bytes": 2185,
+      "sha256": "48c826d46418a117e2364d7ae839723b4bec35349cf39e965f3c192732c9055d"
+    },
+    {
+      "path": "uninstall.php",
+      "bytes": 610,
+      "sha256": "809d117536df4c1b3fc8e3fb0c440df7b18d94c2efedf5dea9d4a1338b32f097"
+    }
+  ]
+}

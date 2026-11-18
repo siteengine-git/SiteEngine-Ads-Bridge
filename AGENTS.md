@@ -1,3 +1,345 @@
+## Ads Bridge 0.9.5 ordinary Google credential Save ? November 17, 2026
+
+Integration Control's consolidated assignment completed from installed0.9.4.
+Source/runtime49fab3cb5e701c3090d9924337a2fdbf011fc207; exact Base2.6.1
+document-save-1 capability adopted in existing ads-bridge/google-sheets group.
+One translated write-only JSON field/Save through Base; Setup guidance updated.
+No Base/CB source edit or duplicate editor. File source/validator/test/switch preserved.
+ZIP7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5;
+82 exact installed members/51 local/native PHP lints;279 focused local checks;
+46 native WordPress/SQL handler assertions; authenticated synthetic browser valid,
+incomplete,malformed,blank Save/redaction and fresh revision1 readback passed.
+Fixture used a one-use synthetic session bootstrap, not main-site login acceptance.
+
+Actual credentials remain FILE; no real Base JSON/provider authentication/migration,
+provider request,Sheet write,export,call,message or client operation.0.9.4 file-auth
+evidence reused. Settings/effective config/journals/other covered options/autoload,
+18 tables,CRM fields,Base stores/key hash,Google file,wp-config preserved;105 frozen
+Base/CB file members unchanged. Cron digest changed; original raw payload uncaptured,
+cause/history restoration unproven. Current hooks inspected/no Ads export hook.
+Strict failure and bounded investigation retained; do not report complete cron equality.
+
+Two native/14 browser fixture tables,two synthetic users/sessions,fixture,key/config
+and request guards removed; maintenance absent; job AB-DOCUMENT-SAVE095-20261117
+complete/inflight null; executor independently FREE. AB private rollback backups retained.
+Versioned successor delivered; no stable publication or real credential transition.
+See releases/0.9.5/RESULTS.json and INTEGRATION-CONTROL-HANDOFF.md. All older overlapping
+credential prompts superseded; further shared-source work returns to Integration Control.
+
+## Alma Sheets path corrected - November 17, 2026
+
+Main Alma installed Ads0.9.1 saved the AWS /home/siteengi credential path, whose
+parent does not exist on Alma. Same failure was retained on November11, before
+November16 CB/Base onboarding. Existing owner-only Alma Sheets file was intact.
+Backed up original settings and changed only google_sheets.credentials_path to
+/home/alma.siteengine.space/.secrets/se-ads-sa.json. Actual web PHP8.3.36/LiteSpeed
+UID5004 and independent owner CLI now report readability/Doctor PASS. No secret
+replacement, permission change, provider/export/call operation or plugin rebuild.
+CB credential pair/source, CB external config, wp-config, Base stores/key metadata,
+all other Ads settings/options and journals preserved. Public probe/private guard
+removed; no worker/maintenance/held lock. See verification/credential-path-20261117.
+Current 0.9.3 package remains separately local-verified, not deployed by this fix.
+
+## Estimated Value addition - 0.9.3 local verification (2026-11-13)
+
+Direct user request adds Estimated Value / estimated_value / number to minimum
+CRM setup. Combined contract now thirteen fields, eight terms. Fresh, existing,
+repeat and conflicting-type paths pass actual setup algorithms with vendor doubles.
+84 replacement and 34 product assertions passed; prior 0.9.2 lifecycle/inquiry/
+reason evidence reused because those runtime files are unchanged. New form 40
+reviewed read-only: Estimated Value source/feed destination match; role/permission,
+appointment naming, empty service conditional, FL default, force subscription and
+legacy consent/status mappings still require form-owner corrections. No uploaded
+form or live site was modified; no sending/enrollment/provider/Google operation.
+Package is local-verified, not native-installed or stable-published. Accepted
+current 0.9.1 delivery stays intact pending native acceptance of a successor.
+
+## Customer Rating correction - 0.9.2 local verification (2026-11-13)
+
+User reports a SiteEngine.io Customer Rating field with Excellent/Good/Fair/Poor.
+AB previously assumed customer_rating was its disqualification-reason dropdown.
+0.9.2 separates fresh defaults and normal setup mapping; preserves compatible
+explicit legacy mappings. Also removes unrelated rating reset during activation
+and preserves historical inquiry reasons under a dedicated mapping in All Leads.
+Local checks pass: 80 setup replacement, 34 product, 16 form, 35 reporting,
+45 inquiry, 18 lifecycle, 6 internal timing, 5 historical row assertions.
+No site installation or native/browser acceptance of 0.9.2 is claimed. Main
+SiteEngine.io is not a registered target in the inspected Access inventory;
+no owner/root/profile is invented and no production write has been performed.
+The accepted current 0.9.1 delivery remains intact until native acceptance.
+0.9.2 source and separately versioned local-verified package are ready for the
+reported main-site correction. No automation/provider/send/export action.
+
+## Issue #3 completed - Ads Bridge 0.9.1 (2026-11-13)
+
+The minimum setup now includes all three FE fields from CRMProjection::definitions(),
+plus a distinct Lost summary tag. One main setup utility owns provisioning; API Setup
+is read-only. All definitions preflight before writes; existing values/edits preserved.
+Runtime f2f6720bf057db6f433e91a654d5903b7f650752 installed on Climatrol dev only. Three normal
+authenticated administrator setup actions passed; all definitions preexisted, zero
+creates. Isolated action preserved all 11 captured tables, fields, settings/options,
+cron and original journals exactly. Login changed FluentCRM activity metadata; the
+initial strict comparison failure remains explicit in releases/0.9.1/RESULTS.json.
+69 + 34 + 16 + 35 local assertions, 10 JS-double checks, 50 local/native PHP lints.
+No importer, email, enrollment, FE sync, Google/provider call or scheduler operation.
+Existing flags retained. Temporary guard removed, maintenance absent, config exact,
+guard complete/inflight null. Private backups/failure receipts retained. Exact 0.9.1
+ZIP delivered; no stable GitHub promotion. Do not rerun old import campaigns.
+
+## Climatrol configuration completed - November 12, 2026
+
+The subsequent user instruction to complete the remaining setup has been handled.
+Installed Ads 0.9.0 now reports Ready with zero setup issues. Selected form 40's
+existing FluentCRM feed is enabled with existing Future Customers / Form Lead
+definitions, exact submission-ID mapping, force-subscribe disabled and unrelated
+tag-removal rules cleared. Referral source is corrected from Qualified to Referral.
+Ads account timezone is America/New_York using the previously confirmed account
+evidence. The saved spreadsheet ID was missing terminal -s; its existing Drive
+identity and service-account metadata read now pass. No sharing/credential change.
+Original import journals and other Ads option hashes remain unchanged; only
+seab_settings_v2 and the one existing feed record changed. No contacts, submissions,
+mail, enrollment, advertising rows or provider actions were performed. Sheets
+write permission and actual form delivery remain untested. The sole Doctor warning
+is that no scheduled export runtime has been recorded; no scheduler was started.
+Request-local CLI guards ended with their processes; no persistent control remains.
+See releases/0.9.0/SITE-CONFIGURATION-RESULTS-20261112.json. Runtime/package hashes
+are unchanged; no rebuild/reinstallation/release ceremony is needed. This
+follow-up supersedes the initial configuration-blocker observations below.
+
+## Current execution closeout - Ads Bridge 0.9.0 (2026-11-12)
+
+The agreed setup replacement is completed and delivered; see STATUS.md and
+releases/0.9.0/RESULTS.json. Runtime/source pin is
+0dc681518f607b59a293656ea57d523e223b4bd1. Assigned installation was the
+Climatrol development clone climatrol.siteengine.space, not production
+climatrolairga.com, main Alma, or the separate accepted GeneratePress 0.8.4.
+Do not repeat the historical import/recreation campaign. User settings and
+original journals are retained. No active executor, task control, maintenance
+or recovery remains; private backups and failed-attempt evidence are retained.
+Normal setup no longer uses CRM ZIP import. Current actual configuration issues:
+form 40 disabled FluentCRM feed, blank Ads account timezone, and saved spreadsheet
+metadata GET returned HTTP 404 after authentication. These are recorded honestly;
+no live conversion delivery or stable GitHub promotion is claimed.
+This closeout supersedes older execution queue/pending notes below.
+
+## Latest verified partial-graph repair — November12,2026
+
+0.8.4 supersedes the0.8.3 collision coverage limit for the assigned GeneratePress
+repair. Source853201d25cb488bda701849c68d561b96da5f45d;ZIP7de8d0454c9ed627dd83a3fcfd5671a7cbce5227e5872e5c4293aef0af4dfcd2.
+Both retired/current parent scopes are checked at write, pending and final readback.
+Actual normal-admin import complete126/126/0native saves;125objects and5historical
+raw journals preserved. Source STATUS.md/releases/0.8.4 distinguish local partial
+fault fixtures from actual native reads/workflow. Physical delivery has one0.8.4ZIP;
+prior0.8.3/stable0.8.2 archives retained. No other-site rollout or stable promotion
+is implied; standing source/access/ownership and disabled-delivery rules remain.
+
+## Current verified importer repair — November12,2026
+
+0.8.3 is the latest verified installable repair, source
+cf185a54a919c13ad67b5240c1315a0188beb1e8;ZIPb45b206bb3be5742d4fc64abe651735ef52147c80b801c3f46ad9ed99ab7f7a7.
+Assigned GeneratePress template only: ordinary authenticated saved import completed,
+56 deleted native definitions recreated/new IDs,69 survivors and original journals
+preserved,125 unique identities/126receipts,0extra replay saves. Details/limits in
+source/STATUS.md and releases/0.8.3. All delivery/enrollment holds unchanged; no
+registry/journal clearing. Current literal Plugins\..Deliverables child holds
+exactlyone0.8.3ZIP; previous0.8.2 delivery/history retained. This patch assignment
+performed no main-Alma/other-site rollout or separate stable GitHub promotion.
+Canonical source and standing access/ownership rules remain unchanged.
+
+## Current accepted release — November11,2026
+
+Stable Ads Bridge0.8.2 is published and main-Alma focused-verified. Package source
+cffd3a9d6d40d71c785ef6c81f332f7e0f197ace; tagv0.8.2 points to release/evidence
+d59daff1f90a1dac5af17e654a9ff2710bc9371d. ExactZIP76333e62c2e610637bc6a8fefa946e9272b53d19daf13d1dc3752c8ce2e3b1d2.
+Canonical source remains this existing project's source checkout. Authoritative
+delivery remains the literal Plugins\..Deliverables child, exactlyone currentZIP.
+Source STATUS.md and releases/0.8.2 hold current results/limits; historical release
+and planning sections remain preserved, not active blockers. All4 ordinary exports
+remain disabled; existing credentials-parent failure is unresolved. ProductionFE
+transport/calladvertising remain held. CRM0.3.18 requires its owner’s exact binding
+update; reviewed source compatibility is recorded, not new producer acceptance.
+No client rollout, external send or new source ownership is implied.
+
+## Standing Alma development installation authority — November 11, 2026
+
+Aubrey's direct instruction supersedes conflicting older installation approval,
+routing and executor restrictions in this project. Alma is a development server.
+An authorized plugin installation includes backups, brief affected-site downtime,
+temporary maintenance controls, necessary site-specific PHP worker/cache handling,
+migration, verification and restoration. Complete these as one job without another
+approval request. Serialize overlapping writes; coordination is not an approval gate.
+
+Pause only for a concrete risk to unrelated sites/services, destructive data changes,
+missing root privileges, or external effects such as real calls, messages, payments
+or advertising submissions. When root is required, immediately prepare the exact
+command and continue independent work. State the precise missing privilege and
+affected operation; do not substitute another planning or authorization handoff.
+Reuse completed evidence and repeat checks only for relevant changes or failures.
+Preserve existing access boundaries, configuration, data, journals and recovery state.
+Apply this authority within the authorized candidate, site and task scope.
+
+## Current ordered correction and setup UI assignment
+
+Complete producer-record compatibility first in its own commit, then four-area setup
+cleanup. Bounded Alma-only native/admin/browser checks, protected additive storage
+preparation and delivery are authorized. Preserve current settings, archives, Consent
+barriers and disabled transports. No clients or unrelated plugin edits.
+
+## Priority0.7.1 settings ownership correction — November5,2026
+
+Direct Helper instruction authorizes the focused runtime/settings correction,local
+checks,bounded Alma Linux fixtures,ordinary administrator save verification,packaging
+and successor delivery. This supersedes the prior release-only scope below. Preserve
+stable0.7.0 and all importer/Consent/recovery evidence. No client sites,CRM source
+edits,journal clearing,unknown-state bypass,live delivery or broader UI cleanup.
+Use the existing canonical source and access. Preserve current delivery until the
+verified successor is ready;canonical physical delivery remains Plugins\..Deliverables.
+
+## Stable0.7.0 released — November5,2026
+
+Tagv0.7.0 pins3ed9ee2044b9d15f9af82e987a23dd757eb82bef;stable publication/delivery verified.
+The controlling Helper accepts Ads closeout b5abb5a and CRM coexistence7da32a6.
+Publish/deliver the exact verified0.7.0 ZIP;do not repeat completed acceptance or
+resume the completed import. Preserve package bytes and historical archives. No UI
+simplification,runtime edit,site/config/schema mutation,client operation or live
+sending/export is in this release-only scope. Delivery remains the filesystem-derived
+D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge literal child.
+The sibling Plugins..Deliverables remains historical. Actual publication and asset
+pins belong in releases/0.7.0/PUBLICATION.json and current STATUS.md.
+
+## Current CRM configuration import assignment — November 4, 2026
+
+Controlling Helper: _(AB) Ads Helper - 10. Canonical source remains this checkout.
+Released baseline 0.6.4.5 / 25579d6 and all Consent/Unqualified repairs are retained.
+Ads owns destination configuration import and setup; CRM owns producer/export
+contract and content. Destination sites must not require the separate CRM plugin.
+This assignment supersedes the earlier standalone setup-patch plan and conflicting
+reporting-only scope. Reuse/adapt the current CRM importer primitives; do not edit
+CRM source or copy its operational application. Local development, scoped publish,
+packaging and isolated Alma export-to-browser-import acceptance are authorized.
+No client sites, real delivery/enrollment, historical rewrite or destructive cleanup.
+Preserve existing journals and packages. One writer per overlapping resource; no
+new general approval gate. Do not replace the current installable until the actual
+ordinary administrator workflow on a fresh isolated destination is verified.
+Delivery: D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge.
+
+## Current November 4 Doctor-reporting assignment
+
+Fix reporting only on Alma; no customer/client or other plugin operations. Current
+specific delivery destination is `D:\SiteEngine\Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge`. This assignment-specific
+path supersedes the earlier general delivery default for this correction. Preserve
+prior accepted packages/evidence in archives. Underlying reported single failure
+is unknown unless demonstrated; initial Alma inspection found zero FAIL.
+
+## Authoritative installable delivery root - latest user clarification
+
+Populate plugin repositories normally. Deliver only the last known installable
+version per plugin, plus matching release documents, to:
+`D:\SiteEngine\Plugins\..Deliverables\[appropriate folder]`.
+`..Deliverables` is a literal child of `Plugins`; `Plugins..Deliverables` is a
+different directory and must not receive deliveries. Archive historical packages
+outside this delivery area. This explicitly supersedes conflicting older paths.
+
+## Current Ads-only setup completion authority - November 3, 2026
+
+The latest direct instruction supersedes historical exact-archive-release gates and
+unrelated Base assignments. Current authoritative deployment ownership and unresolved
+Ads operations determine admission; a historical review/PLAN_ONLY archive is not an
+independent reservation and must be preserved. The bounded0.6.4.2 administrator
+milestone has passed installed authenticated HTTP/native verification. Finalize its
+stable package/release only; no client rollout or additional milestone is authorized.
+Canonical delivery is D:\SiteEngine\Plugins\..Deliverables\PLUGIN - SiteEngine Ads-Bridge
+(actual folder uses the existing em dash). The separator between Plugins and ..Deliverables is required.
+Preserve all configuration/history/journals/Consent and disabled delivery flags.
+
+## Immediate instruction priority — November 3, 2026
+
+New user instructions take priority over the current plan, tests and cleanup.
+A stop, pause or scope correction immediately stops launching commands and
+mutations. Report any already-running process or uncertain write without extended
+cleanup. Do not resume superseded work from older conversation or queued plans.
+The application message queue is outside the agent's control; never claim otherwise.
+These rules explicitly supersede conflicting older continuation/cleanup guidance.
+
+Current bounded milestone: reusable administrator setup on Alma only. Earlier
+Campbell external-configuration patches and direct client development are superseded.
+Preserve their evidence/journals. Canonical source remains this project's source
+folder. One bounded ownership check on contention; no repeated polling. No new
+coordination framework or browser acceptance campaign.
+## Deployment ownership - permanent rule, November 2, 2026
+
+Aubrey's "Fix this forever" instruction supersedes conflicting per-command
+handoff/approval behavior. Plugin Helpers own decisions and their Codex executes;
+Alma is not a plugin approval gate.
+
+Treat a finite multi-batch installation/import and its final readback/reopening as
+ONE deployment job. Extend and reuse the existing supervisor/executor lock: retain
+job ownership across related phases, including dependency version pins. A different
+plugin may not replace those dependencies between batches merely because one PHP
+process exited. Do not hold a SQL named lock across separate PHP sessions.
+
+Every cooperating mutating entry point must check the same durable job ownership
+record under the existing executor lock before changing shared files, definitions,
+schemas or maintenance controls. The record identifies project/job, protected
+resources, dependency hashes, process identity and the safe checkpoint; it contains
+no credentials or customer data. Implement this in the existing supervisor/launcher,
+not a new service, framework, permissions system or alternate connection route.
+Documentary rules alone are not proof that runtime enforcement is implemented.
+
+Handle normal contention with bounded waits and independent local work, then
+recheck actual owner state. Discover the owning package/commit/hashes from existing
+local delivery records; do not ask Aubrey for routine handoffs or another approval.
+Do not delete/steal a live lock, kill foreign workers, or infer cessation from time.
+
+At a completed safe checkpoint, a reviewed compatible dependency update may be
+bound under standing task authorization. Preserve original envelopes, operation
+IDs, receipts and checkpoints unchanged; refresh the installed profile and create
+new exact plans only for remaining work. An interrupted operation must first use
+its supported exact recovery path. Never bypass a source mismatch or blindly replay
+an uncertain save. Verify the actually installed sources after acquiring ownership.
+
+Release ownership only after the job's safe completion/handoff is recorded. The
+owning executor restores only its own temporary maintenance control; outbound and
+enrollment holds remain unless separately authorized. Add a focused two-executor
+regression proving that a second deployment cannot change pinned dependencies
+between the first job's phases, then can proceed after that job finishes.
+
+<!-- ADS-DIRECT-DELIVERY-AUTHORITY-20261102 -->
+## Current Ads ownership and execution authority
+
+Aubrey's direct instruction of 2026-11-02 supersedes older Master/ALMA approval,
+routing and sole-executor requirements for Ads work in this file and historical
+project guidance. Controlling Helper: _(AB) Ads Helper - 10.
+Canonical source: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\source.
+Permitted server role: execute the authorized Ads plugin installation, explicit
+additive guard migration and synthetic/native verification on Alma using existing
+access. Coordination prevents overlapping writes; it is not another approval gate.
+Preserve completed evidence, configuration, journals, Consent barriers and disabled
+real delivery/exports. This authority does not permit production rollout, unrelated
+plugin/shared-server changes, new privileges or another access method. Report
+implemented, packaged, installed, verified and released separately. Ads Codex owns
+its task's backup/evidence and selective recovery; preexisting retained resources
+keep their recorded owners. Inspect actual state before retrying uncertain writes.
+<!-- END ADS-DIRECT-DELIVERY-AUTHORITY-20261102 -->
+
+<!-- SITEENGINE-ROLES-AUTHORITY-BEGIN -->
+## Roles and authority
+
+Historical governance record: Ads approval/routing/executor restrictions in this block are superseded by the current Ads authority section above.
+
+Effective November 2, 2026. This section explicitly supersedes conflicting older workflow, ownership, helper-role, retry-approval and deployment-executor instructions in this file and historical project documents. Preserve historical evidence and all nonconflicting technical, privacy and access requirements. Later explicit task authorizations remain applicable; this governance update itself authorizes no deployment or real delivery.
+
+- Controlling Helper: _(AB) Ads Helper - 10.
+- Canonical source / working home: D:\SiteEngine\Plugins\.PLUGIN — SiteEngine Ads-Bridge\source.
+- Permitted server role: Plugin source/build/test owner. No independent shared-server changes; Alma Codex installs/tests unless Master explicitly delegates a bounded server task.
+- Aubrey remains final authority. The Master server chat sets priorities, owns shared-server coordination and decides server/resource conflicts. Each named plugin Helper owns its product requirements, implementation decisions, acceptance criteria and delivery; its dedicated Codex owns its canonical source, tests, GitHub changes and packages. A coordination request does not transfer plugin ownership to Master or Alma Codex.
+- Shared Project context is reference material, not delegated execution authority. Treat each chat according to its name. Return plugin-source corrections to its owning Helper/Codex; do not create a competing source master.
+- Plugin Helpers continue independent authorized implementation while awaiting a server slot. Existing authorization covers routine invocation and test-tool corrections within scope; inspect actual state before retrying, never blindly replay uncertain writes, and do not create repeated approval loops.
+- Only one executor changes overlapping server resources at a time. Alma Codex owns assigned dev-server installation, backups, scoped controls, installed verification and cleanup; other execution requires an explicit bounded delegation. AWS production operations require their own concrete scope.
+- Preserve completed evidence. Expand testing only for a demonstrated failure or concrete unresolved requirement. Diagnose first and use the smallest adequate correction; do not start another general tooling or infrastructure campaign.
+- Messages intended for another chat start with TO / FROM / SUBJECT. Preparing a handoff is not delivery or acknowledgment. Do not claim another chat received or acted on a message without evidence.
+- Report implemented, packaged, installed, verified and released separately; none implies the next. PC/GitHub remain source authority. The live Alma dev site is the continuing test/integration destination; keep its approved verified plugin versions current under assigned installation scope, without inferring client-production release.
+<!-- SITEENGINE-ROLES-AUTHORITY-END -->
 # SiteEngine Ads Bridge — repository working rules
 
 Canonical editable checkout:

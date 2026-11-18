@@ -1,0 +1,10 @@
+{
+  "version": "0.8.2-dev.2",
+  "source": "402597db0f8e2f0e52b85a747ee874df0db05989",
+  "sha256": "9c7310b80828cef66b7b31d4fc757756b23e2c825e91af3c7c43914df72e2727",
+  "manifest_sha256": "e8610ed33bf9cbd04e0b32d6008628639b9f25b9088a71d6775479a247e40cd7",
+  "members": 99,
+  "fe_source": "1c2fe6827069748c8c5b6ce3565600ce004efc9f",
+  "zip_name": "siteengine-ads-bridge-0.8.2-dev.2-e8610ed33bf9.zip",
+  "designation": "Isolated development successor; not a stable release"
+}

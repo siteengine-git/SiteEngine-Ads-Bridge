@@ -1,0 +1,9 @@
+{
+  "revision": "r4",
+  "zip": "joint-consent-ads-operations-20261031-r4.zip",
+  "zip_sha256": "17b9fed27906e94407c27fb6f29da27292e95447cf84aafc9645a75521ff491b",
+  "package_manifest_sha256": "edf2b16e7a3b5251e1bff526c693565f8c7ea1e5b9bd397e315efe285c373366",
+  "operations_manifest_sha256": "6a264e8aff67a4206eab29a29e800d911abdcbcb36601c413435c34c6bf8de7a",
+  "members": 23,
+  "acceptance": "LOCAL_ONLY_J1_J6_HELD_CONSENT_TARGET_CORRECTION_REQUIRED"
+}

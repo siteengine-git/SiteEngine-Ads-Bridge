@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "test": "crm-import-recreate.php",
+      "assertions": 100,
+      "status": "PASS"
+    },
+    {
+      "test": "crm-import-recovery.php",
+      "assertions": 15,
+      "status": "PASS"
+    },
+    {
+      "test": "crm-import-blockers.php",
+      "assertions": 21,
+      "status": "PASS"
+    },
+    {
+      "test": "crm-import-acceptance.php",
+      "assertions": 78,
+      "status": "PASS"
+    }
+  ],
+  "assertions": 214,
+  "native_SQL": false,
+  "new_partial_graph_assertions": 15,
+  "old_counterexample_retained": "managed-recreation-20261112/partial-graph-counterexample.txt"
+}

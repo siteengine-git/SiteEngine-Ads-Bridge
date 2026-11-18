@@ -1,0 +1,66 @@
+{
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.7.0",
+  "published_at": "2026-11-05T17:02:28Z",
+  "tag": "v0.7.0",
+  "accepted_commit": "3ed9ee2044b9d15f9af82e987a23dd757eb82bef",
+  "draft": false,
+  "prerelease": false,
+  "published_state_verified": true,
+  "assets": [
+    {
+      "name": "siteengine-ads-bridge-0.7.0.zip",
+      "sha256": "ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa",
+      "size": 264647,
+      "github_digest": "sha256:ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.7.0/siteengine-ads-bridge-0.7.0.zip",
+      "download_sha256": "ac4636f8348c7bc5897f2883d0f19d7fe04c4670350751fed9a35ad0cd03aeaa",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "MANIFEST.json",
+      "sha256": "a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f",
+      "size": 9481,
+      "github_digest": "sha256:a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.7.0/MANIFEST.json",
+      "download_sha256": "a8fd3a2eb76e374804eaa4ab0e149c5146e0f66cd38c5473616a4b3cccaa125f",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "sha256": "3862eeebed467071427aeebd3c4ede29a74b3410dbe5960bf25e6768fd1c28f1",
+      "size": 428,
+      "github_digest": "sha256:3862eeebed467071427aeebd3c4ede29a74b3410dbe5960bf25e6768fd1c28f1",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.7.0/SHA256SUMS.txt",
+      "download_sha256": "3862eeebed467071427aeebd3c4ede29a74b3410dbe5960bf25e6768fd1c28f1",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "INSTALL-AND-IMPORT.md",
+      "sha256": "1831dfe340927f10524e6db5bdab40c55437a9ef06f31181ee6c986944e559aa",
+      "size": 2826,
+      "github_digest": "sha256:1831dfe340927f10524e6db5bdab40c55437a9ef06f31181ee6c986944e559aa",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.7.0/INSTALL-AND-IMPORT.md",
+      "download_sha256": "1831dfe340927f10524e6db5bdab40c55437a9ef06f31181ee6c986944e559aa",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "RELEASE-NOTES.md",
+      "sha256": "34880046144dcbda795be49316c7518e00e5c9f4fb531228cc0ee8f1bf5ca55b",
+      "size": 2746,
+      "github_digest": "sha256:34880046144dcbda795be49316c7518e00e5c9f4fb531228cc0ee8f1bf5ca55b",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.7.0/RELEASE-NOTES.md",
+      "download_sha256": "34880046144dcbda795be49316c7518e00e5c9f4fb531228cc0ee8f1bf5ca55b",
+      "download_bytes_verified": true
+    },
+    {
+      "name": "RESULTS.json",
+      "sha256": "f665df395d614090e4f786e19d4964c0abe226a9d5dbe08bae41fbc95c5cea68",
+      "size": 15391,
+      "github_digest": "sha256:f665df395d614090e4f786e19d4964c0abe226a9d5dbe08bae41fbc95c5cea68",
+      "download_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/download/v0.7.0/RESULTS.json",
+      "download_sha256": "f665df395d614090e4f786e19d4964c0abe226a9d5dbe08bae41fbc95c5cea68",
+      "download_bytes_verified": true
+    }
+  ],
+  "all_six_published_downloads_byte_verified": true
+}

@@ -25,7 +25,8 @@ ob_start(); require __DIR__.'/inquiry-acceptance.php'; $bootstrap_log=ob_get_cle
 if ($fails) { echo $bootstrap_log; exit(1); }
 $passes=0; $fails=0;
 
-final class SEAB_SQL_Test_WPDB {
+final class SEAB_SQL_Test_WPDB implements SiteEngine_Ads_Bridge_Coordination_Driver {
+    public function seab_coordination_pin_session() { return static function() {}; }
     public $prefix;
     public $pdo;
     public $submissions=array();
@@ -86,7 +87,7 @@ final class SEAB_SQL_Test_WPDB {
 }
 
 $prefix='seab_acceptance_'.bin2hex(random_bytes(6)).'_';
-$tables=array($prefix.'se_ads_inquiries',$prefix.'fluentform_submissions',$prefix.'fc_tags');
+$tables=array($prefix.'se_ads_inquiries',$prefix.'fluentform_submissions',$prefix.'fc_tags',$prefix.'se_ads_configuration_guard');
 $GLOBALS['wpdb']=new SEAB_SQL_Test_WPDB($pdo,$prefix);
 function native_case($id) {
     global $wpdb;
@@ -100,6 +101,7 @@ function native_lock_name($id) {
 }
 try {
     $pdo->exec('SET SESSION default_storage_engine=InnoDB');
+    $pdo->exec(SiteEngine_Ads_Bridge_Coordination::schema_sql());
     // Exercise the additive SQL column upgrade independently of WordPress dbDelta.
     $legacy_ddl=preg_replace('/^\s*projection_(?:plan longtext|plan_hash char\(64\)|verified_at_utc datetime) NULL,\n/m','',SiteEngine_Ads_Bridge_Inquiries::schema_sql());
     $pdo->exec($legacy_ddl);

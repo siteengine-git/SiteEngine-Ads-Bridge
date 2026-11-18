@@ -91,15 +91,15 @@ final class SiteEngine_Ads_Bridge_Settings {
 						'won'         => 'Won',
 					),
 					'sources'   => array(
-						'call'     => 'Call Lead',
-						'form'     => 'Form Lead',
-						'referral' => 'Referral Lead',
-						'walk_in'  => 'Walk In Lead',
+						'call'     => '',
+						'form'     => '',
+						'referral' => '',
+						'walk_in'  => '',
 					),
 				),
 				'lifecycle_automation' => array(
 					'enabled'                  => false,
-					'unqualified_reason_field' => 'customer_rating',
+					'unqualified_reason_field' => 'se_ads_unqualified_reason',
 					'unqualified_at_field'     => 'unqualified_at',
 					'stale_new_days'           => 3,
 				),
@@ -147,6 +147,7 @@ final class SiteEngine_Ads_Bridge_Settings {
 				'spreadsheet_id'     => '',
 				'credentials_path'   => '',
 				'value_input_option' => 'RAW',
+                'account_timezone' => '',
 			),
 			'consent'        => array(
 				'required_policy_version' => $policy,
@@ -292,6 +293,7 @@ final class SiteEngine_Ads_Bridge_Settings {
 		$config['google_sheets']['spreadsheet_id'] = sanitize_text_field( (string) $config['google_sheets']['spreadsheet_id'] );
 		$config['google_sheets']['credentials_path'] = sanitize_text_field( (string) $config['google_sheets']['credentials_path'] );
 		$config['google_sheets']['value_input_option'] = 'RAW';
+        $config['google_sheets']['account_timezone']=sanitize_text_field((string)($config['google_sheets']['account_timezone']??''));
 
 		$config['consent']['required_policy_version'] = sanitize_text_field( (string) $config['consent']['required_policy_version'] );
 		$config['consent']['require_ad_user_data'] = true;

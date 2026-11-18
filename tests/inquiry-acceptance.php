@@ -149,7 +149,11 @@ namespace {
         }
     }
 
-    final class SEAB_Inquiry_Test_WPDB {
+    require_once dirname(__DIR__) . '/includes/class-siteengine-ads-bridge-coordination.php';
+    require_once __DIR__ . '/coordination-fake.php';
+    if (!defined('DB_NAME')) define('DB_NAME','seab_inquiry_acceptance');
+    final class SEAB_Inquiry_Test_WPDB implements SiteEngine_Ads_Bridge_Coordination_Driver {
+        use SEAB_Coordination_Fake;
         public $prefix = 'wp_';
         public $rows = array();
         public $submissions = array();
@@ -160,6 +164,7 @@ namespace {
         public $locks = array();
         public $deny_locks = false;
         public $lock_unavailable = false;
+        public $lose_acquire_response = false;
         public $lose_lock = false;
         public $fail_release = false;
         public $storage_engine = 'InnoDB';
@@ -178,7 +183,9 @@ namespace {
             return $query;
         }
         public function get_var( $sql ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('get_var',$sql);
             if (preg_match("/SELECT GET_LOCK\\('([^']+)', 0\\)/",$sql,$m)) {
+                if ($this->lose_acquire_response) { $this->locks[$m[1]]=1; return null; }
                 if ($this->lock_unavailable) return null;
                 if ($this->deny_locks || (isset($this->locks[$m[1]]) && 1!==$this->locks[$m[1]])) return 0;
                 $this->locks[$m[1]]=1;
@@ -213,6 +220,7 @@ namespace {
         }
         private function unquote( $s ) { return str_replace( "''", "'", trim( $s, "'" ) ); }
         public function get_row( $sql, $format = null ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('get_row',$sql);
             unset( $format );
             if (false!==strpos($sql,'SHOW TABLE STATUS WHERE Name')) return array('Engine'=>$this->storage_engine);
             if ( preg_match( '/SELECT id, form_id FROM `wp_fluentform_submissions` WHERE id = (\d+)/', $sql, $m ) ) {
@@ -268,6 +276,7 @@ namespace {
             return $n;
         }
         public function query( $sql ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('query',$sql);
             if ($sql===$this->fail_query) return false;
             if ('START TRANSACTION'===$sql) $this->transaction_rows=$this->rows;
             if ('COMMIT'===$sql) $this->transaction_rows=null;
@@ -279,6 +288,7 @@ namespace {
             $this->transaction_rows=null; $this->locks=array(); return true;
         }
         public function get_results( $sql, $format = null ) {
+            if (strpos($sql,'/*seab-coordination*/')!==false) return $this->coord_query('get_results',$sql);
             unset($format);
             if(false!==strpos($sql,'SHOW COLUMNS FROM')) return $this->missing_recovery_columns ? array() : array(
                 array('Field'=>'projection_plan','Type'=>'longtext','Null'=>'YES'),
@@ -432,14 +442,14 @@ namespace {
     [$contact,$old,$new,$activation]=reset_case(40);
     $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
     $values=$contact->custom_fields();
-    $clear_keys=array('qualified_at','unqualified_at','closed_date','invoiced_amount','customer_rating','lost_date','ads_export_status','ads_exported_at','ads_conversion_value_frozen','ads_export_error');
-    check_inq('committed'===$result['status'] && !array_intersect($clear_keys,array_keys($values)),'activation deletes all old inquiry milestones, revenue, reason and export status');
+    $clear_keys=array('qualified_at','closed_date','invoiced_amount','customer_rating','lost_date','ads_export_status','ads_exported_at','ads_conversion_value_frozen','ads_export_error');
+    check_inq('committed'===$result['status'] && !array_intersect($clear_keys,array_keys($values)),'activation resets current projections but preserves the retired CRM timestamp');
     check_inq('401'===($values['submission_id']??'') && uuid_for(940)===($values['se_crm_current_inquiry_id']??'') && 'Repair'===($values['service_type']??'') && 'granted'===($values['se_google_ad_user_data']??''),'reset preserves CRM Ops identity, unrelated fields and consent while projecting the new submission');
     check_inq(in_array(201,array_map(fn($t)=>(int)$t->id,$contact->tags),true),'reset preserves non-lifecycle tags');
     $prior=SiteEngine_Ads_Bridge_Inquiries::get($old);
     check_inq('4500'==(string)$prior['invoiced_amount'] && '2026-10-21'===$prior['closed_date'] && '2026-10-20 10:00:00'===$prior['qualified_at'],'real lifecycle hooks do not restamp or erase the previous inquiry during reset');
     $contact->attachTags(array(102));
-    check_inq('2026-10-23 12:34:56'===($contact->custom_fields()['qualified_at']??''),'lifecycle compliance resumes after activation completes');
+    check_inq(abs(strtotime($contact->custom_fields()['qualified_at']??'')-time())<=2,'lifecycle compliance resumes after activation completes');
 
     [$contact,$old,$new,$activation]=reset_case(41);
     $contact->ignore_field_writes=true;
@@ -496,6 +506,15 @@ namespace {
     $calls=$contact->field_write_calls;
     $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
     check_inq('retry'===$result['status'] && 'projection_field_mapping_invalid'===$result['reason_code'] && $calls===$contact->field_write_calls,'invalid reset field mapping cannot overwrite the canonical submission binding');
+    SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
+
+
+    [$contact,$old,$new,$activation]=reset_case(48);
+    $contact->syncCustomFieldValues(array('customer_rating'=>'Excellent','se_ads_unqualified_reason'=>'Wrong Area'),false);
+    SiteEngine_Ads_Bridge_Config::instance()->overrides['fluentcrm.lifecycle_automation.unqualified_reason_field']='se_ads_unqualified_reason';
+    $result=SiteEngine_Ads_Bridge_Inquiries::commit_activation($activation);
+    check_inq('committed'===$result['status'] && ($contact->custom_fields()['customer_rating']??null)==='Excellent','new inquiry activation preserves unrelated customer rating');
+    check_inq(!isset($contact->custom_fields()['se_ads_unqualified_reason']),'new inquiry activation resets configured reason only');
     SiteEngine_Ads_Bridge_Config::instance()->overrides=array();
 
     if (!defined('SEAB_INQUIRY_TEST_INCLUDE')) {

@@ -1,0 +1,14 @@
+{
+  "candidate": "0.8.1-climatrol-UNACCEPTED-20261106",
+  "designation": "UNACCEPTED; not a stable release or accepted demo freeze; real Google worksheet pending",
+  "source_commit": "e52007069c58645e861bab760d2571fb1e2206dc",
+  "zip_name": "siteengine-ads-bridge-0.8.1-climatrol-UNACCEPTED-20261106-a1e0e7e3fcd4.zip",
+  "sha256": "22e5a3129a75c70196262f4a2ef3e6be76be0e52f3e69ec55cd16e198f48d60d",
+  "manifest_sha256": "a1e0e7e3fcd4a44cbfd3e09ff64418ed4eb42a826f0e08b1586cc44daca0e4cb",
+  "members": 75,
+  "installable": true,
+  "stable_delivery_replaced": false,
+  "real_google_sheet_verified": false,
+  "installed_package_verification": "PASS;75/75 exact members,no stale extras,42 native PHP lints;see INSTALLED-PACKAGE.json",
+  "working_model_acceptance": "NOT COMPLETE;actual service-account/test worksheet input pending"
+}

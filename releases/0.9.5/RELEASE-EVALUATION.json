@@ -1,0 +1,115 @@
+{
+  "decision": "PASS",
+  "accepted_source": "49fab3cb5e701c3090d9924337a2fdbf011fc207",
+  "accepted_evidence": "f1142f4f16ee1416a3b1843153320e73039b64aa",
+  "ZIP_sha256": "7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5",
+  "manifest_sha256": "6d14a75357b3ec480d561192bc70d3efe26bd607fbf3d1881b6609099003a797",
+  "members": 82,
+  "package_Git_blob_and_installed_identity": "PASS81 payloads + embedded manifest; no rebuild",
+  "upstream": {
+    "Base": "v2.6.1 stable/cdab9f1c9cb29e600b3cf492500f982a854711e4",
+    "CB": "v0.2.3 stable/e6debd83b78f0a9584be7a9a58bc9b9437118d7d",
+    "handbacks": [
+      "https://github.com/siteengine-git/siteengine-base/issues/1#issuecomment-6985426851",
+      "https://github.com/siteengine-git/SiteEngine-Call-Bridge/issues/1#issuecomment-6985758973"
+    ]
+  },
+  "native_direct_upgrade": {
+    "PASS": 22,
+    "checks": {
+      "version": true,
+      "Base": true,
+      "plugin_active": true,
+      "owned_prefix": true,
+      "original_options_autoload": true,
+      "se_ads_inquiries_schema": true,
+      "se_ads_inquiries_history": true,
+      "se_ads_configuration_guard_schema": true,
+      "se_ads_configuration_guard_history": true,
+      "se_ads_export_ledger_schema": true,
+      "se_ads_export_ledger_history": true,
+      "82_members": true,
+      "payload_hashes": true,
+      "file_source_without_automatic_Base_import": true,
+      "custom_form_mapping": true,
+      "legacy_reason_mapping": true,
+      "optional_unused": true,
+      "no_automatic_source_key": true,
+      "exports_still_disabled": true,
+      "no_automatic_definition_creation": true,
+      "no_HTTP": true,
+      "no_mail": true
+    },
+    "scope": "Actual WordPress ZIP0.8.2 to0.9.5 upgrade; synthetic private fixture/history only. No form/browser/provider acceptance."
+  },
+  "additional_local_prior_stable_settings_checks": 10,
+  "accepted_evidence_reused": {
+    "local_checks": 279,
+    "native_SQL_handler_assertions": 46,
+    "native_lints": 51,
+    "installed_members": 82,
+    "synthetic_authenticated_browser": "accepted0.9.5 document Save scope; not repeated"
+  },
+  "compatibility": {
+    "PHP_minimum": "8.3",
+    "ordinary_document_Save": "Base2.6.1 document-save-1",
+    "older_Base": "Capability absence/wrong value/exception preserves legacy document controls; credentials-1 runtime unchanged",
+    "schemas": "Inquiry2/coordination1/ledger DDL unchanged from stable0.8.2; no destructive migration",
+    "Customer_Rating": "Explicit existing mapping preserved; dedicated reason field for fresh setup; customer data retained",
+    "Estimated_Value": "Deliberate missing-only provisioning with conflict refusal; no automatic alteration",
+    "Sheet_contracts": "Google_Ads_Import21;All_Leads94 unchanged",
+    "CRM_import_history": "Preserved, including original complete job and registry; no replay",
+    "credential_source": "Real Google FILE remains authoritative; no import/cutover/provider contact"
+  },
+  "preservation": {
+    "main_plugin_files": true,
+    "protected_main_tables": true,
+    "all_main_covered_options_except_cron": true,
+    "cron_exact_equality": false,
+    "source_export_flags": "Unchanged; no activation or execution"
+  },
+  "cron_assessment": {
+    "material_regression_established": false,
+    "retained_post_discrepancy_comparison": "28 same definitions;26 timestamp changes at initial assessment",
+    "after_upgrade_evaluation": {
+      "count": 27,
+      "added": [],
+      "removed": [
+        {
+          "hook": "wp_version_check",
+          "scheduled_UTC": "2026-11-18T17:15:19+00:00",
+          "schedule": false,
+          "interval": null,
+          "argument_sha256": "35786c7117b4e38d0f169239752ce71158266ae2f6e4aa230fbbb87bd699c0e3"
+        }
+      ]
+    },
+    "interpretation": "All recurring schedules/intervals/arguments remain; only one already-due, one-off core wp_version_check is absent. No inference that this task executed it.",
+    "historical_limit": "Original PRE0.9.5 serialized payload unavailable; exact historical equality and cause cannot be established. No reconstruction or restoration.",
+    "product_source": "No new/removed scheduling registrations or cron writes from stable0.8.2"
+  },
+  "cleanup": {
+    "owned_tables_removed": 15,
+    "prefix_absent": true,
+    "fixture_users_tree_config_auth_removed": true,
+    "job_complete": true,
+    "inflight_null": true,
+    "executor_free": true,
+    "fixture_absent": true,
+    "config_auth_absent": true,
+    "maintenance_absent": true,
+    "private_backups_evidence_retained": true
+  },
+  "failed_attempts_retained": [
+    "Initial private seed omitted global wpdb and stopped before any seed writes; zero rows independently verified then only unexecuted stages resumed",
+    "Private cleanup initially expected serialized owner marker; WordPress stored the exact marker as a plain string. Refused before DROP; exact-string ownership checked before cleanup",
+    "Strict main option comparison recorded cron-only drift; definitions assessed explicitly, no whole-option restore"
+  ],
+  "limits": [
+    "No real Base Google credential Save/authentication/cutover; ALMA#5 owns that operation",
+    "No Google provider request/Sheet write/advertising delivery/exports or browser campaign in this release evaluation",
+    "No new positive call Consent/FE production acceptance/client rollout",
+    "Native private WordPress ZIP fixture does not claim main-site browser upload or current real Google reauthentication"
+  ],
+  "runtime_changes_in_release_evaluation": false
+}

@@ -1,0 +1,91 @@
+{
+  "version": "0.9.4",
+  "source_commit": "00aef6caa7e1a3b355095da26f2df63e17f1e0d7",
+  "Base_dependency": {
+    "version": "2.5.0",
+    "source": "277c8c629dd3b3ffff32011030d055b942ea5076",
+    "completed_Base_evidence_reused": true
+  },
+  "local": {
+    "runtime": "PHP8.3.36 + OpenSSL/Sodium; Node",
+    "checks": [
+      {
+        "test": "base-credentials-acceptance.php",
+        "args": [],
+        "result": "SUMMARY 51 PASS; actual pinned Base crypto/AB code; storage, configuration lock and HTTP doubles, NOT installed Google acceptance"
+      },
+      {
+        "test": "base-credentials-acceptance.php",
+        "args": [
+          "--without-base"
+        ],
+        "result": "PASS missing API refuses before file fallback"
+      },
+      {
+        "test": "product-setup-replacement.php",
+        "args": [],
+        "result": "SUMMARY 84 PASS; actual algorithms/rendering, simulated vendor/DB; no installed/browser evidence"
+      },
+      {
+        "test": "product-setup-acceptance.php",
+        "args": [],
+        "result": "SUMMARY 34 PASS; synthetic storage/vendor boundaries; actual product algorithms"
+      },
+      {
+        "test": "setup-reporting-acceptance.php",
+        "args": [],
+        "result": "SUMMARY: 35 PASS; actual resolver/reporting, synthetic WordPress/Base/Doctor"
+      },
+      {
+        "test": "setup-workflow-acceptance.php",
+        "args": [],
+        "result": "SUMMARY 16 PASS;production detector;synthetic DB boundary"
+      },
+      {
+        "test": "product-setup-browser-double.js",
+        "result": "14 PASS; shipped JS with DOM/HTTP doubles; no native browser claim"
+      }
+    ],
+    "lints": 51,
+    "limits": "Real pinned Base crypto/service, AB code; WP/storage/HTTP/DOM doubles. No installed Google acceptance claimed."
+  },
+  "installed": {
+    "target": "Alma development only",
+    "PHP": "8.3.36 CLI",
+    "manifest_members_verified": 82,
+    "native_PHP_lints": 51,
+    "backup_verified": true,
+    "actual_Google_file_authentication": true,
+    "actual_spreadsheet_identity_read": true,
+    "Google_requests": 2,
+    "row_or_worksheet_writes": 0,
+    "Base_source_Google_authentication": "NOT RUN: no administrator-entered active Google document",
+    "normal_form_render_and_save_handler": "PASS under installed WordPress CLI, genuine nonce and unchanged rendered values; NOT browser HTTP acceptance",
+    "source_unchanged": "file",
+    "ordinary_save_provider_requests": 0,
+    "page_render_provider_requests": 0,
+    "missing_Base_active_blocks_test_and_switch": true,
+    "protected_table_snapshots_preserved": 18,
+    "settings_effective_config_fields_original_journals_Base_ciphertext_audit_key_metadata_preserved": true,
+    "consent_snapshot_coverage": "Receipts and event links; chains were not independently snapshotted. No Consent mutation invoked.",
+    "flags": "Existing Sheets and export/lifecycle flags unchanged; no export activation or execution",
+    "website_HTTP_verification": "NOT RUN: Cloudflare403/error1010 blocked the verification client before WordPress",
+    "scheduler": "cron option digest changed during bootstrap; original serialized payload was not captured. Current hooks inspected read-only: no Ads export hook. No cron job invoked by task; no historical per-job equality or cause attribution claimed; no broad restore.",
+    "cleanup": "Original wp-config restored; task probe, temporary authenticated session and maintenance absent; native lock released; shared job complete/idle; private backups and failed evidence retained"
+  },
+  "diagnostic_failures_retained": [
+    "Initial preservation comparison refused changed cron digest; read-only scope assessment retained",
+    "First CLI save-harness invocation failed nonce protection because REQUEST was not populated; no write. Corrected invocation modeled the normal POST globals and passed",
+    "HTTP client missing optional requests library; replaced by standard library without installing dependencies",
+    "HTTP403/error1010 prevented browser-path acceptance; access policy unchanged",
+    "Cleanup stopped on a test-script expected-probe-hash substitution error; independent exact hash established ownership, then only owned remainder removed"
+  ],
+  "unperformed": [
+    "Base-backed provider authentication/source transition in installed WordPress",
+    "Fresh web-PHP/browser AJAX source-selection acceptance",
+    "Sheet write permission and advertising delivery",
+    "Full new CRM provisioning/lifecycle campaign for carried0.9.2/0.9.3 changes",
+    "Client rollout or stable publication"
+  ],
+  "released": false
+}

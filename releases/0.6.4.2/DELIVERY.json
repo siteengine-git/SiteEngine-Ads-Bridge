@@ -1,0 +1,23 @@
+{
+  "version": "0.6.4.2",
+  "tag": "v0.6.4.2",
+  "designation": "ACCEPTED_ALMA_ADMINISTRATOR_VERIFIED",
+  "source_commit": "Published checkpoint containing this file; stable tag pins accepted release",
+  "package": "siteengine-ads-bridge-0.6.4.2.zip",
+  "sha256": "4c130a7ca7dd0914535743964d6c9e269663604039df04dd722e21c55ba76380",
+  "external_manifest_sha256": "b0c89fb00558b8a731ba14b6737905f8220398a1bfd2f9d39413654e6c5c84ff",
+  "embedded_manifest_sha256": "b0c89fb00558b8a731ba14b6737905f8220398a1bfd2f9d39413654e6c5c84ff",
+  "verified_members": 29,
+  "installed": true,
+  "runtime_installed_and_verified": true,
+  "final_documentation_package_installation": "PASS exact 29 members and fresh process readback; runtime unchanged",
+  "authenticated_http_assertions": 60,
+  "local_assertions_retained": 147,
+  "released": true,
+  "destination": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
+  "verified": true,
+  "accepted": true,
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.6.4.2",
+  "accepted_commit": "1d5c995a4ea2d77c3cc09cda3143a047860dd36e",
+  "publication_verified": true
+}

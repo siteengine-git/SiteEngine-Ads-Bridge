@@ -1,0 +1,46 @@
+{
+  "local": {
+    "inquiry": 43,
+    "recovery": 44,
+    "transition": 50,
+    "Unqualified_observer": 6,
+    "lifecycle": 18,
+    "product_setup": 34,
+    "bootstrap": 19,
+    "Consent_dispatch": 32,
+    "Consent_consumer": 104,
+    "settings": 10,
+    "setup_reporting": 30,
+    "administrator": 18,
+    "static": 87,
+    "total": 495
+  },
+  "native": {
+    "assertions": 14,
+    "actual_vendor_tag_hook": true,
+    "missing_Unqualified_CRM_definition": true,
+    "internal_event_timestamp": true,
+    "repeat_and_historical_preservation": true,
+    "All_Leads_columns": 94,
+    "All_Leads_inquiry_timestamp": true,
+    "Qualified_Converted_ineligible": true,
+    "outbound_attempts": 0
+  },
+  "installed": {
+    "version": "0.6.4.5",
+    "members": 34,
+    "packaged_PHP_lints": 17,
+    "Doctor": {
+      "PASS": 36,
+      "WARN": 4,
+      "FAIL": 1,
+      "PENDING": 0
+    },
+    "remaining_failure": "Credentials parent inaccessible/unknown; not related to unqualified_at",
+    "four_export_flags": false
+  },
+  "cleanup": "PASS:8 marked shadow tables and owned contact/inquiry/submission graph removed;original settings,field definitions,contacts,inquiry/Consent/journals unchanged",
+  "fixture_failure_preserved": "Initial native fixture stopped before marking because unowned tag-table discovery did not resolve under the isolated prefix;continued exact owned state using a marked clone of four existing tag definitions,without recreating the contact. Original failure and successful continuation retained locally.",
+  "compatibility": "Existing CRM definitions/values preserved;new projection plans omit retired field;old frozen journals/plans not rewritten. No historical event reconstruction.",
+  "limits": "Actual native WordPress/FluentCRM hooks and database locks in marked shadow resources,not real customer records or browser clicks. No real export/Sheet/Ads/mail delivery. Previous0.6.4.4 portability evidence retained,not repeated."
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Dependency-free release acceptance for SiteEngine Ads Bridge.
+ * Isolated acceptance; requires hash-pinned external Consent authority (see docs).
  * Run: php tests/static-acceptance.php
  */
 
@@ -30,6 +30,7 @@ namespace FluentCrm\App\Models {
 	}
 
 	class Subscriber {
+		public static $current_dnc = false;
 		public $id = 13;
 		public $email = 'Test.User@gmail.com';
 		public $phone = '+1 (850) 555-0123';
@@ -70,7 +71,7 @@ namespace FluentCrm\App\Models {
 
 		public function custom_fields() { return $this->custom; }
 		public function getTable() { return 'wp_fc_subscribers'; }
-		public static function find( $id ) { return 13 === (int) $id ? new self() : null; }
+		public static function find( $id ) { return 13 === (int) $id ? new self( self::$current_dnc ) : null; }
 		public static function query() { return new SubscriberQuery( new self() ); }
 	}
 }
@@ -108,6 +109,8 @@ namespace {
 		return array( 'code' => 200, 'body' => '{}' );
 	}
 
+	require_once __DIR__ . '/consent-authority-fixture.php';
+
 	class SEAB_Test_WPDB {
 		public $prefix = 'wp_';
 		public $last_error = '';
@@ -136,7 +139,7 @@ namespace {
 				$columns = array(
 					'wp_fluentform_submissions' => array( 'id', 'form_id', 'response', 'serial_number', 'status', 'created_at', 'updated_at', 'source_url', 'user_id', 'browser', 'device', 'ip' ),
 					'wp_fluentform_entry_details' => array( 'id', 'submission_id', 'field_name', 'field_value' ),
-					'wp_se_consent_receipts' => array( 'id', 'receipt_id', 'policy_version', 'banner_version', 'google_consent_json' ),
+					'wp_se_consent_receipts' => array_keys( seab_fixture_receipt() ),
 					'wp_fc_subscriber_meta' => array( 'id', 'subscriber_id', 'object_type', 'key', 'value' ),
 				);
 				return isset( $columns[ $m[1] ] ) ? $columns[ $m[1] ] : array();
@@ -147,6 +150,7 @@ namespace {
 			return array();
 		}
 		public function get_var( $sql ) {
+            if ( $sql === 'SELECT @@read_only' ) { return '0'; }
 			if ( false !== strpos( $sql, 'SHOW TABLES LIKE' ) && false !== strpos( $sql, 'wp_se_ads_export_ledger' ) ) {
 				return $this->ledger_enabled ? 'wp_se_ads_export_ledger' : null;
 			}
@@ -171,6 +175,8 @@ namespace {
 		}
 
 		public function get_row( $sql, $format = null ) {
+            if ( strpos( $sql, 'se_consent_events' ) !== false || strpos( $sql, 'se_consent_chains' ) !== false ) { return seab_fixture_current_row( $sql ); }
+			if ( false !== strpos( $sql, 'SELECT id, form_id, response FROM `wp_fluentform_submissions`' ) ) { return $this->submission_row(); }
 			if ( false !== strpos( $sql, 'SELECT id, form_id FROM `wp_fluentform_submissions`' ) ) {
 				$id = 24;
 				if ( preg_match( '/WHERE id = (\d+)/', $sql, $m ) ) { $id = (int) $m[1]; }
@@ -190,7 +196,9 @@ namespace {
 			}
 			return null;
 		}
-		public function get_results( $sql, $format = null ) { return array(); }
+		public function get_results( $sql, $format = null ) {
+			return false !== strpos( $sql, 'wp_se_consent_receipts' ) ? array( seab_fixture_receipt( $this->consent_ad_user_data, $this->consent_ad_personalization ) ) : array();
+		}
 		public function query( $sql ) { return true; }
 		public function insert( $table, $data, $formats = null ) { return 1; }
 		public function submission_row() {
@@ -213,7 +221,7 @@ namespace {
 					'utm_source' => 'google', 'utm_medium' => 'cpc', 'submission_id' => '24',
 					'se_cid' => '123456', 'se_agid' => '654321', 'se_adid' => '777', 'se_kw' => 'ac repair',
 					'se_mt' => 'e', 'se_net' => 'g', 'se_dev' => 'm', 'se_loc' => '1015116',
-					'_se_consent_server' => array( 'receipt_id' => 'receipt-24' ),
+					'_se_consent_server' => seab_fixture_stamp( seab_fixture_receipt( $this->consent_ad_user_data, $this->consent_ad_personalization ) ),
 				) ),
 			);
 		}
@@ -246,6 +254,8 @@ namespace {
 		$ref->setAccessible( true );
 		$ref->setValue( $subscriber, $custom );
 	}
+
+	if ( defined( 'SEAB_TEST_LIBRARY_ONLY' ) ) { return; }
 
 	$config = SiteEngine_Ads_Bridge_Config::instance();
 	check( array() === $config->validate(), 'isolated schema-v2 acceptance config validates' );
@@ -318,6 +328,13 @@ namespace {
 	check( array_column( $all_spec, 'h' ) === $all['headers'], 'All_Leads built headers exactly match provisioning contract' );
 	check( 13 === $all['contact_id'], 'All_Leads row links the matching CRM contact without requiring it' );
 
+    $alias_config=new class($config){private $base;function __construct($base){$this->base=$base;}function get($k,$d=null){return $k==='fluentcrm.lifecycle_automation.unqualified_at_field'?'legacy_rejected_at':$this->base->get($k,$d);}};
+    $internal=['inquiry_id'=>'00000000-0000-4000-8000-000000000099','lifecycle'=>'unqualified','unqualified_at'=>'2026-11-04 12:00:00','submission_id'=>24];
+    $internal_row=invoke_private($cli,'build_all_leads_row',[$GLOBALS['wpdb']->submission_row(),'wp_fluentform_submissions',$alias_config,'Unqualified','2026-11-04 12:00:00',$internal]);
+    $indexed=array_combine(array_column($internal_row['spec'],'k'),array_column($internal_row['spec'],'v'));
+    check(count($internal_row['values'])===94,'inquiry Unqualified retains94-column contract with legacy CRM mapping');
+    check($indexed['unqualified_at']===$internal['unqualified_at'],'inquiry event wins independently of legacy CRM timestamp selector');
+
 	$unmatched_submission = $GLOBALS['wpdb']->submission_row();
 	$unmatched_submission['id'] = 25;
 	$unmatched_submission['response'] = json_encode( array( 'first_name' => 'No', 'last_name' => 'CRM Match' ) );
@@ -366,7 +383,7 @@ namespace {
 	$qualified = invoke_private( $cli, 'build_qualified_lead_import', array( $qualified_subscriber, $config, '12:00:00' ) );
 	check( true === $qualified['exportable'], 'qualified-lead builder exports a durable qualified_at milestone regardless of later lifecycle state' );
 	check( 'ff:3:24' === $qualified['order_id'], 'qualified and converted stages reuse the canonical Fluent Forms transaction ID' );
-	check( '2026-07-22 15:30:00-05:00' === $qualified['conversion_time'], 'qualified timestamp is emitted in the client timezone with offset' );
+	check( '2026-07-22 10:30:00-05:00' === $qualified['conversion_time'], 'site-local UTC qualification instant is converted to client timezone with offset' );
 	check( '250.00' === $qualified['conversion_value'], 'configured Qualified Lead proxy value is emitted when present' );
 	check( 'SE | Qualified Lead' === $qualified['values'][20], 'qualified row emits the standardized conversion action' );
 	check( 'form-gclid' === $qualified['values'][2], 'qualified attribution prefers canonical Fluent Forms submission over CRM fallback' );
@@ -469,12 +486,12 @@ namespace {
 	check( 2 === substr_count( $source, '$this->google_sheets_append_row(' ), 'only the won exporter and shared family exporter can append Sheet rows' );
 
 	$public_methods = array_filter( ( new \ReflectionClass( $cli ) )->getMethods( \ReflectionMethod::IS_PUBLIC ), function ( $method ) { return '__construct' !== $method->name; } );
-	check( 19 === count( $public_methods ), 'CLI exposes 19 public commands including inquiry-admin' );
+	check( 20 === count( $public_methods ) && method_exists($cli,'configuration_admin'), 'CLI exposes 20 public commands including explicit configuration-admin' );
 
 	$package_source = $source . file_get_contents( dirname( __DIR__ ) . '/includes/class-siteengine-ads-bridge-doctor.php' );
 	check( false === strpos( $package_source, '987-654-3210' ) && false === strpos( $package_source, 'LeadEngine - Won Job' ), 'client-neutral runtime code contains no practice Ads account identifiers' );
 	$main_source = file_get_contents( dirname( __DIR__ ) . '/siteengine-ads-bridge.php' );
-	check( false !== strpos( $main_source, 'Version: 0.6.3' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.3'" ), 'release version is 0.6.3 in header and runtime constant' );
+	check( false !== strpos( $main_source, 'Version: 0.6.4.5' ) && false !== strpos( $main_source, "SEAB_VERSION', '0.6.4.5'" ), 'candidate version is 0.6.4.5 in header and runtime constant' );
 
 	echo "\nSUMMARY: {$passes} PASS, {$fails} FAIL\n";
 	exit( 0 === $fails ? 0 : 1 );

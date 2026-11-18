@@ -21,7 +21,7 @@ $check = function ( $ok, $msg ) use ( &$passes, &$fails ) {
     else { $fails++; echo "FAIL: {$msg}\n"; }
 };
 
-$check( false !== strpos( $main, 'Version: 0.6.3' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3'" ), 'current 0.6.3 release metadata is locked' );
+$check( false !== strpos( $main, 'Version: 0.6.3.1-rc.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3.1-rc.1'" ), 'current 0.6.3.1-rc.1 candidate metadata is locked' );
 $check( false !== strpos( $main, 'class-siteengine-ads-bridge-lifecycle.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Lifecycle::init()' ), 'lifecycle compliance runtime is loaded and initialized' );
 $check( false !== strpos( $config, "'new'," ) && false !== strpos( $config, "'qualified'," ) && false !== strpos( $config, "'unqualified'," ) && false !== strpos( $config, "'won'," ), 'canonical lifecycle contains New, Qualified, Unqualified, Won' );
 $check( false !== strpos( $settings, "'unqualified_reason_field' => 'customer_rating'" ) && false !== strpos( $settings, "'unqualified_at_field'     => 'unqualified_at'" ), 'customer_rating and unqualified_at defaults are locked' );

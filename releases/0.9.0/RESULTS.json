@@ -1,0 +1,74 @@
+{
+  "version": "0.9.0",
+  "source_commit": "0dc681518f607b59a293656ea57d523e223b4bd1",
+  "target": "https://climatrol.siteengine.space",
+  "implemented": true,
+  "packaged": true,
+  "assigned_development_site_installed": true,
+  "focused_native_and_visible_workflow_verified": true,
+  "stable_github_promotion": false,
+  "package_sha256": "43bda23c2b45e7ebc177f69d1535f6a30cdc10609cfda3aee0f1ed6913be6a60",
+  "manifest_sha256": "a26bb29541dbd55af5dde8686f9b32f7687e296a5608efbda8408df8437abb88",
+  "members": 77,
+  "native_PHP": "8.4.27",
+  "native_lints": 50,
+  "browser": {
+    "authenticated": true,
+    "normal_CRM_utility": "success; existing definitions adopted; no fixture deletion/creation",
+    "single_save_and_reload": "success with incomplete settings",
+    "navigation": [
+      "Setup",
+      "API Setup / FieldEdge",
+      "Settings / Advanced field overrides",
+      "Settings / Detailed diagnostics",
+      "Settings / Scheduler"
+    ],
+    "remaining_requirements": "disabled form 40 FluentCRM feed and blank Google Ads account timezone are reported explicitly",
+    "Sheets_test": "OAuth authentication completed; spreadsheet metadata GET returned HTTP 404. ID/sharing requires correction; write permission unverified. No rows read/appended."
+  },
+  "preservation": {
+    "original_settings_leaf_values": true,
+    "nonconfiguration_Ads_options_and_import_history_hashes": true,
+    "expected_Ads_option_changes": [
+      "seab_settings_v2",
+      "seab_version"
+    ],
+    "native_tables_byte_equal": [
+      "fc_campaigns",
+      "fc_campaign_emails",
+      "fc_funnels",
+      "fc_funnel_sequences",
+      "fc_lists",
+      "fc_tags",
+      "fc_message_templates"
+    ],
+    "fc_meta": {
+      "aggregate_equal": false,
+      "observed_mutable_key": "fluentcrm_is_sending_emails_last_called",
+      "limit": "Historical per-row baseline not retained; full fc_meta equality is not claimed."
+    },
+    "cron_definitions": true,
+    "active_plugins": true,
+    "wp_config_byte_exact": true,
+    "completed_guard": true,
+    "inflight": null
+  },
+  "cleanup": {
+    "owned_maintenance_removed": true,
+    "owned_browser_guard_removed": true,
+    "public_probe_removed": true,
+    "backups_and_failure_evidence_retained": true
+  },
+  "retained_failures": [
+    "Initial PHP proc_open/proc_close lint wrapper reported failure after copying files; independent owner-shell lint returned 0 for all 50 exact PHP files. No data restoration/reset was performed.",
+    "Private cache probe and unauthenticated owner-host root request returned 403. No security change or bypass. Actual authenticated administrator page rendered and exercised the new compiled implementation."
+  ],
+  "not_performed": [
+    "Real advertising export/row append",
+    "Mail/send/enrollment/call",
+    "FieldEdge provider action",
+    "Production client rollout",
+    "GeneratePress or main Alma replacement",
+    "CRM importer re-run or registry/journal reset"
+  ]
+}

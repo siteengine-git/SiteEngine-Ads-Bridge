@@ -1,0 +1,95 @@
+{
+  "version": "0.7.2",
+  "Windows_assertions": 43,
+  "native_Linux_assertions": 58,
+  "native_Linux_skips": 0,
+  "ordinary_authenticated_HTTP_cases": [
+    {
+      "case": "deployment-only",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": true,
+      "expected_blocked": false,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "admin-only",
+      "PASS": true,
+      "deployment_bytes": 174,
+      "normal_HTTP_save": true,
+      "expected_blocked": false,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "both",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": true,
+      "expected_blocked": false,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "active",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "inflight",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "malformed",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    },
+    {
+      "case": "unknown-format",
+      "PASS": true,
+      "deployment_bytes": 1798466,
+      "normal_HTTP_save": false,
+      "expected_blocked": true,
+      "record_bytes_preserved": true,
+      "fresh_path_exact": true
+    }
+  ],
+  "main": {
+    "version": "0.7.2",
+    "source": "settings",
+    "errors": [],
+    "doctor": {
+      "PASS": 35,
+      "WARN": 7,
+      "FAIL": 0,
+      "PENDING": 0
+    },
+    "four_export_flags": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "main_normal_Sheets_save": {
+    "HTTP": 200,
+    "normal_authenticated_settings_POST": true,
+    "preserved_existing_path": true,
+    "saved": true
+  },
+  "limits": "Credentials persistence does not establish service-account file access. No client operations or transport. Native readbacks,not new visual browser acceptance."
+}

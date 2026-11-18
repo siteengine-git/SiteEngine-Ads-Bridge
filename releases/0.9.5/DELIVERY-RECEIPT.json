@@ -1,0 +1,21 @@
+{
+  "delivery": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge\\siteengine-ads-bridge-0.9.5.zip",
+  "ZIP_count": 1,
+  "sha256": "7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5",
+  "manifest_sha256": "6d14a75357b3ec480d561192bc70d3efe26bd607fbf3d1881b6609099003a797",
+  "archive": "D:\\SiteEngine\\Plugins\\.PLUGIN — SiteEngine Ads-Bridge\\delivery-history\\before-document-save095-a8613520-c9fb-4466-ab82-476e5e0d486d",
+  "prior_files": 7,
+  "prior_files_hash_verified": true,
+  "delivery_files": [
+    "siteengine-ads-bridge-0.9.5.zip",
+    "MANIFEST.json",
+    "DELIVERY.json",
+    "SHA256SUMS.txt",
+    "INSTALL-AND-UPGRADE.md",
+    "RESULTS.json",
+    "INTEGRATION-CONTROL-HANDOFF.md"
+  ],
+  "installed_version": "0.9.5",
+  "real_source": "file",
+  "stable_released": false
+}

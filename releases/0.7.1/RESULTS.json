@@ -1,0 +1,98 @@
+{
+  "version": "0.7.1",
+  "status": "Ads correction verified;CRM producer bootstrap binding review outstanding",
+  "demonstrated_cause": "Released 0.7.0 reads historical admin-state.json before establishing completed authoritative deployment;1,048,644-byte fixture payload reproduced exact generic refusal. Main-Alma initial records were readable/below limit and did not reproduce that condition.",
+  "correction": "Own original executor;bounded deployment-first inspection;explicit complete/inflight-null/checkpoint permits ordinary settings without historical payload read;other states fail closed with record/condition.",
+  "local": {
+    "local_assertions": 89,
+    "suites": [
+      {
+        "suite": "completed-predecessor-settings.php",
+        "assertions": 30,
+        "status": "PASS"
+      },
+      {
+        "suite": "crm-import-blockers.php",
+        "assertions": 21,
+        "status": "PASS"
+      },
+      {
+        "suite": "administrator-setup-acceptance.php",
+        "assertions": 19,
+        "status": "PASS"
+      },
+      {
+        "suite": "successor-bootstrap-acceptance.php",
+        "assertions": 19,
+        "status": "PASS"
+      }
+    ],
+    "changed_PHP_lint": "PASS",
+    "Linux_permission_cases": "Native receipt separate;Windows does not claim permissions coverage",
+    "protected_runtime_byte_identity_to_0_7_0": {
+      "includes/class-siteengine-ads-bridge-consent.php": "d8e10f7cdb0a1239cd0711b72ca0a163843d5d2e216b93de63061796f197c8a0",
+      "includes/class-siteengine-ads-bridge-coordination.php": "90c8ef86bd06b2b05dc57bc7b887fa86e2a55782f348a26455e5ba35503dc18a",
+      "includes/class-siteengine-ads-bridge-inquiries.php": "d1cc0b1285b237f0866f79f7ea45968ac853f59a071c5503a077de56a6bf0454",
+      "includes/class-siteengine-ads-bridge-lifecycle.php": "27a560d638bf8949f844e8d321e42a4615239b58c0435cafd2252961b2461915",
+      "includes/class-siteengine-ads-bridge-time.php": "4ce7fc336271a51eaad62de9518534da2e6f9dd9489810ef0892a1bbe00a471d",
+      "includes/class-siteengine-ads-bridge-doctor.php": "ac98646e6fb9d066feaac72294947913c5d7d26cd4d75589e151661f87d78a71",
+      "includes/class-siteengine-ads-bridge-admin.php": "9cc08995810d9637af93bc65e8b87833007915b955fd2058259f04c574bfca32"
+    }
+  },
+  "native_Linux_permissions": {
+    "assertions": 45,
+    "skips": 0,
+    "owner_UID": 5004,
+    "scope": "actual filesystem and production executor code;not native SQL concurrency"
+  },
+  "isolated_HTTP": {
+    "separate_CRM_plugin_absent": true,
+    "released_error_reproduced": true,
+    "completed_history_bytes": 1048644,
+    "history_unchanged": true,
+    "ordinary_saves_two_paths": true,
+    "fresh_exact_path_readback_and_distinct_Doctor_results": true,
+    "active_inflight_and_unreadable_deployment_blocked": true,
+    "real_credentials_created": false
+  },
+  "main_Alma": {
+    "version": "0.7.1",
+    "members": 50,
+    "PHP_lints": 28,
+    "PHP": "8.3.36",
+    "ordinary_authenticated_HTTP_save": true,
+    "existing_credentials_path_preserved": true,
+    "fresh_path_readback_exact": true,
+    "validation_errors": [],
+    "Doctor": {
+      "PASS": 35,
+      "WARN": 7,
+      "FAIL": 0,
+      "PENDING": 0
+    },
+    "four_export_flags": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "configuration_native_data_history_preserved": true,
+    "full_volatile_fc_meta_identity_claim": false
+  },
+  "cleanup": {
+    "owned_tables_removed": 47,
+    "remaining_owned_tables": 0,
+    "foreign_references": 0,
+    "owned_HTTP_worker_listener_and_forward_stopped": true,
+    "temporary_admin_sessions_revoked": true,
+    "owned_WordPress_copy_removed": true,
+    "private_journals_history_backups_and_failure_receipts_retained": true,
+    "owner": "Ads Codex"
+  },
+  "limits": [
+    "No client access,real sends,exports,credential files or permissions changed.",
+    "No repeat importer/Consent/native-concurrency campaign.",
+    "CRM0.3.16 exact bootstrap allowlist needs CRM-owner review for 0.7.1;0.7.0 coexistence evidence does not establish 0.7.1 acceptance.",
+    "No stable GitHub release designation claimed pending that compatibility disposition."
+  ]
+}

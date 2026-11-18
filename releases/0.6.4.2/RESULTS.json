@@ -1,0 +1,35 @@
+{
+  "fresh_local_assertions": {
+    "administrator_handlers": 18,
+    "setup_destination_lock": 9,
+    "reporting": 30,
+    "settings": 10,
+    "coordination": 55,
+    "ordered_recovery": 6,
+    "bootstrap": 19,
+    "total": 147,
+    "failures": 0
+  },
+  "php_lint": 9,
+  "boundaries": "147 retained local assertions;60 fresh authenticated HTTPS WordPress administrator/native assertions. No browser UI campaign, real export/customer delivery or client deployment.",
+  "historical_evidence": "Retained prior evidence reused; no browser campaign or unchanged Consent/export tests repeated.",
+  "installed_authenticated_http_assertions": 60,
+  "installed_physical_schema": {
+    "inquiry_columns": 34,
+    "inquiry_indexes": 11,
+    "guard_columns": 5,
+    "engine": "InnoDB"
+  },
+  "installed_doctor": {
+    "PASS": 33,
+    "WARN": 9,
+    "FAIL": 0,
+    "PENDING": 0
+  },
+  "installed_module": "Ready",
+  "original_configuration_and_history_preserved": true,
+  "owned_test_resources_removed": true,
+  "runtime_defects": 0,
+  "final_package_runtime_changes": 0,
+  "client_deployment": false
+}

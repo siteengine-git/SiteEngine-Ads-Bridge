@@ -18,7 +18,7 @@ $check = function ( $ok, $msg ) use ( &$passes, &$fails ) {
     else { $fails++; echo "FAIL: {$msg}\n"; }
 };
 
-$check( false !== strpos( $main, 'Version: 0.6.3' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3'" ), '0.6.3 release metadata is locked' );
+$check( false !== strpos( $main, 'Version: 0.6.3.1-rc.1' ) && false !== strpos( $main, "SEAB_VERSION', '0.6.3.1-rc.1'" ), '0.6.3.1-rc.1 candidate metadata is locked' );
 $check( false !== strpos( $main, 'class-siteengine-ads-bridge-inquiries.php' ) && false !== strpos( $main, 'SiteEngine_Ads_Bridge_Inquiries::init()' ), 'inquiry runtime is loaded and initialized' );
 $check( false !== strpos( $main, 'function seab_inquiry_adopt_current' ) && false !== strpos( $main, 'function seab_inquiry_prepare_reconciliation' ) && false !== strpos( $main, 'function seab_inquiry_commit_activation' ), 'stable CRM Ops adapter functions expose adopt, prepare, and activate phases' );
 

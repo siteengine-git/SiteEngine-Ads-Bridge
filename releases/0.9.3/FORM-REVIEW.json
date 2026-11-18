@@ -1,0 +1,56 @@
+{
+  "source_file": "fluentform-export-forms-1-13-11-2026(2).json",
+  "form_id": 40,
+  "title": "Ad-Bridge Lead Form - (Not Used Yet)",
+  "changed": false,
+  "estimated_value": {
+    "form_type": "input_number",
+    "calculation_enabled": true,
+    "formula": "{select.service_type}",
+    "feed_source": "{inputs.estimated_value}",
+    "feed_destination": "estimated_value",
+    "mapping_correct": true,
+    "calculation_runtime_verified": false
+  },
+  "findings": [
+    {
+      "field": "landlord_permission",
+      "action": "Use a single-choice radio for Yes/No; current checkbox permits contradictory selections."
+    },
+    {
+      "field": "service_type",
+      "action": "Disable the enabled conditional rule with blank value/operator, or supply an explicit intended rule."
+    },
+    {
+      "field": "customer_role",
+      "action": "Consider no preselected Home Owner so the visitor deliberately identifies their role."
+    },
+    {
+      "field": "dropdown",
+      "action": "Rename to requested_service_window; update datetime_1 conditional reference. Describe it as a request, not a confirmed reservation."
+    },
+    {
+      "field": "datetime_1",
+      "action": "Rename to requested_appointment_at and require it when Schedule a Date is selected. No FE appointment booking is established."
+    },
+    {
+      "field": "state",
+      "action": "Currently defaults to FL; use GA for the Climatrol copy, or appropriate client default."
+    },
+    {
+      "field": "FluentCRM feed",
+      "action": "Force Subscribe remains true; turn off. Remove legacy static lead_status=New Lead mapping so AB lifecycle owns status."
+    },
+    {
+      "field": "Consent CRM mappings",
+      "action": "Three destination slugs remain truncated: se_google_analytics_stora, se_google_ad_personalizat, se_consent_personalizatio. Reconcile against the standard approved CRM contract without renaming populated fields blindly."
+    }
+  ],
+  "retained_fixes": [
+    "estimated_value now maps to estimated_value",
+    "Actual submission.id maps to submission_id",
+    "remove_tags empty",
+    "Old name/submission-ID surrogate and se_joint test markers removed"
+  ],
+  "scope": "Read-only attachment review; no form submissions or live feed edits."
+}

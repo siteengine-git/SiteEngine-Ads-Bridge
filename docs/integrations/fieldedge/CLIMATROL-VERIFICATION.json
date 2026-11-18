@@ -1,0 +1,35 @@
+{
+  "assignment": "Climatrol running synthetic connector",
+  "date": "2026-11-06",
+  "demonstration_target": "2026-11-09",
+  "started_from": "114324fd6c5a1d753265f91e9fe26e483575e273",
+  "accepted_successor_baseline": "cd9d5bca7bed9a2fd984d516dc9ae65a703b7d80",
+  "php_runtime": "Windows PHP 8.3.36 CLI -n",
+  "foundation_assertions": 62,
+  "climatrol_assertions": 51,
+  "failed_assertions": 0,
+  "linted_php_files": 10,
+  "demo": {
+    "attributed": "recorded",
+    "unattributed": "held",
+    "needs_review": "held",
+    "replay": "recorded, same receipt, no extra fixture insert",
+    "conflict": "operation_identity_reused",
+    "total_fixture_receipt_inserts": 3
+  },
+  "ab_candidate_contract": {
+    "source": "canonical source/docs/EXTERNAL-OUTCOME-CONTRACT.md",
+    "sha256_at_binding": "a1a9f03b68b0eccec08ae3ae57b5c01b047ba0b31247f91ba30b0beb9bee299e",
+    "version": "1",
+    "submit": "seab_external_outcome_submit(string $body): array",
+    "read": "seab_external_outcome_read(string $receipt_id): ?array",
+    "runtime_pin": "awaiting AB owner's frozen integration candidate"
+  },
+  "verification_scope": "local fixtures and in-memory supplied-API test double",
+  "installed_wordpress_tests_executed_by_fieldedge": 0,
+  "provider_authentication": false,
+  "connector_durable_storage": false,
+  "exports_executed": false,
+  "installed_and_worksheet_verification_owner": "primary AB Codex",
+  "release_state": "unaccepted development checkpoint, not installed or released"
+}

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "version": "0.8.4",
+  "PHP": "8.4.27",
+  "FluentCRM": "3.3.1",
+  "checks": [
+    {
+      "kind": "sequence_email",
+      "historical_parent_ID_differs": true,
+      "retired_scope_candidates": 0,
+      "current_scope_candidates": 1,
+      "actual_helper_pass": true,
+      "wrong_action_ID_refused": true
+    },
+    {
+      "kind": "step",
+      "historical_parent_ID_differs": true,
+      "retired_scope_candidates": 0,
+      "current_scope_candidates": 1,
+      "actual_helper_pass": true,
+      "wrong_action_ID_refused": true
+    }
+  ],
+  "native_model_reads": true,
+  "native_mutations": 0,
+  "limitations": "Read-only real ORM scopes using recorded historical IDs; no live duplicate insertion or destructive partial-graph fixture. Mutation/fault branches remain local doubles."
+}

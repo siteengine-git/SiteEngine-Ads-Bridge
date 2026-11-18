@@ -1,0 +1,129 @@
+{
+  "version": "0.8.3",
+  "source_commit": "cf185a54a919c13ad67b5240c1315a0188beb1e8",
+  "ZIP_sha256": "b45b206bb3be5742d4fc64abe651735ef52147c80b801c3f46ad9ed99ab7f7a7",
+  "manifest_sha256": "576d5be06292adfaa7eaf0428c3138399b475fd450086e6c0e4e63c326914fdd",
+  "configuration_ZIP_sha256": "ec3beece625693abe25fa90267b249059e579848a7c83f139a3946e8e81cc6e5",
+  "cause": "Preview unconditionally rejected an absent managed native row, despite deliberate new zero-write upload and completed predecessor. Portable relationships also need old-reference preconditions and new-reference readback when parents are recreated.",
+  "correction": [
+    "Review missing definitions as create with explicit previous ID; assign new native IDs",
+    "Freeze old kind/ID bindings in the new plan; explicitly review surviving relationship relinks while retaining chosen destination bodies",
+    "Keep invalid identity/ambiguity/new collision/old ID reappearance/post-review deletion-edit refusals",
+    "Use exact before/current pending-operation readback; never repeat an uncertain create without returned ID; preserve completed journals and receipts"
+  ],
+  "local": {
+    "tests": [
+      {
+        "test": "crm-import-recreate.php",
+        "assertions": 85,
+        "status": "PASS"
+      },
+      {
+        "test": "crm-import-recovery.php",
+        "assertions": 15,
+        "status": "PASS"
+      },
+      {
+        "test": "crm-import-blockers.php",
+        "assertions": 21,
+        "status": "PASS"
+      },
+      {
+        "test": "crm-import-acceptance.php",
+        "assertions": 78,
+        "status": "PASS"
+      }
+    ],
+    "assertions": 199,
+    "native_SQL": false,
+    "test_wording_correction": "Existing setup blocker expectation updated to exact current Resume wording; setup runtime unchanged"
+  },
+  "package": {
+    "members": 70,
+    "PHP_files": 46,
+    "ZIP_CRC_exact_payload": "PASS",
+    "PHP_minimum_lint": "8.3.36",
+    "PHP_lints": 46,
+    "JS_syntax": "PASS"
+  },
+  "installed": {
+    "target": "assigned GeneratePress template only",
+    "CLI_PHP": "8.4.27",
+    "web_PHP": "8.4.27",
+    "web_SAPI": "litespeed",
+    "web_OPcache_enabled": true,
+    "changed_cached_paths_invalidated": "site wp-config/bootstrap/importer only; no pool/global restart",
+    "compiled_recreation_method_and_source_pin": "PASS",
+    "members": 70,
+    "PHP_lints": 46,
+    "original_plugin_and_configuration_backup": "restricted exact backups retained",
+    "original_registry_count": 125,
+    "before_missing": {
+      "tag": 8,
+      "automation": 7,
+      "sequence_email": 19,
+      "step": 22
+    },
+    "prior_job": "complete; original bytes/hash preserved",
+    "saved_upload": "original individual upload, source digest/mappings/administrator retained; no second upload",
+    "administrator_workflow": "Actual authenticated page/nonce/preview/begin/16 bounded continue requests/completed replay through ordinary plugin AJAX",
+    "visual_browser_automation": false,
+    "HTTP_requests": 20,
+    "all_HTTP_success": true,
+    "native_recreated": {
+      "tag": 8,
+      "automation": 7,
+      "sequence_email": 19,
+      "step": 22
+    },
+    "new_native_IDs": 56,
+    "preserved_surviving_native_objects_and_edits": 69,
+    "unique_final_managed_identities": 125,
+    "native_receipts": 125,
+    "total_receipts": 126,
+    "native_saves": 56,
+    "settings_save": "existing correct settings reused; no settings mutation",
+    "saved_and_effective_configuration_identical": true,
+    "all_managed_content": "draft/inactive",
+    "relationship_evidence": "all125 native portable bodies match persisted receipts; each candidate lookup resolves only its exact recorded ID",
+    "completed_replay": "0 additional saves; exact IDs/write count retained",
+    "original_completed_job_and_retired_binding": "preserved",
+    "pending_action": null,
+    "guard": "complete; fresh inspection none pending; no write permission inferred",
+    "protected_data_tables": 15,
+    "contacts_forms_inquiries_Consent_queues": "all selected table hashes/counts identical",
+    "active_plugins": "unchanged",
+    "raw_cron": "identical",
+    "lifecycle_automation": false,
+    "Sheets": false,
+    "four_export_families": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "historical_raw_journal_records_preserved": 3,
+    "historical_option_bytes_and_autoload_preserved": true
+  },
+  "closeout": {
+    "status": "PASS",
+    "configuration_restored_exact": true,
+    "maintenance_absent": true,
+    "temporary_web_probe_removed": true,
+    "temporary_session_revoked": true,
+    "private_backup_retained": true,
+    "native_operation": "complete; no pending action",
+    "ordinary_administrator_HTTP": "PASS",
+    "unrelated_sites_or_services_changed": false
+  },
+  "limits": [
+    "Only the existing deleted-subgraph case ran natively; partial-survivor/fault/recovery branches are actual Engine methods with local storage/vendor doubles, not new native fault injection",
+    "No registry/journal clearing, whole-DB restore, schema change, additional fixture/delete campaign or other plugin edit",
+    "No sending/enrollment/advertising delivery, main-Alma or other-site rollout",
+    "Stable0.8.2 history preserved; no separate stable GitHub promotion in this repair task"
+  ],
+  "private_evidence": {
+    "exact_ID_graph_and_native_backups": "retained locally and at assigned site, excluded from Git",
+    "cleanup_owner": "AB; temporary request guard/configuration/maintenance/probe and owned authentication session restored/removed; private historical receipts retained"
+  }
+}

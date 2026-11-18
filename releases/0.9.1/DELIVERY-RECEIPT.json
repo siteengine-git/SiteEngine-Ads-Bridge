@@ -1,0 +1,63 @@
+{
+  "version": "0.9.1",
+  "physical_directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
+  "archive_directory": "D:\\SiteEngine\\Plugins\\.PLUGIN — SiteEngine Ads-Bridge\\.secrets\\field-setup-release-20261113-3ca670f2-5bc7-47ad-a99a-a57e84751adf\\previous-delivery",
+  "previous_files": [
+    {
+      "name": "DELIVERY.json",
+      "sha256": "c27871cd603c0aa7f1cc6784cae2c55a87015d72bdca1598ae1bfac2e97f716e"
+    },
+    {
+      "name": "MANIFEST.json",
+      "sha256": "a26bb29541dbd55af5dde8686f9b32f7687e296a5608efbda8408df8437abb88"
+    },
+    {
+      "name": "RELEASE-0.9.0.md",
+      "sha256": "c6dc78b71ce4ec4ffa7542c82e919e6c22ad9d908ee2717179d2868b3ee4fc3d"
+    },
+    {
+      "name": "RESULTS.json",
+      "sha256": "5bbb2ffc381846f5033b5f876b830757ea7d80aab6595c33c2d31fff4cce1c1a"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "sha256": "b3e0db9c43c80b02b42522cc7dd01764d34b76a48e912bd308ff52012618c540"
+    },
+    {
+      "name": "SITE-CONFIGURATION-RESULTS-20261112.json",
+      "sha256": "50f07c4a673a981ab80e5ca0593f670510d691513ddbd9eb81dfc9f67b3b5752"
+    },
+    {
+      "name": "siteengine-ads-bridge-0.9.0.zip",
+      "sha256": "43bda23c2b45e7ebc177f69d1535f6a30cdc10609cfda3aee0f1ed6913be6a60"
+    }
+  ],
+  "current_files": [
+    {
+      "name": "siteengine-ads-bridge-0.9.1.zip",
+      "sha256": "a70d0f573685db952f1591f7a1c793fe3e0ccabf8f83f186893f50e5baff027d"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "sha256": "c3963857b637556c99cedb335b23bddc06f661afa2afd49df902f03c42d54237"
+    },
+    {
+      "name": "MANIFEST.json",
+      "sha256": "170adab74f5dde4e84d8f14058176695a6e1e6130bac39425b7d4537cfb10b91"
+    },
+    {
+      "name": "RELEASE-0.9.1.md",
+      "sha256": "d74ce72a757f2485ccd0445f11afaaf15b542a3e6ef032e23c30adb820029458"
+    },
+    {
+      "name": "RESULTS.json",
+      "sha256": "e36f23796a8b2cf2afa1d899924fdba5773d68f602912fe26a57a5d5b59ec0e5"
+    },
+    {
+      "name": "DELIVERY.json",
+      "sha256": "b32e5f49458d23dedbc6bf5538c4004154d96025a2a4d61825d1a0eac4819dd1"
+    }
+  ],
+  "single_current_ZIP": true,
+  "package_sha256": "a70d0f573685db952f1591f7a1c793fe3e0ccabf8f83f186893f50e5baff027d"
+}

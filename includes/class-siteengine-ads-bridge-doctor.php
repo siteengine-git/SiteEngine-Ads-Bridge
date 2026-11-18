@@ -286,42 +286,12 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_wordpress_timezone() {
-		$config_timezone = $this->config->get( 'client.timezone', '' );
-		$wp_timezone     = function_exists( 'wp_timezone_string' ) ? wp_timezone_string() : '';
-
-		if ( '' === $wp_timezone ) {
-			$this->add_result(
-				self::STATUS_WARN,
-				'WordPress timezone',
-				'Could not resolve WordPress timezone via wp_timezone_string().'
-			);
-			return;
-		}
-
-		if ( $config_timezone === $wp_timezone ) {
-			$this->add_result(
-				self::STATUS_PASS,
-				'WordPress timezone',
-				sprintf( 'Config timezone matches WordPress timezone: %s', $wp_timezone )
-			);
-		} else {
-			$this->add_result(
-				self::STATUS_WARN,
-				'WordPress timezone',
-				sprintf(
-					'Config timezone (%s) does not match WordPress timezone (%s). Confirm which timezone should drive conversion timestamps.',
-					(string) $config_timezone,
-					(string) $wp_timezone
-				)
-			);
-		}
-
-		$this->add_result(
-			self::STATUS_WARN,
-			'Google Ads timezone',
-			'Operator must confirm the Google Ads account timezone matches the configured conversion timezone before live Data Manager imports.'
-		);
-	}
+        $site=function_exists('wp_timezone_string')?wp_timezone_string():'unavailable';
+        $this->add_result(self::STATUS_PASS,'WordPress timezone',sprintf('Site-local vendor timestamps use %s; conversion presentation uses %s. Different zones are supported; explicit offsets preserve instants. Historical naive fold values require review.',$site,$this->config->get('client.timezone','')));
+        $zone=(string)$this->config->get('google_sheets.account_timezone','');
+        $valid=$zone!==''&&in_array($zone,timezone_identifiers_list(),true);
+        $this->add_result($valid?self::STATUS_PASS:self::STATUS_WARN,'Google Ads timezone',$valid?'Configured account timezone: '.$zone.'. Administrator supplied; Google Ads was NOT queried.':'Google Ads account timezone is not configured. Set it in Ads Bridge > Setup before advertising delivery.');
+    }
 
 	/**
 	 * Dependency presence checks.
@@ -598,9 +568,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 		foreach ( $sources as $role => $mapped_name ) {
 			if ( ! is_string( $mapped_name ) || '' === trim( $mapped_name ) ) {
 				$this->add_result(
-					self::STATUS_WARN,
+					self::STATUS_PASS,
 					'FluentCRM source tags (optional)',
-					sprintf( 'Source role unmapped: %s. Optional; set or remove the mapping.', $role )
+					sprintf( 'Source role %s deliberately unused (optional).', $role )
 				);
 				continue;
 			}
@@ -787,15 +757,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_fluentcrm_custom_fields() {
-		$required_fields = array(
-			'invoiced_amount',
-			'closed_date',
-			'submission_id',
-			'ads_export_status',
-			'ads_exported_at',
-			'ads_conversion_value_frozen',
-			'ads_export_error',
-		);
+        try{$required_definitions=SiteEngine_Ads_Bridge_Fields::required();}
+        catch(Throwable $e){$this->add_result(self::STATUS_FAIL,'FluentCRM custom fields',$e->getMessage());return;}
+        $required_fields=array_column($required_definitions,'slug');
 
 		if ( (bool) $this->config->get( 'exports.qualified_leads.enabled', false ) ) {
 			$required_fields[] = (string) $this->config->get( 'exports.qualified_leads.date_field', 'qualified_at' );
@@ -805,8 +769,7 @@ class SiteEngine_Ads_Bridge_Doctor {
 			$required_fields[] = (string) $this->config->get( 'exports.won_jobs.date_field', 'closed_date' );
 		}
 		if ( (bool) $this->config->get( 'fluentcrm.lifecycle_automation.enabled', false ) ) {
-			$required_fields[] = (string) $this->config->get( 'fluentcrm.lifecycle_automation.unqualified_at_field', 'unqualified_at' );
-			$required_fields[] = (string) $this->config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'customer_rating' );
+			$required_fields[] = (string) $this->config->get( 'fluentcrm.lifecycle_automation.unqualified_reason_field', 'se_ads_unqualified_reason' );
 		}
 		$required_fields = array_values( array_unique( array_filter( $required_fields ) ) );
 
@@ -844,7 +807,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 			}
 		}
 
-		if ( empty( $missing ) ) {
+        $wrong=[];
+        foreach($required_definitions as$required){foreach((array)$field_definitions as$definition){if(($definition['slug']??'')===$required['slug']&&(($definition['type']??'')!==$required['type']||(isset($required['options'])&&array_values((array)($definition['options']??[]))!==$required['options']))){$wrong[]=$required['slug'];$this->add_result(self::STATUS_FAIL,'FluentCRM custom fields','Existing '.$required['slug'].' definition differs from the required type/options. Preserved; review Setup > CRM requirements and coordinate shared definition correction with its owner.');}}}
+		if ( empty( $missing ) && empty($wrong) ) {
 			$this->add_result(
 				self::STATUS_PASS,
 				'FluentCRM custom fields',
@@ -897,7 +862,7 @@ class SiteEngine_Ads_Bridge_Doctor {
 			$won_bad && $won_enabled ? self::STATUS_FAIL : ( $won_bad ? self::STATUS_WARN : self::STATUS_PASS ),
 			'Export family: converted_leads',
 			$won_bad
-				? sprintf( 'Converted Lead/Won export is incomplete (shared tab: "%s", conversion_action: "%s").', $google_tab, $won_action )
+				? sprintf( 'Converted Lead/Won export is incomplete (shared tab: "%s", conversion_action: "%s"). Set exports.won_jobs.conversion_action in Ads Bridge > Exports > Converted Conversion Action. Qualified and Converted intentionally share one worksheet; they are distinct events.', $google_tab, $won_action )
 				: sprintf( 'converted_leads %s: shared tab "%s", conversion action "%s", value field "%s", date field "%s".', $won_enabled ? 'ENABLED' : 'declared (disabled)', $google_tab, $won_action, (string) $this->config->get( 'exports.won_jobs.value_field', 'invoiced_amount' ), (string) $this->config->get( 'exports.won_jobs.date_field', 'closed_date' ) )
 		);
 		if ( ( $q_enabled || $won_enabled ) && '' !== $google_tab ) {
@@ -973,25 +938,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 			);
 		}
 
-		if ( '' === $creds_path ) {
-			$this->add_result(
-				$enabled ? self::STATUS_FAIL : self::STATUS_WARN,
-				'Google Sheets credentials',
-				'google_sheets.credentials_path is missing.'
-			);
-		} elseif ( ! is_readable( $creds_path ) ) {
-			$this->add_result(
-				$enabled ? self::STATUS_FAIL : self::STATUS_WARN,
-				'Google Sheets credentials',
-				sprintf( 'Service-account JSON is not readable at "%s". Verify existence, ownership, and permissions for the PHP user.', $creds_path )
-			);
-		} else {
-			$this->add_result(
-				self::STATUS_PASS,
-				'Google Sheets credentials',
-				sprintf( 'Service-account JSON is readable at "%s" (contents never inspected or printed by doctor).', $creds_path )
-			);
-		}
+        $status=SiteEngine_Ads_Bridge_Credentials::status($this->config);
+        $context=' Context: PHP '.PHP_VERSION.' / '.PHP_SAPI.'; effective UID '.(function_exists('posix_geteuid')?posix_geteuid():'unavailable').'. Web and scheduler identities may differ.';
+        $this->add_result($status['locally_valid']?self::STATUS_PASS:($enabled?self::STATUS_FAIL:self::STATUS_WARN),'Google Sheets credentials','Source: '.$status['source'].'. '.$status['message'].$context);
 
 		if ( in_array( $vio, array( 'RAW', 'USER_ENTERED' ), true ) ) {
 			$this->add_result(
@@ -1016,6 +965,12 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_cron_health() {
+        $enabled=(bool)$this->config->get('google_sheets.enabled',false)&&((bool)$this->config->get('exports.all_leads.enabled',false)||(bool)$this->config->get('exports.qualified_leads.enabled',false)||(bool)$this->config->get('exports.won_jobs.enabled',false));
+        if(!$enabled){$this->add_result(self::STATUS_WARN,'Scheduled export runtime','Disabled: sink or all export families disabled. Do not schedule or run exports to clear this state. Configure a ten-minute scheduler only after separate delivery authorization.');return;}
+        $attempt=get_option('seab_last_export_attempt',[]);
+        if(is_array($attempt)&&in_array($attempt['status']??'', ['running','failed'],true)){
+            $this->add_result(self::STATUS_WARN,'Scheduled export runtime',($attempt['status']==='failed'?'Failed aggregate operation recorded.':'Incomplete/running aggregate operation; outcome is not confirmed.').' Inspect retained CLI output/ledger before retrying; no automatic replay.');return;
+        }
 		$expected = max( 1, (int) $this->config->get( 'diagnostics.cron_expected_minutes', 10 ) );
 		$runtime  = get_option( 'seab_last_export_runtime', array() );
 		if ( ! is_array( $runtime ) || empty( $runtime['timestamp'] ) ) {
@@ -1046,67 +1001,19 @@ class SiteEngine_Ads_Bridge_Doctor {
 	/**
 	 * Consent policy authority: the configured required_policy_version is
 	 * authoritative. Runtime sources (SE_CONSENT_POLICY_VERSION constant,
-	 * se_consent_policy_version option) are observed and compared — never
+	 * se_consent_policy_version option) are observed and compared â€” never
 	 * silently substituted. The export-gate wiring to the config value lands
 	 * in Phase 3 with fixture proof; until then a mismatch is a reported
 	 * configuration/runtime mismatch.
 	 *
 	 * @return void
 	 */
-	private function check_consent_policy() {
-		$required = trim( (string) $this->config->get( 'consent.required_policy_version', '' ) );
-
-		if ( '' === $required || SiteEngine_Ads_Bridge_Config::looks_like_placeholder( $required ) ) {
-			$this->add_result(
-				$this->is_legacy() ? self::STATUS_WARN : self::STATUS_FAIL,
-				'Consent policy version',
-				'consent.required_policy_version is not configured. The locked expected value for current clients is "2026-05-08-v1"; the config is the authority.' . ( $this->is_legacy() ? ' Legacy configs predate this key; add it during v2 migration.' : '' )
-			);
-			return;
-		}
-
-		$this->add_result(
-			self::STATUS_PASS,
-			'Consent policy version',
-			sprintf( 'Configured required consent policy version: %s (config-authoritative).', $required )
-		);
-
-		$runtime        = '';
-		$runtime_source = '';
-		if ( defined( 'SE_CONSENT_POLICY_VERSION' ) && '' !== trim( (string) constant( 'SE_CONSENT_POLICY_VERSION' ) ) ) {
-			$runtime        = trim( (string) constant( 'SE_CONSENT_POLICY_VERSION' ) );
-			$runtime_source = 'SE_CONSENT_POLICY_VERSION constant';
-		} else {
-			$opt = get_option( 'se_consent_policy_version', '' );
-			if ( is_string( $opt ) && '' !== trim( $opt ) ) {
-				$runtime        = trim( $opt );
-				$runtime_source = 'se_consent_policy_version option';
-			}
-		}
-
-		if ( '' === $runtime ) {
-			$this->add_result(
-				self::STATUS_WARN,
-				'Consent policy runtime',
-				'No runtime consent policy source is available (MU constant/option not present in this context). The receipt-staleness gate currently skips when no runtime source exists; config-authoritative gating lands in Phase 3.'
-			);
-			return;
-		}
-
-		if ( $runtime === $required ) {
-			$this->add_result(
-				self::STATUS_PASS,
-				'Consent policy runtime',
-				sprintf( 'Runtime policy version (%s) matches the configured requirement.', $runtime_source )
-			);
-		} else {
-			$this->add_result(
-				self::STATUS_WARN,
-				'Consent policy runtime',
-				sprintf( 'Configuration/runtime mismatch: config requires "%s" but %s reports "%s". Config is authoritative; reconcile before Phase 3 wires the config value into the export consent gate.', $required, $runtime_source, $runtime )
-			);
-		}
-	}
+    private function check_consent_policy() {
+        $required=SiteEngine_Ads_Bridge_Product_Setup::policy();
+        if($required===''){$this->add_result(self::STATUS_FAIL,'Consent policy authority','SiteEngine Consent authority/policy is unavailable in this request. Advertising remains held; activate the supported Consent dependency. No grant or policy was inferred.');return;}
+        if($this->config->get('consent.required_policy_version','')!==$required){$this->add_result(self::STATUS_FAIL,'Consent policy authority','Effective advertising policy does not match the loaded Consent issuer. Inspect Settings > Detailed diagnostics; do not substitute a grant.');return;}
+        $this->add_result(self::STATUS_PASS,'Consent policy authority','Policy requirement supplied by the loaded Consent issuer. Original signed evidence and fresh current eligibility are still required for each advertising event.');
+    }
 
 	/**
 	 * Static runtime invariants of this build, asserted for the record.
@@ -1189,6 +1096,8 @@ class SiteEngine_Ads_Bridge_Doctor {
 		$missing_fields = array();
 
 		foreach ( $required_fields as $required_field ) {
+            $key=$required_field==='country-list'?'country':$required_field;
+            $required_field=(string)$this->config->get('fluent_forms.fields.'.$key,$required_field);
 			if ( ! in_array( $required_field, $field_names, true ) ) {
 				$missing_fields[] = $required_field;
 			}
@@ -1594,12 +1503,9 @@ class SiteEngine_Ads_Bridge_Doctor {
 	 * @return void
 	 */
 	private function check_submission_id_pipeline() {
-		$this->add_result(
-			self::STATUS_WARN,
-			'submission_id pipeline',
-			'Operator verification required: confirm the Fluent Forms feed maps {submission.id} to the FluentCRM custom field submission_id. No supported API exposes feed mappings, so doctor cannot verify this automatically. The stored value must be the real Fluent Forms entry ID - never a random string or hard-coded value. Validate stored runtime fixtures with: wp se-ads inspect-contact / inspect-contact-submissions.'
-		);
-	}
+        $feed=SiteEngine_Ads_Bridge_Product_Setup::feed((int)$this->config->get('fluent_forms.form_id',0));
+        $this->add_result($feed['configured']?self::STATUS_PASS:self::STATUS_WARN,'submission_id pipeline',$feed['message'].' Open the selected form Integrations > FluentCRM to edit.');
+    }
 
 	/**
 	 * Check whether a full table name exists.
