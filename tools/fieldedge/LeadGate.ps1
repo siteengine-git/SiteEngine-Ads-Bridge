@@ -23,7 +23,7 @@ function Invoke-ABLeadOperation([hashtable]$Request) {
     $runner='D:\SiteEngine\Agency\AI-Workspace\Invoke-Site-Wp.ps1'
     $output=& $runner -SiteProfile $profile -WpArguments @('--require=/home/climatrol.siteengine.space/.se-ads-pilot-gatea-20261118/gate-b/admit.php','--user=1','eval-file','/home/climatrol.siteengine.space/public_html/wp-content/plugins/siteengine-ads-bridge/tools/acceptance/lead-gate.php',$remote,$sha) -TimeoutSeconds 30
     $reply=($output|Out-String)|ConvertFrom-Json -Depth 35
-    if($reply.request_sha256 -cne $sha -or $reply.operation -cne $Request.operation -or $reply.version -cne '0.9.6-rc.2' -or !$reply.execution.transaction_absent -or !$reply.execution.coordination_lock_free -or $reply.execution.site -cne 'https://climatrol.siteengine.space'){throw 'lead_native_reply_unconfirmed'}
+    if($reply.request_sha256 -cne $sha -or $reply.operation -cne $Request.operation -or $reply.version -cne '0.9.6-rc.3' -or !$reply.execution.transaction_absent -or !$reply.execution.coordination_lock_free -or $reply.execution.site -cne 'https://climatrol.siteengine.space'){throw 'lead_native_reply_unconfirmed'}
     return $reply.result
 }
 function New-ABLeadCard([string]$InputFile,[string]$InputSha,[string]$Tenant) {
