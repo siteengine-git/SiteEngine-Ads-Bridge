@@ -1,3 +1,33 @@
+## Gate A controlled reinstall PASS — November18,2026
+
+Executed owner-authorized issue6/comment6987733417 using exact accepted0.9.6-rc.1
+ZIP88c415872d2d109f57ea8b7a74395bded712f5d1c641c7f4b69ce5b47d47e2a7;
+package runtime source276e21ba86a8ec1a0b0dc41c1fc2323bedb4e110. No rebuild,
+new runtime development or stable publication. Existing109 local/128 native
+functional assertions reused. Eight focused native installation/preservation
+checks PASS; one controlled installer-fence refusal PASS.86 exact package members
+match before and independently AFTER cleanup/fence/lock release; actual PHP8.4.27
+loads active0.9.6-rc.1. Main SHA56e2eb40765cc0f0858973db479315ae8755dd9b6252af1b0760b29b6a1745ce.
+
+102 preexisting table checksums/all1208 captured options/cron registrations match;
+nonheartbeat metadata and114 Base/CB/FE/Consent files unchanged. Three updater
+status caches changed during the installer HTTP-blocked window; exact before
+values/autoload restored by guarded compare-and-swap. Initial strict failure
+preserved; no blind cron/queue restore. No new fixtures or customer/Consent/CRM
+lifecycle/provider/Google operation. Historical form39/889 and original settings
+retained. Prior scheduler churn remains historical, not undone or reattributed.
+
+Original replacement actor still UNKNOWN; site-owner cannot read log directory.
+No active rival evident. Brief site-only MU fence/whole-tree monitor recorded one
+admitted exact install, one controlled rejection, zero unexpected install attempts,
+and only stable0.9.5→candidate0.9.6-rc.1 tree transition. Fence/maintenance removed,
+config byte-exact; monitor exited0, executor independentlyFREE/jobcomplete/inflight
+null, Windows mutex released. Stable0.9.5 remains sole canonical delivery ZIP.
+Gate A installed/preservation acceptance now PASS within its synthetic-transport
+limits; no browser-feed/provider/OAuth acceptance or stable release is implied.
+Next: operator approves one exact tenant/test-contact/appointment/service envelope
+and notification effects before a one-POST/no-retry live FE test. Current candidate
+continues to refuse real dispatch. See releases/0.9.6-rc.1/REINSTALL-RESULTS.json.
 ## Gate A HELD — sole Climatrol FieldEdge pilot owner — November18,2026
 
 Canonical issue6 / branch pilot/climatrol-fe-lead-guid-20261118. Implementation

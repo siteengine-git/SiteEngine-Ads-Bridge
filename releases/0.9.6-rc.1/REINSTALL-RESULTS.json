@@ -1,0 +1,135 @@
+{
+  "assignment": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/issues/6#issuecomment-6987733417",
+  "status": "PASS",
+  "gate": "A installed/preservation acceptance; prior isolated-transport limitations remain",
+  "candidate_version": "0.9.6-rc.1",
+  "package_source_commit": "276e21ba86a8ec1a0b0dc41c1fc2323bedb4e110",
+  "zip_sha256": "88c415872d2d109f57ea8b7a74395bded712f5d1c641c7f4b69ce5b47d47e2a7",
+  "manifest_sha256": "614346d5841010b84b9b45aed1650db63c1900296e7d6ce137e79fbd5dea1856",
+  "rebuild": false,
+  "prior_local_assertions_reused": 109,
+  "prior_native_assertions_reused": 128,
+  "focused_native_checks": {
+    "preexisting_business_tables_exact": true,
+    "protected_options_exact": true,
+    "nonheartbeat_crm_metadata_exact": true,
+    "cron_registrations_preserved": true,
+    "inquiry_schema_ready": true,
+    "installed_version": true,
+    "new_api_available": true,
+    "native_refusal_path_no_write": true
+  },
+  "preexisting_tables_checked": 102,
+  "captured_options": 1208,
+  "preservation_final": {
+    "status": "PASS",
+    "checks": {
+      "preexisting_business_tables_exact": true,
+      "protected_options_exact": true,
+      "nonheartbeat_crm_metadata_exact": true,
+      "cron_registrations_preserved": true,
+      "inquiry_schema_ready": true,
+      "installed_version": true,
+      "new_api_available": true,
+      "native_refusal_path_no_write": true
+    },
+    "tables_checked": 102,
+    "business_table_changes": [],
+    "ambient_table_changes": [],
+    "option_changes": [],
+    "unexpected_option_changes": [],
+    "cron_registration_changes": [],
+    "version": "0.9.6-rc.1",
+    "real_provider_requests": 0,
+    "new_fixture_rows": 0
+  },
+  "unrelated_plugin_members_verified": 114,
+  "targeted_restoration": "Exact three Kadence updater status cache entries, after install-time last_check/update metadata drift; values/autoload restored with compare-and-swap. Failed initial comparison retained. No cron/queue restoration.",
+  "installer_fence": {
+    "admitted_exact_installs": 1,
+    "controlled_rejections": 1,
+    "unexpected_attempts": 0,
+    "removed": true
+  },
+  "tree_monitor": {
+    "monitor_transitions": [
+      {
+        "utc_epoch": 1795026759.7913404,
+        "tree_sha256": "b9dafcec6bc37894194d4f25a5bb791d5ff346185fdd3862944eb3e517aa99c5",
+        "members": 82,
+        "main_sha256": "98f8d8461d51b49970c4d1a900b13ec46c531573028596ad3c74dbf6b95a1a4f",
+        "main_version": [
+          "* Version: 0.9.5"
+        ]
+      },
+      {
+        "utc_epoch": 1795026806.1054957,
+        "tree_sha256": "46efe83f1e3eaa6212ca5431f407e9f8d922dfbfc15cdc09996384f5b10acb53",
+        "members": 86,
+        "main_sha256": "56e2eb40765cc0f0858973db479315ae8755dd9b6252af1b0760b29b6a1745ce",
+        "main_version": [
+          "* Version: 0.9.6-rc.1"
+        ]
+      }
+    ],
+    "unexpected_installer_attempts": 0,
+    "current_main_sha256": "56e2eb40765cc0f0858973db479315ae8755dd9b6252af1b0760b29b6a1745ce",
+    "post_release_native_sha256": "b2464ee7f39f6b85692451a9c348380e204dbd8ba695bfe963995e2c5ea316fd"
+  },
+  "post_release_native": {
+    "status": "PASS",
+    "runtime_version": "0.9.6-rc.1",
+    "php": "8.4.27",
+    "source_commit": "276e21ba86a8ec1a0b0dc41c1fc2323bedb4e110",
+    "members_checked": 86,
+    "payload_differences": [],
+    "manifest_match": true,
+    "main_sha256": "56e2eb40765cc0f0858973db479315ae8755dd9b6252af1b0760b29b6a1745ce",
+    "plugins": {
+      "siteengine-ads-bridge/siteengine-ads-bridge.php": {
+        "version": "0.9.6-rc.1",
+        "active": true
+      },
+      "siteengine-base/siteengine-base.php": {
+        "version": "2.6.1",
+        "active": true
+      },
+      "siteengine-call-bridge/siteengine-call-bridge.php": {
+        "version": "0.2.3",
+        "active": true
+      },
+      "siteengine-fieldedge-connector/siteengine-fieldedge-connector.php": {
+        "version": "0.1.1",
+        "active": true
+      },
+      "siteengine-consent/siteengine-consent.php": {
+        "version": "0.6.6",
+        "active": true
+      }
+    },
+    "maintenance": false,
+    "temporary_fence": false,
+    "inquiries": "0",
+    "evidence": "0",
+    "historical_889": {
+      "id": "889",
+      "form_id": "39"
+    },
+    "config_exact": true
+  },
+  "executor": {
+    "executor": "FREE",
+    "job_id": "AB-CLIMATROL-GATEA-REINSTALL-20261118",
+    "state": "complete",
+    "inflight": null
+  },
+  "monitor_exited": 0,
+  "windows_mutex_released": true,
+  "replacement_actor": "UNKNOWN. Prior installer timestamp is evidence of replacement, not actor identity; site-owner log directory read denied. No active rival installer was evident.",
+  "real_provider_requests": 0,
+  "new_fixture_rows": 0,
+  "customer_crm_lifecycle_changes": 0,
+  "google_operations": 0,
+  "current_delivery": "Stable0.9.5 unchanged; no new release or delivery replacement",
+  "next_specific_approval": "One exact Climatrol tenant and test subject/contact envelope, appointment/service and staff-notification effects, one POST ceiling and no automatic retry. Real dispatch remains disabled; no live provider acceptance is claimed."
+}
