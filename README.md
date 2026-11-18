@@ -1,3 +1,7 @@
+# FieldEdge integration — provider clarification November 18, 2026
+
+**Latest:** [FieldEdge's confirmed lead GUID/status contract and revised implementation plan](docs/integrations/fieldedge/PROVIDER-CLARIFICATION-20261118.md). No API lead-to-work-order crosswalk exists; API-created leads can instead be evaluated by their own GET status. This new FE-only status interpreter does not mark a sale or submit conversions.
+
 # November 2026 FieldEdge integration review
 
 **External reviewers: [START HERE — FieldEdge integration, November 16](FIELD-EDGE-REVIEW-START-HERE.md).** This branch contains SiteEngine FieldEdge Connector **0.1.1**, a verified DEV installation and scoped technical evidence. The older Ads Bridge version notes below are historical for this branch; they do not describe the current Climatrol DEV-installed Ads Bridge 0.9.1. The GitHub default `main` branch is also an older baseline.

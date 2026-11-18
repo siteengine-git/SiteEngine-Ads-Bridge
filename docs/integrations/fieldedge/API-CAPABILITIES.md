@@ -1,3 +1,5 @@
+> **Updated November 18, 2026:** FieldEdge Integrations Team confirmed there is no supported lead-to-work-order ID GET/webhook; `trackingId` must be a GUID and becomes the lead ID; lead GET supports business outcome statuses. The historical open questions below are superseded by [the provider clarification](PROVIDER-CLARIFICATION-20261118.md). Do not infer revenue from lead/customer coincidence.
+
 # FieldEdge capability research — 2026-11-05
 
 Evidence class: official documentation inspected, not observed tenant behavior.

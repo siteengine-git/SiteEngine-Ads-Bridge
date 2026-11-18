@@ -13,6 +13,14 @@ final class LeadResponse {
 		$e = array( 'classification' => 'uncertain', 'reason_code' => 'provider_result_unconfirmed', 'http_status' => $http,
 			'response_sha256' => is_string( $body ) ? hash( 'sha256', $body ) : null,
 			'lead_id' => null, 'provider_status' => null, 'received_at' => null );
+		// FieldEdge confirmed on 2026-11-18: duplicate tracking GUIDs return
+		// HTTP 400 and no original lead. A known GUID can be independently
+		// inspected by GET; never treat the 400 as success or retry POST.
+		if ( 400 === $http && is_string( $body ) && strlen( $body ) <= 65536 &&
+			false !== stripos( $body, 'Tracking ID already exists' ) ) {
+			$e['reason_code'] = 'provider_tracking_guid_exists_lookup_required';
+			return $e;
+		}
 		if ( in_array( $http, array( 400, 422 ), true ) ) {
 			$e['classification'] = 'validation_failed'; $e['reason_code'] = 'provider_validation_rejected'; return $e;
 		}

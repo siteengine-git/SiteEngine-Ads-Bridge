@@ -55,10 +55,16 @@ final class LeadCreateDryRun {
 		$payload = array( 'source' => self::text( $input['source'] ?? null, 80 ), 'preferredContactMethod' => $method, 'isExistingCustomer' => $mode === 'existing', 'customer' => $customer,
 			'appointment' => array( 'preferredDate' => $date, 'preferredTime' => $time, 'timezone' => $zone, 'location' => $location ),
 			'serviceRequest' => array( 'serviceCategory' => self::text( $s['category'] ?? null, 80 ), 'serviceType' => self::text( $s['type'] ?? null, 80 ), 'issueDescription' => self::text( $s['description'] ?? null, 500 ) ) );
+		// FieldEdge confirmed that trackingId is an optional GUID, becomes the
+		// resulting leadId and is unique. Never generate one during dispatch:
+		// the caller must first durably bind it to the original inquiry.
+		if ( array_key_exists( 'tracking_id', $input ) ) {
+			$payload['trackingId'] = self::uuid( $input['tracking_id'] );
+		}
 		$body = json_encode( $payload, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR );
 		return array( 'synthetic' => true, 'dry_run' => true, 'production_post_authorized' => false, 'network_requests' => 0, 'provider' => 'fieldedge', 'tenant_id' => $tenant,
 			'local_inquiry' => $inquiry, 'customer_evidence_id' => $evidence, 'intent_id' => self::intentId( $tenant, $inquiry ), 'body' => $body, 'body_sha256' => hash( 'sha256', $body ), 'payload' => $payload,
-			'holds' => array( 'source_and_service_values_not_tenant_validated', 'provider_requiredness_and_enum_acceptance_not_tested', 'trackingId_not_documented_as_idempotency_key', 'production_create_not_authorized' ) );
+			'holds' => array( 'source_and_service_values_not_tenant_validated', 'provider_requiredness_and_enum_acceptance_not_tested', 'tracking_guid_400_duplicate_requires_get_not_idempotent_post', 'production_create_not_authorized' ) );
 	}
 	private static function verify( array $i ): void {
 		if ( ( $i['synthetic'] ?? null ) !== true || ( $i['dry_run'] ?? null ) !== true || ( $i['production_post_authorized'] ?? null ) !== false ||

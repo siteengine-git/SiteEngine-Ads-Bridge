@@ -1,6 +1,12 @@
 # FieldEdge Integration — External Technical Review
 
-**Prepared:** November 13, 2026 | **Review meeting target:** Monday, November 16, 2026
+## November 18 provider clarification — read this first
+
+FieldEdge has now **explicitly confirmed** that there is **no supported leadId-to-workOrderId GET or webhook**. Our earlier questions requesting that direct join have been answered and should not be repeated. Their `GET /v1/leads/{leadId}` returns lead-specific business statuses including `QuoteAccepted`, `JobCompleted` and `JobFinalized`. For future API-created leads, a caller-supplied GUID `trackingId` becomes the lead ID; duplicate GUIDs return HTTP 400 and require independent GET reconciliation, never a blind retry.
+
+See [the November 18 provider-confirmed contract and implementation changes](docs/integrations/fieldedge/PROVIDER-CLARIFICATION-20261118.md). This newer clarification **supersedes the open provider questions in the historical November 16 brief**. We have added a pure no-effects status interpreter and synthetic protocol tests; this does not authorize a live lead POST, CRM Won/Lost changes or Google Ads export. Revenue attribution still needs an independently established work-order association.
+
+**Original pilot acceptance:** November 13, 2026 | **Provider contract update:** November 18, 2026
 **Organization:** SiteEngine Web Services LLC | **Pilot:** Climatrol Air
 **Project state:** Real API -> CRM synchronization verified on Climatrol DEV; broader end-to-end product not yet complete.
 
@@ -8,7 +14,7 @@
 
 **Review this branch, not the default branch:**
 
-[`review/fieldedge-20261116`](https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/review/fieldedge-20261116)
+[`review/fieldedge-20261118`](https://github.com/siteengine-git/SiteEngine-Ads-Bridge/tree/review/fieldedge-20261118)
 
 The default `main` branch retains an earlier Ads Bridge baseline and does **not** represent the installed Climatrol or FieldEdge connector version. The FieldEdge implementation is maintained on a separate development branch to prevent unrelated Ads Bridge changes. Installed Climatrol DEV dependencies include Ads Bridge **0.9.1**; the stand-alone FieldEdge connector is **0.1.1**.
 

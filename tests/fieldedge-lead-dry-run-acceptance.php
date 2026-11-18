@@ -11,6 +11,13 @@ verifyLead( isset( $i['payload']['customer']['phone'] ) && ! isset( $i['payload'
 verifyLead( ! isset( $i['payload']['customer']['marketingEmailOptedIn'] ) && ! isset( $i['payload']['trackingId'] ), 'marketing opt-in and tracking transport are not invented' );
 verifyLead( ! isset( $i['payload']['inquiry_id'] ) && $i['local_inquiry'] === $new['inquiry'], 'original form inquiry/binding stays local' );
 verifyLead( L::prepare( $new ) === $i, 'identical input retains exact intent/body/digest' );
+$guid_input = $new;
+$guid_input['tracking_id'] = '77777777-7777-4777-8777-777777777777';
+$guid_intent = L::prepare( $guid_input );
+verifyLead( ( $guid_intent['payload']['trackingId'] ?? null ) === $guid_input['tracking_id'], 'caller-prebound GUID transported as FieldEdge trackingId' );
+verifyLead( L::prepare( $guid_input )['body_sha256'] === $guid_intent['body_sha256'] && $guid_intent['intent_id'] === $i['intent_id'], 'repeated GUID binding retains original inquiry identity and same payload' );
+verifyLead( $guid_intent['body_sha256'] !== $i['body_sha256'], 'tracking GUID changes request-body identity and cannot be silently injected at dispatch' );
+$bad_guid = $new; $bad_guid['tracking_id'] = 'ff:39:889'; refusedLead( $bad_guid, 'invalid_lead_provider_id' );
 $roundtrip = json_decode( json_encode( L::state( $i ), JSON_THROW_ON_ERROR ), true, 8, JSON_THROW_ON_ERROR );
 verifyLead( L::decide( $i, $roundtrip )['status'] === 'duplicate_intent', 'duplicate intent detected from caller-retained state' );
 verifyLead( L::decide( $i )['status'] === 'dry_run_ready' && ! L::decide( $i )['post_allowed'] && $i['network_requests'] === 0, 'ready dry run never authorizes POST' );
