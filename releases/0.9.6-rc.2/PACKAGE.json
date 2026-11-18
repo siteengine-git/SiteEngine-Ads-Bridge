@@ -1,0 +1,8 @@
+{
+  "version": "0.9.6-rc.2",
+  "source_commit": "3aa1cf544272f6edb85916e83f95d61b7e6588ba",
+  "sha256": "91a3939125166653562bc432777718258f4a60b8900fdb994bd0479c33f17ad7",
+  "manifest_sha256": "8fe4ea42368cac29b8878364e82ed87325c99544a5d5e74693b72b6c2366cb93",
+  "members": 93,
+  "lints": 58
+}

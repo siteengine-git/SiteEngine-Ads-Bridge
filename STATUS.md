@@ -1,3 +1,43 @@
+## Gate B ready for one specific POST approval — November18,2026
+
+Implemented/packaged/installed/native-preparation verified0.9.6-rc.2 on Climatrol
+DEV only. Runtime source3aa1cf544272f6edb85916e83f95d61b7e6588ba;
+ZIP91a3939125166653562bc432777718258f4a60b8900fdb994bd0479c33f17ad7;
+manifest8fe4ea42368cac29b8878364e82ed87325c99544a5d5e74693b72b6c2366cb93.
+29 local approved-transport assertions and29 native WP/SQL injected assertions
+PASS;58 local lints;93 exact installed members match again after fence/lock
+release. Prior GateA109local/128native reused; no repeated GateA campaign.
+
+Official FE create schema requires appointment/serviceRequest OBJECTS, with no
+required nested properties. Confirmed subject contact341/form40 entry896 mapped
+privately from original fields. Unscheduled payload retains availabilityNotes and
+location, omits absent preferredDate/preferredTime/issueDescription. No invented
+form fields or appointment. FE owns scheduling/facts; original inquiry preferences
+remain frozen separately. Runtime schema acceptance awaits the real approved POST.
+
+One actual AB inquiry/GUID and immutable exact card are prepared. Card SHA
+362765644d26bb23a9439249f09073b6496136af864238bb66af9b9a43a820c4;
+body SHA13a689235d02dc2a070edb6d8e2918a78d3a2473c26c23f9470f80410919a1ae.
+Approval row0/POST claim absent. Actual Windows launcher refused that unapproved
+card before credentials loaded. DPAPI secret host retained; owner-only stdin staging
+and canonical WP runner provide native custody. No public API/parallel ledger.
+No real provider request, call/email, CRM lifecycle or Google operation occurred.
+
+102 original tables/options exact after the owned native fixture was removed and
+three installer update-status caches CAS-restored; original strict fixture failure
+retained/version expectation corrected. Then only authorized candidate additions:
+one inquiry/two AB evidence rows. Other tables/config/history/889 unchanged;114
+Base/CB/FE/Consent files exact. No CRM preference overwrite, job/invoice join or
+revenue retrieval claimed. Local overlap is absent from the compiled/tested source;
+old collision snapshots remain unchanged. No other writer was started.
+
+Temporary fence/maintenance removed; config exact; executor independentlyFREE/job
+complete/inflightnull; Windows mutex released. Stable0.9.5 single-ZIP delivery
+untouched. Private exact JSON/HTML approval card retained in existing Windows DPAPI
+custody directory; no private contact values in Git/issues/chat. Await only approval
+of that exact card for one real Climatrol lead POST, one initial GET and at most
+one explicit recovery GET, two token requests, no automatic retry. Not a stable
+release or live provider acceptance. See releases/0.9.6-rc.2/RESULTS.json.
 ## Authoritative FieldEdge scheduling decision — November18,2026
 
 Direct superseding user/AB Helper instruction: Form40 captures a service inquiry,

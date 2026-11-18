@@ -1,0 +1,106 @@
+{
+  "status": "PREPARATION_VERIFIED_AWAITING_SPECIFIC_POST_APPROVAL",
+  "version": "0.9.6-rc.2",
+  "package": {
+    "version": "0.9.6-rc.2",
+    "source_commit": "3aa1cf544272f6edb85916e83f95d61b7e6588ba",
+    "sha256": "91a3939125166653562bc432777718258f4a60b8900fdb994bd0479c33f17ad7",
+    "manifest_sha256": "8fe4ea42368cac29b8878364e82ed87325c99544a5d5e74693b72b6c2366cb93",
+    "members": 93,
+    "lints": 58
+  },
+  "local_approved_transport_assertions": 29,
+  "native_approval_assertions": 29,
+  "prior_Gate_A_reused": {
+    "local": 109,
+    "native": 128
+  },
+  "installed": {
+    "status": "PASS",
+    "version": "0.9.6-rc.2",
+    "payload_differences": [],
+    "members": 93,
+    "manifest_match": true,
+    "main_sha256": "47e2d45a933fd4ba24673e4ba8f0985abea7e40351f83c094be334a095323f87",
+    "maintenance": false,
+    "temporary_mu_fence": false,
+    "config_exact": true
+  },
+  "preservation_before_authorized_candidate_additions": {
+    "status": "PASS",
+    "checks": {
+      "preexisting_business_tables_exact": true,
+      "protected_options_exact": true,
+      "nonheartbeat_crm_metadata_exact": true,
+      "cron_registrations_preserved": true,
+      "inquiry_schema_ready": true,
+      "installed_version": true,
+      "new_api_available": true,
+      "native_refusal_path_no_write": true
+    },
+    "tables_checked": 102,
+    "business_table_changes": [],
+    "ambient_table_changes": [],
+    "option_changes": [],
+    "unexpected_option_changes": [],
+    "cron_registration_changes": [],
+    "version": "0.9.6-rc.2",
+    "real_provider_requests": 0,
+    "new_fixture_rows": 0
+  },
+  "candidate_readback": {
+    "status": "PASS",
+    "version": "0.9.6-rc.2",
+    "contact_id": 341,
+    "form_id": 40,
+    "entry_id": 896,
+    "inquiry_id": "inq_b5f91d94-da31-44b1-8b04-a099c83f8ce9",
+    "guid": "e637434b-a65e-4ba8-9d80-b690a9be1815",
+    "body_sha256": "13a689235d02dc2a070edb6d8e2918a78d3a2473c26c23f9470f80410919a1ae",
+    "card_sha256": "362765644d26bb23a9439249f09073b6496136af864238bb66af9b9a43a820c4",
+    "card_expires": "2026-11-19T20:02:22Z",
+    "approval_rows": 0,
+    "post_claim_present": false,
+    "appointment_fields": [
+      "availabilityNotes",
+      "location"
+    ],
+    "issue_description_present": false,
+    "unexpected_preexisting_table_changes": [],
+    "expected_AB_additions": [
+      "wp_se_ads_inquiries",
+      "wp_se_ads_outcome_evidence"
+    ],
+    "historical_889": {
+      "id": "889",
+      "form_id": "39"
+    },
+    "real_provider_requests": 0
+  },
+  "unapproved_real_launcher": {
+    "status": "held",
+    "reason_code": "prospective_specific_approval_required",
+    "credentials_loaded": false
+  },
+  "cleanup": {
+    "maintenance_absent": true,
+    "temporary_fence_removed": true,
+    "wp_config_exact": true,
+    "installer_allowed": 1,
+    "unexpected_installer_attempts": 0
+  },
+  "executor": {
+    "executor": "FREE",
+    "job_id": "AB-CLIMATROL-GATEB-20261118",
+    "state": "complete",
+    "inflight": null
+  },
+  "contract": "Official leadRequest requires top-level appointment/serviceRequest objects; no required nested properties. Missing optional scheduling/issue fields omitted, original preferences retained. Actual provider acceptance unperformed.",
+  "actual_private_payload": "Stored window/location and service choice from operator-confirmed record; no invented date/time/address/issue description. Private exact JSON/HTML kept outside Git.",
+  "provider_requests": 0,
+  "live_approval_recorded": false,
+  "CRM_lifecycle_writes": 0,
+  "Google_operations": 0,
+  "stable_delivery_changed": false,
+  "limits": "No live FieldEdge POST/GET, appointment/job/invoice relationship, revenue or sending acceptance. One explicit card approval remains required."
+}
