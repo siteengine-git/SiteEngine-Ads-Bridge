@@ -1,3 +1,33 @@
+## Approved external attempt HELD — November18,2026
+
+User explicitly approved exact card362765644d26bb23a9439249f09073b6496136af864238bb66af9b9a43a820c4
+for contact341/form40 entry896 within its limits. Native approval durably recorded.
+Preflight verified all93 installed members, expiry and absence of prior claim.
+Before dispatch fixed Windows stdin JSON depth (client90308a6); actual serialization
+AST/offline binding checks preserve exact body. No approved card/request change.
+
+ONE LeadDispatch invocation returned generic worker failure, with no confirmed
+provider reply/HTTP status. Exact initiating failure cause UNKNOWN; original
+worker discarded detail. It cannot be claimed that a POST was accepted or even
+that it reached FE. No second POST invocation was made. The single allowed
+recovery invocation obtained an OAuth token and returned HTTP404/empty body for
+original GUID e637434b-a65e-4ba8-9d80-b690a9be1815. Creation remains unconfirmed;
+no false successful lead/status/appointment/revenue/CRM/Google claim.
+
+Durable POST claim and both GET slots retained; creation result uncertain/httpnull;
+append-only recovery observation held/404. No claim reset, replacement GUID or
+network retry. Initial physical HTTP counts unknown; recovery reports one token,
+zero POSTs and one GET. Treat card request reservations as consumed; no more
+provider requests made. Private raw receipts/snapshots retained outside Git.
+
+Original inquiry unchanged. Only ambient Action Scheduler actions/logs, FC metadata
+and cron changed; no other protected-table changes. No historical restoration.
+Server remains0.9.6-rc.2/package3aa1cf5; Windows-only client serialization/fixed-error
+reporting corrections are separate operational commits, not a rebuilt/reinstalled
+package. Stable delivery untouched. Shared holder exited0, Windows mutex released;
+no task maintenance/controls active. Operation HELD pending identification of the
+first worker failure and a separately authorized supported recovery; do not replay
+LeadDispatch. Exact results: releases/0.9.6-rc.2/APPROVED-ATTEMPT.json.
 ## Gate B ready for one specific POST approval — November18,2026
 
 Implemented/packaged/installed/native-preparation verified0.9.6-rc.2 on Climatrol

@@ -1,0 +1,86 @@
+{
+  "status": "HELD_CREATION_UNCONFIRMED",
+  "approval": {
+    "status": "approved",
+    "card_sha256": "362765644d26bb23a9439249f09073b6496136af864238bb66af9b9a43a820c4"
+  },
+  "preflight": {
+    "status": "PASS",
+    "version": "0.9.6-rc.2",
+    "exact_members": 93,
+    "approval_rows": 0,
+    "post_claim_absent": true,
+    "snapshot_sha256": "da591f7827207794ec407eec99678f367102d82424230bd4b13da6afaacbf68b"
+  },
+  "initial_dispatch": {
+    "launcher_status": "held",
+    "reason": "lead_transport_unconfirmed_get_original_guid",
+    "physical_HTTP_counts": "UNKNOWN; original worker masked failure detail",
+    "LeadDispatch_invocations": 1,
+    "POST_retries": 0
+  },
+  "recovery": {
+    "launcher_status": "held",
+    "oauth_token_requests_reported": 1,
+    "lead_posts": 0,
+    "lead_gets": 1,
+    "http_status": 404,
+    "response_body_bytes": 0
+  },
+  "native_result": {
+    "version": "0.9.6-rc.2",
+    "approval_card_sha256": "362765644d26bb23a9439249f09073b6496136af864238bb66af9b9a43a820c4",
+    "post_claim_retained": true,
+    "post_mode": "approved_single_post",
+    "get_claim_slots": [
+      "initial",
+      "recovery"
+    ],
+    "creation_status": "uncertain",
+    "creation_http_status": null,
+    "latest_status": "held",
+    "observations": [
+      {
+        "sequence": 1,
+        "previous_sha256": null,
+        "request_sha256": "df6956371920bb13f3d414a36df85fe25090755975bda44d71021c12cc538f09",
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "observed_at": "2026-11-18T20:13:19Z",
+        "http_status": 404,
+        "provider_status": null,
+        "status": "held",
+        "reason_code": "provider_get_unconfirmed"
+      }
+    ],
+    "original_inquiry_unchanged": true,
+    "protected_table_changes": [
+      "wp_actionscheduler_actions",
+      "wp_actionscheduler_logs",
+      "wp_fc_meta"
+    ],
+    "option_changes": [
+      "cron"
+    ],
+    "snapshot_sha256": "f7d6ba6a3439d52a2a8f40c6407e23a1539d7fa93f15b7f81efa69515754939b",
+    "no_claims_reset": true,
+    "no_new_guid": true
+  },
+  "offline_binding_check": {
+    "status": "PASS",
+    "offline_transport_calls": 3
+  },
+  "offline_serialized_binding_check": {
+    "status": "PASS",
+    "offline_transport_calls": 3
+  },
+  "installed_server_version": "0.9.6-rc.2",
+  "installed_package_source": "3aa1cf544272f6edb85916e83f95d61b7e6588ba",
+  "client_serialization_fix": "90308a6",
+  "card_body_changed": false,
+  "claims_reset": false,
+  "replacement_GUID": false,
+  "CRM_lifecycle_or_Google_change": false,
+  "underlying_initial_failure": "UNKNOWN. No confirmed initial HTTP reply; no inference that the POST was sent or accepted.",
+  "custody": "Private worker receipts contain no logged credentials/tokens; retained outside Git.",
+  "execution": "Owned holder exited successfully; Windows launcher mutex released; no further network request."
+}
