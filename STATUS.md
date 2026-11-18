@@ -1,3 +1,35 @@
+## Gate A HELD — sole Climatrol FieldEdge pilot owner — November18,2026
+
+Canonical issue6 / branch pilot/climatrol-fe-lead-guid-20261118. Implementation
+and package complete:0.9.6-rc.1 runtime source276e21ba86a8ec1a0b0dc41c1fc2323bedb4e110;
+ZIP88c415872d2d109f57ea8b7a74395bded712f5d1c641c7f4b69ce5b47d47e2a7.
+Existing AB prospective/evidence store extended; no wholesale FE merge/side ledger.
+109 focused local assertions/54 local lints;128 actual installed WP/SQL assertions
+passed with four owned native form40 storage/adoption inquiries and injected
+transport only.86 exact installed members matched successful readback. No real
+provider request, Google operation or lifecycle write. Not browser form-feed or
+native provider/OAuth acceptance. Native first fixture failed before reservation
+on the old synthetic-ID requirement; corrected fixture reused original owned state.
+
+Concrete blocker: candidate was independently replaced with original stable0.9.5
+while shared job still named this owner. Seven candidate members changed/vanished;
+all82 original members now match pre-job backup. Actor UNKNOWN. One bounded
+ownership check preserved this conflict; no competing reinstall or polling.
+Contained preservation rerun stopped on runtime version precondition, no r2 fixture.
+Initial cleanup caught97/100 original table checksum equality; scheduler actions/
+logs,FC metadata and cron changed. Existing minute tasks/logs/heartbeat advance and
+installer cleanup event retained; no full equality, actor attribution or blind
+scheduler restoration. All original customers/Consent/889/form39 evidence retained.
+
+Four owned contacts/submissions/inquiries and32 evidence rows removed; original
+config byte-exact; maintenance already absent at closeout. Two additive empty AB
+outcome tables retained. Holder exited0, Windows FE mutex released, no task controls.
+Implemented YES; packaged YES; installed transiently YES/current NO (stable0.9.5);
+functional native verified YES; preservation/final Gate A HELD; released NO.
+Stable0.9.5 remains sole canonical delivery ZIP. Candidate/private proof retained
+outside delivery; releases/0.9.6-rc.1/GATE-A-RESULTS.json has exact limits and hashes.
+Next: Integration Control reconcile runtime replacement writer; no real POST
+without specific approval. No Gate B/C/D execution or scheduling repair performed.
 ## Gate A implementation — November18,2026
 
 Sole AB owner accepted issue6 and pilot/climatrol-fe-lead-guid-20261118.

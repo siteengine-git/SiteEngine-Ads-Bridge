@@ -36,11 +36,11 @@ use SiteEngine\AdsBridge\Connectors\FieldEdge\LeadCreateDryRun;
 use SiteEngine\AdsBridge\Connectors\FieldEdge\TargetedRead;
 $api=SiteEngine_Ads_Bridge_Prospective::class;
 if($phase==='run'){
- $check($j['phase']==='fixtures_ready','run_once_only');$j['phase']='run_started';$save($j);
+ $check($j['phase']==='fixtures_ready'||($j['phase']==='run_started'&&!array_filter($j['cases'],static fn($c)=>isset($c['intent']))),'run_once_or_pre_reservation_fixture_failure');$j['phase']='run_started';$save($j);
  // Fixture implementation is intentionally not packaged or exposed over HTTP.
  require_once $dir.'/LeadFixture.php';
  foreach($j['cases']as$case=>&$c){
-  $input=\SiteEngine\AdsBridge\Tests\FieldEdge\LeadFixture::input();$input['inquiry']['source']=['type'=>'fluent_form','form_id'=>40,'entry_id'=>$c['entry']];$input['inquiry']['inquiry_id']=$c['inquiry'];
+  $input=\SiteEngine\AdsBridge\Tests\FieldEdge\LeadFixture::input();$input['inquiry']['source']=['type'=>'fluent_form','form_id'=>40,'entry_id'=>$c['entry']];$input['inquiry']['inquiry_id']='synthetic-gatea-'.$case;
   $dry=LeadCreateDryRun::prepare($input);$ctx=['tenant_id'=>'00000000-0000-4000-8000-000000000118','inquiry_id'=>$c['inquiry'],'source'=>$input['inquiry']['source']+['transaction_id'=>'ff:40:'.$c['entry']]];
   $c['envelope']=LeadPilotDispatch::envelope($dry,$ctx,$c['guid']);
   if($case==='duplicate'){$collision=json_decode($c['envelope'],true);$collision['guid']=$j['cases']['success']['guid'];$p=json_decode($collision['request']['body'],true);$p['trackingId']=$collision['guid'];$collision['request']['body']=$json($p);$collision['request']['body_sha256']=hash('sha256',$collision['request']['body']);$test=$api::lead_prepare($json($collision));$check(($test['reason_code']??null)==='prospective_guid_already_reserved','same_tenant_guid_unique_across_inquiries');}
@@ -87,8 +87,21 @@ if($phase==='fresh'){
  }
  $j['phase']='verified';$save($j);$check($http===0&&$mail===0,'zero_real_network_or_mail');echo $json(['status'=>'PASS','checks'=>$checks,'real_provider_requests'=>0,'transport'=>'injected only; GET bodies are fixtures, not authenticated provider acceptance']);return;
 }
+if($phase==='negative'){
+ $check($j['phase']==='verified','verified_state_negative_checks');$c=$j['cases']['success'];$r=$api::lead_read($c['intent']);
+ $check($api::lead_result($c['intent'],$r['claim']['permit'],$r['creation_result']['exact_json'])['status']==='replayed','creation_exact_replay');
+ $changed=json_decode($r['creation_result']['exact_json'],true);$changed['http_status']=400;$check($api::lead_result($c['intent'],$r['claim']['permit'],$json($changed))['status']==='conflict','creation_overwrite_refused');
+ $check($api::lead_result($c['intent'],str_repeat('0',64),$r['creation_result']['exact_json'])['status']==='held','wrong_claim_permit_refused');
+ $live=json_decode($c['envelope'],true);$live['synthetic']=false;$live['tenant_id']='00000000-0000-4000-8000-000000000119';$prepared=$api::lead_prepare($json($live));$check($prepared['status']==='prepared','real_envelope_preparation_only');$j['extra_intents']=[$prepared['intent_id']];$save($j);
+ $check($api::lead_claim($prepared['intent_id'],$live['request']['body_sha256'])['reason_code']==='prospective_real_post_approval_required','real_dispatch_approval_hold');
+ $check(LeadPilotDispatch::send($prepared['intent_id'],$live['request']['body_sha256'],static function(){throw new RuntimeException('must_not_reach');})['reason_code']==='real_post_approval_required','adapter_real_dispatch_hold');
+ $name='seab_c_'.substr(SiteEngine_Ads_Bridge_Coordination::capability()['destination'],0,48);$other=new wpdb(DB_USER,DB_PASSWORD,DB_NAME,DB_HOST);$check((string)$other->get_var($other->prepare('SELECT GET_LOCK(%s,0)',$name))==='1','independent_native_lock_owner');
+ try{$blocked=$api::lead_read($c['intent']);$check($blocked['status']==='held','competing_connection_refused');}finally{$check((string)$other->get_var($other->prepare('SELECT RELEASE_LOCK(%s)',$name))==='1','independent_native_lock_released');$other->close();}
+ $check($api::lead_read($c['intent'])['creation_result']===$r['creation_result'],'negative_checks_preserve_results');$j['phase']='negative_verified';$save($j);echo $json(['status'=>'PASS','checks'=>$checks,'real_provider_requests'=>0]);return;
+}
 if($phase==='cleanup'){
- $check($j['phase']==='verified','accepted_fixture_cleanup_only');
+ $check($j['phase']==='negative_verified','accepted_fixture_cleanup_only');
+ foreach($j['extra_intents']??[]as$id)$wpdb->delete(SiteEngine_Ads_Bridge_Outcomes::table('evidence'),['evidence_id'=>'ps-lead-'.$id]);
  foreach($j['cases']as$c){
   $row=$wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}fc_subscribers WHERE id=%d",$c['contact']),ARRAY_A);$check(($row['email']??null)===$c['email'],'owned_contact_cleanup');
   $sub=$wpdb->get_row($wpdb->prepare("SELECT response FROM {$wpdb->prefix}fluentform_submissions WHERE id=%d AND form_id=40",$c['entry']),ARRAY_A);$check((json_decode($sub['response']??'',true)['gate_a_marker']??null)===$c['marker'],'owned_submission_cleanup');
