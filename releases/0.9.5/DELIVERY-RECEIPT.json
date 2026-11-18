@@ -1,21 +1,46 @@
 {
-  "delivery": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge\\siteengine-ads-bridge-0.9.5.zip",
+  "release_url": "https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.9.5",
+  "tag": "v0.9.5",
+  "source": "49fab3cb5e701c3090d9924337a2fdbf011fc207",
+  "main_integration_commit": "1a106ef72e6ece5d840d1fd751d5ee46d586f5dd",
+  "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN \u2014 SiteEngine Ads-Bridge",
   "ZIP_count": 1,
-  "sha256": "7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5",
-  "manifest_sha256": "6d14a75357b3ec480d561192bc70d3efe26bd607fbf3d1881b6609099003a797",
-  "archive": "D:\\SiteEngine\\Plugins\\.PLUGIN — SiteEngine Ads-Bridge\\delivery-history\\before-document-save095-a8613520-c9fb-4466-ab82-476e5e0d486d",
-  "prior_files": 7,
-  "prior_files_hash_verified": true,
-  "delivery_files": [
-    "siteengine-ads-bridge-0.9.5.zip",
-    "MANIFEST.json",
-    "DELIVERY.json",
-    "SHA256SUMS.txt",
-    "INSTALL-AND-UPGRADE.md",
-    "RESULTS.json",
-    "INTEGRATION-CONTROL-HANDOFF.md"
+  "files": [
+    {
+      "name": "siteengine-ads-bridge-0.9.5.zip",
+      "sha256": "7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5"
+    },
+    {
+      "name": "MANIFEST.json",
+      "sha256": "6d14a75357b3ec480d561192bc70d3efe26bd607fbf3d1881b6609099003a797"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "sha256": "3cc4a831d47c2adc0936123d7e5bee0b037e795fa02c892ee866e1226cc64580"
+    },
+    {
+      "name": "RELEASE-NOTES.md",
+      "sha256": "c30d1643b79e2eedb6df440499d2914964bf88015dde6b7142d070ac24afa9f5"
+    },
+    {
+      "name": "INSTALL-AND-UPGRADE.md",
+      "sha256": "703ed82393824f1723093a20f2f63a529ad1092792ff6d2e30d1159dc2341993"
+    },
+    {
+      "name": "RELEASE-EVALUATION.json",
+      "sha256": "e04f118869e0db9f419335a3ac0ce3dc2d100733e5d5a532a4afdfb4302e30c6"
+    },
+    {
+      "name": "RESULTS.json",
+      "sha256": "92abc1ad1cc4ad928ea118ea0245e795f884056fb733dc1dfd9d67c3272dc181"
+    },
+    {
+      "name": "DELIVERY.json",
+      "sha256": "926d620a1ea3d84506cfd4b451d08f971ddf2148264e9574b01e1c08dda34fc6"
+    }
   ],
-  "installed_version": "0.9.5",
-  "real_source": "file",
-  "stable_released": false
+  "all_equal_verified_public_assets": true,
+  "prior_stable_082_archive_preserved": true,
+  "previous_development_delivery_archived": true,
+  "shared_execution_released": true
 }

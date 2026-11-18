@@ -1,3 +1,31 @@
+## RELEASED — Ads Bridge0.9.5 — November18,2026
+
+PASS. Stable https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.9.5
+Annotated tag peels exactly to accepted runtime49fab3cb5e701c3090d9924337a2fdbf011fc207.
+PR5 merged normally at1a106ef72e6ece5d840d1fd751d5ee46d586f5dd;all81 payload blobs match.
+Exact ZIP7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5;
+manifest6d14a75357b3ec480d561192bc70d3efe26bd607fbf3d1881b6609099003a797.
+Eight stable assets passed GitHub digest AND fresh authenticated download checks.
+No package rebuild/runtime change/reinstall for promotion. Upstream Base2.6.1 and
+CB0.2.3 release handbacks were confirmed first; older development labels remain
+historical evidence, superseded for publication state by this release.
+
+Native WordPress ZIP0.8.2→0.9.5 upgrade22 PASS;10 additional local compatibility
+checks PASS;previous279 local/46 native/51 lint/browser evidence reused.15 exact
+marker-owned fixture tables/private tree/users/config/auth removed. Main files,
+protected tables and covered options except cron retained. Recurring schedules
+unchanged;one already-due core wp_version_check one-off absent. Original pre0.9.5
+cron payload uncaptured: no historical equality/cause claim, no speculative restore.
+No cron/queue/provider/export/credential/source operation. Real Google FILE remains
+authoritative; operational cutover remains ALMA#5. No new real Base authentication.
+Holder exited0;executor independentlyFREE;maintenance absent;private backups retained.
+
+Canonical literal Plugins\..Deliverables\PLUGIN — SiteEngine Ads-Bridge now
+contains exactly ONE stable0.9.5 ZIP plus seven matching published documents.
+Old stable0.8.2 ZIP and previous development delivery archived/hash-verified outside
+current delivery;all historical evidence remains. See releases/0.9.5/PUBLICATION.json,
+RELEASE-EVALUATION.json and DELIVERY-RECEIPT.json. No AB execution hold remains.
+
 ## 0.9.5 stable release evaluation PASS — November18,2026
 
 Upstream Base2.6.1 and CB0.2.3 stable handbacks confirmed. Exact accepted source
