@@ -1,0 +1,8 @@
+{
+  "version": "0.9.6-rc.3",
+  "source_commit": "c60b93e7006381e37210cdc92ef74f4b4c9e58e0",
+  "sha256": "871c71ef4bfca2c29663e1ac1dc9d9a1461e4d3f1f6d2b540d5d50abb52040d5",
+  "manifest_sha256": "b48bd220f1ca46da49889e224d59eec1413b6adf135e224170f03e1f0e90ad08",
+  "members": 97,
+  "php_lints": 60
+}

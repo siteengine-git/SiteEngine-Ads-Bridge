@@ -1,3 +1,13 @@
+## Diagnostic milestone complete — November 18, 2026
+
+Climatrol DEV diagnostic candidate0.9.6-rc.3/c60b93e is installed and delta-verified;
+see source STATUS/releases0.9.6-rc.3. Original live lead remains unconfirmed, first
+failure unknown; retain original GUID, approval, consumed POST/GET claims and
+receipts unchanged. This installation authorized no FE request or new live case.
+Private read-only staff/support audit draft is UNSENT; capability unverified.
+No new POST approval request, replay or new inquiry/GUID/claim is authorized by
+this completed milestone. Stable0.9.5 delivery unchanged; Call Bridge on standby.
+
 ## Authoritative FieldEdge scheduling decision — November18,2026
 
 Direct superseding user/AB Helper instruction: Form40 captures a service inquiry,

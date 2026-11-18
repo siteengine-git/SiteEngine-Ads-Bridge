@@ -1,0 +1,201 @@
+{
+  "version": "0.9.6-rc.3",
+  "runtime_source": "c60b93e7006381e37210cdc92ef74f4b4c9e58e0",
+  "implemented": true,
+  "packaged": true,
+  "installed": true,
+  "verified": "focused local and native injected/refusal acceptance; no live FE acceptance",
+  "stable_released": false,
+  "zero_provider_requests": true,
+  "new_inquiries_GUIDs_claims_approvals": 0,
+  "package": {
+    "version": "0.9.6-rc.3",
+    "source_commit": "c60b93e7006381e37210cdc92ef74f4b4c9e58e0",
+    "sha256": "871c71ef4bfca2c29663e1ac1dc9d9a1461e4d3f1f6d2b540d5d50abb52040d5",
+    "manifest_sha256": "b48bd220f1ca46da49889e224d59eec1413b6adf135e224170f03e1f0e90ad08",
+    "members": 97,
+    "php_lints": 60
+  },
+  "local_checkpoint": {
+    "status": "PASS",
+    "assertions": 18,
+    "network_requests": 0,
+    "new_inquiries_or_claims": 0,
+    "native_wp": false
+  },
+  "local_protocol": {
+    "status": "PASS",
+    "assertions": 70,
+    "network_requests": 0,
+    "AB_operations": 0
+  },
+  "native": {
+    "status": "PASS",
+    "assertions": 25,
+    "native_wp": true,
+    "php": "8.4.27",
+    "version": "0.9.6-rc.3",
+    "provider_requests": 0,
+    "new_inquiries_or_claims": 0,
+    "worker_faults": {
+      "status": "PASS",
+      "assertions": 18,
+      "network_requests": 0,
+      "new_inquiries_or_claims": 0,
+      "native_wp": true
+    }
+  },
+  "native_helper": {
+    "contract_version": "1",
+    "status": "held",
+    "reason_code": "prospective_reservation_missing"
+  },
+  "installed_verification": {
+    "status": "PASS",
+    "version": "0.9.6-rc.3",
+    "source_commit": "c60b93e7006381e37210cdc92ef74f4b4c9e58e0",
+    "members": 97,
+    "member_differences": [],
+    "extra_members": [],
+    "other_plugin_files_unchanged": 114,
+    "main_sha256": "0dd013137ccffcab8aa66b68d9143ddbcca2671d5b9a2be5eaf1b48d16d2b071",
+    "actual_installed_cli_invalid_input": "held/input/json_invalid/exit2",
+    "native_child_process_faults": [
+      {
+        "mode": "child_crash",
+        "exit_code": 7,
+        "timed_out": false,
+        "confirmed_creation_checkpoint_retained": true
+      },
+      {
+        "mode": "child_timeout",
+        "exit_code": null,
+        "timed_out": true,
+        "confirmed_creation_checkpoint_retained": true
+      }
+    ],
+    "provider_requests": 0
+  },
+  "post_cleanup": {
+    "status": "PASS",
+    "version": "0.9.6-rc.3",
+    "source_commit": "c60b93e7006381e37210cdc92ef74f4b4c9e58e0",
+    "members": 97,
+    "member_differences": [],
+    "other_plugin_files_exact": 114,
+    "owned_fence_absent": true,
+    "maintenance_absent": true,
+    "verification": "independent filesystem read after cleanup and executor release"
+  },
+  "preservation": {
+    "status": "PASS",
+    "checks": {
+      "business_tables_exact": true,
+      "options_exact_except_reported_installer_cron": true,
+      "nonheartbeat_crm_metadata_exact": true,
+      "original_lead_claims_receipts_exact": true,
+      "config_credentials_exact": true
+    },
+    "tables_checked": 102,
+    "business_table_changes": [],
+    "ambient_table_changes": [
+      "wp_actionscheduler_actions",
+      "wp_actionscheduler_logs",
+      "wp_fc_meta"
+    ],
+    "option_changes": [
+      "_fc_last_funnel_processor_ran",
+      "_fc_last_sequence_run",
+      "_fcrm_last_email_process_cleanup",
+      "_fcrm_last_scheduler",
+      "action_scheduler_lock_async-request-runner",
+      "cron"
+    ],
+    "ambient_option_changes": [
+      "_fc_last_funnel_processor_ran",
+      "_fc_last_sequence_run",
+      "_fcrm_last_email_process_cleanup",
+      "_fcrm_last_scheduler",
+      "action_scheduler_lock_async-request-runner"
+    ],
+    "unexpected_option_changes": [],
+    "cron_exact": false,
+    "version": "0.9.6-rc.3",
+    "original_lead_sha256": "f7fbcf79355085438cc94246181ece6cce728b07c8b65a20cb227d2958ea2136",
+    "provider_requests": 0
+  },
+  "preservation_detail": {
+    "status": "PASS",
+    "targeted_restoration": {
+      "restored": [
+        "stellarwp_uplink_update_status_kadence-blocks-pro",
+        "stellarwp_uplink_update_status_kadence-conversions",
+        "stellarwp_uplink_update_status_kadence-theme-pro",
+        "edd_sl_failed_http_170228ca9a8b20013cfc64f2e72067b4"
+      ],
+      "comparison": "exact current value and autoload",
+      "original_snapshot_preserved": true
+    },
+    "cron_exact": false,
+    "cron_hook_names_added": [],
+    "cron_hook_names_removed": [],
+    "original_lead_snapshot_exact": true,
+    "protected_files_checked": 2,
+    "no_historical_cron_restore": true
+  },
+  "initial_strict_preservation": {
+    "status": "FAIL",
+    "checks": {
+      "business_tables_exact": true,
+      "options_exact_except_reported_installer_cron": false,
+      "nonheartbeat_crm_metadata_exact": true,
+      "original_lead_claims_receipts_exact": true,
+      "config_credentials_exact": true
+    },
+    "tables_checked": 102,
+    "business_table_changes": [],
+    "ambient_table_changes": [],
+    "option_changes": [
+      "stellarwp_uplink_update_status_kadence-blocks-pro",
+      "stellarwp_uplink_update_status_kadence-conversions",
+      "stellarwp_uplink_update_status_kadence-theme-pro",
+      "edd_sl_failed_http_170228ca9a8b20013cfc64f2e72067b4"
+    ],
+    "unexpected_option_changes": [
+      "stellarwp_uplink_update_status_kadence-blocks-pro",
+      "stellarwp_uplink_update_status_kadence-conversions",
+      "stellarwp_uplink_update_status_kadence-theme-pro",
+      "edd_sl_failed_http_170228ca9a8b20013cfc64f2e72067b4"
+    ],
+    "cron_exact": true,
+    "version": "0.9.6-rc.3",
+    "original_lead_sha256": "f7fbcf79355085438cc94246181ece6cce728b07c8b65a20cb227d2958ea2136",
+    "provider_requests": 0
+  },
+  "reconciliation": {
+    "status": "PASS",
+    "existing_receipt_hashes_unchanged": 2,
+    "draft_created": true,
+    "draft_sent": false,
+    "draft_sha256": "6646d94b7144e748cb3f81859d2fa4d8256915cccf9213c6b6cc1ef44cc05d2b",
+    "historical_lead_creation": "unconfirmed",
+    "initial_failure_cause": "unknown",
+    "documented_guid_GET_exists": true,
+    "new_provider_requests": 0,
+    "staff_audit_lookup_capability": "not independently verified",
+    "next_external_decision": "owner may choose manual FieldEdge staff/support audit lookup by original GUID; no new POST decision supported"
+  },
+  "executor": {
+    "status": "PASS",
+    "job_id": "AB-CLIMATROL-DIAGNOSTICS-20261118",
+    "state": "complete",
+    "executor": "FREE",
+    "inflight": null
+  },
+  "stable_delivery": {
+    "directory": "D:\\SiteEngine\\Plugins\\..Deliverables\\PLUGIN — SiteEngine Ads-Bridge",
+    "zip_count": 1,
+    "stable_sha256": "7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5",
+    "unchanged": true
+  }
+}

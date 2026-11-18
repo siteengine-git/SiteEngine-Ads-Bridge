@@ -1,3 +1,31 @@
+## Diagnostic successor installed and delta-verified — November 18, 2026
+
+Climatrol DEV active 0.9.6-rc.3, runtime c60b93e7006381e37210cdc92ef74f4b4c9e58e0.
+ZIP 871c71ef4bfca2c29663e1ac1dc9d9a1461e4d3f1f6d2b540d5d50abb52040d5;
+manifest b48bd220f1ca46da49889e224d59eec1413b6adf135e224170f03e1f0e90ad08.
+97 exact members after cleanup/executor release; 114 Base/CB/FE/Consent files exact.
+18 local checkpoint/70 protocol assertions and 25 native WP/SQL assertions PASS;
+actual Windows-to-installed-native helper refusal and Linux crash/timeout pass.
+60 payload PHP lints; prior 138/44/29 and Gate A/Gate B evidence reused.
+
+Creation checkpoint is flushed before GET; child failures preserve captured evidence.
+Dispatch ceiling60s covers3x15s HTTP+15s margin; recovery45s covers2x15s+15s.
+Fixed the demonstrated stale Windows native-version pin in final candidate.
+Original business payload/validation contracts, inquiry/GUID/consumed claims and
+private receipts preserved. No new provider requests, inquiry/GUID/claims/approval.
+102-table preservation: business/config/credential state exact; four update caches
+CAS-restored. Ambient AS/CRM heartbeat/options/cron churn retained (cron not exact,
+hook-name set unchanged); initial strict failure retained. No historical reset.
+Executor complete/inflight null and independently FREE; Windows mutex released;
+owned fence removed/maintenance absent. Rollback0.9.6-rc.2 and candidates retained.
+Implemented/packaged/installed/delta-verified YES; stable released NO, stable0.9.5
+single-ZIP delivery unchanged. Source releases/0.9.6-rc.3 holds final evidence.
+
+Original live lead remains UNCONFIRMED and first failure UNKNOWN. Private unsent
+staff/support GUID audit draft prepared; actual staff lookup capability unverified.
+No local evidence conclusively recovers historical delivery. No further FE requests,
+claim reset/replay, new live case or POST approval request. Call Bridge stays standby.
+
 ## Offline dispatch diagnosis completed — November 18, 2026
 
 The first real dispatch failure's exact cause remains UNKNOWN: its original
