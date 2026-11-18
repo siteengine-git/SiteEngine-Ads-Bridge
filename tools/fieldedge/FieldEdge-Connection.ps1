@@ -173,7 +173,7 @@ try {
                 Assert-NoLink $inputObject.journal_file
                 Assert-NoLink $inputObject.findings_file
             }
-            $inputJson = ConvertTo-Json -InputObject $inputObject -Compress
+            $inputJson = ConvertTo-Json -InputObject $inputObject -Depth 30 -Compress
             # Write UTF-8 bytes directly: Windows PowerShell's default writer
             # uses the console code page, which can alter Unicode input.
             $inputBytes = [Text.Encoding]::UTF8.GetBytes($inputJson)
