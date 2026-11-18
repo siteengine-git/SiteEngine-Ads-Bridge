@@ -1,0 +1,121 @@
+{
+  "date": "2026-11-18",
+  "installed_version": "0.9.6-rc.3",
+  "runtime_source": "c60b93e7006381e37210cdc92ef74f4b4c9e58e0",
+  "functional_code_changed": false,
+  "classification": "lead_unconfirmed_phone_only_customer_candidates",
+  "submitted_request_field": "trackingId",
+  "submitted_request_guid": "e637434b-a65e-4ba8-9d80-b690a9be1815",
+  "request_has_leadId": false,
+  "previous_recovery_route": "GET /open-api/v1/leads/e637434b-a65e-4ba8-9d80-b690a9be1815",
+  "previous_recovery_parameter_name": "leadId",
+  "previous_recovery_selector_source": "immutable reservation GUID identical to request.trackingId",
+  "provider_clarification": "provided GUID trackingId stored as leadId; retained written-response summary, not an observed roundtrip",
+  "actual_case_equality_verified": false,
+  "read_pass": {
+    "status": "read_pass_complete",
+    "token_http": 200,
+    "findings": {
+      "lead": {
+        "http_status": 404,
+        "json_shape_valid": false,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_bytes": 0
+      },
+      "phone": {
+        "http_status": 200,
+        "json_shape_valid": true,
+        "response_sha256": "8ccf9075ada4ef658e28053ca682ddcb259f9bad4efcbe6468c9b1c08c6f4258",
+        "response_bytes": 1361,
+        "total": 2,
+        "returned": 2,
+        "exact_email_matches": 0,
+        "exact_phone_matches": 0,
+        "formatted_phone_matches": 0
+      },
+      "email": {
+        "http_status": 200,
+        "json_shape_valid": true,
+        "response_sha256": "7b45d2f5cb2e7c2a3c2714efc462c4c780ab0b91beeb0bd0cb84e5d78b5de51d",
+        "response_bytes": 47,
+        "total": 0,
+        "returned": 0,
+        "exact_email_matches": 0,
+        "exact_phone_matches": 0,
+        "formatted_phone_matches": 0
+      },
+      "cross_search": {
+        "shared_customer_ids": 0
+      }
+    },
+    "actual_data_GETs": 3,
+    "lead_posts": 0,
+    "customer_writes": 0,
+    "automatic_retries": 0,
+    "original_AB_claims_untouched": true,
+    "transport": "Windows HttpClient system TLS; installed PHP transport unchanged"
+  },
+  "phone_comparison": {
+    "query": "unchanged exact entry896.phone",
+    "total": 2,
+    "returned": 2,
+    "literal_string_matches": 0,
+    "formatted_digits_matches": 0,
+    "US_country_code_normalized_matches": 2,
+    "email_matches_among_phone_results": 0,
+    "name_matches_operator_input": 0,
+    "lead_identifier_in_customer_response": false
+  },
+  "preservation": {
+    "version": "0.9.6-rc.3",
+    "admin_email_matches_entry": false,
+    "admin_phone_metadata_present": false,
+    "admin_phone_matches_entry": false,
+    "original_lead_snapshot_sha256": "f7fbcf79355085438cc94246181ece6cce728b07c8b65a20cb227d2958ea2136",
+    "crm_write_allowed": false,
+    "export_eligible": false
+  },
+  "original_card_hash_unchanged": true,
+  "original_receipt_hashes_unchanged": 2,
+  "original_snapshot_unchanged": true,
+  "current_transport_diagnosis": "PHP cURL intermittent pre-HTTP timeout; credential-free TLS12+HTTP11 succeeded once, repeat failed; Windows HttpClient authenticated read pass succeeded; no installed transport change",
+  "earlier_local_passes": [
+    "cURL not loaded: stopped before HTTP",
+    "cURL loaded: token transport failed without HTTP response; zero business GETs"
+  ],
+  "credential_free_HEAD_probes": {
+    "attempts": 7,
+    "HTTP405": 2,
+    "no_HTTP_response": 5
+  },
+  "historical_initial_failure_cause": "unknown; current transport failure does not establish historical causation",
+  "crm_projection_writes": 0,
+  "advertising_writes": 0,
+  "original_inquiry_retried": false,
+  "lead_customer_POSTs": 0,
+  "new_test_draft": {
+    "status": "DRAFT_ONLY_NOT_DISPATCHABLE",
+    "payload_sha256": "1f33d6f430f6e76a21b0e151df7aa6ddbc3b5e77a0e2e97a2d7665599742a540",
+    "case": "fresh controlled inquiry required; never entry896",
+    "tracking_guid_new_and_draft_only": true,
+    "AB_reservation_created": false,
+    "approval_created": false,
+    "post_claim_created": false,
+    "provider_requests": 0,
+    "email_source": "SiteEngine-domain address from previously owner-approved private input",
+    "phone_included": false,
+    "phone_ownership_unverified": true,
+    "appointment_confirmed": false,
+    "customer_creation_possible": true,
+    "staff_notifications_possible": true,
+    "marketing_opt_in": "omitted; no authority to grant opt-in",
+    "crm_projection": "disabled",
+    "advertising": "disabled",
+    "requirements_before_any_POST": [
+      "fresh native inquiry and durable binding to this draft GUID",
+      "verify exact payload and single-use approval card",
+      "specific owner approval"
+    ],
+    "local_validation": "PASS"
+  }
+}

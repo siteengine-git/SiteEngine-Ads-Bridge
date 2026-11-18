@@ -1,3 +1,30 @@
+## Identifier reconciliation completed — November 18, 2026
+
+Installed 0.9.6-rc.3/c60b93e preserved; no runtime/package/development repeat.
+Retained request uses trackingId=e637434b-a65e-4ba8-9d80-b690a9be1815, no leadId.
+Recovery queried that same GUID in documented /leads/{leadId}. Retained provider
+written-response summary says supplied GUID trackingId becomes leadId; public
+example alone does not establish equality. Actual case equality remains unverified.
+
+Separately authorized bounded read pass: existing DPAPI OAuth200, original-GUID
+GET404/empty, exact-phone customer search200 (2/2 returned; both US-country-code
+normalized phone matches; neither submitted email/name), exact-email search200
+(0 results). Customer records have no lead association. Classification: no confirmed
+lead, only phone candidates; API cannot conclusively recover historical delivery.
+Successful read-only probe used Windows HttpClient normal system TLS. PHP cURL
+had intermittent pre-HTTP failures; no stable fix or historical cause inferred.
+Installed transport unchanged. No lead/customer POST, entry896 retry or claim reset.
+Original card, two receipts and native lead/claims/observations snapshot exact;
+crm_write_allowed/export_eligible false. No CRM projection or advertising writes.
+
+Private exact email-only fresh-test draft validates locally; SHA256
+1f33d6f430f6e76a21b0e151df7aa6ddbc3b5e77a0e2e97a2d7665599742a540.
+SiteEngine-domain email comes from prior owner-approved input; phone omitted
+because ownership unverified. Draft GUID is not bound to entry896. No fresh native
+inquiry/reservation/approval/claim created; draft is not dispatchable. Fresh native
+binding and specific exact-card approval remain necessary before any POST.
+Evidence: releases/0.9.6-rc.3/IDENTIFIER-RECONCILIATION-20261118.{md,json}.
+
 ## Diagnostic successor installed and delta-verified — November 18, 2026
 
 Climatrol DEV active 0.9.6-rc.3, runtime c60b93e7006381e37210cdc92ef74f4b4c9e58e0.

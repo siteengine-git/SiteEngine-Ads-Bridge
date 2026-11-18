@@ -1,3 +1,15 @@
+## Current identifier-reconciliation scope — November 18, 2026
+
+Latest direct instruction supersedes conflicting earlier finish-today development
+and CRM-tag directions for this assignment: preserve installed0.9.6-rc.3, existing
+transport/approval/GUID/claims/receipts. Bounded read-only reconciliation completed;
+no lead confirmed, phone-only customer candidates. No entry896 replay/reset.
+Keep CRM projection and advertising writes disabled until actual lead association
+is verified. New email-only private payload is a local fresh-case draft only; no
+native inquiry/reservation/approval/claim exists and no POST is authorized for it.
+Do not treat provider contract clarification or customer equality as a live lead
+roundtrip. STATUS and identifier-reconciliation report hold exact evidence/limits.
+
 ## Diagnostic milestone complete — November 18, 2026
 
 Climatrol DEV diagnostic candidate0.9.6-rc.3/c60b93e is installed and delta-verified;
