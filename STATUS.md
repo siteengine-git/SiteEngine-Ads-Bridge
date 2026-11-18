@@ -1,3 +1,15 @@
+## Gate A implementation — November18,2026
+
+Sole AB owner accepted issue6 and pilot/climatrol-fe-lead-guid-20261118.
+Baseline stable0.9.5 retained; Climatrol DEV already0.9.5/Base2.6.1/CB0.2.3/FE0.1.1,
+form40 published, inquiry schema ready/empty. Native actor clima6647/PHP8.4.27.
+0.9.6-rc.1 adds version2 immutable original inquiry/tenant/GUID/exact body reservation
+inside existing prospective AB evidence storage, exclusive injected-only claims,
+immutable creation result and append-only GET/recovery observations. Reviewed FE
+LeadStatusProjection selectively reused, old branch never merged. Native real POST
+remains unavailable pending explicit approval. Tests/install results pending;
+22 new parser +14 existing contract +21 submission +35 transport +17 identity
+local assertions pass. No stable release or client deployment implied.
 ## RELEASED — Ads Bridge0.9.5 — November18,2026
 
 PASS. Stable https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.9.5
