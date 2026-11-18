@@ -1,3 +1,22 @@
+## Offline dispatch diagnosis completed — November 18, 2026
+
+The first real dispatch failure's exact cause remains UNKNOWN: its original
+secret-bearing stdin and exception were not retained. Offline reproduction with
+fake credentials and the retained exact approved body proved the old worker gave
+identical generic output for an OAuth failure before POST and a confirmed POST
+followed by invalid UTF-8 GET serialization. Neither scenario is established as
+the historical cause. Recovery OAuth/404 evidence and consumed claims stand.
+
+Source correction adds safe fixed-phase diagnostics, HTTP/invocation evidence,
+creation checkpoints, byte-safe bounded GET protocol and durable child receipts.
+138 worker + 44 process/protocol + existing 29 transport assertions PASS; six PHP
+lints/three PowerShell parses PASS. No server/provider/credential-bundle operation;
+no GUID/claim/card/runtime/stable-delivery change or new approval request.
+Implemented and offline verified ONLY; not newly packaged, installed or released.
+Last verified runtime stays 0.9.6-rc.2/3aa1cf5; live creation remains unconfirmed.
+See source/releases/0.9.6-rc.2/OFFLINE-DIAGNOSIS.md (source checkout: releases/...)
+and accompanying JSON for exact results, evidence limits and remaining blocker.
+
 ## Approved external attempt HELD — November18,2026
 
 User explicitly approved exact card362765644d26bb23a9439249f09073b6496136af864238bb66af9b9a43a820c4

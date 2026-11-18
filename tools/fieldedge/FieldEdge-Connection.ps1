@@ -17,6 +17,7 @@ $privateDirectory = Join-Path $env:LOCALAPPDATA 'SiteEngine\FieldEdge-Climatrol-
 $credentialFile = Join-Path $privateDirectory 'oauth.clixml'
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $leadMutex=$null;$leadLocked=$false
+$card=$null;$leadPhase='initialization';$leadWorkerStarted=$false;$leadStdinComplete=$false
 
 function Assert-NoLink([string]$Path) {
     if ((Test-Path -LiteralPath $Path) -and ((Get-Item -LiteralPath $Path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
@@ -117,18 +118,22 @@ try {
         $post=$null;$get=$null;$card=$null;$slot=$null
         if($Action -in @('LeadDispatch','LeadRecover')) {
             . (Join-Path $PSScriptRoot 'LeadGate.ps1')
+            . (Join-Path $PSScriptRoot 'LeadWorkerProtocol.ps1')
+            $leadPhase='card_validation'
             $card=Read-ABLeadCard $CardFile $CardSha256
             $leadMutex=New-Object Threading.Mutex($false,'Local\SiteEngine-FieldEdge-Climatrol-Dev');$leadLocked=$leadMutex.WaitOne(0)
             if(!$leadLocked){throw 'lead_existing_sync_active'}
             if($Action -eq 'LeadDispatch'){
+                $leadPhase='post_claim'
                 $post=Invoke-ABLeadOperation @{operation='claim';intent_id=$card.intent_id;card_sha256=$CardSha256;request_body_sha256=$card.request_body_sha256}
                 if($post.status -cne 'claimed'){[ordered]@{status='held';reason_code=$post.reason_code;credentials_loaded=$false}|ConvertTo-Json -Compress;exit 2}
                 $slot='initial'
             }else{$slot='recovery'}
+            $leadPhase='get_claim'
             $get=Invoke-ABLeadOperation @{operation='get_claim';intent_id=$card.intent_id;card_sha256=$CardSha256;slot=$slot}
             if($get.status -cne 'claimed'){[ordered]@{status='held';reason_code=$get.reason_code;credentials_loaded=$false}|ConvertTo-Json -Compress;exit 2}
         }
-        $bundle = Read-Bundle
+        $leadPhase='credential_load';$bundle = Read-Bundle
         if($Action -eq 'PrepareLead'){
             . (Join-Path $PSScriptRoot 'LeadGate.ps1')
             $prepared=New-ABLeadCard $EvidenceFile $EvidenceSha256 (Convert-ForProcess $bundle.target_id)
@@ -152,7 +157,9 @@ try {
         $process = New-Object Diagnostics.Process
         $process.StartInfo = $psi
         try {
+            $leadPhase='worker_start'
             [void]$process.Start()
+            $leadWorkerStarted=$true
             $outTask = $process.StandardOutput.ReadToEndAsync()
             $errTask = $process.StandardError.ReadToEndAsync()
             $inputObject = @{
@@ -173,34 +180,38 @@ try {
                 Assert-NoLink $inputObject.journal_file
                 Assert-NoLink $inputObject.findings_file
             }
-            $inputJson = ConvertTo-Json -InputObject $inputObject -Depth 30 -Compress
+            $leadPhase='stdin_serialization'
+            if($Action -in @('LeadDispatch','LeadRecover')){$inputBytes=ConvertTo-ABLeadWorkerInput $inputObject}else{$inputBytes=[Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $inputObject -Depth 30 -Compress))}
             # Write UTF-8 bytes directly: Windows PowerShell's default writer
             # uses the console code page, which can alter Unicode input.
-            $inputBytes = [Text.Encoding]::UTF8.GetBytes($inputJson)
+            $leadPhase='stdin_write'
             $process.StandardInput.BaseStream.Write($inputBytes,0,$inputBytes.Length)
             $process.StandardInput.BaseStream.Flush()
             $process.StandardInput.Close()
+            $leadStdinComplete=$true
             [Array]::Clear($inputBytes,0,$inputBytes.Length)
-            Remove-Variable inputBytes,inputJson,inputObject,bundle
+            Remove-Variable inputBytes,inputObject,bundle
             $ceilingMilliseconds = if ($Action -eq 'Discover') { 130000 } else { 40000 }
-            if (-not $process.WaitForExit($ceilingMilliseconds)) { $process.Kill(); $process.WaitForExit(); throw 'bounded_probe_timeout' }
-            # Never echo raw stderr; provider/cURL diagnostics are not a log source.
-            [void]$errTask.Result
-            $result = $outTask.Result | ConvertFrom-Json
+            $leadPhase='worker_wait';$timedOut=-not $process.WaitForExit($ceilingMilliseconds)
+            if($timedOut){$process.Kill();$process.WaitForExit()}
             if($Action -in @('LeadDispatch','LeadRecover')){
-                $receipt=Join-Path $privateDirectory ('lead-observation-'+$card.intent_id+'-'+[guid]::NewGuid().ToString('N')+'.json')
-                $stream=[IO.File]::Open($receipt,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
-                try{$record=[Text.UTF8Encoding]::new($false).GetBytes($outTask.Result);$stream.Write($record,0,$record.Length);$stream.Flush($true)}finally{$stream.Dispose()}
+                $leadPhase='receipt_capture'
+                $protocol=ConvertFrom-ABLeadWorkerOutput $outTask.Result $errTask.Result $process.ExitCode $timedOut
+                $receipt=Save-ABLeadWorkerReceipt $privateDirectory $card.intent_id $protocol
+                $result=$protocol.worker_result;$leadPhase='ab_record'
                 $creation=$null;$observed=$null
                 if($result.status -cne 'observations_ready'){
-                    if($post){$uncertain=[ordered]@{http_status=$null;response_sha256=('0'*64);lead_id=$null;request_body_sha256=$card.request_body_sha256};$creation=Invoke-ABLeadOperation @{operation='result';intent_id=$card.intent_id;permit=$post.permit;observation_json=($uncertain|ConvertTo-Json -Compress)}}
-                    [ordered]@{status='held';reason_code='lead_transport_unconfirmed_get_original_guid';private_receipt=$receipt;automatic_retries=0}|ConvertTo-Json -Compress;exit 2
+                    if($post){$uncertain=$result.creation;if(!$uncertain){$uncertain=[ordered]@{http_status=$null;response_sha256=('0'*64);lead_id=$null;request_body_sha256=$card.request_body_sha256}};$creation=Invoke-ABLeadOperation @{operation='result';intent_id=$card.intent_id;permit=$post.permit;observation_json=($uncertain|ConvertTo-Json -Compress)}}
+                    [ordered]@{status='held';reason_code=$result.reason_code;phase=$result.diagnostics.phase;private_receipt=$receipt;automatic_retries=0}|ConvertTo-Json -Compress;exit 2
                 }
                 if($post){$creation=Invoke-ABLeadOperation @{operation='result';intent_id=$card.intent_id;permit=$post.permit;observation_json=($result.creation|ConvertTo-Json -Compress)}}
-                if($null -ne $result.get_http){$observed=Invoke-ABLeadOperation @{operation='status';intent_id=$card.intent_id;card_sha256=$CardSha256;slot=$slot;permit=$get.permit;http_status=$result.get_http;body=$result.get_body;observed_at=$result.observed_at}}
+                if($null -ne $result.get_http){$observed=Invoke-ABLeadOperation @{operation='status';intent_id=$card.intent_id;card_sha256=$CardSha256;slot=$slot;permit=$get.permit;http_status=$result.get_http;body_base64=$result.get_body_base64;observed_at=$result.observed_at}}
                 [ordered]@{status=if($observed -and $observed.status -cin @('observed','replayed')){'observed'}else{'held'};creation_status=if($creation){$creation.status}else{$null};provider_status=if($observed){$observed.observation.provider_status}else{$null};guid=$card.guid;request_body_sha256=$card.request_body_sha256;private_receipt=$receipt;counts=$result.counts;automatic_retries=0}|ConvertTo-Json -Depth 8 -Compress
                 if(!$observed -or $observed.status -cnotin @('observed','replayed')){exit 2};exit 0
             }
+            if($timedOut){throw 'bounded_probe_timeout'}
+            # Legacy results still never expose raw stderr.
+            $result=$outTask.Result|ConvertFrom-Json
             if ($result.reason_code -notmatch '^[a-z_]{1,80}$') { throw 'probe_output_unconfirmed' }
             $result | ConvertTo-Json -Depth 8
             if ($process.ExitCode -ne 0) { exit 2 }
@@ -216,6 +227,13 @@ try {
         'credential_input_incomplete','approved_php_runtime_unavailable','bounded_probe_timeout','probe_output_unconfirmed',
         'selected_evidence_unavailable','selected_evidence_hash_mismatch')
     $reason = if ($_.Exception.Message -in $codes) { $_.Exception.Message } else { 'secure_local_operation_unconfirmed' }
+    if($Action -in @('LeadDispatch','LeadRecover')){
+        $failure=[ordered]@{status='held';reason_code=$reason;phase=$leadPhase;worker_started=$leadWorkerStarted;stdin_complete=$leadStdinComplete;automatic_retries=0}
+        if($card -and (Get-Command Save-ABLeadWorkerReceipt -ErrorAction SilentlyContinue)){
+            try{Assert-PrivateDirectory;$failure.private_receipt=Save-ABLeadWorkerReceipt $privateDirectory $card.intent_id @{launcher_failure=$failure.Clone()}}catch{}
+        }
+        $failure|ConvertTo-Json -Depth 8 -Compress;exit 2
+    }
     [pscustomobject]@{provisioned_or_test_confirmed=$false;reason_code=$reason} | ConvertTo-Json -Compress
     if ($Action -eq 'Provision') { Write-Host 'No provider call was made. Existing credential files are preserved. Use -Action Status before retrying.' }
     exit 2

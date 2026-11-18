@@ -23,7 +23,7 @@ try{
   case 'claim':$r=$api::lead_claim_approved($id,$card,$q['request_body_sha256']);break;
   case 'get_claim':$r=$api::lead_claim_get($id,$card,$q['slot']);break;
   case 'result':$r=$api::lead_result($id,$q['permit'],$q['observation_json']);break;
-  case 'status':$r=$api::lead_approved_status($id,$card,$q['slot'],$q['permit'],$q['http_status'],$q['body'],$q['observed_at']);break;
+  case 'status':require_once SEAB_PLUGIN_DIR.'includes/connectors/fieldedge/ApprovedLeadWorker.php';$body=\SiteEngine\AdsBridge\Connectors\FieldEdge\ApprovedLeadWorker::decodeStatusBody($q);$r=$api::lead_approved_status($id,$card,$q['slot'],$q['permit'],$q['http_status'],$body,$q['observed_at']);break;
   default:throw new RuntimeException('lead_operation_refused');
  }
  global $wpdb;$lock='seab_c_'.substr(SiteEngine_Ads_Bridge_Coordination::capability()['destination'],0,48);

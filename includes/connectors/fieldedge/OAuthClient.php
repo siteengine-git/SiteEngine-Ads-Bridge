@@ -3,6 +3,7 @@
 namespace SiteEngine\AdsBridge\Connectors\FieldEdge;
 
 require_once __DIR__ . '/TargetedRead.php';
+require_once __DIR__ . '/LeadDiagnostics.php';
 
 final class OAuthClient {
 	public const TOKEN_URL = 'https://fieldedge.withgobo.com/oauth/token';
@@ -89,33 +90,41 @@ final class OAuthClient {
 
 
 	/** Shared original OAuth logic; credentials/token never persisted or returned to UI. */
-	public function approvedLead(array $credentials,?array $post,array $get):array {
+	public function approvedLead(array $credentials,?array $post,array $get,?LeadDiagnostics $diagnostics=null):array {
+		$diagnostics??=new LeadDiagnostics();$diagnostics->enter('binding');
+		try {
 		require_once __DIR__.'/LiveLeadPayload.php';require_once __DIR__.'/LeadResponse.php';
 		$r=$get['reservation']??[];$guid=$r['guid']??'';
 		if(($get['status']??null)!=='claimed'||($get['dispatch_mode']??null)!=='approved_guid_get'||!preg_match('/^[a-f0-9]{64}$/D',$get['permit']??'')||($credentials['target_id']??null)!==($r['tenant_id']??null)||($r['synthetic']??null)!==false||strtotime($get['expires_at']??'')<=($this->clock)())throw new \RuntimeException('approved_binding_required');
 		LiveLeadPayload::validate($r['request']['body']??'',$guid);
 		if(hash('sha256',$r['request']['body'])!==($r['request']['body_sha256']??null)||$r['request']['method']!=='POST'||$r['request']['endpoint']!==LeadResponse::URL)throw new \RuntimeException('approved_binding_required');
 		if($post!==null&&(($post['status']??null)!=='claimed'||($post['dispatch_mode']??null)!=='approved_single_post'||($post['reservation']??null)!==$r||($post['card_sha256']??null)!==($get['card_sha256']??null)||($post['permit']??null)!==($get['post_permit']??null)))throw new \RuntimeException('approved_binding_required');
-		$counts=['token_attempts'=>1,'lead_posts'=>0,'lead_gets'=>0];$report=[];$session=$this->authenticate($credentials,$report);unset($credentials);
+		$counts=['token_attempts'=>1,'lead_posts'=>0,'lead_gets'=>0];$report=[];$session=$this->authenticate($credentials,$report,$diagnostics);unset($credentials);
 		$headers=['Accept: application/json','Content-Type: application/json','Authorization: Bearer '.$session['token'],'X-Correlation-Id: '.$guid];
-		$send=function(string $method,string $url,string $body)use($headers,$session,$get):array{
+		$send=function(string $method,string $url,string $body)use($headers,$session,$get,$diagnostics):array{
 			if(($this->clock)()+5>=min($session['expires_at'],strtotime($get['expires_at'])))throw new \RuntimeException('approval_or_token_expired');
-			return $this->injected?($this->transport)($method,$url,$headers,$body):self::https($method,$url,$headers,$body,true);
+			$phase=$method==='POST'?'post':'get';$diagnostics->attempt($phase);
+			$response=$this->injected?($this->transport)($method,$url,$headers,$body):self::https($method,$url,$headers,$body,true);
+			$diagnostics->reply($phase,$response);return $response;
 		};
 		$creation=null;
 		if($post!==null){
-			$counts['lead_posts']=1;$response=null;try{$response=$send('POST',LeadResponse::URL,$r['request']['body']);}catch(\Throwable $e){}
+			$diagnostics->enter('post');$counts['lead_posts']=1;$response=null;try{$response=$send('POST',LeadResponse::URL,$r['request']['body']);}catch(\Throwable $e){$diagnostics->failure($e);}
+			$diagnostics->enter('post_classification');
 			$class=LeadResponse::classify($response);$lead=$class['classification']==='success'&&$class['lead_id']===$guid?$guid:null;
 			$creation=['http_status'=>$class['http_status'],'response_sha256'=>is_string($response['body']??null)?hash('sha256',$response['body']):hash('sha256','unconfirmed-reply'),'lead_id'=>$lead,'request_body_sha256'=>$r['request']['body_sha256']];
+			$diagnostics->creation($creation);
 		}
-		$response=null;try{$counts['lead_gets']=1;$response=$send('GET',TargetedRead::url('lead',['id'=>$guid]),'');}catch(\Throwable $e){}
+		$diagnostics->enter('get');$response=null;try{$counts['lead_gets']=1;$response=$send('GET',TargetedRead::url('lead',['id'=>$guid]),'');}catch(\Throwable $e){$diagnostics->failure($e);}
 		$http=$response['status']??null;$body=$response['body']??'';
 		if(!is_int($http)||$http<100||$http>599||!is_string($body)||strlen($body)>65536){$http=null;$body='';}
-		return ['status'=>'observations_ready','creation'=>$creation,'get_http'=>$http,'get_body'=>$body,'observed_at'=>gmdate('Y-m-d\TH:i:s\Z'),'counts'=>$counts,'automatic_retries'=>0];
+		$diagnostics->enter('complete');return ['status'=>'observations_ready','creation'=>$creation,'get_http'=>$http,'get_body'=>$body,'observed_at'=>gmdate('Y-m-d\TH:i:s\Z'),'counts'=>$counts,'automatic_retries'=>0];
+		} catch(\Throwable $e){$diagnostics->failure($e);throw $e;}
 	}
 
 	/** Shared original OAuth logic; credentials/token never persisted or returned to UI. */
-	private function authenticate( array $credentials, array &$report ): array {
+	private function authenticate( array $credentials, array &$report,?LeadDiagnostics $diagnostics=null ): array {
+		$diagnostics?->enter('credentials');
 		foreach ( array( 'client_id' => 512, 'client_secret' => 8192, 'target_id' => 128 ) as $field => $limit ) {
 			$value = $credentials[ $field ] ?? null;
 			if ( ! is_string( $value ) || '' === trim( $value ) || strlen( $value ) > $limit || preg_match( '/[\x00-\x1f\x7f]/', $value ) ) {
@@ -123,11 +132,13 @@ final class OAuthClient {
 			}
 		}
 		$started = ( $this->clock )();
+		$diagnostics?->enter('oauth');$diagnostics?->attempt('oauth');
 		$response = ( $this->transport )( 'POST', self::TOKEN_URL,
 			array( 'Content-Type: application/x-www-form-urlencoded', 'Accept: application/json' ),
 			http_build_query( array( 'client_id' => $credentials['client_id'], 'client_secret' => $credentials['client_secret'],
 				'target_id' => $credentials['target_id'], 'grant_type' => 'client_credentials' ), '', '&', PHP_QUERY_RFC3986 ) );
 		$report['token_http_status'] = $this->status( $response );
+		$diagnostics?->reply('oauth',$response);
 		if ( 200 !== $report['token_http_status'] ) { throw new \RuntimeException( 'oauth_http_rejected' ); }
 		$data = $this->object( $response );
 		$token = $data['access_token'] ?? null;
