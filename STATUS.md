@@ -1,3 +1,17 @@
+## 0.9.5 stable release evaluation PASS — November18,2026
+
+Upstream Base2.6.1 and CB0.2.3 stable handbacks confirmed. Exact accepted source
+49fab3cb5e701c3090d9924337a2fdbf011fc207 and ZIP7553dddcbc256225c28568a04cb5499931b58a8ccdea0fba5c9c246ccbf7fef5
+unchanged. Native WordPress ZIP0.8.2→0.9.5 upgrade22 PASS;10 additional local
+prior-stable settings checks PASS. Existing279/46/51 evidence reused.15 owned tables
+and private fixture/config/auth removed; holder exited0, executor independentlyFREE.
+Main files/protected tables/options except cron retained. All recurring schedules
+remain; one overdue one-off wp_version_check absent. Original pre0.9.5 cron payload
+uncaptured; no historical equality/cause claim or restoration. File authority and
+flags unchanged; no Google/provider/export/source operation. ALMA#5 owns cutover.
+Source integration/tag/release publication in progress; no new runtime or rebuild.
+See releases/0.9.5/RELEASE-EVALUATION.json; private evidence retained.
+
 ## Ads Bridge 0.9.5 ordinary Google credential Save ? November 17, 2026
 
 Integration Control's consolidated assignment completed from installed0.9.4.

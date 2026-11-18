@@ -1,3 +1,22 @@
+# Stable0.9.5 installation and upgrade
+
+Use the exact published ZIP on PHP8.3+. Back up plugin files, active configuration
+and database/journals first. Direct native WordPress ZIP0.8.2 to0.9.5 replacement
+passed22 assertions in the isolated release fixture; no intermediate Ads version
+or destructive migration is required. Existing compatible storage and history are
+retained. Incomplete/incompatible storage or unfinished ownership still requires its
+supported recovery, never a reset. Back up any legacy plugin-local config outside
+the replaceable folder; use controlled file-preserving replacement for that mode.
+
+Base2.6.1 is released and supplies ordinary document Save. CB0.2.3's release is
+confirmed. Credential Save, Google authentication and Ads source selection remain
+separate. Do not import a real credential or change its authority as part of this
+upgrade. Existing File deployments stay File. No live export is part of validation.
+See RELEASE-NOTES.md and RELEASE-EVALUATION.json for cron/acceptance limits.
+
+The unchanged package's following build-time credential instructions remain
+applicable; references to older stable publication state are historical.
+
 # Google Sheets credentials — Ads Bridge 0.9.5
 
 Base 2.6.1 (accepted Alma source `cdab9f1c9cb29e600b3cf492500f982a854711e4`)
