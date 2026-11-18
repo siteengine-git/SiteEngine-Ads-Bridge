@@ -2,9 +2,11 @@
 /** Trusted prospective submission boundary; no transport, worker or new ledger. */
 if (!defined('ABSPATH')) exit;
 require_once __DIR__.'/class-siteengine-ads-bridge-lead-pilot.php';
+require_once __DIR__.'/class-siteengine-ads-bridge-lead-approval.php';
 require_once __DIR__.'/connectors/fieldedge/LeadStatusProjection.php';
 final class SiteEngine_Ads_Bridge_Prospective {
     use SiteEngine_Ads_Bridge_Lead_Pilot;
+    use SiteEngine_Ads_Bridge_Lead_Approval;
     private static function json(array $v): string { return json_encode($v,JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES); }
     private static function hash(string $v): string { if(!preg_match('/^[a-f0-9]{64}$/D',$v))throw new InvalidArgumentException('prospective_digest_invalid');return $v; }
     private static function id($v): string { return \SiteEngine\AdsBridge\Connectors\FieldEdge\Foundation::id($v); }

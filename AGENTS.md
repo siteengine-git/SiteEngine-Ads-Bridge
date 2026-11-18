@@ -1,3 +1,17 @@
+## Authoritative FieldEdge scheduling decision — November18,2026
+
+Direct superseding user/AB Helper instruction: Form40 captures a service inquiry,
+preferred window and optional requested date. Climatrol schedules appointments in
+FieldEdge. FE owns actual appointment/job/financial facts. Preserve original AB
+inquiry preferences and store verified FE facts separately; never replace preferences
+with actual scheduling. No existing FE lead, confirmed appointment, new mandatory
+form field, invented date/time/address or issue description is a prerequisite.
+FE create schema requires source/customer/isExistingCustomer/appointment/serviceRequest
+at the top level; its appointment/serviceRequest properties are optional. Unscheduled
+lead payloads retain required objects and omit absent optional properties. The
+previous mandatory date/time/issue-description recommendation is superseded.
+Continue sole-writer GateB for confirmed contact341/form40 entry896; no POST until
+one exact valid request is approved. Reuse GateA evidence; no stable delivery changes.
 ## RELEASED — Ads Bridge0.9.5 — November18,2026
 
 PASS. Stable https://github.com/siteengine-git/SiteEngine-Ads-Bridge/releases/tag/v0.9.5

@@ -1,8 +1,9 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('Provision','Status','Test','Discover','PilotDouble')][string]$Action = 'Status',
+    [ValidateSet('Provision','Status','Test','Discover','PilotDouble','PrepareLead','ApproveLead','LeadDispatch','LeadRecover')][string]$Action = 'Status',
     [string]$EvidenceFile,
     [string]$EvidenceSha256,
+    [string]$ApprovalReference,
     [string]$RouteFile,[string]$RouteSha256,[string]$CardFile,[string]$CardSha256,
     [string]$BridgeAdapterPath,[string]$BridgeAdapterSha256,
     [ValidateSet('review','simulate','disabled-execute')][string]$PilotMode='simulate'
@@ -15,6 +16,7 @@ Set-StrictMode -Version Latest
 $privateDirectory = Join-Path $env:LOCALAPPDATA 'SiteEngine\FieldEdge-Climatrol-OAuth'
 $credentialFile = Join-Path $privateDirectory 'oauth.clixml'
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$leadMutex=$null;$leadLocked=$false
 
 function Assert-NoLink([string]$Path) {
     if ((Test-Path -LiteralPath $Path) -and ((Get-Item -LiteralPath $Path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
@@ -90,6 +92,14 @@ try {
         $pilotSucceeded = $?
         $pilotOutput
         if (-not $pilotSucceeded) { exit 2 }
+    } elseif ($Action -eq 'ApproveLead') {
+        Assert-PrivateDirectory
+        . (Join-Path $PSScriptRoot 'LeadGate.ps1')
+        $card=Read-ABLeadCard $CardFile $CardSha256
+        if($ApprovalReference -cnotmatch '^[A-Za-z0-9:._-]{1,128}$'){throw 'specific_approval_reference_required'}
+        $decision=Invoke-ABLeadOperation @{operation='approve';intent_id=$card.intent_id;card_sha256=$CardSha256;approval_reference=$ApprovalReference}
+        $decision|ConvertTo-Json -Compress
+        if($decision.status -cnotin @('approved','replayed')){exit 2}
     } elseif ($Action -eq 'Status') {
         if (-not (Test-Path -LiteralPath $credentialFile)) {
             '{"provisioned":false,"reason_code":"credential_bundle_not_provisioned"}'
@@ -104,13 +114,34 @@ try {
             Assert-NoLink $EvidenceFile
             if ((Get-FileHash -LiteralPath $EvidenceFile -Algorithm SHA256).Hash.ToLowerInvariant() -ne $EvidenceSha256) { throw 'selected_evidence_hash_mismatch' }
         }
+        $post=$null;$get=$null;$card=$null;$slot=$null
+        if($Action -in @('LeadDispatch','LeadRecover')) {
+            . (Join-Path $PSScriptRoot 'LeadGate.ps1')
+            $card=Read-ABLeadCard $CardFile $CardSha256
+            $leadMutex=New-Object Threading.Mutex($false,'Local\SiteEngine-FieldEdge-Climatrol-Dev');$leadLocked=$leadMutex.WaitOne(0)
+            if(!$leadLocked){throw 'lead_existing_sync_active'}
+            if($Action -eq 'LeadDispatch'){
+                $post=Invoke-ABLeadOperation @{operation='claim';intent_id=$card.intent_id;card_sha256=$CardSha256;request_body_sha256=$card.request_body_sha256}
+                if($post.status -cne 'claimed'){[ordered]@{status='held';reason_code=$post.reason_code;credentials_loaded=$false}|ConvertTo-Json -Compress;exit 2}
+                $slot='initial'
+            }else{$slot='recovery'}
+            $get=Invoke-ABLeadOperation @{operation='get_claim';intent_id=$card.intent_id;card_sha256=$CardSha256;slot=$slot}
+            if($get.status -cne 'claimed'){[ordered]@{status='held';reason_code=$get.reason_code;credentials_loaded=$false}|ConvertTo-Json -Compress;exit 2}
+        }
         $bundle = Read-Bundle
+        if($Action -eq 'PrepareLead'){
+            . (Join-Path $PSScriptRoot 'LeadGate.ps1')
+            $prepared=New-ABLeadCard $EvidenceFile $EvidenceSha256 (Convert-ForProcess $bundle.target_id)
+            Remove-Variable bundle
+            $prepared|ConvertTo-Json -Depth 8 -Compress;exit 0
+        }
         $projectDirectory = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
         $phpDirectory = Join-Path $projectDirectory 'local-test-runtime\php-8.3.36'
         $php = Join-Path $phpDirectory 'php.exe'
         if (-not (Test-Path -LiteralPath $php) -or -not (Test-Path -LiteralPath (Join-Path $phpDirectory 'ext\php_curl.dll'))) { throw 'approved_php_runtime_unavailable' }
         $probe = Join-Path $PSScriptRoot 'oauth-probe.php'
         if ($Action -eq 'Discover') { $probe = Join-Path $PSScriptRoot 'selected-case.php' }
+        if ($Action -in @('LeadDispatch','LeadRecover')) { $probe=Join-Path $PSScriptRoot 'lead-approved-worker.php' }
         $psi = New-Object Diagnostics.ProcessStartInfo
         $psi.FileName = $php
         # Runtime arguments contain paths and flags only; credential JSON goes to
@@ -129,6 +160,10 @@ try {
                 client_id = Convert-ForProcess $bundle.client_id
                 client_secret = Convert-ForProcess $bundle.client_secret
                 target_id = Convert-ForProcess $bundle.target_id
+            }
+            if($Action -in @('LeadDispatch','LeadRecover')){
+                if($inputObject.target_id -cne $card.tenant_id){throw 'lead_dpapi_tenant_mismatch'}
+                $inputObject.post=$post;$inputObject.get=$get
             }
             if ($Action -eq 'Discover') {
                 $inputObject.evidence_file = (Resolve-Path -LiteralPath $EvidenceFile).Path
@@ -152,6 +187,20 @@ try {
             # Never echo raw stderr; provider/cURL diagnostics are not a log source.
             [void]$errTask.Result
             $result = $outTask.Result | ConvertFrom-Json
+            if($Action -in @('LeadDispatch','LeadRecover')){
+                $receipt=Join-Path $privateDirectory ('lead-observation-'+$card.intent_id+'-'+[guid]::NewGuid().ToString('N')+'.json')
+                $stream=[IO.File]::Open($receipt,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+                try{$record=[Text.UTF8Encoding]::new($false).GetBytes($outTask.Result);$stream.Write($record,0,$record.Length);$stream.Flush($true)}finally{$stream.Dispose()}
+                $creation=$null;$observed=$null
+                if($result.status -cne 'observations_ready'){
+                    if($post){$uncertain=[ordered]@{http_status=$null;response_sha256=('0'*64);lead_id=$null;request_body_sha256=$card.request_body_sha256};$creation=Invoke-ABLeadOperation @{operation='result';intent_id=$card.intent_id;permit=$post.permit;observation_json=($uncertain|ConvertTo-Json -Compress)}}
+                    [ordered]@{status='held';reason_code='lead_transport_unconfirmed_get_original_guid';private_receipt=$receipt;automatic_retries=0}|ConvertTo-Json -Compress;exit 2
+                }
+                if($post){$creation=Invoke-ABLeadOperation @{operation='result';intent_id=$card.intent_id;permit=$post.permit;observation_json=($result.creation|ConvertTo-Json -Compress)}}
+                if($null -ne $result.get_http){$observed=Invoke-ABLeadOperation @{operation='status';intent_id=$card.intent_id;card_sha256=$CardSha256;slot=$slot;permit=$get.permit;http_status=$result.get_http;body=$result.get_body;observed_at=$result.observed_at}}
+                [ordered]@{status=if($observed -and $observed.status -cin @('observed','replayed')){'observed'}else{'held'};creation_status=if($creation){$creation.status}else{$null};provider_status=if($observed){$observed.observation.provider_status}else{$null};guid=$card.guid;request_body_sha256=$card.request_body_sha256;private_receipt=$receipt;counts=$result.counts;automatic_retries=0}|ConvertTo-Json -Depth 8 -Compress
+                if(!$observed -or $observed.status -cnotin @('observed','replayed')){exit 2};exit 0
+            }
             if ($result.reason_code -notmatch '^[a-z_]{1,80}$') { throw 'probe_output_unconfirmed' }
             $result | ConvertTo-Json -Depth 8
             if ($process.ExitCode -ne 0) { exit 2 }
@@ -170,4 +219,4 @@ try {
     [pscustomobject]@{provisioned_or_test_confirmed=$false;reason_code=$reason} | ConvertTo-Json -Compress
     if ($Action -eq 'Provision') { Write-Host 'No provider call was made. Existing credential files are preserved. Use -Action Status before retrying.' }
     exit 2
-}
+} finally {if($leadLocked){$leadMutex.ReleaseMutex()};if($leadMutex){$leadMutex.Dispose()}}
