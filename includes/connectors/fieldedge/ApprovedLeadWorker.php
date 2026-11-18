@@ -3,8 +3,8 @@
 namespace SiteEngine\AdsBridge\Connectors\FieldEdge;
 require_once __DIR__.'/OAuthClient.php';
 final class ApprovedLeadWorker {
-    public static function run(string $bytes,?OAuthClient $client=null):array {
-        $trace=new LeadDiagnostics();
+    public static function run(string $bytes,?OAuthClient $client=null,?callable $checkpoint=null):array {
+        $trace=new LeadDiagnostics($checkpoint);
         try{
             $trace->enter('input');if(strlen($bytes)>196608)throw new \RuntimeException('worker_input_bound');
             $q=json_decode($bytes,true,24,JSON_THROW_ON_ERROR);

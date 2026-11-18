@@ -1,4 +1,8 @@
 # Pure private protocol functions. They cannot load credentials, call AB or HTTP.
+function Get-ABLeadWorkerCeiling([bool]$HasPost) {
+    # cURL's 15s total includes connect. Token+POST+GET=45s; add 15s local margin.
+    return $(if($HasPost){60000}else{45000})
+}
 function Test-ABLeadCreation([object]$Value) {
     if($null -eq $Value){return $true}
     $keys=@('http_status','response_sha256','lead_id','request_body_sha256')
@@ -34,7 +38,15 @@ function ConvertFrom-ABLeadWorkerOutput([string]$Stdout,[string]$Stderr,[int]$Ex
     $utf8=[Text.UTF8Encoding]::new($false)
     $hash={param([string]$v)[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($utf8.GetBytes($v))).ToLowerInvariant()}
     $metadata=[ordered]@{protocol='lead-worker-2';exit_code=$ExitCode;timed_out=$TimedOut;stdout_bytes=$utf8.GetByteCount($Stdout);stderr_bytes=$utf8.GetByteCount($Stderr);stdout_sha256=(& $hash $Stdout);stderr_sha256=(& $hash $Stderr)}
-    $reason=$null;$result=$null
+    $reason=$null;$result=$null;$checkpoint=$null
+    # A small flushed first frame survives child termination during a later GET.
+    # Only the four sanitized creation fields may escape a malformed final frame.
+    if($Stdout.Length -le 262144 -and $Stdout.Contains("`n")){
+        $parts=$Stdout.Split([char]10,2)
+        try{$first=ConvertFrom-Json -InputObject $parts[0] -Depth 12 -ErrorAction Stop
+            if(@($first.PSObject.Properties.Name).Count -eq 2 -and $first.protocol -ceq 'lead-creation-checkpoint-1' -and $null -ne $first.creation -and (Test-ABLeadCreation $first.creation)){$checkpoint=$first.creation;$Stdout=$parts[1]}
+        }catch{}
+    }
     if($TimedOut){$reason='worker_timeout'}elseif($Stdout.Length -gt 262144){$reason='worker_output_bound'}else{
         try{
             $result=ConvertFrom-Json -InputObject $Stdout -Depth 40 -ErrorAction Stop
@@ -51,7 +63,9 @@ function ConvertFrom-ABLeadWorkerOutput([string]$Stdout,[string]$Stderr,[int]$Ex
             if(!$result.PSObject.Properties['diagnostics']){$result|Add-Member -NotePropertyName diagnostics -NotePropertyValue @{phase='legacy_unknown';transport_invocations=$null}}
         }catch{$reason='worker_output_invalid';$result=$null}
     }
-    if($reason){$result=[pscustomobject]@{status='held';reason_code=$reason;creation=$null;automatic_retries=0;diagnostics=@{phase='worker_protocol';transport_invocations=$null;historical_counts='unknown'}}}
+    if($reason){$result=[pscustomobject]@{status='held';reason_code=$reason;creation=$checkpoint;automatic_retries=0;diagnostics=@{phase='worker_protocol';transport_invocations=$null;historical_counts='unknown'}}}
+    elseif($null -ne $checkpoint){$result.creation=$checkpoint}
+    $metadata['creation_checkpoint_captured']=$null -ne $checkpoint
     return [pscustomobject]@{metadata=$metadata;worker_result=$result}
 }
 function Save-ABLeadWorkerReceipt([string]$Directory,[string]$IntentId,[object]$Receipt) {

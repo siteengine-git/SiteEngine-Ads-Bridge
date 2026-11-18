@@ -6,6 +6,7 @@ require_once __DIR__ . '/TargetedRead.php';
 require_once __DIR__ . '/LeadDiagnostics.php';
 
 final class OAuthClient {
+	public const HTTP_TIMEOUT_SECONDS = 15;
 	public const TOKEN_URL = 'https://fieldedge.withgobo.com/oauth/token';
 	public const READ_URL = 'https://api.fieldedge.com/open-api/v1/work-orders?offset=0&limit=1';
 	private const MAX_BYTES = 65536;
@@ -244,7 +245,7 @@ final class OAuthClient {
 				CURLOPT_HTTPHEADER => $headers, CURLOPT_FOLLOWLOCATION => false, CURLOPT_MAXREDIRS => 0,
 				CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
 				CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2,
-				CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 15, CURLOPT_VERBOSE => false,
+				CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => self::HTTP_TIMEOUT_SECONDS, CURLOPT_VERBOSE => false,
 				CURLOPT_HEADERFUNCTION => static function ( $unused, string $line ) use ( &$header_bytes, &$oversized ): int {
 					$header_bytes += strlen( $line );
 					if ( $header_bytes > 8192 ) {

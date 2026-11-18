@@ -17,7 +17,7 @@ $privateDirectory = Join-Path $env:LOCALAPPDATA 'SiteEngine\FieldEdge-Climatrol-
 $credentialFile = Join-Path $privateDirectory 'oauth.clixml'
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $leadMutex=$null;$leadLocked=$false
-$card=$null;$leadPhase='initialization';$leadWorkerStarted=$false;$leadStdinComplete=$false
+$card=$null;$leadPhase='initialization';$leadWorkerStarted=$false;$leadStdinComplete=$false;$leadReceipt=$null
 
 function Assert-NoLink([string]$Path) {
     if ((Test-Path -LiteralPath $Path) -and ((Get-Item -LiteralPath $Path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
@@ -191,13 +191,14 @@ try {
             $leadStdinComplete=$true
             [Array]::Clear($inputBytes,0,$inputBytes.Length)
             Remove-Variable inputBytes,inputObject,bundle
-            $ceilingMilliseconds = if ($Action -eq 'Discover') { 130000 } else { 40000 }
+            $ceilingMilliseconds = if($Action -in @('LeadDispatch','LeadRecover')){Get-ABLeadWorkerCeiling ($null -ne $post)}elseif ($Action -eq 'Discover') { 130000 } else { 40000 }
             $leadPhase='worker_wait';$timedOut=-not $process.WaitForExit($ceilingMilliseconds)
             if($timedOut){$process.Kill();$process.WaitForExit()}
             if($Action -in @('LeadDispatch','LeadRecover')){
                 $leadPhase='receipt_capture'
                 $protocol=ConvertFrom-ABLeadWorkerOutput $outTask.Result $errTask.Result $process.ExitCode $timedOut
                 $receipt=Save-ABLeadWorkerReceipt $privateDirectory $card.intent_id $protocol
+                $leadReceipt=$receipt
                 $result=$protocol.worker_result;$leadPhase='ab_record'
                 $creation=$null;$observed=$null
                 if($result.status -cne 'observations_ready'){
@@ -229,6 +230,7 @@ try {
     $reason = if ($_.Exception.Message -in $codes) { $_.Exception.Message } else { 'secure_local_operation_unconfirmed' }
     if($Action -in @('LeadDispatch','LeadRecover')){
         $failure=[ordered]@{status='held';reason_code=$reason;phase=$leadPhase;worker_started=$leadWorkerStarted;stdin_complete=$leadStdinComplete;automatic_retries=0}
+        if($leadReceipt){$failure.worker_private_receipt=$leadReceipt}
         if($card -and (Get-Command Save-ABLeadWorkerReceipt -ErrorAction SilentlyContinue)){
             try{Assert-PrivateDirectory;$failure.private_receipt=Save-ABLeadWorkerReceipt $privateDirectory $card.intent_id @{launcher_failure=$failure.Clone()}}catch{}
         }
